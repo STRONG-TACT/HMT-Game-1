@@ -893,9 +893,6 @@ MonoBehaviour:
   playerDiceNum: 0
   monsterNum: 
   combatUIPanel: {fileID: 0}
-  playerTxt: {fileID: 0}
-  enemyTxt: {fileID: 0}
-  resultTxt: {fileID: 0}
 --- !u!4 &419401961
 Transform:
   m_ObjectHideFlags: 0
@@ -1947,12 +1944,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a142a833c90126849a3d481f68c9ce4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameAssets: {fileID: 0}
   isGameStart: 0
+  isFinishedTutorial: 000000
   tilePrefabs: {fileID: 1558536664244524811, guid: cd49e41ee3569414d9f8ed137ff173e9, type: 3}
   turn: 0
-  MainPlayer: {fileID: 0}
+  mainPlayer: {fileID: 0}
   playerIDs: 
-  Goal: 0
+  goalCount: 0
   moveLeft: 0
 --- !u!114 &1087705000
 MonoBehaviour:
@@ -3919,6 +3918,63 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1001 &1920540797
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 8586804875866554796, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: m_RootOrder
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 8586804875866554796, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 562.796
+      objectReference: {fileID: 0}
+    - target: {fileID: 8586804875866554796, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 136.5347
+      objectReference: {fileID: 0}
+    - target: {fileID: 8586804875866554796, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.0009918213
+      objectReference: {fileID: 0}
+    - target: {fileID: 8586804875866554796, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8586804875866554796, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8586804875866554796, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8586804875866554796, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8586804875866554796, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8586804875866554796, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8586804875866554796, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8586804875866554802, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: m_Name
+      value: GameAssets
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
 --- !u!1 &1970481169
 GameObject:
   m_ObjectHideFlags: 0
@@ -4015,14 +4071,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adef74eb3bdf6114c8ae5ba6363a79a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alertMessage: {fileID: 0}
   unknownPinPrefab: {fileID: 5396355076399025377, guid: fff058a624480e241929e58ad51eaa28, type: 3}
   dangerPinPrefab: {fileID: 6282587997109624219, guid: 7a610df4d29701a49bcdf8deb4d67e84, type: 3}
   assistPinPrefab: {fileID: 5172976549118782620, guid: 2f21aa8de594b904f9076ab6ccd573a9, type: 3}
   omwPinPrefab: {fileID: 4189028818561207507, guid: 858f0d221a30a4c479db13184455a0cb, type: 3}
-  pinWheel: {fileID: 0}
   pinIconPrefab: {fileID: 8488578663114726935, guid: 511f84a93bd2dc44d85e59e7f06d58d2, type: 3}
-  pinWindow: {fileID: 0}
   pinWheelBtnImg:
   - {fileID: 21300000, guid: fdd1cf4efbe9d674e9d5ecefa6977bb2, type: 3}
   - {fileID: 21300000, guid: 813841b338916e54c902dfc492947e5e, type: 3}

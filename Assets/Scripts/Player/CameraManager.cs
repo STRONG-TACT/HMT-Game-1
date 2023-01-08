@@ -44,7 +44,7 @@ public class CameraManager : MonoBehaviour
             }
         }
 
-        targetPlayer = GameManager.instance.MainPlayer.transform;
+        targetPlayer = GameManager.instance.mainPlayer.transform;
         cameraOffset = MainCamera.transform.position - targetPlayer.transform.position;
     }
 

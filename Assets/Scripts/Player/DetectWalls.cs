@@ -32,7 +32,7 @@ public class DetectWalls : MonoBehaviour
         {
             dir = 3;
         }
-        player = GameManager.instance.MainPlayer;
+        player = GameManager.instance.mainPlayer;
     }
 
     // Update is called once per frame

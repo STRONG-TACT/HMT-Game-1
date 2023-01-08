@@ -3,10 +3,12 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
 using Photon.Pun;
+using TMPro;
 
 public class CombatSystem : MonoBehaviour
 {
     public static CombatSystem instance;
+    private GameAssets gameAssets;
 
     [HideInInspector] public GameObject mainPlayer;
     [HideInInspector] public GameObject enemy;
@@ -24,22 +26,18 @@ public class CombatSystem : MonoBehaviour
     PhotonView view;
 
     // UI
-    public GameObject combatUIPanel;
-    public Text playerTxt;
-    public Text enemyTxt;
-    public Text resultTxt;
+    [HideInInspector] public GameObject combatUIPanel;
+    TextMeshProUGUI resultTxt;
 
     void Start()
     {
         combatUIPanel = GameObject.Find("UI").transform.GetChild(6).gameObject;
-        enemyTxt = combatUIPanel.GetComponentsInChildren<Text>(true)[0];
-        playerTxt = combatUIPanel.GetComponentsInChildren<Text>(true)[1];
-        resultTxt = combatUIPanel.GetComponentsInChildren<Text>(true)[2];
+        resultTxt = combatUIPanel.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
         instance = this;
         playerDiceNum = 0;
         isInFight = false;
         fightEnd = false;
-        mainPlayer = GameManager.instance.MainPlayer;
+        mainPlayer = GameManager.instance.mainPlayer;
         view = GetComponent<PhotonView>();
         MonsterFightCount = 0;
     }
@@ -50,12 +48,10 @@ public class CombatSystem : MonoBehaviour
         {
             if (playerInFight == mainPlayer)
             {
-                combatUIPanel.SetActive(true);
-                ShowPanel();
+                ShowDiceImg();
                 if (fightEnd) // show the result for 2 sec
                 {
                     fightEnd = false;
-                    Debug.Log("FightEnd" + fightEnd);
                     if (fightType == 0)
                     {
                         StartCoroutine(RockFightEnd());
@@ -75,8 +71,8 @@ public class CombatSystem : MonoBehaviour
 
     public void StartFight(GameObject obj, int i, GameObject playerObj)
     {
+        //Debug.Log("StartFight");
         playerInFight = playerObj;
-        Debug.Log("StartFight");
         fightType = i;
         enemy = obj;
         if (playerInFight == mainPlayer)
@@ -90,29 +86,47 @@ public class CombatSystem : MonoBehaviour
             enemy.GetComponent<Animator>().SetBool("Attack", true);
             enemy.GetComponent<Animator>().SetBool("Idle", false);
         }
+
+        ShowPanel();
     }
     private void ShowPanel()
     {
-        playerTxt.text = "Player Dice: " + instance.playerDiceNum.ToString();
-        if (fightType == 0)
+        Image CombatUIImg = combatUIPanel.transform.GetChild(0).GetComponent<Image>();
+
+        if (fightType == 0) // rock fight
         {
-            enemyTxt.text = "Roll > 5 to move rock";
+            CombatUIImg.sprite = gameAssets.rockCombatUI;
         }
-        else if (fightType == 1)
+        else if (fightType == 1) // trap fight
         {
-            enemyTxt.text = "Roll < 3 to dstroy the trap";
+            CombatUIImg.sprite = gameAssets.trapCombatUI;
         }
-        else
+        else // monster fight
         {
-            string txt = "Monster:";
+            CombatUIImg.sprite = gameAssets.monsterCombatUI;
+            TextMeshProUGUI monsterNumberTxt = combatUIPanel.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
+            string txt = "";
             for (int i = 0; i < monsterNum.Length; i++)
             {
                 txt = txt + monsterNum[i].ToString() + " ";
             }
-            enemyTxt.text = txt;
+            monsterNumberTxt.text = txt;
         }
-
+        combatUIPanel.SetActive(true);
     }
+    private void ShowDiceImg()
+    {
+        Image diceImg = GameObject.Find("DiceImgs").transform.GetChild(fightType).gameObject.GetComponent<Image>();
+        diceImg.sprite = gameAssets.diceImg[playerDiceNum - 1];
+        diceImg.gameObject.SetActive(true);
+    }
+
+    private void CloseDiceImg()
+    {
+        Image diceImg = GameObject.Find("DiceImgs").transform.GetChild(fightType).gameObject.GetComponent<Image>();
+        diceImg.gameObject.SetActive(false);
+    }
+
     private IEnumerator RockFightEnd()
     {
         if (playerDiceNum >= 5) //win
@@ -179,6 +193,8 @@ public class CombatSystem : MonoBehaviour
 
     private void EndGame()
     {
+        TextMeshProUGUI resultTxt = combatUIPanel.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
+        CloseDiceImg();
         resultTxt.text = "";
         combatUIPanel.SetActive(false);
         playerDiceNum = 0;
@@ -207,14 +223,13 @@ public class CombatSystem : MonoBehaviour
             }
         }
         isInFight = false;
-        Debug.Log("FightEnd : win");
+        //Debug.Log("FightEnd : win");
     }
     [PunRPC]
     public void FightLose()
     {
         playerInFight.GetComponent<Player>().movePoint.position = playerInFight.GetComponent<Player>().prevMovePointPos;
         isInFight = false;
-        Debug.Log("FightEnd : Lose");
-        //win
+        //Debug.Log("FightEnd : Lose");
     }
 }

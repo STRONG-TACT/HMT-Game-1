@@ -35,7 +35,7 @@ public class SpawnPlayer : MonoBehaviour
         GameManager.instance.CallAddPlayerID(PhotonNetwork.LocalPlayer.ActorNumber, newPlayer.GetPhotonView().ViewID);
 
         // Set mainplayer to the game
-        GameManager.instance.MainPlayer = newPlayer;
+        GameManager.instance.mainPlayer = newPlayer;
 
         // Set Mask on/off
         SetMask();
@@ -64,8 +64,8 @@ public class SpawnPlayer : MonoBehaviour
     {
         if (gameData.maskOn)
         {
-            GameManager.instance.MainPlayer.transform.GetChild(3).gameObject.SetActive(true); //open vision Mask
+            GameManager.instance.mainPlayer.transform.GetChild(3).gameObject.SetActive(true); //open vision Mask
         }
-        GameManager.instance.MainPlayer.transform.GetChild(6).gameObject.SetActive(false); //close shared Mask
+        GameManager.instance.mainPlayer.transform.GetChild(6).gameObject.SetActive(false); //close shared Mask
     }
 }

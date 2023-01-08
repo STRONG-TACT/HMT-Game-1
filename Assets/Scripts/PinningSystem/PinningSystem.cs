@@ -75,7 +75,7 @@ public class PinningSystem : MonoBehaviour
 
     void Update()
     {
-        Player = GameManager.instance.MainPlayer.transform;
+        Player = GameManager.instance.mainPlayer.transform;
         if (Input.GetMouseButtonDown(0)){
             //Debug.Log("mouse clicked + " + Input.mousePosition);
 

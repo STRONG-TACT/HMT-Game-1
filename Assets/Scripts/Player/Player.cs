@@ -120,7 +120,7 @@ public class Player : MonoBehaviour
             {
                 if (Input.GetAxisRaw("Vertical") < 0 && movable[3])  // back
                 {
-                    movePoint.position += new Vector3(0f, 0f, Input.GetAxisRaw("Vertical") * 3 - 0.2f);
+                    movePoint.position += new Vector3(0f, 0f, Input.GetAxisRaw("Vertical") * 3 - gameData.tileGapLength);
                     if (this.transform.GetChild(0).rotation != Quaternion.Euler(0, 180, 0)) //rotate
                     {
                         this.transform.GetChild(0).rotation = Quaternion.Euler(0, 180, 0);
@@ -129,7 +129,7 @@ public class Player : MonoBehaviour
                 }
                 else if (Input.GetAxisRaw("Vertical") > 0 && movable[2])  // front
                 {
-                    movePoint.position += new Vector3(0f, 0f, Input.GetAxisRaw("Vertical") * 3 + 0.2f);
+                    movePoint.position += new Vector3(0f, 0f, Input.GetAxisRaw("Vertical") * 3 + gameData.tileGapLength);
                     if (this.transform.GetChild(0).rotation != Quaternion.Euler(0, 0, 0)) //rotate
                     {
                         this.transform.GetChild(0).rotation = Quaternion.Euler(0, 0, 0);
@@ -160,7 +160,7 @@ public class Player : MonoBehaviour
             {
                 if (view.IsMine)
                 {
-                    GameManager.instance.CallGoalCount();
+                    GameManager.instance.CallGoalCount(PhotonNetwork.LocalPlayer.ActorNumber);
                 }
 
                 if (PhotonNetwork.IsMasterClient)
@@ -173,7 +173,7 @@ public class Player : MonoBehaviour
         if (col.gameObject.CompareTag("Door"))
         {
             //Debug.Log("Triggered Door");
-            if (view.IsMine && GameManager.instance.Goal == 3)  //After collect all the goal, the door can be stepped and end game
+            if (view.IsMine && GameManager.instance.goalCount == 3)  //After collect all the goal, the door can be stepped and end game
             {
                 GameManager.instance.CallNextLevel();
             }

@@ -10,20 +10,22 @@ public class GameManager : MonoBehaviour
     public static GameManager instance = null;
     private PhotonView photonView;
     private GameData gameData;
+    public GameAssets gameAssets;
+
     public bool isGameStart;
     public bool[] isFinishedTutorial = new bool[3] { false, false, false };
 
     public GameObject tilePrefabs;
 
     // UI
-    private Text turnIndicatorText;
-    private Text goalIndicatorText;
-    private Text actionCountTxt;
+    private GameObject turnIndicator;
+    private GameObject actionUI;
+    private GameObject goalUI;
 
     [HideInInspector] public int turn; // Indicate which player's turn
-    public GameObject MainPlayer; 
+    public GameObject mainPlayer; 
     [HideInInspector] public List<int> playerIDs = new List<int>(); // All the players' Photon ViewID
-    [HideInInspector] public int Goal; // Goal collected, shown on the UI
+    [HideInInspector] public int goalCount; // Goal collected, shown on the UI
     [HideInInspector] public int moveLeft; // Player's remaining moves, shown on the UI
 
     /*    public GameObject Player1Items;
@@ -37,6 +39,7 @@ public class GameManager : MonoBehaviour
         playerIDs.Add(0);
         playerIDs.Add(0);
         gameData = FindObjectOfType<GameData>();
+        gameAssets = FindObjectOfType<GameAssets>();
 
         if (gameData.gameLevel == 1)
         {
@@ -49,21 +52,23 @@ public class GameManager : MonoBehaviour
     }
     private void Start()
     {
-        //Debug.Log(GameObject.Find("UI").name);
-        turnIndicatorText = GameObject.Find("UI").GetComponentsInChildren<Text>(true)[0]; 
-        goalIndicatorText = GameObject.Find("GoalCountNum").GetComponent<Text>();
-        actionCountTxt = GameObject.Find("UI").GetComponentsInChildren<Text>(true)[1];
+        turnIndicator = GameObject.Find("UI").transform.GetChild(0).gameObject;
+        actionUI = GameObject.Find("UI").transform.GetChild(1).gameObject;
+        goalUI = GameObject.Find("UI").transform.GetChild(2).gameObject;
+
         
-        //Debug.Log(turnIndicatorText.text);
         turn = 1; // Player 1 goes first
         photonView = GetComponent<PhotonView>();
 
-        if (isGameStart)
+        if (isGameStart) //Start game in the levels that does not have tutorial
         {
             GameObject.Find("WaitForPlayerTxt").SetActive(false);
-            turnIndicatorText.gameObject.SetActive(true);
-            actionCountTxt.gameObject.SetActive(true);
-            ChangeTurnIndicatorText();
+            turnIndicator.SetActive(true);
+            actionUI.SetActive(true);
+            goalUI.SetActive(true);
+            ChangeActionUI();
+            ChangeTurnIndicator();
+            //ChangeTurnIndicator();
         }
 
         if (SceneManager.GetActiveScene().name == "Level_5")
@@ -80,8 +85,6 @@ public class GameManager : MonoBehaviour
             //Debug.Log("Change Turn");
             CallChangeTurn();
         }
-        actionCountTxt.text = "Action Left: " + moveLeft.ToString();
-        goalIndicatorText.text = Goal.ToString();
     }
 
     public void CallStartGame()
@@ -98,9 +101,9 @@ public class GameManager : MonoBehaviour
     {
         photonView.RPC("ChangeTurn", RpcTarget.All);
     }
-    public void CallGoalCount()
+    public void CallGoalCount(int playerGetGoal)
     {
-        photonView.RPC("GoalCount", RpcTarget.All);
+        photonView.RPC("GoalCount", RpcTarget.All, playerGetGoal);
     }
     public void CallMoveLeft(int num)
     {
@@ -139,36 +142,70 @@ public class GameManager : MonoBehaviour
             turn += 1;
         }
 
-        ChangeTurnIndicatorText();
+        ChangeTurnIndicator();
     }
 
-    private void ChangeTurnIndicatorText()
+    private void ChangeTurnIndicator()
     {
-        if (instance.turn == PhotonNetwork.LocalPlayer.ActorNumber) 
+        /*        if (instance.turn == PhotonNetwork.LocalPlayer.ActorNumber) 
+                {
+                    turnIndicatorText.text = "Your turn";
+                }*/
+        Image characterIcon = GameObject.Find("CharactorIcon").GetComponent<Image>();
+        if (turn == 1)
         {
-            turnIndicatorText.text = "Your turn";
-        }
-        else if (turn == 1)
-        {
-            turnIndicatorText.text = "Player1's turn";
+            characterIcon.sprite = gameAssets.dwarfIcon;
         }
         else if (turn == 2)
         {
-            turnIndicatorText.text = "Player2's turn";
+            characterIcon.sprite = gameAssets.giantIcon;
         }
         else if (turn == 3)
         {
-            turnIndicatorText.text = "Player3's turn";
+            characterIcon.sprite = gameAssets.humanIcon;
         }
+    }
+
+    private void ChangeActionUI()
+    {
+        GameObject actionIcons = GameObject.Find("ActionIcons");
+        for (int i = 0; i < 6; i++)
+        {
+            if (i < moveLeft) 
+                actionIcons.transform.GetChild(i).gameObject.SetActive(true);
+            else 
+                actionIcons.transform.GetChild(i).gameObject.SetActive(false);
+        }
+    }
+    private void ChangeGoalUI(string player)
+    {
+        GameObject goalIcons;
+        if (player == "dwarf")
+        {
+            goalIcons = GameObject.Find("GoalDwarf");
+        }
+        else if (player == "giant")
+        {
+            goalIcons = GameObject.Find("GoalGiant");
+        }
+        else 
+        {
+            goalIcons = GameObject.Find("GoalHuman");
+        }
+
+        Color newColor = goalIcons.GetComponent<Image>().color;
+        newColor.a = 1f;
+        goalIcons.GetComponent<Image>().color = newColor;
     }
 
     [PunRPC]
     public void StartGame()
     {
         GameObject.Find("WaitForPlayerTxt").SetActive(false);
-        turnIndicatorText.gameObject.SetActive(true);
-        actionCountTxt.gameObject.SetActive(true);
-        ChangeTurnIndicatorText();
+        turnIndicator.SetActive(true);
+        actionUI.SetActive(true);
+        ChangeActionUI();
+        ChangeTurnIndicator();
         isGameStart = true;
     }
     [PunRPC]
@@ -183,15 +220,30 @@ public class GameManager : MonoBehaviour
     }
 
     [PunRPC]
-    public void GoalCount()
+    public void GoalCount(int playerGetGoalNum)
     {
-        Goal++;
+        string playerGetGoal;
+        if (playerGetGoalNum == 1)
+        {
+            playerGetGoal = "dwarf";
+        }
+        else if (playerGetGoalNum == 2)
+        {
+            playerGetGoal = "giant";
+        }
+        else
+        {
+            playerGetGoal = "human";
+        }
+        ChangeGoalUI(playerGetGoal);
+        goalCount++;
     }
 
     [PunRPC]
     public void MoveLeft(int num)
     {
         moveLeft = num;
+        ChangeActionUI();
     }
 
     [PunRPC]
