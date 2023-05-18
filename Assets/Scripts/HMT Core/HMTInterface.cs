@@ -168,7 +168,7 @@ namespace HMT {
         public abstract string GetState(bool formated = false);
 
         /// <summary>
-        /// Exectutes a player action on behalf of the agent.
+        /// Exectutes a character action on behalf of the agent.
         /// 
         /// This is mostly a stub for now since actions will probalby require more than a single string for context.
         /// </summary>

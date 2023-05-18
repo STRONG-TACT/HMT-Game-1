@@ -24,7 +24,7 @@ public class PinWindow : MonoBehaviour
 
     public void AddPing(Vector3 position, int iconType)
     {
-        //Transform pingUITransform = Instantiate(PinIconPrefab.transform, instance.transform);
+        //Transform pingUITransform = Instantiate(PinIconPrefab.transform, Instance.transform);
         PingUIObj = PhotonNetwork.Instantiate(PinIconPrefab.name, instance.transform.position, Quaternion.identity);
         CallPingUISetUp(position, PingUIObj.GetPhotonView().ViewID, iconType);
     }

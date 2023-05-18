@@ -3,58 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class DetectWalls : MonoBehaviour
-{
-    [HideInInspector] public GameObject player;
-    private int dir;
-    PhotonView view;
+public class DetectWalls : MonoBehaviour {
+    Character character;
+    public Character.Direction direction;
+    //private int dir;
 
-    // Start is called before the first frame update
-    void Awake()
-    {
-        view = this.transform.parent.parent.GetComponent<PhotonView>();
-    }
-    void Start()
-    {
-        if (this.name == "left")
-        {
-            dir = 0;
-        }
-        else if (this.name == "right")
-        {
-            dir = 1;
-        }
-        else if (this.name == "front")
-        {
-            dir = 2;
-        }
-        else if (this.name == "back")
-        {
-            dir = 3;
-        }
-        player = GameManager.instance.mainPlayer;
+
+    void Start() {
+        character = transform.parent.parent.GetComponent<Character>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    void OnTriggerEnter(Collider col)
-    {
-        if (view.IsMine && col.CompareTag("Walls"))
-        {
+    void OnTriggerEnter(Collider col) {
+        if (col.CompareTag("Walls")) {
             //Debug.Log("Triggered walls " + dir);
-            player.GetComponent<Player>().movable[dir] = false;
+            character.movable[direction] = false;
         }
     }
-    void OnTriggerExit(Collider col)
-    {
-        if (view.IsMine && col.CompareTag("Walls"))
-        {
-            Debug.Log("Triggered walls Exit " + dir);
-            player.GetComponent<Player>().movable[dir] = true;
+    void OnTriggerExit(Collider col) {
+        if (col.CompareTag("Walls")) {
+            //Debug.Log("Triggered walls Exit " + direction);
+            character.movable[direction] = true;
         }
     }
 

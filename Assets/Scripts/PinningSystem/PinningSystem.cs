@@ -16,7 +16,7 @@ public class PinningSystem : MonoBehaviour
     private RaycastHit hit;
 
     private float maxVisionDistance;
-    private float pinDistance; // pin and player distance
+    private float pinDistance; // pin and character distance
 
     private Vector3 pinPosition;
     private bool isPinned;
@@ -75,7 +75,7 @@ public class PinningSystem : MonoBehaviour
 
     void Update()
     {
-        Player = GameManager.instance.mainPlayer.transform;
+        Player = GameManager.Instance.mainPlayer.transform;
         if (Input.GetMouseButtonDown(0)){
             //Debug.Log("mouse clicked + " + Input.mousePosition);
 
@@ -141,8 +141,8 @@ public class PinningSystem : MonoBehaviour
         GameObject pinObj;
         GameObject pinUIObj;
         pinObj = PhotonNetwork.Instantiate(pinPrefab.name, pinPosition, Quaternion.Euler(0, 180, 0));
-        //PinWindow.instance.AddPing(new Vector3(hit.transform.position.x, 0, hit.transform.position.z), 1);
-        pinUIObj = AddPinUI(pinPosition, iconType, PhotonNetwork.LocalPlayer.ActorNumber-1); // Actor num starts from 1, List index start from 0
+        //PinWindow.Instance.AddPing(new Vector3(hit.transform.position.x, 0, hit.transform.position.z), 1);
+        pinUIObj = AddPinUI(pinPosition, iconType, PhotonNetwork.LocalPlayer.ActorNumber-1); // Actor targetValues starts from 1, List index start from 0
         AddPinToList(pinObj.GetPhotonView().ViewID, pinUIObj.GetPhotonView().ViewID);
         Cancel();
     }
@@ -164,7 +164,7 @@ public class PinningSystem : MonoBehaviour
         alertMessage.gameObject.SetActive(false);
     }
 
-    // Pin amount control: Each player can only has 3 pins
+    // Pin amount control: Each character can only has 3 pins
     private void AddPinToList(int _pinObjId, int _pinUIId)
     {
         Pin newPin = new Pin();
@@ -206,7 +206,7 @@ public class PinningSystem : MonoBehaviour
     }
 
     [PunRPC]
-    public void PingUISetUp(Vector3 position, int pingUIID, int iconType, int playerNum)  // use pin viewID to set up pin positions in other player's game
+    public void PingUISetUp(Vector3 position, int pingUIID, int iconType, int playerNum)  // use pin viewID to set up pin positions in other character's game
     {
         //Debug.Log("PingUISetUpCalled " + position + " " + "ID: " + "pingUIID");
         Transform pinUITransform;

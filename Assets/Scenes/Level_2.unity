@@ -468,6 +468,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.data[1]
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.data[2]
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 1023968545885977171, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
       propertyPath: sceneViewId
       value: 6
@@ -1175,7 +1191,7 @@ MonoBehaviour:
   mainPlayer: {fileID: 0}
   playerIDs: 
   goalCount: 0
-  moveLeft: 0
+  actionPoints: 0
 --- !u!114 &982793478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1205,27 +1221,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameLevel: 2
-  dwarfMovecount: 2
-  giantMovecount: 2
-  humanMovecount: 2
-  dwarfSettings:
-    name: Dwarf
+  characters:
+  - name: Dwarf
+    type: 1
     movement: 2
-    sightRange: 10
+    sightRange: 2
     cameraPosition: {x: 0, y: 0, z: 0}
     dieFaces: 010000000100000002000000020000000300000003000000
-  giantSettings:
-    name: Giant
+  - name: Giant
+    type: 2
     movement: 2
-    sightRange: 10
+    sightRange: 2
     cameraPosition: {x: 0, y: 0, z: 0}
     dieFaces: 040000000400000005000000050000000600000006000000
-  humanSettings:
-    name: Human
+  - name: Human
+    type: 0
     movement: 2
-    sightRange: 10
+    sightRange: 2
     cameraPosition: {x: 0, y: 0, z: 0}
     dieFaces: 010000000200000003000000040000000500000006000000
+  characterMapping: 000000000100000002000000
   maskOn: 0
   tileSize: 3
   tileGapLength: 0.43
@@ -1489,6 +1504,22 @@ PrefabInstance:
     - target: {fileID: 702390614520077751, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.data[1]
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.data[2]
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1023968545885977171, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
       propertyPath: sceneViewId
@@ -2122,6 +2153,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.data[0]
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.data[1]
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.data[2]
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 1023968545885977171, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
       propertyPath: sceneViewId
       value: 10
@@ -2338,6 +2385,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 776863360}
     m_Modifications:
+    - target: {fileID: 4185061564047081532, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
+      propertyPath: targetValues.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4185061564047081532, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
+      propertyPath: targetValues.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4185061564047081532, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
+      propertyPath: targetValues.Array.data[1]
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8288587600597579001, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
       propertyPath: sceneViewId
       value: 5

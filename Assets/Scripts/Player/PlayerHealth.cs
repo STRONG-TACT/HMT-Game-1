@@ -23,7 +23,7 @@ public class PlayerHealth : MonoBehaviour
     {
         if (health == 0)
         {
-            GameManager.instance.CallEndGame();
+            GameManager.Instance.CallEndGame();
         }
     }
     public int Gethealth()

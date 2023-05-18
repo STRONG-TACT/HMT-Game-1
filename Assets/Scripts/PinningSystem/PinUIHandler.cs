@@ -6,7 +6,7 @@ using Photon.Pun;
 
 public class PinUIHandler : MonoBehaviour
 {
-    public int playerPinnedIndex; // Player that made this pin
+    public int playerPinnedIndex; // Character that made this pin
     public int IconType; // 0: danger, 1: Assist, 2: OMW, 3: Unknown, 4: location
     public Sprite[] pinIcons = new Sprite[5]; // 0: danger, 1: Assist, 2: OMW, 3: Unknown, 4: location
 
@@ -32,7 +32,7 @@ public class PinUIHandler : MonoBehaviour
         IconType = iconType;
         this.pingPosition = pingPosition;
         rectTransform = transform.GetComponent<RectTransform>();
-        Player = GameManager.instance.mainPlayer.transform;
+        Player = GameManager.Instance.mainPlayer.transform;
 
         if (PhotonNetwork.LocalPlayer.ActorNumber == 1)
         {
@@ -46,7 +46,7 @@ public class PinUIHandler : MonoBehaviour
         {
             VisionDistance = (gameData.tileSize + gameData.tileGapLength) * 3 * Mathf.Sqrt(2) + 0.5f;
         }
-        //Debug.Log("Setup: " + pingPosition + " Player: " + Player);
+        //Debug.Log("Setup: " + pingPosition + " Character: " + Character);
     }
 
     private void Update()
@@ -68,7 +68,7 @@ public class PinUIHandler : MonoBehaviour
             Vector3 cameraViewPos = Camera.main.transform.position - cameraOffset;
             Vector3 fromPosition = new Vector3(cameraViewPos.x, cameraViewPos.z, 0);
             Vector3 dir = (new Vector3(pingPosition.x, pingPosition.z, 0) - fromPosition).normalized;
-            //Vector3 fromPosition = new Vector3(Player.position.x, Player.position.z, 0);
+            //Vector3 fromPosition = new Vector3(Character.position.x, Character.position.z, 0);
             //Vector3 dir = (new Vector3(pingPosition.x, pingPosition.z, 0) - fromPosition).normalized;
             float uiRadius = 250f;
             rectTransform.anchoredPosition = dir * uiRadius;

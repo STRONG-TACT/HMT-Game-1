@@ -10,7 +10,7 @@ public class SpawnPlayer : MonoBehaviour
     public GameObject GiantPlayer;
     public GameObject HumanPlayer;
 
-    [HideInInspector] public GameObject newPlayer;
+    //[HideInInspector] public Character newPlayer;
 
     private Vector3 dwarfIniPosistion;
     private Vector3 giantIniPosistion;
@@ -23,49 +23,69 @@ public class SpawnPlayer : MonoBehaviour
         //Debug.Log(PhotonNetwork.LocalPlayer.ActorNumber);
         gameData = FindObjectOfType<GameData>();
 
-        // Initialize each player's position
+        // Initialize each character's position
         dwarfIniPosistion = GameObject.Find("DwarfIniPos").transform.position;
         giantIniPosistion = GameObject.Find("GiantIniPos").transform.position;
         humanIniPosistion = GameObject.Find("HumanIniPos").transform.position;
 
-        // Spawn Player
-        SpawnPlayerPrefab();
+        // Spawn Character
+        Character newPlayer =  SpawnPlayerPrefab();
 
-        // Call PunRPC for adding player's Photon viewID to the List
-        GameManager.instance.CallAddPlayerID(PhotonNetwork.LocalPlayer.ActorNumber, newPlayer.GetPhotonView().ViewID);
+        // Call PunRPC for adding character's Photon viewID to the List
+        GameManager.Instance.CallAddPlayerID(PhotonNetwork.LocalPlayer.ActorNumber, newPlayer.gameObject.GetPhotonView().ViewID);
 
         // Set mainplayer to the game
-        GameManager.instance.mainPlayer = newPlayer;
+        GameManager.Instance.mainPlayer = newPlayer;
 
         // Set Mask on/off
         SetMask();
     }
 
-    private void SpawnPlayerPrefab()
+    private Character SpawnPlayerPrefab()
     {
-        if (PhotonNetwork.LocalPlayer.ActorNumber == 1) // First person that join the game is Dwarf Player
+
+        GameData.CharacterConfig config = gameData.GetCharacter(PhotonNetwork.LocalPlayer.ActorNumber);
+        Character newPlayer;
+        GameObject instantiatedPrefab = null;
+        switch (config.type) {
+            case GameData.CharacterType.Dwarf:
+                instantiatedPrefab = PhotonNetwork.Instantiate(DwarfPlayer.name, dwarfIniPosistion, Quaternion.identity);
+                break;
+            case GameData.CharacterType.Giant:
+                instantiatedPrefab = PhotonNetwork.Instantiate(GiantPlayer.name, giantIniPosistion, Quaternion.identity);
+                break;
+            case GameData.CharacterType.Human:
+                instantiatedPrefab = PhotonNetwork.Instantiate(HumanPlayer.name, humanIniPosistion, Quaternion.identity);
+                break;
+        }
+        newPlayer = instantiatedPrefab.GetComponent<Character>();
+        newPlayer.config = config;
+        return newPlayer;
+/*
+
+        if (PhotonNetwork.LocalPlayer.ActorNumber == 1) // First person that join the game is Dwarf Character
         {
             newPlayer = PhotonNetwork.Instantiate(DwarfPlayer.name, dwarfIniPosistion, Quaternion.identity);
-            newPlayer.GetComponent<Player>().config = gameData.dwarfSettings;
+            newPlayer.GetComponent<Character>().config = gameData.dwarfSettings;
         }
-        else if (PhotonNetwork.LocalPlayer.ActorNumber == 2) // Second person that join the game is Giant Player
+        else if (PhotonNetwork.LocalPlayer.ActorNumber == 2) // Second person that join the game is Giant Character
         {
             newPlayer = PhotonNetwork.Instantiate(GiantPlayer.name, giantIniPosistion, Quaternion.identity);
-            newPlayer.GetComponent<Player>().config = gameData.giantSettings;
+            newPlayer.GetComponent<Character>().config = gameData.giantSettings;
         }
-        else if (PhotonNetwork.LocalPlayer.ActorNumber == 3) // Third person that join the game is Human Player
+        else if (PhotonNetwork.LocalPlayer.ActorNumber == 3) // Third person that join the game is Human Character
         {
             newPlayer = PhotonNetwork.Instantiate(HumanPlayer.name, humanIniPosistion, Quaternion.identity);
-            newPlayer.GetComponent<Player>().config = gameData.humanSettings;
-        }
+            newPlayer.GetComponent<Character>().config = gameData.humanSettings;
+        }*/
     }
 
     private void SetMask()
     {
         if (gameData.maskOn)
         {
-            GameManager.instance.mainPlayer.transform.GetChild(3).gameObject.SetActive(true); //open vision Mask
+            GameManager.Instance.mainPlayer.transform.GetChild(3).gameObject.SetActive(true); //open vision Mask
         }
-        GameManager.instance.mainPlayer.transform.GetChild(6).gameObject.SetActive(false); //close shared Mask
+        GameManager.Instance.mainPlayer.transform.GetChild(6).gameObject.SetActive(false); //close shared Mask
     }
 }

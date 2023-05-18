@@ -38,8 +38,8 @@ public class DiceSideCheck : MonoBehaviour
                     GiantDiceCheck(col.gameObject);
                 }
                 diceRolled = true;
-                CombatSystem.instance.fightEnd = true;
-                CombatSystem.instance.playerDiceNum = diceNum;
+                CombatSystem.Instance.fightEnd = true;
+                CombatSystem.Instance.playerDiceNum = diceNum;
             }
         }
     }

@@ -20,7 +20,7 @@ public class Game1Interface : HMTInterface {
     GameObject[] traps;
     GameObject[] goals;
     GameObject[] walls;
-    Player[] players;
+    Character[] characters;
     GameObject door;
 
 
@@ -65,7 +65,7 @@ public class Game1Interface : HMTInterface {
         goals = GameObject.FindGameObjectsWithTag("Goal");
         door = GameObject.FindGameObjectWithTag("Door");
         walls = GameObject.FindGameObjectsWithTag("Walls");
-        players = FindObjectsOfType<Player>();
+        characters = FindObjectsOfType<Character>();
         var manager = GameObject.Find("GameManager");
         gameManager = manager != null ? manager.GetComponent<GameManager>() : null;
         gameData = manager != null ? manager.GetComponent<GameData>() : null;
@@ -73,7 +73,7 @@ public class Game1Interface : HMTInterface {
         Debug.LogFormat("FindKeyObjects found {0} Doors, {1} Goals, {2} Players, {3} Walls, {4} Monsters, {5} Traps, {6} Stones",
             door == null ? 0 : 1,
             goals.Length,
-            players.Length,
+            characters.Length,
             walls.Length,
             monsters.Length,
             traps.Length,
@@ -108,16 +108,21 @@ public class Game1Interface : HMTInterface {
         var boardHeight = upperRight.z - lowerLeft.z;
     }
 
+    /*
+     * TODO: Add an "Action_in_progess" flag to the state
+     * 
+     */ 
+
     public override string GetState(bool formated) {
 
         if (door == null) {
             return "No Door Found, probably not in a scene or currently transitioning";
         }
         else {
-            if(players.Length ==0) {
+            if(characters.Length ==0) {
                 FindKeyObjects();
             }
-            if(players.Length == 0) {
+            if(characters.Length == 0) {
                 return "Found No Players, probably not in a scene or currently transitioning";
             }
         }
@@ -143,7 +148,7 @@ public class Game1Interface : HMTInterface {
             {"gridWidth",  Mathf.CeilToInt((boardWidth - gameData.tileGapLength) / (gameData.tileSize + gameData.tileGapLength))},
             {"gridHeight", Mathf.CeilToInt((boardHeight- gameData.tileGapLength) / (gameData.tileSize + gameData.tileGapLength))},
             {"level", gameData.gameLevel },
-            {"currentPlayer", GameManager.instance.turn },
+            {"currentPlayer", GameManager.Instance.turn },
             {"localPlayerId", PhotonNetwork.LocalPlayer.ActorNumber },
         };
 
@@ -171,24 +176,24 @@ public class Game1Interface : HMTInterface {
         }
 
         //CHARACTERS
-        foreach(Player player in players) {
-            if(player == null) { continue;  }
-            pos = WorldPointToGridPosition(player.transform.position, gameData.tileSize, gameData.tileGapLength, lowerLeft);
-            var role = player.name[0] switch {
+        foreach(Character character in characters) {
+            if(character == null) { continue;  }
+            pos = WorldPointToGridPosition(character.transform.position, gameData.tileSize, gameData.tileGapLength, lowerLeft);
+            var role = character.name[0] switch {
                 'D' => "drawf",
                 'G' => "giant",
                 'H' => "human",
                 _ => "UNKOWN"
             };
-            PlayerHealth health = player.GetComponent<PlayerHealth>();
+            PlayerHealth health = character.GetComponent<PlayerHealth>();
             scene.Add(new JObject {
-                {"name", player.name },
-                {"controllingPlayerId", player.playerId },
+                {"name", character.name },
+                {"controllingPlayerId", character.playerId },
                 {"type", role},
-                {"moveCount", player.moveCount },
-                {"movementRange", player.config.movement },
-                {"sightRange", player.config.sightRange },
-                {"dieFaces", new JArray(player.config.dieFaces) },
+                {"moveCount", character.moveCount },
+                {"movementRange", character.config.movement },
+                {"sightRange", character.config.sightRange },
+                {"dieFaces", new JArray(character.config.dieFaces) },
                 {"health", health.heart.Length}
             });
         }
@@ -204,7 +209,7 @@ public class Game1Interface : HMTInterface {
                 {"name", mon.name },
                 {"type", "monster" },
                 {"monsterSize", mon.monsterType },
-                {"targets", new JArray(mon.num) },
+                {"targets", new JArray(mon.targetValues) },
                 {"x", pos.x },
                 {"y", pos.y }
             });

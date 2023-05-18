@@ -16,7 +16,7 @@ public class PinView : MonoBehaviour
     void Start()
     {
         //isTriggered = false;
-        playerId = GameManager.instance.playerIDs.IndexOf(this.transform.parent.gameObject.GetPhotonView().ViewID);
+        playerId = GameManager.Instance.playerIDs.IndexOf(this.transform.parent.gameObject.GetPhotonView().ViewID);
     }
 
     private void OnTriggerStay(Collider col)

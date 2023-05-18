@@ -4512,7 +4512,7 @@ MonoBehaviour:
   mainPlayer: {fileID: 0}
   playerIDs: 
   goalCount: 0
-  moveLeft: 0
+  actionPoints: 0
 --- !u!114 &2091787181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4542,27 +4542,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameLevel: 4
-  dwarfMovecount: 3
-  giantMovecount: 3
-  humanMovecount: 3
-  dwarfSettings:
-    name: Dwarf
-    movement: 2
-    sightRange: 10
-    cameraPosition: {x: 0, y: 0, z: 0}
+  characters:
+  - name: Dwarf
+    type: 1
+    movement: 6
+    sightRange: 1
+    cameraPosition: {x: 0, y: 9.67, z: -2.83}
     dieFaces: 010000000100000002000000020000000300000003000000
-  giantSettings:
-    name: Giant
+  - name: Giant
+    type: 2
     movement: 2
-    sightRange: 10
-    cameraPosition: {x: 0, y: 0, z: 0}
+    sightRange: 7
+    cameraPosition: {x: 3.43, y: 17.58, z: -6.5}
     dieFaces: 040000000400000005000000050000000600000006000000
-  humanSettings:
-    name: Human
-    movement: 2
-    sightRange: 10
-    cameraPosition: {x: 0, y: 0, z: 0}
+  - name: Human
+    type: 0
+    movement: 4
+    sightRange: 3
+    cameraPosition: {x: 0, y: 13.4, z: -7.8}
     dieFaces: 010000000200000003000000040000000500000006000000
+  characterMapping: 000000000100000002000000
   maskOn: 1
   tileSize: 3
   tileGapLength: 0.43

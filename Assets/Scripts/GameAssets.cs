@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
+/// <summary>
+/// This should probably be a scriptable Asset...
+/// </summary>
 public class GameAssets : MonoBehaviour
 {
     [Header("Combat UI Assets")]
@@ -16,5 +20,12 @@ public class GameAssets : MonoBehaviour
     public Sprite giantIcon;
     public Sprite humanIcon;
 
-
+    public Sprite GetCharacterIcon(GameData.CharacterType character) {
+        return character switch {
+            GameData.CharacterType.Dwarf => dwarfIcon,
+            GameData.CharacterType.Human => humanIcon,
+            GameData.CharacterType.Giant => giantIcon,
+            _ => null,
+        };
+    }
 }

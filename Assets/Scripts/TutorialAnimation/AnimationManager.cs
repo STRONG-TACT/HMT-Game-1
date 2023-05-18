@@ -90,7 +90,7 @@ public class AnimationManager : MonoBehaviour
 
         yield return new WaitForSeconds(4f);
         tutorial.SetActive(false);
-        GameManager.instance.CallEndTutorial();
+        GameManager.Instance.CallEndTutorial();
     }
 
     private IEnumerator FadeOut(Image img)
@@ -269,6 +269,6 @@ public class AnimationManager : MonoBehaviour
         //PhotonNetwork.LoadLevel("Level_1");
         StopCoroutine(coroutine);
         tutorial.SetActive(false);
-        GameManager.instance.CallEndTutorial();
+        GameManager.Instance.CallEndTutorial();
     }
 }

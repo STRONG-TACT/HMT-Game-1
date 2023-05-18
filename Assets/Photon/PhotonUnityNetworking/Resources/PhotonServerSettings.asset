@@ -53,6 +53,11 @@ MonoBehaviour:
   - LoadNextLevel
   - StartGame
   - EndTutorial
+  - UpdateActionPoints
+  - CallAddPlayerID
+  - CallAssignCharacter
+  - NextTurn
+  - AssignCharacter
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

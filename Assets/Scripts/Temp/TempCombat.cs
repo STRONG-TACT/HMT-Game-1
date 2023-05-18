@@ -63,13 +63,13 @@ public class TempCombat : MonoBehaviour
         player.transform.GetChild(3).gameObject.SetActive(true); // Dice Ground
         if (fightType == 2)
         {
-            monsterNum = instance.enemy.GetComponent<Monster>().num;
+            monsterNum = instance.enemy.GetComponent<Monster>().targetValues;
         }
         combatUIPanel.SetActive(true);
     }
     private void showPanel()
     {
-        playerTxt.text = "Player Dice: " + instance.playerDiceNum.ToString();
+        playerTxt.text = "Character Dice: " + instance.playerDiceNum.ToString();
         if (fightType == 0)
         {
             enemyTxt.text = "Roll > 5 to move rock";
