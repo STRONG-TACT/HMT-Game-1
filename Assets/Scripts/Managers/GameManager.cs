@@ -23,8 +23,8 @@ public class GameManager : MonoBehaviour {
     public GameObject tilePrefabs;
 
     [HideInInspector] public int turn; // Indicate which character's turn
-    public Character mainPlayer;
-    [HideInInspector] public List<int> playerIDs = new List<int>(); // All the characters' Photon ViewID
+    public Character mainCharacter;
+    //[HideInInspector] public List<int> playerIDs = new List<int>(); // All the characters' Photon ViewID
     [HideInInspector] public int goalCount; // Goal collected, shown on the UI
     [HideInInspector] public int currentActionPoints; // Character's remaining moves, shown on the UI
 
@@ -34,9 +34,9 @@ public class GameManager : MonoBehaviour {
 
     private void Awake() {
         Instance = this;
-        playerIDs.Add(0);
-        playerIDs.Add(0);
-        playerIDs.Add(0);
+        //playerIDs.Add(0);
+        //playerIDs.Add(0);
+        //playerIDs.Add(0);
         uiManager = FindObjectOfType<UIManager>();
         gameData = FindObjectOfType<GameData>();
         gameAssets = FindObjectOfType<GameAssets>();
@@ -49,14 +49,14 @@ public class GameManager : MonoBehaviour {
         }
     }
     private void Start() {
-        turn = 1; // Character 1 goes first
+        turn = 0; // Character 1 goes first
         photonView = GetComponent<PhotonView>();
 
         //Start game in the levels that does not have tutorial
         if (isFirstLevel) {
             uiManager.HideWaitingForPlayers();
             uiManager.InitGameUI();
-            uiManager.UpdateTurnIndicator(gameData.characters[turn].type);
+            uiManager.UpdateTurnIndicator(gameData.characterConfigs[turn].type);
             uiManager.UpdateActionPointsUI(currentActionPoints);
         }
 
@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour {
         uiManager.HideWaitingForPlayers();
         uiManager.InitGameUI();
         uiManager.UpdateActionPointsUI(currentActionPoints);
-        uiManager.UpdateTurnIndicator(gameData.characters[turn].type);
+        uiManager.UpdateTurnIndicator(gameData.characterConfigs[turn].type);
         isFirstLevel = true;
     }
 
@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour {
         turn++;
         turn %= 3;
 
-        uiManager.UpdateTurnIndicator(gameData.characters[turn].type);
+        uiManager.UpdateTurnIndicator(gameData.characterConfigs[turn].type);
     }
 
     public void CallGoalCount(int playerGetGoal) {
@@ -135,14 +135,15 @@ public class GameManager : MonoBehaviour {
         uiManager.UpdateActionPointsUI(currentActionPoints);
     }
 
-    public void CallAddPlayerID(int playerNum, int id) {
-        photonView.RPC("AddPlayerID", RpcTarget.All, playerNum, id);
-    }
+    //Add Player is now handled in the PlayerMapper
+    //public void CallAddPlayerID(int playerNum, int id) {
+    //    photonView.RPC("AddPlayerID", RpcTarget.All, playerNum, id);
+    //}
 
-    [PunRPC]
-    public void AddPlayerID(int playerNum, int id) {
-        playerIDs[playerNum - 1] = id;
-    }
+    //[PunRPC]
+    //public void AddPlayerID(int playerNum, int id) {
+    //    playerIDs[playerNum - 1] = id;
+    //}
 
     public void CallEndGame() {
         photonView.RPC("EndGame", RpcTarget.All);

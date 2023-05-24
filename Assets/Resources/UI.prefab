@@ -493,7 +493,7 @@ GameObject:
   m_Component:
   - component: {fileID: 447845980866214378}
   m_Layer: 5
-  m_Name: TurnIndicator
+  m_Name: TurnIndicatorPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -535,7 +535,7 @@ GameObject:
   - component: {fileID: 5907890589520832092}
   - component: {fileID: 8546444449116695054}
   m_Layer: 5
-  m_Name: CharactorIcon
+  m_Name: CharacterIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -608,7 +608,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1297491263668851622}
   m_Layer: 0
-  m_Name: CombatUI
+  m_Name: CombatPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2026,6 +2026,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6247692751839540502}
+  - component: {fileID: 3570762843824375902}
   - component: {fileID: 6247692751839540489}
   - component: {fileID: 6247692751839540488}
   - component: {fileID: 6247692751839540491}
@@ -2064,6 +2065,26 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &3570762843824375902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6247692751839540490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 284a7e148bbb20d40bad1677f3497bbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PinErrorPanel: {fileID: 6247692751569951237}
+  PinWindow: {fileID: 6247692750904709725}
+  WaitingForPlayersPanel: {fileID: 7077293913625099580}
+  TurnIndicatorPanel: {fileID: 2995330061783431216}
+  ActionPanel: {fileID: 8009378013068659303}
+  HealthPanel: {fileID: 6247692752299394057}
+  GoalPanel: {fileID: 4607379857397680031}
+  CombatUI: {fileID: 4116687956884308455}
 --- !u!223 &6247692751839540489
 Canvas:
   m_ObjectHideFlags: 0
@@ -2439,7 +2460,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6247692752299394070}
   m_Layer: 5
-  m_Name: Health
+  m_Name: HealthPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3308,7 +3329,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4638456535653834663}
   m_Layer: 0
-  m_Name: Action
+  m_Name: ActionPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

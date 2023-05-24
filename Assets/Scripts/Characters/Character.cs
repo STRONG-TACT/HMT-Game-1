@@ -19,14 +19,12 @@ public class Character : MonoBehaviour {
     PhotonView photonView;
 
     public float speed;
-    public Transform movePoint;
-    public Vector3 prevMovePointPos;
-    public Dictionary<Direction, bool> movable;
+    private Vector3 movePoint;
+    private Vector3 prevMovePointPos;
 
     public int playerId;
 
     private CharacterState characterState;
-
 
     public CharacterState State {
         get { return characterState; }
@@ -55,11 +53,11 @@ public class Character : MonoBehaviour {
     }
     //public bool[] movable; // detecting walls. index 0: left, 1: right, 2: front, 3: back 
 
-    public GameObject wallDetectors;
-
     public int moveCount;
 
-    public GameData.CharacterConfig config;
+    public CharacterConfig config;
+
+    private Transform characterRig;
 
     //Health
     public int Health { get { return health; } }
@@ -67,17 +65,17 @@ public class Character : MonoBehaviour {
     private GameObject[] hearts;
     private GameObject[] brokenHearts;
 
+    
+
     private Animator animator;
 
     public CameraManager cameraManager;
     private UIManager uiManager;
     public GameData gameData;
 
-    private bool isReset;
-
     void Awake() {
         photonView = GetComponent<PhotonView>();
-        isReset = false;
+        characterRig = transform.GetChild(0);
 
     }
     private void Start() {
@@ -87,18 +85,14 @@ public class Character : MonoBehaviour {
         gameData = FindObjectOfType<GameData>();
         uiManager = FindObjectOfType<UIManager>();
 
-        movePoint = transform.Find("Character Move Point");
-        movePoint.parent = null;
-        prevMovePointPos = movePoint.position;
+        movePoint = transform.position;
+        prevMovePointPos = movePoint;
 
         moveCount = 0;
-        movable = new Dictionary<Direction, bool> { { Direction.Left, true }, { Direction.Right, true }, { Direction.Up, true }, { Direction.Down, true } };
-        //    new bool[4] { true, true, true, true};
 
         animator = GetComponentInChildren<Animator>();
         animator.SetBool("Idle", true);
         State = CharacterState.Idle;
-        wallDetectors = transform.Find("WallDetector").gameObject;
 
         health = 3;
     }
@@ -120,89 +114,72 @@ public class Character : MonoBehaviour {
     private void PlayerMovement() {
         switch (State) {
             case CharacterState.Walking:
-                transform.position = Vector3.MoveTowards(transform.position, movePoint.position, speed * Time.deltaTime);
-                if (Vector3.Distance(transform.position, movePoint.position) == 0f) {
-                    //ResetWallDetector();
-                    //wallDetectors.SetActive(true);
+                transform.position = Vector3.MoveTowards(transform.position, movePoint, speed * Time.deltaTime);
+                if (Vector3.Distance(transform.position, movePoint) == 0f) {
                     GameManager.Instance.CallUpdateActionPoints(config.movement - moveCount);
 
-                    prevMovePointPos = movePoint.position;
+                    prevMovePointPos = movePoint;
                     if (moveCount == config.movement) {
                         moveCount = 0;
                         GameManager.Instance.EndTurn();
                     }
                     State = CharacterState.Idle;
                 }
-                else {
-                    isReset = false;
-                    //wallDetectors.SetActive(false);
-                }
                 break;
             case CharacterState.Idle:
-                if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) == 1f) {
-                    if (Input.GetAxisRaw("Horizontal") < 0 && movable[Direction.Left]) {
-                        Move(Direction.Left);
-                    }
-                    else if (Input.GetAxisRaw("Horizontal") > 0 && movable[Direction.Right]) {
-                        Move(Direction.Right);
-                    }
-                }
-                //vertical move
-                else if (Mathf.Abs(Input.GetAxisRaw("Vertical")) == 1f) {
-                    if (Input.GetAxisRaw("Vertical") > 0 && movable[Direction.Up]) {
-                        Move(Direction.Up);
-                    }
-                    else if (Input.GetAxisRaw("Vertical") < 0 && movable[Direction.Down]) {
-                        Move(Direction.Down);
-                    }
-                }
-                break;
-
             case CharacterState.Attacking:
-                //if we're in a fight then roll a die if we can
-                break;
-
             default: break;
         }
     }
 
-    private void Move(Direction direction) {
+    public bool Move(Direction direction) {
+        Vector3 moveVec = Vector3.zero;
+        Quaternion rot = Quaternion.identity;
+
+
         switch(direction) {
             case Direction.Up:
-                movePoint.position += Vector3.forward * (gameData.tileSize + gameData.tileGapLength);
-
-                if (this.transform.GetChild(0).rotation != Quaternion.Euler(0, 180, 0)) {
-                    this.transform.GetChild(0).rotation = Quaternion.Euler(0, 180, 0);
-                }
-                moveCount++;
-                State = CharacterState.Walking;
+                moveVec = Vector3.forward;
+                rot = Quaternion.Euler(0, 180, 0);
                 break;
+
             case Direction.Down:
-                movePoint.position += Vector3.back * (gameData.tileSize + gameData.tileGapLength);
-                if (this.transform.GetChild(0).rotation != Quaternion.Euler(0, 0, 0)) {
-                    this.transform.GetChild(0).rotation = Quaternion.Euler(0, 0, 0);
-                }
-                moveCount++;
-                State = CharacterState.Walking;
-                break;
-            case Direction.Left:
-                movePoint.position += Vector3.left * (gameData.tileSize + gameData.tileGapLength);
-                if (this.transform.GetChild(0).rotation != Quaternion.Euler(0, 270, 0)) {
-                    this.transform.GetChild(0).rotation = Quaternion.Euler(0, 270, 0);
-                }
-                moveCount++;
-                State = CharacterState.Walking;
-                break;
-            case Direction.Right:
-                movePoint.position += Vector3.right * (gameData.tileSize + gameData.tileGapLength);
-                if (this.transform.GetChild(0).rotation != Quaternion.Euler(0, 90, 0)) {
-                    this.transform.GetChild(0).rotation = Quaternion.Euler(0, 90, 0);
-                }
-                moveCount++;
-                State = CharacterState.Walking;
+                moveVec = Vector3.back;
+                rot = Quaternion.Euler(0, 0, 0);
                 break;
 
+            case Direction.Left:
+                moveVec = Vector3.left;
+                rot = Quaternion.Euler(0, 270, 0);
+                break;
+                
+            case Direction.Right:
+                moveVec = Vector3.right;
+                rot = Quaternion.Euler(0, 90, 0);
+                break;
+
+            default:
+                goto case Direction.Up;
         }
+
+        if (Physics.Raycast(transform.position, moveVec, out RaycastHit hit, gameData.tileSize + gameData.tileGapLength, LayerMask.GetMask("Impassible"))) {
+            Debug.Log("Impassible space that direction, preventing move");
+            return false;
+        }
+        else {
+            movePoint += moveVec * (gameData.tileSize + gameData.tileGapLength);
+
+            if (characterRig.rotation != rot) {
+                characterRig.rotation = rot;
+            }
+            moveCount++;
+            State = CharacterState.Walking;
+            return true;
+        }
+    }
+
+    public void ResetPosition() {
+        movePoint = prevMovePointPos;
     }
 
     private void OnTriggerEnter(Collider col) {
@@ -297,16 +274,6 @@ public class Character : MonoBehaviour {
             return false;
         }
     }*/
-
-    private void ResetWallDetector() {
-        if (!isReset) {
-            isReset = true;
-            movable[Direction.Left] = true;
-            movable[Direction.Right] = true;
-            movable[Direction.Up] = true;
-            movable[Direction.Down] = true;
-        }
-    }
 
     public void Damage(int amount) {
         health -= amount;

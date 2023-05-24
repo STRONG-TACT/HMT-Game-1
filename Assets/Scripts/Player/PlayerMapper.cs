@@ -24,19 +24,20 @@ public class PlayerMapper : MonoBehaviour {
 
     public GameObject playerPrefab;
 
+    /// <summary>
+    /// The Index of the Local Player's Character in the GameData.inSceneCharacters array
+    /// </summary>
     public int LocalCharacterNumber { get ; private set; }
+    /// <summary>
+    /// The PhotonID of the Local Player's Player Object
+    /// </summary>
     public int LocalPlayerNumber { get; private set; }
-    public Character LocalCharacter { get; private set; }
 
     private Dictionary<int, int> playerIDMapping = new Dictionary<int, int>();
     private Dictionary<int, int> characterMapping = new Dictionary<int, int>();
 
-    // Start is called before the first frame update
-    void Start() {
-        if(StaticCharacterMapping.Length != 3) {
-            Debug.LogError("StaticCharacterMapping must only be 3 elements!");
-        }
 
+    private void Awake() {
         if (Instance == null) {
             Instance = this;
         }
@@ -45,6 +46,14 @@ public class PlayerMapper : MonoBehaviour {
             Destroy(gameObject);
         }
         DontDestroyOnLoad(gameObject);
+    }
+
+    // Start is called before the first frame update
+    void Start() {
+        if(StaticCharacterMapping.Length != 3) {
+            Debug.LogError("StaticCharacterMapping must only be 3 elements!");
+        }
+
         photonView = GetComponent<PhotonView>();
         playerIDMapping = new Dictionary<int, int>();
         characterMapping = new Dictionary<int, int>();

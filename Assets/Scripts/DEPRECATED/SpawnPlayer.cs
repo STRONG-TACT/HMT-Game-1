@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Pun.UtilityScripts;
 
+#if DEPRECATED
 public class SpawnPlayer : MonoBehaviour
 {
     public GameObject DwarfPlayer;
@@ -44,7 +45,7 @@ public class SpawnPlayer : MonoBehaviour
     private Character SpawnPlayerPrefab()
     {
 
-        GameData.CharacterConfig config = gameData.GetCharacter(PhotonNetwork.LocalPlayer.ActorNumber);
+        GameData.CharacterConfig config = gameData.characterConfigs[PhotonNetwork.LocalPlayer.ActorNumber-1];
         Character newPlayer;
         GameObject instantiatedPrefab = null;
         switch (config.type) {
@@ -89,3 +90,4 @@ public class SpawnPlayer : MonoBehaviour
         GameManager.Instance.mainPlayer.transform.GetChild(6).gameObject.SetActive(false); //close shared Mask
     }
 }
+#endif

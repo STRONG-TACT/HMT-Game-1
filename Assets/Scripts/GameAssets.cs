@@ -20,11 +20,11 @@ public class GameAssets : MonoBehaviour
     public Sprite giantIcon;
     public Sprite humanIcon;
 
-    public Sprite GetCharacterIcon(GameData.CharacterType character) {
+    public Sprite GetCharacterIcon(CharacterConfig.CharacterType character) {
         return character switch {
-            GameData.CharacterType.Dwarf => dwarfIcon,
-            GameData.CharacterType.Human => humanIcon,
-            GameData.CharacterType.Giant => giantIcon,
+            CharacterConfig.CharacterType.Dwarf => dwarfIcon,
+            CharacterConfig.CharacterType.Human => humanIcon,
+            CharacterConfig.CharacterType.Giant => giantIcon,
             _ => null,
         };
     }

@@ -16,13 +16,13 @@ public class DetectWalls : MonoBehaviour {
     void OnTriggerEnter(Collider col) {
         if (col.CompareTag("Walls")) {
             //Debug.Log("Triggered walls " + dir);
-            character.movable[direction] = false;
+         //   character.movable[direction] = false;
         }
     }
     void OnTriggerExit(Collider col) {
         if (col.CompareTag("Walls")) {
             //Debug.Log("Triggered walls Exit " + direction);
-            character.movable[direction] = true;
+        //    character.movable[direction] = true;
         }
     }
 

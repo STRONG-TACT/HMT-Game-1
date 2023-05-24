@@ -2,9 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
+using static CombatSystem;
 
 /// <summary>
 /// This class is a central hub for any edits to the UI.
@@ -16,27 +19,31 @@ public class UIManager : MonoBehaviour {
 
     private GameAssets gameAssets;
     
-    GameObject PinErrorPanel;
-    GameObject PinWindow;
+    public GameObject PinErrorPanel;
+    public GameObject PinWindow;
     
-    GameObject CombatUI;
-    GameObject WaitingForPlayersPanel;
+
+    public GameObject WaitingForPlayersPanel;
 
     //Turn Indicator
-    GameObject TurnIndicatorPanel;
+    public GameObject TurnIndicatorPanel;
     Image characterIcon;
 
     //Action Panel
-    GameObject ActionPanel;
+    public GameObject ActionPanel;
     List<GameObject> actionPoints = new List<GameObject>();
 
     //Health Panel
-    GameObject HealthPanel;
+    public GameObject HealthPanel;
     List<GameObject> hearts = new List<GameObject>(); 
     List<GameObject> brokenHearts = new List<GameObject>();
 
     //Goal Panel
-    GameObject GoalPanel;
+    public GameObject GoalPanel;
+    
+    //Combat Panel
+    public GameObject CombatUI;
+
 
 
     // Start is called before the first frame update
@@ -44,14 +51,14 @@ public class UIManager : MonoBehaviour {
         Instance = this;
         gameAssets = FindObjectOfType<GameAssets>();
 
-        TurnIndicatorPanel = GameObject.Find("UI/TurnIndicator");
-        ActionPanel = GameObject.Find("UI/Action");
-        HealthPanel = GameObject.Find("UI/Health");
-        PinErrorPanel = GameObject.Find("UI/PinErrorMessage");
-        PinWindow = GameObject.Find("UI/PinWindow");
-        GoalPanel = GameObject.Find("UI/GoalPanel");
-        CombatUI = GameObject.Find("UI/CombatUI");
-        WaitingForPlayersPanel = GameObject.Find("UI/WaitForPlayerTxt");
+        //TurnIndicatorPanel = GameObject.Find("UI/TurnIndicator");
+        //ActionPanel = GameObject.Find("UI/Action");
+        //HealthPanel = GameObject.Find("UI/Health");
+        //PinErrorPanel = GameObject.Find("UI/PinErrorMessage");
+        //PinWindow = GameObject.Find("UI/PinWindow");
+        //GoalPanel = GameObject.Find("UI/GoalPanel");
+        //CombatUI = GameObject.Find("UI/CombatUI");
+        //WaitingForPlayersPanel = GameObject.Find("UI/WaitForPlayerTxt");
 
         //TurnIndicator Links
         characterIcon = TurnIndicatorPanel.transform.Find("CharacterIcon").GetComponent<Image>();
@@ -118,34 +125,34 @@ public class UIManager : MonoBehaviour {
 
     //It would be great to have a combined image that was just each character's turn or "YOUR turn"
     //Also this could implicitly kick off the turn transition indicator
-    public void UpdateTurnIndicator(GameData.CharacterType character) {
+    public void UpdateTurnIndicator(CharacterConfig.CharacterType character) {
         characterIcon.sprite = gameAssets.GetCharacterIcon(character);
     }
 
     public void UpdateGoalUI(string character, bool achieved=true) {
         switch(character.ToLower()) {
             case "dwarf":
-                UpdateGoalUI(GameData.CharacterType.Dwarf,achieved);
+                UpdateGoalUI(CharacterConfig.CharacterType.Dwarf,achieved);
                 break;
             case "giant":
-                UpdateGoalUI(GameData.CharacterType.Giant,achieved);
+                UpdateGoalUI(CharacterConfig.CharacterType.Giant,achieved);
                 break;
             case "human":
-                UpdateGoalUI(GameData.CharacterType.Human,achieved);
+                UpdateGoalUI(CharacterConfig.CharacterType.Human,achieved);
                 break;
         }
     }
 
-    public void UpdateGoalUI(GameData.CharacterType character, bool achieved = true) {
+    public void UpdateGoalUI(CharacterConfig.CharacterType character, bool achieved = true) {
         Image goalIcon;
         switch (character) {
-            case GameData.CharacterType.Dwarf:
+            case CharacterConfig.CharacterType.Dwarf:
                 goalIcon = GoalPanel.transform.Find("GoalDwarf").GetComponent<Image>();
                 break;
-            case GameData.CharacterType.Human:
+            case CharacterConfig.CharacterType.Human:
                 goalIcon = GoalPanel.transform.Find("GoalHuman").GetComponent<Image>();
                 break;
-            case GameData.CharacterType.Giant:
+            case CharacterConfig.CharacterType.Giant:
                 goalIcon = GoalPanel.transform.Find("GoalGiant").GetComponent<Image>();
                 break;
             default:
@@ -159,6 +166,54 @@ public class UIManager : MonoBehaviour {
             tint.a = .5f;
         }
         goalIcon.color = tint;
+    }
+
+    public void ShowCombatUI(CombatSystem.FightType fightType, int[] enemyNumbers ) {
+        Image CombatImg = CombatUI.transform.Find("CombatUIImg").GetComponent<Image>();
+        TextMeshProUGUI CombatTxt = CombatUI.transform.Find("MonsterNumerTxt").GetComponent<TextMeshProUGUI>();
+
+        switch (fightType) {
+            case FightType.Rock:
+                CombatImg.sprite = gameAssets.rockCombatUI;
+                break;
+
+            case FightType.Trap:
+                CombatImg.sprite = gameAssets.trapCombatUI;
+                break;
+
+            case FightType.Monster:
+                CombatImg.sprite = gameAssets.monsterCombatUI;
+                string txt = "";
+                for (int i = 0; i < enemyNumbers.Length; i++) {
+                    txt = txt + enemyNumbers[i].ToString() + " ";
+                }
+                CombatTxt.text = txt;
+                break;
+        }
+        CombatUI.SetActive(true);
+    }
+
+    public void DisplayCombatResult(string message) {
+        CombatUI.transform.Find("ResultTxt").GetComponent<TextMeshProUGUI>().text = message;
+    }
+
+    public void DismissCombatUI() {
+        CombatUI.transform.Find("ResultTxt").GetComponent<TextMeshProUGUI>().text = string.Empty;
+        CloseDiceImg();
+        CombatUI.SetActive(false);
+    }
+
+    public void ShowDiceImg(FightType fightType, int playerDie) {
+        Image diceImg = GameObject.Find("DiceImgs").transform.GetChild((int)fightType).gameObject.GetComponent<Image>();
+        diceImg.sprite = gameAssets.diceImg[playerDie - 1];
+        diceImg.gameObject.SetActive(true);
+    }
+
+    public void CloseDiceImg() {
+        GameObject DiceImgs = GameObject.Find("DiceImgs");
+        foreach(Transform t in DiceImgs.transform) {
+            t.gameObject.SetActive(false);
+        }
     }
 
     // Update is called once per frame

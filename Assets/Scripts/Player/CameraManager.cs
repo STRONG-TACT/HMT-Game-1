@@ -10,7 +10,7 @@ public class CameraManager : MonoBehaviour
     public GameData gameData;
 
 
-    private Transform targetPlayer;
+    private Transform targetCharacter;
     public Vector3 cameraOffset;
 
     public bool cameraCentered;
@@ -44,8 +44,9 @@ public class CameraManager : MonoBehaviour
             }
         }
 
-        targetPlayer = GameManager.Instance.mainPlayer.transform;
-        cameraOffset = MainCamera.transform.position - targetPlayer.transform.position;
+        //targetCharacter = GameManager.Instance.mainCharacter.transform;
+        targetCharacter = gameData.inSceneCharacters[PlayerMapper.Instance.LocalCharacterNumber].transform;
+        cameraOffset = MainCamera.transform.position - targetCharacter.transform.position;
     }
 
     private void Update()
@@ -67,7 +68,7 @@ public class CameraManager : MonoBehaviour
             timer += Time.deltaTime;
             float t = timer / lerpDuration;
             t = t * t * (3f - 2f * t);
-            Vector3 endPosition = targetPlayer.transform.position + cameraOffset;
+            Vector3 endPosition = targetCharacter.transform.position + cameraOffset;
             MainCamera.transform.position = Vector3.Lerp(MainCamera.transform.position, endPosition, t);
             if (MainCamera.transform.position == endPosition) // when camera moved back
             {
@@ -81,7 +82,7 @@ public class CameraManager : MonoBehaviour
     {
         if (GameManager.Instance.turn == PhotonNetwork.LocalPlayer.ActorNumber && cameraCentered)
         {
-            MainCamera.transform.position = targetPlayer.transform.position + cameraOffset;
+            MainCamera.transform.position = targetCharacter.transform.position + cameraOffset;
         }
     }
 
@@ -92,7 +93,7 @@ public class CameraManager : MonoBehaviour
     }
 
     IEnumerator RecenterCameraCoroutine() {
-        Vector3 target = targetPlayer.transform.position + cameraOffset;
+        Vector3 target = targetCharacter.transform.position + cameraOffset;
         float startTime = Time.time;
         while(Time.time - startTime < lerpDuration) {
             MainCamera.transform.position = Vector3.Lerp(MainCamera.transform.position, target, (Time.time - startTime) / lerpDuration);

@@ -32,7 +32,7 @@ public class PinUIHandler : MonoBehaviour
         IconType = iconType;
         this.pingPosition = pingPosition;
         rectTransform = transform.GetComponent<RectTransform>();
-        Player = GameManager.Instance.mainPlayer.transform;
+        Player = GameManager.Instance.mainCharacter.transform;
 
         if (PhotonNetwork.LocalPlayer.ActorNumber == 1)
         {

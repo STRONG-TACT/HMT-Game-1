@@ -22,12 +22,12 @@ public class AnimationManager : MonoBehaviour
     private float fadeTime = 1f;
 
     public GameObject tutorial;
-    private Coroutine coroutine;
+    private Coroutine animationCoroutine;
 
     // Start is called before the first frame update
     void Start()
     {
-        coroutine = StartCoroutine(StartAnimation());
+        animationCoroutine = StartCoroutine(StartAnimation());
     }
 
     private IEnumerator StartAnimation()
@@ -267,7 +267,7 @@ public class AnimationManager : MonoBehaviour
     public void LoadGameScene()
     {
         //PhotonNetwork.LoadLevel("Level_1");
-        StopCoroutine(coroutine);
+        StopCoroutine(animationCoroutine);
         tutorial.SetActive(false);
         GameManager.Instance.CallEndTutorial();
     }
