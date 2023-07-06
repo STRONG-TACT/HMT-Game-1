@@ -1,7 +1,9 @@
+#if DEPRECATED
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 public class DiceSideCheck : MonoBehaviour
 {
@@ -105,3 +107,4 @@ public class DiceSideCheck : MonoBehaviour
         }
     }
 }
+#endif

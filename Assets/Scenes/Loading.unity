@@ -297,6 +297,18 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6015561875687066449, guid: a122e3138053f004d9f8453195c34286, type: 3}
+      propertyPath: IgnoreScenes.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015561875687066449, guid: a122e3138053f004d9f8453195c34286, type: 3}
+      propertyPath: IgnoreScenes.Array.data[0]
+      value: Loading
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015561875687066449, guid: a122e3138053f004d9f8453195c34286, type: 3}
+      propertyPath: IgnoreScenes.Array.data[1]
+      value: Lobby
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015561875687066449, guid: a122e3138053f004d9f8453195c34286, type: 3}
       propertyPath: RecaptureHotKey.Array.size
       value: 2
       objectReference: {fileID: 0}

@@ -42,12 +42,14 @@ public class UIManager : MonoBehaviour {
     public GameObject GoalPanel;
     
     //Combat Panel
-    public GameObject CombatUI;
-
+    public GameObject CombatPanel;
+    Image CombatUIImg;
+    TextMeshProUGUI CombatMonsterNumbers;
+    TextMeshProUGUI CombatResultText;
 
 
     // Start is called before the first frame update
-    void Start() {
+    IEnumerator Start() {
         Instance = this;
         gameAssets = FindObjectOfType<GameAssets>();
 
@@ -57,7 +59,7 @@ public class UIManager : MonoBehaviour {
         //PinErrorPanel = GameObject.Find("UI/PinErrorMessage");
         //PinWindow = GameObject.Find("UI/PinWindow");
         //GoalPanel = GameObject.Find("UI/GoalPanel");
-        //CombatUI = GameObject.Find("UI/CombatUI");
+        
         //WaitingForPlayersPanel = GameObject.Find("UI/WaitForPlayerTxt");
 
         //TurnIndicator Links
@@ -83,6 +85,36 @@ public class UIManager : MonoBehaviour {
         }
         hearts = hearts.OrderBy(gob => gob.transform.position.x).ToList();
         brokenHearts = brokenHearts.OrderBy(gob => gob.transform.position.x).ToList();
+
+        //CombatUI Pointers
+        //CombatPanel = GameObject.Find("UI/CombatPanel");
+        if (CombatPanel != null) {
+            CombatPanel.SetActive(false);
+
+            CombatUIImg = CombatPanel.transform.Find("CombatUIImg").GetComponent<Image>();
+            CombatMonsterNumbers = CombatPanel.transform.Find("MonsterNumberTxt").GetComponent<TextMeshProUGUI>();
+            CombatResultText = CombatPanel.transform.Find("ResultTxt").GetComponent<TextMeshProUGUI>();
+
+            //Debug.LogFormat("<color=cyan>IS NULL</color>CombatUIImg: {0}, CombatMonsterNumbers: {1}, CombatResultText: {2}", 
+            //    CombatUIImg == null,
+            //    CombatMonsterNumbers == null,
+            //    CombatResultText == null);
+            //foreach(Transform child in CombatPanel.transform) {
+            //    Debug.LogFormat("<color=green>CombatPanel Child</color>: {0}", child.name);
+            //}
+
+            //foreach(MonoBehaviour mb in CombatPanel.transform.Find("MonsterNumberTxt").GetComponents<MonoBehaviour>()) {
+            //    Debug.LogFormat("<color=red>CombatPanel MonsterNumberTxt</color>: {0}", mb.GetType().Name);
+            //}
+
+        }
+
+        while (!PlayerMapper.Instance.Inititialized) {
+            yield return null;
+        }
+        GameData gameData = FindObjectOfType<GameData>();
+        Image playerIndicator = GameObject.Find("UI/YouArePanel").GetComponent<Image>();
+        playerIndicator.sprite = gameData.characterConfigs[PlayerMapper.Instance.LocalCharacterNumber].youAreIcon;
     }
 
     public void HideWaitingForPlayers() {
@@ -169,38 +201,38 @@ public class UIManager : MonoBehaviour {
     }
 
     public void ShowCombatUI(CombatSystem.FightType fightType, int[] enemyNumbers ) {
-        Image CombatImg = CombatUI.transform.Find("CombatUIImg").GetComponent<Image>();
-        TextMeshProUGUI CombatTxt = CombatUI.transform.Find("MonsterNumerTxt").GetComponent<TextMeshProUGUI>();
-
         switch (fightType) {
             case FightType.Rock:
-                CombatImg.sprite = gameAssets.rockCombatUI;
+                CombatUIImg.sprite = gameAssets.rockCombatUI;
+                CombatMonsterNumbers.text = string.Empty;
                 break;
 
             case FightType.Trap:
-                CombatImg.sprite = gameAssets.trapCombatUI;
+                CombatUIImg.sprite = gameAssets.trapCombatUI;
+                CombatMonsterNumbers.text = string.Empty;
                 break;
 
             case FightType.Monster:
-                CombatImg.sprite = gameAssets.monsterCombatUI;
+                CombatUIImg.sprite = gameAssets.monsterCombatUI;
                 string txt = "";
                 for (int i = 0; i < enemyNumbers.Length; i++) {
                     txt = txt + enemyNumbers[i].ToString() + " ";
                 }
-                CombatTxt.text = txt;
+                CombatMonsterNumbers.text = txt;
                 break;
         }
-        CombatUI.SetActive(true);
+        CombatResultText.text = string.Empty;
+        CombatPanel.SetActive(true);
     }
 
     public void DisplayCombatResult(string message) {
-        CombatUI.transform.Find("ResultTxt").GetComponent<TextMeshProUGUI>().text = message;
+        CombatResultText.text = message;
     }
 
     public void DismissCombatUI() {
-        CombatUI.transform.Find("ResultTxt").GetComponent<TextMeshProUGUI>().text = string.Empty;
+        CombatResultText.text = string.Empty;
         CloseDiceImg();
-        CombatUI.SetActive(false);
+        CombatPanel.SetActive(false);
     }
 
     public void ShowDiceImg(FightType fightType, int playerDie) {

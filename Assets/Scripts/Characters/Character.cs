@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using Photon.Pun.Demo.PunBasics;
 
 /// <summary>
 /// A goal is that this script knows nothing about dwarves, giants, or humans.
@@ -28,7 +29,7 @@ public class Character : MonoBehaviour {
 
     public CharacterState State {
         get { return characterState; }
-        private set {
+        set {
             if (value != characterState) {
                 characterState = value;
                 switch (value) {
@@ -56,14 +57,15 @@ public class Character : MonoBehaviour {
     public int moveCount;
 
     public CharacterConfig config;
+    public int CharacterId;
 
     private Transform characterRig;
+    public Transform characterMask { get; private set; }
+    public Transform visibilityMask { get; private set; }
 
     //Health
     public int Health { get { return health; } }
     private int health;
-    private GameObject[] hearts;
-    private GameObject[] brokenHearts;
 
     
 
@@ -98,20 +100,33 @@ public class Character : MonoBehaviour {
     }
 
     void Update() {
-        if (photonView.IsMine && 
-            GameManager.Instance.turn == PhotonNetwork.LocalPlayer.ActorNumber && 
-            !CombatSystem.Instance.isInFight && 
-            GameManager.Instance.isFirstLevel) {
-            if (!gameData.differentCameraView) {
-                PlayerMovement();
-            }
-            else if (cameraManager.cameraCentered) {
-                PlayerMovement();
-            }
-        }
-    }
+        //if its our turn the camera is centered then move
+        //if (GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber) {
+        //    if (gameData.differentCameraView) {
+        //        if (cameraManager.cameraCentered) {
+        //            PlayerMovement();
+        //        }
+        //    }
+        //    else {
+        //        PlayerMovement();
+        //    }
+        //}
+        //else {
+        //    PlayerMovement();
+        //}
 
-    private void PlayerMovement() {
+        ////if its not out turn then just move?
+        //if (GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber && 
+        //    !CombatSystem.Instance.isInFight && 
+        //    GameManager.Instance.isFirstLevel) {
+        //    if (!gameData.differentCameraView) {
+        //        PlayerMovement();
+        //    }
+        //    else if (cameraManager.cameraCentered) {
+        //        PlayerMovement();
+        //    }
+        //}
+
         switch (State) {
             case CharacterState.Walking:
                 transform.position = Vector3.MoveTowards(transform.position, movePoint, speed * Time.deltaTime);
@@ -132,7 +147,49 @@ public class Character : MonoBehaviour {
         }
     }
 
+    public void SetUpConfig(CharacterConfig config, int characterId, GameData gameData) {
+        this.config = config;
+        CharacterId = characterId;
+
+        characterMask = transform.Find("CharacterMask");
+        visibilityMask = transform.Find("VisibleMask");
+       
+        Vector3 cellScale = new Vector3( gameData.tileSize + 2 * gameData.tileGapLength, 
+                                         0, 
+                                         gameData.tileSize + 2 * gameData.tileGapLength);
+        characterMask.localScale = cellScale;
+        visibilityMask.localScale = cellScale * config.sightRange;
+        
+    }
+
+    public void CallDoMove(Vector3 targetPos, Quaternion orientation) {
+        photonView.RPC("DoMove", RpcTarget.All, targetPos, orientation);
+    }
+
+    [PunRPC]
+    public void DoMove(Vector3 targetPos, Quaternion orientation) {
+        movePoint = targetPos;
+        if (characterRig.rotation != orientation) {
+            characterRig.rotation = orientation;
+        }
+        moveCount++;
+        State = CharacterState.Walking;
+    }
+
+    public bool CheckMove(Direction direction) {
+        Vector3 moveVec = direction switch {
+            Direction.Up => Vector3.forward,
+            Direction.Down => Vector3.back,
+            Direction.Left => Vector3.left,
+            Direction.Right => Vector3.right,
+            _ => Vector3.forward
+        } ;
+
+        return !Physics.Raycast(transform.position, moveVec, gameData.tileSize + gameData.tileGapLength, LayerMask.GetMask("Impassible"));
+    }
+
     public bool Move(Direction direction) {
+        //Debug.LogFormat("Calling Move on: {0} direction: {1}", name, direction.ToString());
         Vector3 moveVec = Vector3.zero;
         Quaternion rot = Quaternion.identity;
 
@@ -140,12 +197,12 @@ public class Character : MonoBehaviour {
         switch(direction) {
             case Direction.Up:
                 moveVec = Vector3.forward;
-                rot = Quaternion.Euler(0, 180, 0);
+                rot = Quaternion.Euler(0, 0, 0);
                 break;
 
             case Direction.Down:
                 moveVec = Vector3.back;
-                rot = Quaternion.Euler(0, 0, 0);
+                rot = Quaternion.Euler(0, 180, 0);
                 break;
 
             case Direction.Left:
@@ -162,8 +219,10 @@ public class Character : MonoBehaviour {
                 goto case Direction.Up;
         }
 
+        Debug.DrawLine(transform.position, transform.position + moveVec * (gameData.tileSize + gameData.tileGapLength), Color.red, 1f, false);
+
         if (Physics.Raycast(transform.position, moveVec, out RaycastHit hit, gameData.tileSize + gameData.tileGapLength, LayerMask.GetMask("Impassible"))) {
-            Debug.Log("Impassible space that direction, preventing move");
+            Debug.LogErrorFormat("{0} attempted {1} move but hit {2}", name, direction.ToString(), hit.collider.gameObject.name);
             return false;
         }
         else {
@@ -178,21 +237,23 @@ public class Character : MonoBehaviour {
         }
     }
 
+    public void CompleteMove() {
+        State = CharacterState.Walking;
+    }
+
     public void ResetPosition() {
         movePoint = prevMovePointPos;
+        State = CharacterState.Walking;
     }
 
     private void OnTriggerEnter(Collider col) {
-
+        //Debug.LogFormat("Character Hit Trigger: {0}", col.gameObject.tag);
         switch (col.gameObject.tag) {
             case "Goal":
                 //Debug.Log("Triggered Goal");
                 if (CheckRightGoal(col.gameObject)) {
-                    if (photonView.IsMine) {
-                        GameManager.Instance.CallGoalCount(PhotonNetwork.LocalPlayer.ActorNumber);
-                    }
-
                     if (PhotonNetwork.IsMasterClient) {
+                        GameManager.Instance.CallGoalReached(config.type.ToString());
                         PhotonNetwork.Destroy(col.gameObject);
                     }
                 }
@@ -201,52 +262,38 @@ public class Character : MonoBehaviour {
             case "Door":
                 //Debug.Log("Triggered Door");
                 //After collect all the goal, the door can be stepped and end game
-                if (photonView.IsMine && GameManager.Instance.goalCount == 3) { //take th econditional logic out of the character and move it to the Manager
+                if (PhotonNetwork.IsMasterClient && GameManager.Instance.goalCount == 3) { //take th econditional logic out of the character and move it to the Manager
                     GameManager.Instance.CallNextLevel();
                 }
                 break;
 
             case "Rock":
-                if (photonView.IsMine) {
-                    PlayAttackAnimation();
-                }
-                //Debug.Log("Triggered Rock");
-                //CombatSystem.Instance.isInFight = true;
-                CombatSystem.Instance.StartFight(col.gameObject, CombatSystem.FightType.Rock, this);
-                break;
-
             case "Trap":
-                if (photonView.IsMine) {
-                    PlayAttackAnimation();
+            case "Monster":
+                if (GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber) {
+                    GameManager.Instance.CallStartFight(photonView.ViewID, col.gameObject.GetComponent<PhotonView>().ViewID);
                 }
-                //Debug.Log("Triggered Trap");
-                //CombatSystem.Instance.isInFight = true;
-                CombatSystem.Instance.StartFight(col.gameObject, CombatSystem.FightType.Trap, this);
+                //CombatSystem.Instance.StartFight(col.gameObject, CombatSystem.FightType.Rock, this);
                 break;
 
-            case "Monster":
-                if (photonView.IsMine) {
-                    PlayAttackAnimation();
-                }
-                //Debug.Log("Triggered Monster");
-                //CombatSystem.Instance.isInFight = true;
-                CombatSystem.Instance.StartFight(col.gameObject, CombatSystem.FightType.Monster, this);
+            case "VisableArea":
+            case "VisibleArea":
                 break;
 
             default:
-                Debug.LogFormat("Triggered: {0}", col.gameObject.tag);
+                Debug.LogFormat("Character Hit Trigger: {0}", col.gameObject.tag);
                 break;
         }
     }
 
     private bool CheckRightGoal(GameObject goal) {
-        if (playerId == 0 && goal.name == "DwarfGoal") {
+        if (config.type == CharacterConfig.CharacterType.Dwarf  && goal.name == "DwarfGoal") {
             return true;
         }
-        else if (playerId == 1 && goal.name == "GiantGoal") {
+        else if (config.type == CharacterConfig.CharacterType.Giant && goal.name == "GiantGoal") {
             return true;
         }
-        else if (playerId == 2 && goal.name == "HumanGoal") {
+        else if (config.type == CharacterConfig.CharacterType.Human && goal.name == "HumanGoal") {
             return true;
         }
         else {
@@ -254,11 +301,11 @@ public class Character : MonoBehaviour {
         }
     }
 
-    private void PlayAttackAnimation() {
-        animator.SetBool("Idle", false);
-        animator.SetBool("Walk", false);
-        animator.SetBool("Attack", true);
-    }
+    //private void PlayAttackAnimation() {
+    //    animator.SetBool("Idle", false);
+    //    animator.SetBool("Walk", false);
+    //    animator.SetBool("Attack", true);
+    //}
 
    /* private bool CheckMoveCount() {
         if (PhotonNetwork.LocalPlayer.ActorNumber == 1 && moveCount == gameData.dwarfMovecount) {
@@ -277,6 +324,8 @@ public class Character : MonoBehaviour {
 
     public void Damage(int amount) {
         health -= amount;
-        uiManager.UpdateHealthUI(health);
+        if (CharacterId == GameManager.Instance.CurrentTurnCharacterId) {
+            uiManager.UpdateHealthUI(health);
+        }
     }
 }

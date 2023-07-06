@@ -9,11 +9,16 @@ using Newtonsoft.Json.Linq;
 using System.Threading;
 using Photon.Pun;
 using Photon.Pun.Demo.Cockpit.Forms;
+using System.Linq;
 
 public class Game1Interface : HMTInterface {
 
     [Header("Game Specific Settings")]
+    public string[] IgnoreScenes; 
+    
     public KeyCode[] RecaptureHotKey;
+
+    
     
     GameObject[] monsters;
     GameObject[] stones;
@@ -30,7 +35,7 @@ public class Game1Interface : HMTInterface {
     protected override void Start() {
         base.Start();
         SceneManager.activeSceneChanged += OnSceneChange;
-        FindKeyObjects();
+        //FindKeyObjects();
     }
 
     protected override void Update() {
@@ -92,6 +97,9 @@ public class Game1Interface : HMTInterface {
 
 
     void OnSceneChange(Scene current, Scene next) {
+        if (IgnoreScenes.Contains(next.name)) {
+            return;
+        }
         FindKeyObjects();
     }
 
@@ -148,7 +156,7 @@ public class Game1Interface : HMTInterface {
             {"gridWidth",  Mathf.CeilToInt((boardWidth - gameData.tileGapLength) / (gameData.tileSize + gameData.tileGapLength))},
             {"gridHeight", Mathf.CeilToInt((boardHeight- gameData.tileGapLength) / (gameData.tileSize + gameData.tileGapLength))},
             {"level", gameData.gameLevel },
-            {"currentPlayer", GameManager.Instance.turn },
+            {"currentPlayer", GameManager.Instance.CurrentTurnPlayerNum },
             {"localPlayerId", PhotonNetwork.LocalPlayer.ActorNumber },
         };
 
@@ -188,7 +196,7 @@ public class Game1Interface : HMTInterface {
             PlayerHealth health = character.GetComponent<PlayerHealth>();
             scene.Add(new JObject {
                 {"name", character.name },
-                {"controllingPlayerId", character.playerId },
+                {"controllingPlayerId", character.playerId }, //TODO this value is wrong
                 {"type", role},
                 {"moveCount", character.moveCount },
                 {"movementRange", character.config.movement },

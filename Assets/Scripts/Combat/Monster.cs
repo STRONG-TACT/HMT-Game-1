@@ -32,7 +32,7 @@ public class Monster : MonoBehaviour {
         }
         else {
             if(monsterType != targetValues.Length) {
-                Debug.LogErrorFormat("MonsterType: {0} does not match targetValue Size: {1}", monsterType, targetValues.Length);
+                Debug.LogWarningFormat("MonsterType: {0} does not match targetValue Size: {1}", monsterType, targetValues.Length);
             }
         }
     }

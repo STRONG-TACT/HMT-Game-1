@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5365208049671062596}
   - component: {fileID: 5365208049671062599}
   m_Layer: 0
-  m_Name: VisableMask
+  m_Name: VisibleMask
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -148,13 +148,7 @@ MonoBehaviour:
   speed: 0
   playerId: 0
   moveCount: 0
-  config:
-    name: 
-    type: 0
-    movement: 0
-    sightRange: 0
-    cameraPosition: {x: 0, y: 0, z: 0}
-    dieFaces: 010000000200000003000000040000000500000006000000
+  config: {fileID: 0}
   cameraManager: {fileID: 0}
   gameData: {fileID: 0}
 --- !u!114 &5365208050811761956
@@ -315,7 +309,7 @@ GameObject:
   - component: {fileID: 4468111550110224568}
   - component: {fileID: 4635480889586988059}
   m_Layer: 0
-  m_Name: VisableMask2
+  m_Name: CharacterMask
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -329,8 +323,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6538687704029812379}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.32, y: -1.63, z: 1.74}
-  m_LocalScale: {x: 5.166, y: 0.5, z: 5.4509997}
+  m_LocalPosition: {x: 0, y: -1.63, z: 0}
+  m_LocalScale: {x: 4.5, y: 0, z: 4.5}
   m_Children: []
   m_Father: {fileID: 5365208050811761962}
   m_RootOrder: 3

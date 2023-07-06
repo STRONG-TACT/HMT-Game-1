@@ -24,6 +24,10 @@ public class PlayerMapper : MonoBehaviour {
 
     public GameObject playerPrefab;
 
+    public bool Inititialized {
+        get { return characterMapping.Count == 3; }
+    }
+
     /// <summary>
     /// The Index of the Local Player's Character in the GameData.inSceneCharacters array
     /// </summary>
@@ -31,11 +35,16 @@ public class PlayerMapper : MonoBehaviour {
     /// <summary>
     /// The PhotonID of the Local Player's Player Object
     /// </summary>
-    public int LocalPlayerNumber { get; private set; }
+    public int LocalPlayerNumber { get { return PhotonNetwork.LocalPlayer.ActorNumber; } }
 
     private Dictionary<int, int> playerIDMapping = new Dictionary<int, int>();
     private Dictionary<int, int> characterMapping = new Dictionary<int, int>();
 
+    public Dictionary<int, int> CharacterMapping {
+        get {
+            return characterMapping;
+        }
+    }
 
     private void Awake() {
         if (Instance == null) {
@@ -69,6 +78,7 @@ public class PlayerMapper : MonoBehaviour {
 
     [PunRPC]
     public void AddPlayerID(int playerNum, int photonId) {
+        //Debug.LogFormat("[RPC Recieve] AddPlayerId, playerNum:{0}, photonId:{1}", playerNum, photonId);
         playerIDMapping[playerNum] = photonId;
         if(playerIDMapping.Count == 3 && PhotonNetwork.IsMasterClient) {
             CreateCharacterAssignment();
@@ -82,8 +92,10 @@ public class PlayerMapper : MonoBehaviour {
 
     [PunRPC]
     public void AssignCharacter(int playerNum, int characterID) {
+        //Debug.LogFormat("[RPC Recieve] AssignCharacter, playerNum:{0}, characterID:{1}", playerNum, characterID);
         characterMapping[playerNum] = characterID;
         if (playerNum == PhotonNetwork.LocalPlayer.ActorNumber) {
+            Debug.LogFormat("Actor Number {0} adopting character {1}", PhotonNetwork.LocalPlayer.ActorNumber, characterID);
             LocalCharacterNumber = characterID;
         }
     }
@@ -105,5 +117,17 @@ public class PlayerMapper : MonoBehaviour {
             default:
                 goto case AssignmentMode.Static;
         }
+    }
+
+    public int GetCharacterFromPlayer(int playerNum) {
+        if(!characterMapping.ContainsKey(playerNum)) {
+            Debug.LogErrorFormat("PlayerMapper: Player {0} could not find character assignment defaulting to 0!", playerNum);
+            return 0;
+        }
+        return characterMapping[playerNum];
+    }
+
+    public int GetPlayerFromCharacter(int playerNum) {
+        return characterMapping.FirstOrDefault(x => x.Value == playerNum).Key;
     }
 }

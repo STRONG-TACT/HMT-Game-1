@@ -269,6 +269,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3912182}
     m_Modifications:
+    - target: {fileID: 4185061564047081532, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
+      propertyPath: targetValues.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4185061564047081532, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
+      propertyPath: targetValues.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4185061564047081532, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
+      propertyPath: targetValues.Array.data[1]
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8288587600597579001, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
       propertyPath: sceneViewId
       value: 7
@@ -1092,16 +1104,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3299ecb6cf607aa4cb0a301e631d702f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainPlayer: {fileID: 0}
-  enemy: {fileID: 0}
+  target: {fileID: 0}
   characterInFight: {fileID: 0}
-  isInFight: 0
-  fightEnd: 0
   fightType: 0
-  MonsterFightCount: 0
-  playerDiceNum: 0
+  attemptCount: 0
+  autoReroll: 0
   monsterNum: 
-  combatUIPanel: {fileID: 0}
 --- !u!4 &487927825
 Transform:
   m_ObjectHideFlags: 0
@@ -1449,6 +1457,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3912182}
     m_Modifications:
+    - target: {fileID: 4185061564047081532, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
+      propertyPath: targetValues.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4185061564047081532, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
+      propertyPath: targetValues.Array.data[0]
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4185061564047081532, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
+      propertyPath: targetValues.Array.data[1]
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 8288587600597579001, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
       propertyPath: sceneViewId
       value: 5
@@ -2141,6 +2161,22 @@ PrefabInstance:
     - target: {fileID: 702390614520077751, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.data[1]
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
+      propertyPath: targetValues.Array.data[2]
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1023968545885977171, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
       propertyPath: sceneViewId
@@ -3548,6 +3584,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3912182}
     m_Modifications:
+    - target: {fileID: 4185061564047081532, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
+      propertyPath: targetValues.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4185061564047081532, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
+      propertyPath: targetValues.Array.data[0]
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4185061564047081532, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
+      propertyPath: targetValues.Array.data[1]
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 8288587600597579001, guid: 19cb5bc82aeed2545b86fda47daf95e8, type: 3}
       propertyPath: sceneViewId
       value: 6
@@ -3779,7 +3827,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &1851783391
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -4598,14 +4646,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameAssets: {fileID: 0}
+  debugRPCReceipts: 0
   isFirstLevel: 0
   isFinishedTutorial: 000000
   tilePrefabs: {fileID: 0}
-  turn: 0
-  mainPlayer: {fileID: 0}
-  playerIDs: 
+  mainCharacter: {fileID: 0}
   goalCount: 0
-  currentActionPoints: 0
 --- !u!114 &2091787181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4642,10 +4688,12 @@ MonoBehaviour:
   - {fileID: 772837366}
   - {fileID: 433439078}
   - {fileID: 495306345}
-  maskOn: 1
   tileSize: 3
   tileGapLength: 0.43
+  maskOn: 1
   differentCameraView: 1
+  inlcudeMonsterTurn: 0
+  maxCombatAttempts: 3
   cameraViews:
   - {x: 0, y: 9.67, z: -2.83}
   - {x: 3.43, y: 17.58, z: -6.5}

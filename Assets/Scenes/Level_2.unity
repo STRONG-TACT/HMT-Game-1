@@ -491,7 +491,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
       propertyPath: targetValues.Array.data[2]
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1023968545885977171, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
       propertyPath: sceneViewId
@@ -1162,14 +1162,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameAssets: {fileID: 0}
+  debugRPCReceipts: 0
   isFirstLevel: 0
   isFinishedTutorial: 000000
   tilePrefabs: {fileID: 0}
-  turn: 0
-  mainPlayer: {fileID: 0}
-  playerIDs: 
+  mainCharacter: {fileID: 0}
   goalCount: 0
-  currentActionPoints: 0
 --- !u!114 &982793479
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1195,6 +1193,7 @@ MonoBehaviour:
   tileSize: 3
   tileGapLength: 0.43
   differentCameraView: 1
+  inlcudeMonsterTurn: 0
   cameraViews:
   - {x: 6.86, y: 10.53, z: -6.04}
   - {x: 3.43, y: 10.53, z: -6.04}
@@ -2223,7 +2222,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
       propertyPath: targetValues.Array.data[0]
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1023968545885977168, guid: 26a1acf9de117534484f2c255837ced9, type: 3}
       propertyPath: targetValues.Array.data[1]
@@ -2296,7 +2295,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3299ecb6cf607aa4cb0a301e631d702f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainPlayer: {fileID: 0}
+  mainCharacter: {fileID: 0}
   enemy: {fileID: 0}
   characterInFight: {fileID: 0}
   isInFight: 0
@@ -2305,7 +2304,6 @@ MonoBehaviour:
   MonsterFightCount: 0
   playerDiceNum: 0
   monsterNum: 
-  combatUIPanel: {fileID: 0}
 --- !u!4 &1667403597
 Transform:
   m_ObjectHideFlags: 0

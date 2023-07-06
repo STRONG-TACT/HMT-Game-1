@@ -30,5 +30,8 @@ public class CharacterConfig : ScriptableObject {
 
     [Tooltip("The usual icon used for the character.")]
     public Sprite characterIcon;
+
+    [Tooltip("The icon used for the YouAre UI.")]
+    public Sprite youAreIcon;
 }
 

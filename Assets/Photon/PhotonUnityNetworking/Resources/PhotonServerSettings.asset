@@ -58,6 +58,12 @@ MonoBehaviour:
   - CallAssignCharacter
   - NextTurn
   - AssignCharacter
+  - DoMove
+  - MoveCharacter
+  - GoalReached
+  - StartFight
+  - RollDie
+  - DisplayCombatResult
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -22,7 +22,7 @@ public class CameraManager : MonoBehaviour
     {
         Instance = this;
     }
-    void Start()
+    IEnumerator Start()
     {
         MainCamera = Camera.main;
         cameraCentered = true;
@@ -45,13 +45,18 @@ public class CameraManager : MonoBehaviour
         }
 
         //targetCharacter = GameManager.Instance.mainCharacter.transform;
+        while (!PlayerMapper.Instance.Inititialized) {
+            yield return null;
+        }
+
         targetCharacter = gameData.inSceneCharacters[PlayerMapper.Instance.LocalCharacterNumber].transform;
         cameraOffset = MainCamera.transform.position - targetCharacter.transform.position;
+        yield break;
     }
 
     private void Update()
     {
-        if (GameManager.Instance.turn != PhotonNetwork.LocalPlayer.ActorNumber) // when not the character's turn, camera can move around
+        if (GameManager.Instance.CurrentTurnPlayerNum != PhotonNetwork.LocalPlayer.ActorNumber) // when not the character's turn, camera can move around
         {
             cameraCentered = false;
             if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) == 1f)
@@ -80,7 +85,7 @@ public class CameraManager : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        if (GameManager.Instance.turn == PhotonNetwork.LocalPlayer.ActorNumber && cameraCentered)
+        if (GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber && cameraCentered)
         {
             MainCamera.transform.position = targetCharacter.transform.position + cameraOffset;
         }

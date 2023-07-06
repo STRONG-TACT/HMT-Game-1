@@ -20,6 +20,11 @@ public class GameAssets : MonoBehaviour
     public Sprite giantIcon;
     public Sprite humanIcon;
 
+    [Header("YouAre UI Assets")]
+    public Sprite youAreDwarf;
+    public Sprite youAreGiant;
+    public Sprite youAreHuman;
+
     public Sprite GetCharacterIcon(CharacterConfig.CharacterType character) {
         return character switch {
             CharacterConfig.CharacterType.Dwarf => dwarfIcon,
