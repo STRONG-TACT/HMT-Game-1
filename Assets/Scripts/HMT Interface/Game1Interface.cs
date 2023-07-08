@@ -271,8 +271,60 @@ public class Game1Interface : HMTInterface {
         }
     }
 
-    public override string ExecuteAction(string action) {
-        return "No Action to Execute for now.";
+    public bool MyTurn {
+        get {
+            return GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber;
+        }
+    }
+
+    public Character LocalCharacter {
+        get {
+            if (gameData != null && gameData.Initialized && PlayerMapper.Instance.Inititialized) {
+                return gameData.inSceneCharacters[PlayerMapper.Instance.LocalCharacterNumber];
+            }
+            else {
+                return null;
+            }
+        }
+    }
+
+    public override string ExecuteAction(JObject actionJob) {
+        if (!MyTurn) {
+            return "Not your turn";
+        }
+
+        string action = actionJob["action"].ToString();
+        switch (action.ToLower()) {
+            case "move":
+                string direction = ((JArray)actionJob["inputs"])[0].ToString();
+                switch (direction.ToLower()) {
+                    case "up":
+                        GameManager.Instance.CallMoveCharacter(PlayerMapper.Instance.LocalCharacterNumber, Character.Direction.Up);
+                        break;
+                    case "down":
+                        GameManager.Instance.CallMoveCharacter(PlayerMapper.Instance.LocalCharacterNumber, Character.Direction.Down);
+                        break;
+                    case "left":
+                        GameManager.Instance.CallMoveCharacter(PlayerMapper.Instance.LocalCharacterNumber, Character.Direction.Left);
+                        break;
+                    case "right":
+                        GameManager.Instance.CallMoveCharacter(PlayerMapper.Instance.LocalCharacterNumber, Character.Direction.Right);
+                        break;
+                    default:
+                        return string.Format("Unknown Direction: {0}", direction);
+                }
+                return "OK";
+            case "interact":
+                if(CombatSystem.Instance.State == CombatSystem.FightState.Waiting) {
+                    GameManager.Instance.CallRollDie();
+                }
+                break;
+            default:
+                return string.Format("Unknown Action: {0}", action);
+        }
+
+        return string.Empty;
+
     }
 
 }

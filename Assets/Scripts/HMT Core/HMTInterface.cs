@@ -170,11 +170,12 @@ namespace HMT {
         /// <summary>
         /// Exectutes a character action on behalf of the agent.
         /// 
-        /// This is mostly a stub for now since actions will probalby require more than a single string for context.
+        /// Currently it expects a JObject that should have come over the wire.
+        /// In general we would assume the JObject would have selection, action, and inputs fields.
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public abstract string ExecuteAction(string action);
+        public abstract string ExecuteAction(JObject action);
 
         /// <summary>
         /// Process a command comming off of the Websocket Protocol.
@@ -200,7 +201,7 @@ namespace HMT {
                 case "execute_action":
                     //TODO this is just a stub API for now. Actions' will likely be much more complex.
                     string action = json["action"].ToString();
-                    response = ExecuteAction(action);
+                    response = ExecuteAction(json);
                     //do the action
                     //respond with result?
                     break;
