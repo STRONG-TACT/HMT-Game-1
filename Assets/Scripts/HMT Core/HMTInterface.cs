@@ -3,6 +3,7 @@ using UnityEngine;
 #if HMT_BUILD
 using WebSocketSharp;
 using WebSocketSharp.Server;
+using System.Collections.Concurrent;
 #endif
 
 namespace HMT {
@@ -17,6 +18,8 @@ namespace HMT {
 
 #if HMT_BUILD
         private WebSocketServer server = null;
+
+        public ConcurrentQueue<JObject> CommandQueue = new ConcurrentQueue<JObject>();
 
         // Start is called before the first frame update
         virtual protected void Start() {
@@ -59,6 +62,17 @@ namespace HMT {
             }
             if (CheckHotKey(PrintCurrentStateHotKey)) {
                 Debug.LogFormat("[HMTInterface] State Hotkey: {0}", GetState(false));
+            }
+
+            while(CommandQueue.Count > 0)  {
+                if (CommandQueue.TryDequeue(out JObject command))
+                {
+                   string resp = ProcessCommand(command["command"].ToString(), command);
+                    if(resp != string.Empty)
+                    {
+                        server.WebSocketServices.Broadcast(resp);
+                    }
+                }
             }
         }
 
@@ -227,13 +241,17 @@ namespace HMT {
     public class HMTService : WebSocketBehavior {
         protected override void OnMessage(MessageEventArgs e) {
             string response = string.Empty;
-
+            Debug.LogFormat("[HMTInterface] recieved command: {0}", e.Data);
             JObject json = JObject.Parse(e.Data);
-            string command = json["command"].ToString();
+            HMTInterface.Instance.CommandQueue.Enqueue(json);
 
-            Debug.LogFormat("[HMTInterface] recieved command: {0}", command);
+
+
+            /*string command = json["command"].ToString();
+
+
             response = HMTInterface.Instance.ProcessCommand(command, json);
-            Send(response);
+            Send(response);*/
         }
 
         protected override void OnOpen() {
