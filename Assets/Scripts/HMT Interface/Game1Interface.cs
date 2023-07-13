@@ -193,7 +193,7 @@ public class Game1Interface : HMTInterface {
                 'H' => "human",
                 _ => "UNKOWN"
             };
-            PlayerHealth health = character.GetComponent<PlayerHealth>();
+            //PlayerHealth health = character.GetComponent<PlayerHealth>();
             scene.Add(new JObject {
                 {"name", character.name },
                 {"controllingPlayerId", character.playerId }, //TODO this value is wrong
@@ -202,7 +202,7 @@ public class Game1Interface : HMTInterface {
                 {"movementRange", character.config.movement },
                 {"sightRange", character.config.sightRange },
                 {"dieFaces", new JArray(character.config.dieFaces) },
-                {"health", health.heart.Length}
+                {"health", character.Health}
             });
         }
 
