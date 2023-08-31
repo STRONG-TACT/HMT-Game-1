@@ -21,6 +21,8 @@ namespace HMT {
 
         public ConcurrentQueue<JObject> CommandQueue = new ConcurrentQueue<JObject>();
 
+        public ArgParser ArgParser = new ArgParser();
+
         // Start is called before the first frame update
         virtual protected void Start() {
             if (Instance != null) {
@@ -30,6 +32,12 @@ namespace HMT {
             else {
                 Instance = this;
             }
+            
+
+            ArgParser.AddArg("hmtsocketurl", ArgParser.ArgType.One);
+            ArgParser.AddArg("hmtsocketport", ArgParser.ArgType.One);
+
+            ArgParser.ParseArgs();
 
             DontDestroyOnLoad(this);
             if (StartServerOnStart) {
@@ -38,6 +46,9 @@ namespace HMT {
         }
 
         public void StartSocketServer() {
+            socketPort = ArgParser.GetArgValue("hmtsocketport", socketPort);
+            url = ArgParser.GetArgValue("hmtsocketurl", url);
+
             if (socketPort == 80) {
                 Debug.LogWarning("Socket set to Port 80, which will probably have permissions issues.");
             }
@@ -112,6 +123,8 @@ namespace HMT {
                 GUILayout.Label("Socket Server Status");
                 if (server == null) {
                     GUILayout.Label("Server NOT connected.");
+                    GUILayout.Label(string.Format("URL: {0}", ArgParser.GetArgValue("hmtsocketurl", url)));
+                    GUILayout.Label(string.Format("Port: {0}", ArgParser.GetArgValue("hmtsocketport", socketPort)));
                 }
                 else {
                     GUILayout.Label(string.Format("Address: {0}", server.Address.ToString()));
