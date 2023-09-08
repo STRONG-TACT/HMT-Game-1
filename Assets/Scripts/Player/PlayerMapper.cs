@@ -122,12 +122,21 @@ public class PlayerMapper : MonoBehaviour {
     public int GetCharacterFromPlayer(int playerNum) {
         if(!characterMapping.ContainsKey(playerNum)) {
             Debug.LogErrorFormat("PlayerMapper: Player {0} could not find character assignment defaulting to 0!", playerNum);
-            return 0;
+            return -1;
         }
         return characterMapping[playerNum];
     }
 
-    public int GetPlayerFromCharacter(int playerNum) {
-        return characterMapping.FirstOrDefault(x => x.Value == playerNum).Key;
+    public int GetPlayerIdFromCharacterId(int characterNum) {
+        return characterMapping.FirstOrDefault(x => x.Value == characterNum).Key;
+    }
+
+    public int GetPlayerIdFromCharacter(Character character) {
+        for(int i = 0; i < GameManager.Instance.gameData.inSceneCharacters.Length; i++) {
+            if (GameManager.Instance.gameData.inSceneCharacters[i] == character) {
+                return GetPlayerIdFromCharacterId(i);
+            }
+        }
+        return -1;
     }
 }

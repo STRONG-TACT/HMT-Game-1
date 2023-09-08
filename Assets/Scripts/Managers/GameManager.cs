@@ -18,7 +18,7 @@ using static CombatSystem;
 public class GameManager : MonoBehaviour {
     public static GameManager Instance = null;
     private PhotonView photonView;
-    private GameData gameData;
+    public GameData gameData {get; private set;}
     private UIManager uiManager;
     public GameAssets gameAssets;
     public bool debugRPCReceipts = false;

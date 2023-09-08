@@ -196,7 +196,7 @@ public class Game1Interface : HMTInterface {
             //PlayerHealth health = character.GetComponent<PlayerHealth>();
             scene.Add(new JObject {
                 {"name", character.name },
-                {"controllingPlayerId", character.playerId }, //TODO this value is wrong
+                {"controllingPlayerId", PlayerMapper.Instance.GetPlayerIdFromCharacter(character)}, //TODO this value is wrong
                 {"type", role},
                 {"moveCount", character.moveCount },
                 {"movementRange", character.config.movement },

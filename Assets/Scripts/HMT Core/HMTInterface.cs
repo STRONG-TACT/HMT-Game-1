@@ -139,6 +139,11 @@ namespace HMT {
                 if(GUILayout.Button("Snap State")) {
                     lastState = GetState(true);
                 }
+                if(lastState != string.Empty) {
+                    if(GUILayout.Button("Copy State")) {
+                        GUIUtility.systemCopyBuffer = lastState;
+                    }
+                }
                 GUILayout.Label(lastState);
                 GUILayout.EndVertical();
                 GUILayout.EndScrollView();
