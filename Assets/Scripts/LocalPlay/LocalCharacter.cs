@@ -6,7 +6,7 @@ public class LocalCharacter : MonoBehaviour
 {
     public enum Direction
     {
-        Left = 1, Right = 2, Up = 3, Down = 4
+        Up = 1, Down = 2, Left = 3, Right = 4, Wait = 0
     }
 
     public float speed;
@@ -16,8 +16,6 @@ public class LocalCharacter : MonoBehaviour
     private float stepLength;
 
     public int playerId;
-
-    public int moveCount;
 
     public CharacterConfig config;
     public int CharacterId;
@@ -33,15 +31,7 @@ public class LocalCharacter : MonoBehaviour
         movePoint = transform.position;
         prevMovePointPos = movePoint;
 
-        moveCount = 0;
-
         health = 3;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void SetUpConfig(CharacterConfig config, int characterId, LocalGameData gameData)
@@ -66,7 +56,134 @@ public class LocalCharacter : MonoBehaviour
         return !Physics.Raycast(indicator.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible"));
     }
 
-    public void startPlanning() {
+    public void startPlanning()
+    {
         indicator.SetActive(true);
+    }
+
+    public void pausePlanning()
+    {
+        indicator.SetActive(false);
+    }
+
+    public void endPlanning()
+    {
+        indicator.SetActive(false);
+        indicator.transform.position = this.transform.position;
+    }
+
+    public void planNewStep(Direction direction)
+    {
+        Vector3 moveVec = Vector3.zero;
+        //Quaternion rot = Quaternion.identity;
+
+        switch (direction)
+        {
+            case Direction.Up:
+                moveVec = Vector3.forward;
+                //rot = Quaternion.Euler(0, 0, 0);
+                break;
+
+            case Direction.Down:
+                moveVec = Vector3.back;
+                //rot = Quaternion.Euler(0, 180, 0);
+                break;
+
+            case Direction.Left:
+                moveVec = Vector3.left;
+                //rot = Quaternion.Euler(0, 270, 0);
+                break;
+
+            case Direction.Right:
+                moveVec = Vector3.right;
+                //rot = Quaternion.Euler(0, 90, 0);
+                break;
+
+            default:
+                break;
+        }
+
+        indicator.transform.position += moveVec * stepLength;
+    }
+
+    public void backOnePlannedStep(Direction direction)
+    {
+        Vector3 moveVec = Vector3.zero;
+        //Quaternion rot = Quaternion.identity;
+
+        switch (direction)
+        {
+            case Direction.Up:
+                moveVec = Vector3.forward;
+                //rot = Quaternion.Euler(0, 0, 0);
+                break;
+
+            case Direction.Down:
+                moveVec = Vector3.back;
+                //rot = Quaternion.Euler(0, 180, 0);
+                break;
+
+            case Direction.Left:
+                moveVec = Vector3.left;
+                //rot = Quaternion.Euler(0, 270, 0);
+                break;
+
+            case Direction.Right:
+                moveVec = Vector3.right;
+                //rot = Quaternion.Euler(0, 90, 0);
+                break;
+
+            default:
+                break;
+        }
+
+        indicator.transform.position += -moveVec * stepLength;
+    }
+
+    public void moveOneStep(Direction direction)
+    {
+        Vector3 moveVec = Vector3.zero;
+        //Quaternion rot = Quaternion.identity;
+
+        switch (direction)
+        {
+            case Direction.Up:
+                moveVec = Vector3.forward;
+                //rot = Quaternion.Euler(0, 0, 0);
+                break;
+
+            case Direction.Down:
+                moveVec = Vector3.back;
+                //rot = Quaternion.Euler(0, 180, 0);
+                break;
+
+            case Direction.Left:
+                moveVec = Vector3.left;
+                //rot = Quaternion.Euler(0, 270, 0);
+                break;
+
+            case Direction.Right:
+                moveVec = Vector3.right;
+                //rot = Quaternion.Euler(0, 90, 0);
+                break;
+
+            default:
+                break;
+        }
+
+        this.transform.position += moveVec * stepLength;
+    }
+
+    private void OnTriggerEnter(Collider col)
+    {
+        switch (col.gameObject.tag)
+        {
+            case "Monster":
+                Debug.Log("Collide with a monster. An event should happen.");
+                break;
+            default:
+                Debug.LogFormat("Character Hit Trigger: {0}", col.gameObject.tag);
+                break;
+        }
     }
 }

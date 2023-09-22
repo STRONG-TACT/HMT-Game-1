@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LocalPlayer : MonoBehaviour
 {
@@ -8,7 +8,19 @@ public class LocalPlayer : MonoBehaviour
 
     public bool isPlanning = false;
 
-    private int moveCount = 0;
+    public int charaID { get { return myCharacter.CharacterId; } }
+
+    public Button dwarfBtn;
+    public Button gaintBtn;
+    public Button humanBtn;
+
+    public Button upBtn;
+    public Button downBtn;
+    public Button leftBtn;
+    public Button rightBtn;
+    public Button waitBtn;
+    public Button backBtn;
+    public Button submitBtn;
 
     // Start is called before the first frame update
     void Start()
@@ -16,40 +28,176 @@ public class LocalPlayer : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         isPlanning = false;
+
+        dwarfBtn.onClick.AddListener(delegate { switchCharacter(0); });
+        gaintBtn.onClick.AddListener(delegate { switchCharacter(1); });
+        humanBtn.onClick.AddListener(delegate { switchCharacter(2); });
+
+        upBtn.onClick.AddListener(delegate { addNewMove(1); });
+        downBtn.onClick.AddListener(delegate { addNewMove(2); });
+        leftBtn.onClick.AddListener(delegate { addNewMove(3); });
+        rightBtn.onClick.AddListener(delegate { addNewMove(4); });
+        waitBtn.onClick.AddListener(delegate { addNewMove(0); });
+
+        backBtn.onClick.AddListener(delegate { backOneMove(); });
+        submitBtn.onClick.AddListener(delegate { submitPlan(); });
     }
 
+    //// Update is called once per frame
+    //void Update()
+    //{
+    //    if (isPlanning)
+    //    {
+    //        if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) == 1f)
+    //        {
+    //            if (Input.GetAxisRaw("Horizontal") < 0 && myCharacter.CheckMove(LocalCharacter.Direction.Left))
+    //            {
+    //                Debug.Log("Moving left");
 
+    //                myCharacter.planNewStep(LocalCharacter.Direction.Left);
+    //            }
+    //            else if (Input.GetAxisRaw("Horizontal") > 0 && myCharacter.CheckMove(LocalCharacter.Direction.Right))
+    //            {
+    //                Debug.Log("Moving right");
+    //            }
+    //        }
+    //        //vertical move
+    //        else if (Mathf.Abs(Input.GetAxisRaw("Vertical")) == 1f)
+    //        {
+    //            if (Input.GetAxisRaw("Vertical") > 0 && myCharacter.CheckMove(LocalCharacter.Direction.Up))
+    //            {
+    //                Debug.Log("Moving up");
+    //            }
+    //            else if (Input.GetAxisRaw("Vertical") < 0 && myCharacter.CheckMove(LocalCharacter.Direction.Down))
+    //            {
+    //                Debug.Log("Moving down");
+    //            }
+    //        }
+    //    }
+    //}
 
-    // Update is called once per frame
-    void Update()
+    private void switchCharacter(int index)
     {
-        if (isPlanning)
+        LocalGameManager.Instance.switchCharacter(index);
+    }
+
+    public void charaSwitched(int index, bool submitted, bool isEmpty, bool isFull)
+    {
+        switch (index)
         {
-            if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) == 1f)
-            {
-                if (Input.GetAxisRaw("Horizontal") < 0 && myCharacter.CheckMove(LocalCharacter.Direction.Left))
-                {
-                    Debug.Log("Moving left");
-                    moveCount += 1;
-                    LocalGameManager.Instance.PlanUpdated(myCharacter.config.movement - moveCount);
-                }
-                else if (Input.GetAxisRaw("Horizontal") > 0 && myCharacter.CheckMove(LocalCharacter.Direction.Right))
-                {
-                    Debug.Log("Moving right");
-                }
-            }
-            //vertical move
-            else if (Mathf.Abs(Input.GetAxisRaw("Vertical")) == 1f)
-            {
-                if (Input.GetAxisRaw("Vertical") > 0 && myCharacter.CheckMove(LocalCharacter.Direction.Up))
-                {
-                    Debug.Log("Moving up");
-                }
-                else if (Input.GetAxisRaw("Vertical") < 0 && myCharacter.CheckMove(LocalCharacter.Direction.Down))
-                {
-                    Debug.Log("Moving down");
-                }
-            }
+            case 0:
+                dwarfBtn.interactable = false;
+                gaintBtn.interactable = true;
+                humanBtn.interactable = true;
+                break;
+            case 1:
+                dwarfBtn.interactable = true;
+                gaintBtn.interactable = false;
+                humanBtn.interactable = true;
+                break;
+            case 2:
+                dwarfBtn.interactable = true;
+                gaintBtn.interactable = true;
+                humanBtn.interactable = false;
+                break;
+            default:
+                break;
         }
+
+        checkBtnStatus(submitted, isEmpty, isFull);
+    }
+
+    public void addNewMove(int move)
+    {
+        if(move > 0 && move < 5 && myCharacter.CheckMove((LocalCharacter.Direction)move))
+        {
+            LocalGameManager.Instance.newPlayerMovePlan(charaID, move);
+        }else if (move == 0)
+        {
+            LocalGameManager.Instance.newPlayerMovePlan(charaID, move);
+        }
+    }
+
+    public void planUpdated(bool submitted, bool isEmpty, bool isFull)
+    {
+        checkBtnStatus(submitted, isEmpty, isFull);
+    }
+
+    public void backOneMove()
+    {
+        LocalGameManager.Instance.backOneMove(charaID);
+    }
+
+    public void submitPlan()
+    {
+        LocalGameManager.Instance.newPlanSubmitted(charaID);
+    }
+
+    private void checkBtnStatus(bool submitted, bool isEmpty, bool isFull)
+    {
+        if (submitted)
+        {
+            shutDownPlanButtons();
+        }
+        else if (isFull)
+        {
+            lastMovePlaned();
+        }
+        else if (isEmpty)
+        {
+            noMovePlaned();
+        }
+        else
+        {
+            someMovePlaned();
+        }
+    }
+
+    public void lastMovePlaned()
+    {
+        upBtn.interactable = false;
+        downBtn.interactable = false;
+        leftBtn.interactable = false;
+        rightBtn.interactable = false;
+        waitBtn.interactable = false;
+
+        backBtn.interactable = true;
+        submitBtn.interactable = true;
+    }
+
+    public void noMovePlaned()
+    {
+        upBtn.interactable = true;
+        downBtn.interactable = true;
+        leftBtn.interactable = true;
+        rightBtn.interactable = true;
+        waitBtn.interactable = true;
+
+        backBtn.interactable = false;
+        submitBtn.interactable = false;
+    }
+
+    public void someMovePlaned()
+    {
+        upBtn.interactable = true;
+        downBtn.interactable = true;
+        leftBtn.interactable = true;
+        rightBtn.interactable = true;
+        waitBtn.interactable = true;
+
+        backBtn.interactable = true;
+        submitBtn.interactable = false;
+    }
+
+    public void shutDownPlanButtons()
+    {
+        upBtn.interactable = false;
+        downBtn.interactable = false;
+        leftBtn.interactable = false;
+        rightBtn.interactable = false;
+        waitBtn.interactable = false;
+
+        backBtn.interactable = false;
+        submitBtn.interactable = false;
     }
 }

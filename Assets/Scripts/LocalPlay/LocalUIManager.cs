@@ -11,6 +11,9 @@ public class LocalUIManager : MonoBehaviour
 
     private string stageText = "";
 
+    public GameObject PlanUI;
+    public GameObject SwitchCharaButton;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -37,15 +40,31 @@ public class LocalUIManager : MonoBehaviour
         LocalGameManager.Instance.StartLevel();
     }
 
-    public void ShowCharacterPlanUI(string charaName)
+    public void ShowCharacterPlanUI(string charaName, int movePoints)
     {
-        stageText = string.Format("{0}'s planning time - ", charaName);
+        stageText = string.Format("{0}'s planning - ", charaName);
 
-        text.text = stageText;
+        text.text = stageText + string.Format("Moves left: {0}", movePoints);
+
+        PlanUI.SetActive(true);
+        SwitchCharaButton.SetActive(true);
     }
 
-    public void ShowMoveLeft(int moveLeft)
+    public void HideCharacterPlanUI()
     {
-        text.text = stageText + string.Format("Moves left: {0}", moveLeft);
+        text.text = "Characters moving...";
+
+        PlanUI.SetActive(false);
+        SwitchCharaButton.SetActive(false);
+    }
+
+    public void ShowMoveLeft(int movePoints)
+    {
+        text.text = stageText + string.Format("Moves left: {0}", movePoints);
+    }
+
+    public void ShowMonsterTurnUI()
+    {
+        text.text = "Monsters moving...";
     }
 }
