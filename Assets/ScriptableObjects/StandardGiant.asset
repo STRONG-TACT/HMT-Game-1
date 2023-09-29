@@ -15,6 +15,9 @@ MonoBehaviour:
   characterName: Giant
   type: 2
   movement: 2
+  monsterDice: 6
+  trapDice: 4
+  stoneDice: 8
   sightRange: 7
   cameraPosition: {x: 0, y: 0, z: 0}
   dieFaces: 040000000400000005000000050000000600000006000000

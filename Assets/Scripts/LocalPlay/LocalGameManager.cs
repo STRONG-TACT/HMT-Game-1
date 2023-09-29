@@ -13,6 +13,7 @@ public class LocalGameManager : MonoBehaviour
 {
     public static LocalGameManager Instance = null;
     public LocalGameData gameData { get; private set; }
+    public List<LocalMonster> inSceneMonsters;
     private LocalUIManager uiManager;
     public LocalPlayer player;
     public bool debugRPCReceipts = false;
@@ -26,11 +27,12 @@ public class LocalGameManager : MonoBehaviour
     [HideInInspector] public int goalCount; // Goal collected, shown on the UI
     private int currentActionPoints;
 
+    public bool isPlayerTurn = true;
     private int planSubmittedCount = 0;
     private bool[] isSubmitted;
     private bool[] isEmpty;
     private bool[] isFull;
-    private int moveFinishedCount = 0;
+    public int moveFinishedCount = 0;
 
     private List<int> DwarfPlan;
     private List<int> GiantPlan;
@@ -39,7 +41,7 @@ public class LocalGameManager : MonoBehaviour
     private Queue<int> DwarfMoves;
     private Queue<int> GiantMoves;
     private Queue<int> HumanMoves;
-    private Queue<LocalCombat> eventQueue;
+    private Queue<LocalTile> eventQueue;
 
     private void Awake()
     {
@@ -47,6 +49,11 @@ public class LocalGameManager : MonoBehaviour
         uiManager = FindObjectOfType<LocalUIManager>();
         gameData = FindObjectOfType<LocalGameData>();
         player = FindObjectOfType<LocalPlayer>();
+
+        for (int i = 0; i < gameData.inSceneMonsters.Length; i++)
+        {
+            inSceneMonsters.Add(gameData.inSceneMonsters[i]);
+        }
 
         if (gameData.gameLevel == 1)
         {
@@ -79,6 +86,7 @@ public class LocalGameManager : MonoBehaviour
     private void StartPlayerTurn()
     {
         //Player start to plan their moves
+        isPlayerTurn = true;
         planSubmittedCount = 0;
 
         DwarfPlan = new List<int>();
@@ -90,11 +98,6 @@ public class LocalGameManager : MonoBehaviour
         isFull = new bool[3] { false, false, false };
 
         StartPlayerPlanningPhase();
-    }
-
-    private void StartMonsterTurn()
-    {
-        uiManager.ShowMonsterTurnUI();
     }
 
     private void StartPlayerPlanningPhase()
@@ -173,6 +176,7 @@ public class LocalGameManager : MonoBehaviour
         DwarfMoves = new Queue<int>();
         GiantMoves = new Queue<int>();
         HumanMoves = new Queue<int>();
+        eventQueue = new Queue<LocalTile>();
 
         for (int i = 0; i < DwarfPlan.Count; i ++)
         {
@@ -192,13 +196,21 @@ public class LocalGameManager : MonoBehaviour
 
     private IEnumerator CharacterMoveByStep()
     {
-        isEmpty = new bool[3] { false, false, false };
+        uiManager.ShowCharacterMovingUI();
+
+        // A flag, whether this round of step triggers a combat
+        bool hasCombat = false;
+
+        if (moveFinishedCount <= 0)
+        {
+            isEmpty = new bool[3] { false, false, false };
+        }
 
         while (moveFinishedCount < 3)
         {
             if (!isEmpty[0])
             {
-                Debug.Log("In Loop.");
+                //Debug.Log("In Loop.");
                 if (DwarfMoves.Count == 0)
                 {
                     isEmpty[0] = true;
@@ -240,21 +252,131 @@ public class LocalGameManager : MonoBehaviour
 
             if (eventQueue.Count != 0)
             {
-                StartCoroutine(CombatOneByOne());
+                StartCoroutine(ExecuteCombatOneByOne());
+                hasCombat = true;
                 break;
             }
         }
 
-        if (moveFinishedCount == 3)
+        // If everyone finishes and no combat happens
+            // if there are combats, deal with them and then come back
+        if (moveFinishedCount == 3 && !hasCombat)
         {
             Debug.Log("Moving phase ended.");
             StartMonsterTurn();
         }
     }
 
-    private IEnumerator CombatOneByOne()
+    private void StartMonsterTurn()
     {
-        yield return new WaitForSeconds(0.8f);
+        isPlayerTurn = false;
+        moveFinishedCount = 0;
+
+        foreach (LocalMonster m in inSceneMonsters)
+        {
+            m.MonsterTurnStart();
+        }
+
+        StartCoroutine(MonsterMoveByStep());
+    }
+
+    private IEnumerator MonsterMoveByStep()
+    {
+        uiManager.ShowMonsterTurnUI();
+        bool hasCombat = false;
+
+        while (moveFinishedCount < inSceneMonsters.Count)
+        {
+            foreach(LocalMonster m in inSceneMonsters)
+            {
+                if (!m.turnFinished)
+                {
+                    // if monster still have moves
+                    m.moveOneStep();
+                }
+            }
+
+            yield return new WaitForSeconds(1.2f);
+
+            if (eventQueue.Count != 0)
+            {
+                StartCoroutine(ExecuteCombatOneByOne());
+                hasCombat = true;
+                break;
+            }
+        }
+
+        if (moveFinishedCount == inSceneMonsters.Count && !hasCombat)
+        {
+            Debug.Log("Monster moving phase ended.");
+            StartPlayerTurn();
+        }
+    }
+
+    public void monsterMoveFinished()
+    {
+        moveFinishedCount += 1;
+    }
+
+    private IEnumerator ExecuteCombatOneByOne()
+    {
+        Debug.Log("An event happened.");
+
+        while (eventQueue.Count != 0)
+        {
+            bool win = false;
+            LocalTile t = eventQueue.Dequeue();
+
+            if (!t.isBarrier)
+            {
+                win = Combat.ExecuteCombat(Combat.FightType.Monster, t, uiManager);
+            }
+            else
+            {
+                if (t.tileType == LocalTile.TileType.Trap)
+                {
+                    win = Combat.ExecuteCombat(Combat.FightType.Trap, t, uiManager);
+                }else if (t.tileType == LocalTile.TileType.Rock)
+                {
+                    win = Combat.ExecuteCombat(Combat.FightType.Rock, t, uiManager);
+                }
+            }
+
+            if (win)
+            {
+                // if the character(s) won the battle, destory the enemies
+                Debug.Log("Character won.");
+
+                foreach (LocalMonster m in t.enemyList)
+                {
+                    inSceneMonsters.Remove(m);
+                    Destroy(m.gameObject);
+                }
+
+                t.enemyList.Clear();
+            }
+            else
+            {
+                // If not, reduce health
+                Debug.Log("Enemy won.");
+                
+            }
+
+            yield return new WaitForSeconds(1.5f);
+        }
+
+        if (isPlayerTurn)
+        {
+            StartCoroutine(CharacterMoveByStep());
+        }else if (!isPlayerTurn)
+        {
+            StartCoroutine(MonsterMoveByStep());
+        }
+    }
+
+    public void updateEventQueue(LocalTile tile)
+    {
+        eventQueue.Enqueue(tile);
     }
 
     private int getMovePoints(int index)
@@ -339,6 +461,11 @@ public class LocalGameManager : MonoBehaviour
                 {
                     isEmpty[index] = true;
                 }
+                if (isFull[index])
+                {
+                    isFull[index] = false;
+                }
+                
                 break;
             case 1:
                 move = GiantPlan[GiantPlan.Count - 1];
@@ -348,6 +475,11 @@ public class LocalGameManager : MonoBehaviour
                 {
                     isEmpty[index] = true;
                 }
+                if (isFull[index])
+                {
+                    isFull[index] = false;
+                }
+
                 break;
             case 2:
                 move = HumanPlan[HumanPlan.Count - 1];
@@ -357,6 +489,11 @@ public class LocalGameManager : MonoBehaviour
                 {
                     isEmpty[index] = true;
                 }
+                if (isFull[index])
+                {
+                    isFull[index] = false;
+                }
+
                 break;
             default:
                 break;

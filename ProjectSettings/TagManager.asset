@@ -16,6 +16,7 @@ TagManager:
   - Walls
   - Door
   - Corner
+  - Character
   layers:
   - Default
   - TransparentFX

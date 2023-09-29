@@ -16,6 +16,10 @@ public partial class GameData : MonoBehaviour
     public CharacterConfig[] characterConfigs;
     [Tooltip("The in-scene pointers to the character prefabs")]
     public Character[] inSceneCharacters;
+    [Tooltip("The Configurations of Characters.")]
+    public MonsterConfig[] monsterConfigs;
+    [Tooltip("The in-scene pointers to the monster prefabs")]
+    public Monster[] inSceneMonsters;
     public float tileSize;
     public float tileGapLength; // the length between tiles, mainlt used in PlayerMovement.cs
 
@@ -39,6 +43,11 @@ public partial class GameData : MonoBehaviour
 
         for(int i =0; i < characterConfigs.Length; i++) {
             inSceneCharacters[i].SetUpConfig(characterConfigs[i], i, this);
+        }
+
+        for (int j = 0; j < monsterConfigs.Length; j++)
+        {
+            inSceneMonsters[j].SetUpConfig(monsterConfigs[j], j, this);
         }
 
         Initialized = true;

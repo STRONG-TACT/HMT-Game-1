@@ -52,15 +52,37 @@ public class LocalUIManager : MonoBehaviour
 
     public void HideCharacterPlanUI()
     {
-        text.text = "Characters moving...";
-
         PlanUI.SetActive(false);
         SwitchCharaButton.SetActive(false);
+    }
+
+    public void ShowCharacterMovingUI()
+    {
+        text.text = "Characters moving...";
     }
 
     public void ShowMoveLeft(int movePoints)
     {
         text.text = stageText + string.Format("Moves left: {0}", movePoints);
+    }
+
+    public void ShowCombatUI(Combat.FightType type, List<int> charaDice, List<int> enemyDice)
+    {
+        if (type == Combat.FightType.Monster)
+        {
+            text.text = "Combat with monster... Character: ";
+            foreach (int i in charaDice)
+            {
+                text.text += string.Format("{0} ", i);
+            }
+
+            text.text += "Monster: ";
+
+            foreach (int i in enemyDice)
+            {
+                text.text += string.Format("{0} ", i);
+            }
+        }
     }
 
     public void ShowMonsterTurnUI()

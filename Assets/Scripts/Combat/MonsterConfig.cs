@@ -19,7 +19,8 @@ public class MonsterConfig : ScriptableObject
     [Min(1)]
     public int movement;
 
-
+    [Tooltip("The dice use for combat.")]
+    public Combat.DiceType combatDice;
 
     [Tooltip("The usual icon used for the monster.")]
     public Sprite MonsterIcon;

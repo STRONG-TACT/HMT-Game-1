@@ -17,6 +17,13 @@ public class CharacterConfig : ScriptableObject {
     [Min(1)]
     public int movement;
 
+    [Tooltip("Combat dice when facing monsters.")]
+    public Combat.DiceType monsterDice;
+    [Tooltip("Combat dice when facing traps.")]
+    public Combat.DiceType trapDice;
+    [Tooltip("Combat dice when facing stones.")]
+    public Combat.DiceType stoneDice;
+
     //Below here currently only used for reference.
     [Tooltip("How many adjacent tiles they can see. Currently for reference only.")]
     [Min(1)]

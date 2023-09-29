@@ -171,19 +171,11 @@ public class LocalCharacter : MonoBehaviour
                 break;
         }
 
-        this.transform.position += moveVec * stepLength;
+        prevMovePointPos = movePoint; 
+        movePoint += moveVec * stepLength;
+
+        this.transform.position = movePoint;
     }
 
-    private void OnTriggerEnter(Collider col)
-    {
-        switch (col.gameObject.tag)
-        {
-            case "Monster":
-                Debug.Log("Collide with a monster. An event should happen.");
-                break;
-            default:
-                Debug.LogFormat("Character Hit Trigger: {0}", col.gameObject.tag);
-                break;
-        }
-    }
+
 }

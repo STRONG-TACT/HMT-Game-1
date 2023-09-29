@@ -15,4 +15,5 @@ MonoBehaviour:
   monsterName: S_Monster
   type: 2
   movement: 2
+  combatDice: 4
   MonsterIcon: {fileID: 0}
