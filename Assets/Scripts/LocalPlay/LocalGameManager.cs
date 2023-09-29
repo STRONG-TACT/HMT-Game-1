@@ -24,7 +24,7 @@ public class LocalGameManager : MonoBehaviour
 
     public Character mainCharacter;
     //[HideInInspector] public List<int> playerIDs = new List<int>(); // All the characters' Photon ViewID
-    [HideInInspector] public int goalCount; // Goal collected, shown on the UI
+    public int goalCount; // Goal collected, shown on the UI
     private int currentActionPoints;
 
     public bool isPlayerTurn = true;
@@ -49,6 +49,7 @@ public class LocalGameManager : MonoBehaviour
         uiManager = FindObjectOfType<LocalUIManager>();
         gameData = FindObjectOfType<LocalGameData>();
         player = FindObjectOfType<LocalPlayer>();
+        goalCount = 0;
 
         for (int i = 0; i < gameData.inSceneMonsters.Length; i++)
         {
@@ -358,7 +359,32 @@ public class LocalGameManager : MonoBehaviour
             else
             {
                 // If not, reduce health
+                // If character's turn, all remaining steps should be cleared.
                 Debug.Log("Enemy won.");
+
+                foreach (LocalCharacter c in t.charaList)
+                {
+                    c.HealthReduced();
+
+                    if (isPlayerTurn)
+                    {
+                        switch (c.CharacterId)
+                        {
+                            case 0:
+                                DwarfMoves.Clear();
+                                break;
+                            case 1:
+                                GiantMoves.Clear();
+                                break;
+                            case 2:
+                                HumanMoves.Clear();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                
                 
             }
 
@@ -501,5 +527,15 @@ public class LocalGameManager : MonoBehaviour
 
         player.planUpdated(false, isEmpty[index], false);
         return move;
+    }
+
+    public void GoalReached(int charaID)
+    {
+        goalCount += 1;
+    }
+
+    public void NextLevel()
+    {
+        Debug.Log("Moving to next level.");
     }
 }

@@ -177,5 +177,63 @@ public class LocalCharacter : MonoBehaviour
         this.transform.position = movePoint;
     }
 
+    private void OnTriggerEnter(Collider col)
+    {
+        //Debug.LogFormat("Character Hit Trigger: {0}", col.gameObject.tag);
+        switch (col.gameObject.tag)
+        {
+            case "Goal":
+                //Debug.Log("Triggered Goal");
+                if (CheckRightGoal(col.gameObject))
+                {
+                    LocalGameManager.Instance.GoalReached(CharacterId);
+                    Destroy(col.gameObject);
+                }
+                break;
 
+            case "Door":
+                //Debug.Log("Triggered Door");
+                //After collect all the goal, the door can be stepped and end game
+                if (LocalGameManager.Instance.goalCount == 3)
+                { //take th econditional logic out of the character and move it to the Manager
+                    LocalGameManager.Instance.NextLevel();
+                }
+                break;
+
+            default:
+                //Debug.LogFormat("Character Hit Trigger: {0}", col.gameObject.tag);
+                break;
+        }
+    }
+
+    private bool CheckRightGoal(GameObject goal)
+    {
+        if (config.type == CharacterConfig.CharacterType.Dwarf && goal.name == "DwarfGoal")
+        {
+            return true;
+        }
+        else if (config.type == CharacterConfig.CharacterType.Giant && goal.name == "GiantGoal")
+        {
+            return true;
+        }
+        else if (config.type == CharacterConfig.CharacterType.Human && goal.name == "HumanGoal")
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void HealthReduced()
+    {
+        health -= 1;
+        Debug.Log(string.Format("Character {0} health: {1}", config.characterName, health));
+
+        if (health == 0)
+        {
+            Debug.Log(string.Format("Character {0} Died!", config.characterName));
+        }
+    }
 }
