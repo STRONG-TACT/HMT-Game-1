@@ -7,6 +7,7 @@ public class CameraManager : MonoBehaviour
 {
     public static CameraManager Instance { get; private set; }
     public static Camera MainCamera;
+    public GameObject cameraPivot;
     public GameData gameData;
 
 
@@ -14,6 +15,7 @@ public class CameraManager : MonoBehaviour
     public Vector3 cameraOffset;
 
     public bool cameraCentered;
+    public float ScrollSpeed = 0.8f;
 
     float lerpDuration = 3f;
     float timer;
@@ -28,6 +30,7 @@ public class CameraManager : MonoBehaviour
         cameraCentered = true;
         gameData = FindObjectOfType<GameData>();
 
+        /*
         if (gameData.differentCameraView)
         {
             if (PhotonNetwork.LocalPlayer.ActorNumber == 1) //Dwarf photonView
@@ -43,6 +46,7 @@ public class CameraManager : MonoBehaviour
                 MainCamera.transform.position = gameData.cameraViews[2];
             }
         }
+        */
 
         //targetCharacter = GameManager.Instance.mainCharacter.transform;
         while (!PlayerMapper.Instance.Inititialized) {
@@ -56,9 +60,11 @@ public class CameraManager : MonoBehaviour
 
     private void Update()
     {
+        /*
         if (GameManager.Instance.CurrentTurnPlayerNum != PhotonNetwork.LocalPlayer.ActorNumber) // when not the character's turn, camera can move around
         {
             cameraCentered = false;
+            
             if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) == 1f)
             {
                 MainCamera.transform.position += new Vector3(Input.GetAxisRaw("Horizontal") *  0.06f, 0f, 0f);
@@ -67,6 +73,8 @@ public class CameraManager : MonoBehaviour
             {
                 MainCamera.transform.position += new Vector3(0f, 0f, Input.GetAxisRaw("Vertical") * 0.06f);
             }
+
+
         }
         else if(!cameraCentered) // when character's turn, camera move back before the character starts moving
         {
@@ -80,15 +88,43 @@ public class CameraManager : MonoBehaviour
                 cameraCentered = true;
             }
         }
+        */
+        if (Input.GetKey(KeyCode.I)) 
+        {
+            cameraPivot.transform.position += new Vector3(0f, 1 * 0.06f, 0f);
+        }
+        if (Input.GetKey(KeyCode.K))
+        {
+            cameraPivot.transform.position += new Vector3(0f, -1 * 0.06f, 0f);
+        }
+        if (Input.GetKey(KeyCode.J))
+        {
+            cameraPivot.transform.position += new Vector3(-1 * 0.03f, 0f, -1 * 0.03f);
+        }
+        if (Input.GetKey(KeyCode.L))
+        {
+            cameraPivot.transform.position += new Vector3(1 * 0.03f, 0f, 1 * 0.03f);
+        }
+
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
-        if (GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber && cameraCentered)
+        
+        //if (GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber && cameraCentered)
+        if(Input.GetKey(KeyCode.T))
         {
-            MainCamera.transform.position = targetCharacter.transform.position + cameraOffset;
+            cameraPivot.transform.position = targetCharacter.transform.position; //+ cameraOffset;
         }
+        
+        MainCamera.orthographicSize -= Input.GetAxis("Mouse ScrollWheel") * ScrollSpeed;
+        if (MainCamera.orthographicSize <= 1)
+            MainCamera.orthographicSize = 1;
+        if (MainCamera.orthographicSize >= 10)
+            MainCamera.orthographicSize = 10;
+
+
     }
 
     public void RecenterCamera() {
