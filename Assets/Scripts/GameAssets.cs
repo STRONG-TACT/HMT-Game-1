@@ -33,4 +33,9 @@ public class GameAssets : MonoBehaviour
             _ => null,
         };
     }
+
+    [Header("Tile Assets")]
+    public GameObject OpenTile;
+    public GameObject WallTile;
+    public GameObject DoorTile;
 }
