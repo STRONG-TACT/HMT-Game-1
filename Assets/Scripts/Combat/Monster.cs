@@ -14,6 +14,12 @@ public class Monster : MonoBehaviour {
     public bool generateTargetValues = false;
     private Animator animator;
 
+    public MonsterConfig config;
+    public int monsterId;
+    public GameData gameData;
+
+    private float stepLength;
+
     // Start is called before the first frame update
     void Start() {
         animator = GetComponent<Animator>();
@@ -53,5 +59,15 @@ public class Monster : MonoBehaviour {
             }
             state = newState;
         }
+    }
+
+    public void SetUpConfig(MonsterConfig config, int MonsterId, GameData data)
+    {
+        this.config = config;
+        monsterId = MonsterId;
+
+        gameData = data;
+
+        stepLength = data.tileSize + data.tileGapLength;
     }
 }
