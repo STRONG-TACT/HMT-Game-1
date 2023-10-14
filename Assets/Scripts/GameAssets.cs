@@ -36,6 +36,18 @@ public class GameAssets : MonoBehaviour
 
     [Header("Tile Assets")]
     public GameObject OpenTile;
-    public GameObject WallTile;
     public GameObject DoorTile;
+    public List<GameObject> WallTiles;
+    public List<GameObject> TrapTiles;
+    public List<GameObject> RockTiles;
+    public GameObject MapBoundary;
+
+    [Header("Character/Monster Assets")]
+    public List<GameObject> Characters;
+    public List<GameObject> Monsters;
+    public List<GameObject> Goals;
+
+    [Header("Character/Monster Config")]
+    public List<CharacterConfig> CharacterConfigs;
+    public List<MonsterConfig> MonsterConfigs;
 }

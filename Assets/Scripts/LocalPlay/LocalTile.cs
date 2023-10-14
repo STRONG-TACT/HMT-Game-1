@@ -6,19 +6,16 @@ public class LocalTile : MonoBehaviour
 {
     public enum TileType
     {
-        Passible, Impassible, Trap, Rock
+        Other, Trap, Rock
     }
 
     // The type of this tile
-    public TileType tileType = TileType.Passible;
+    public TileType tileType;
     public Combat.DiceType localDice = Combat.DiceType.D0;
     public int diceBonus = 0;
 
     public int row;
     public int col;
-
-    // If the tile has trap or rock on it
-    public bool isBarrier = false;
 
     // Lists of enemies and characters on this tile
     public List<LocalMonster> enemyList;
@@ -38,7 +35,7 @@ public class LocalTile : MonoBehaviour
                 charaList.Add(col.gameObject.GetComponent<LocalCharacter>());
                 break;
             default:
-                Debug.LogFormat("Character Hit Trigger: {0}", col.gameObject.tag);
+                Debug.LogFormat("Tile Hit Trigger: {0}", col.gameObject.tag);
                 break;
         }
 

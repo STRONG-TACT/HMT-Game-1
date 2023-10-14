@@ -208,15 +208,15 @@ public class LocalCharacter : MonoBehaviour
 
     private bool CheckRightGoal(GameObject goal)
     {
-        if (config.type == CharacterConfig.CharacterType.Dwarf && goal.name == "DwarfGoal")
+        if (config.type == CharacterConfig.CharacterType.Dwarf && goal.name.Contains("DwarfGoal"))
         {
             return true;
         }
-        else if (config.type == CharacterConfig.CharacterType.Giant && goal.name == "GiantGoal")
+        else if (config.type == CharacterConfig.CharacterType.Giant && goal.name.Contains("GiantGoal"))
         {
             return true;
         }
-        else if (config.type == CharacterConfig.CharacterType.Human && goal.name == "HumanGoal")
+        else if (config.type == CharacterConfig.CharacterType.Human && goal.name.Contains("HumanGoal"))
         {
             return true;
         }

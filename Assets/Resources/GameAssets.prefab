@@ -56,3 +56,47 @@ MonoBehaviour:
   dwarfIcon: {fileID: 21300000, guid: d0d76f0bcf97e5645bb0a8ae52e5192d, type: 3}
   giantIcon: {fileID: 21300000, guid: ef146bac666375346acc6ebaf3d7ea20, type: 3}
   humanIcon: {fileID: 21300000, guid: 84bedc0588834bb4595092c86e34fbbe, type: 3}
+  youAreDwarf: {fileID: 0}
+  youAreGiant: {fileID: 0}
+  youAreHuman: {fileID: 0}
+  OpenTile: {fileID: 820993973835651314, guid: dc9bfa23167af4069aafeba8ba5b7fb4, type: 3}
+  DoorTile: {fileID: 5421383699883065198, guid: 2156a555e7f4c4b41bcd9dbf07356e3f, type: 3}
+  WallTiles:
+  - {fileID: 5461037204865345503, guid: 6077b557c406243dca71e4e0d47f5dcc, type: 3}
+  - {fileID: 4676536006019389302, guid: efb8beacbeead4575bb50147c2436388, type: 3}
+  - {fileID: 665779002927803539, guid: b5e02e4f14105497da7e517b0bfa5736, type: 3}
+  - {fileID: 438455888594864229, guid: 9971c73df0df1419697bbffade6f76ec, type: 3}
+  - {fileID: 5959802271096397102, guid: ad1c09a307c4e40eeaf984caea821595, type: 3}
+  - {fileID: 1984093338750683295, guid: 68ffa9b1f00564fb7aae450381df8f19, type: 3}
+  - {fileID: 9153439007067548606, guid: b22349b874fd0424fa8ad053e7390403, type: 3}
+  - {fileID: 4348979063034727788, guid: a4a541ba43bbc4024bf7d236a5586f67, type: 3}
+  - {fileID: 5489681040685038276, guid: 3a20117565be841f1a0d73c6d56146fd, type: 3}
+  - {fileID: 458854253063774723, guid: 6e836351b528e4efaaa47eb0da2281ee, type: 3}
+  - {fileID: 4284385660779267023, guid: 644c1c4ac61164b389ee97d007e58883, type: 3}
+  - {fileID: 7850342880735688130, guid: 5bc145bfb2462416fbe2b7d0a63d9afe, type: 3}
+  - {fileID: 4049360142575092999, guid: 09a9adafbd5f8479e867817aa1a32543, type: 3}
+  - {fileID: 4775453016064692093, guid: 89d453257fe314ff0be98eebf368db17, type: 3}
+  - {fileID: 2195637893526711754, guid: 25752f57696ad4373abd70da3080cfaf, type: 3}
+  TrapTiles:
+  - {fileID: 7221710844014363561, guid: 6aa9873090c0241d28b5c6faa1b52e53, type: 3}
+  - {fileID: 5914118010568122004, guid: 520945744428d49caad12b15a5bb9110, type: 3}
+  RockTiles: []
+  MapBoundary: {fileID: 733805391813641436, guid: c6d2da011e7ba4f9692401c53021b507, type: 3}
+  Characters:
+  - {fileID: 2284675785199134838, guid: 0029e325ca3214438a0e4cb70cd4d0bc, type: 3}
+  - {fileID: 2958692308354745720, guid: 2daec67310b2a4e6487d722fb37b1851, type: 3}
+  - {fileID: 814971363674059150, guid: 786c6b4cdb24c479d914df36d458cf89, type: 3}
+  Monsters:
+  - {fileID: 8414332739641434188, guid: d249ffcb9ef9d44048ae0307d619d9b6, type: 3}
+  - {fileID: 3266103959046910403, guid: de429b9d68cb44eaa90fbdbf52bb2698, type: 3}
+  Goals:
+  - {fileID: 8362223678440659000, guid: 977b3e1ccab1d41c3bf33f30e78164d3, type: 3}
+  - {fileID: 7350101868502248773, guid: 915585588ce0b4eaea95a87e0d83c750, type: 3}
+  - {fileID: 5065180891822975960, guid: ed3ae3283b9394fa7b4ae297e86cb384, type: 3}
+  CharacterConfigs:
+  - {fileID: 11400000, guid: c6b44fe2a04fe7b44872f86875a07caf, type: 2}
+  - {fileID: 11400000, guid: c716ed11fa455404ab8b58937cdf7629, type: 2}
+  - {fileID: 11400000, guid: ddef099a6c3811c4c91188e77be96c42, type: 2}
+  MonsterConfigs:
+  - {fileID: 11400000, guid: e723aa6405680499d97c2d73e1e96a99, type: 2}
+  - {fileID: 11400000, guid: c11dc880b9f0e414fb0e611dd1add381, type: 2}

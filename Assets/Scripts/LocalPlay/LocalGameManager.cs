@@ -13,14 +13,17 @@ public class LocalGameManager : MonoBehaviour
 {
     public static LocalGameManager Instance = null;
     public LocalGameData gameData { get; private set; }
-    public List<LocalMonster> inSceneMonsters;
     private LocalUIManager uiManager;
     public LocalPlayer player;
     public bool debugRPCReceipts = false;
 
     public bool isFirstLevel;
 
-    public GameObject tilePrefabs;
+    [Tooltip("The in-scene pointers to the character prefabs")]
+    public List<LocalCharacter> inSceneCharacters = new List<LocalCharacter>();
+
+    [Tooltip("The in-scene pointers to the monster prefabs")]
+    public List<LocalMonster> inSceneMonsters = new List<LocalMonster>();
 
     public Character mainCharacter;
     //[HideInInspector] public List<int> playerIDs = new List<int>(); // All the characters' Photon ViewID
@@ -51,11 +54,6 @@ public class LocalGameManager : MonoBehaviour
         player = FindObjectOfType<LocalPlayer>();
         goalCount = 0;
 
-        for (int i = 0; i < gameData.inSceneMonsters.Length; i++)
-        {
-            inSceneMonsters.Add(gameData.inSceneMonsters[i]);
-        }
-
         if (gameData.gameLevel == 1)
         {
             isFirstLevel = true;
@@ -64,6 +62,11 @@ public class LocalGameManager : MonoBehaviour
         {
             isFirstLevel = false;
         }
+    }
+
+    public void setCharaPosition(int ID, float x, float z)
+    {
+        inSceneCharacters[ID].transform.position = new Vector3(x, inSceneCharacters[ID].transform.position.y, z);
     }
 
     // Start is called before the first frame update
@@ -104,11 +107,11 @@ public class LocalGameManager : MonoBehaviour
     private void StartPlayerPlanningPhase()
     {
         // Local version of player planning stage
-        player.myCharacter = gameData.inSceneCharacters[0];
+        player.myCharacter = inSceneCharacters[0];
         player.myCharacter.startPlanning();
         player.charaSwitched(0, isSubmitted[0], isEmpty[0], isFull[0]);
 
-        uiManager.ShowCharacterPlanUI(gameData.inSceneCharacters[0].name, getMovePoints(0));
+        uiManager.ShowCharacterPlanUI(inSceneCharacters[0].name, getMovePoints(0));
     }
 
     public void newPlayerMovePlan(int index, int move)
@@ -126,11 +129,12 @@ public class LocalGameManager : MonoBehaviour
     public void switchCharacter(int index)
     {
         player.myCharacter.pausePlanning();
-        
-        player.myCharacter = gameData.inSceneCharacters[index];
+
+        player.myCharacter = inSceneCharacters[index];
         player.myCharacter.startPlanning();
-        uiManager.ShowCharacterPlanUI(gameData.inSceneCharacters[index].name, getMovePoints(index));
+        uiManager.ShowCharacterPlanUI(inSceneCharacters[index].name, getMovePoints(index));
         player.charaSwitched(index, isSubmitted[index], isEmpty[index], isFull[index]);
+        LocalCameraManager.Instance.ChangeTargetCharacter(index);
     }
 
     public void backOneMove(int index)
@@ -168,7 +172,7 @@ public class LocalGameManager : MonoBehaviour
         Debug.Log("Planning phase ended.");
         uiManager.HideCharacterPlanUI();
 
-        foreach(LocalCharacter chara in gameData.inSceneCharacters)
+        foreach(LocalCharacter chara in inSceneCharacters)
         {
             chara.endPlanning();
         }
@@ -219,7 +223,7 @@ public class LocalGameManager : MonoBehaviour
                 }
                 else
                 {
-                    gameData.inSceneCharacters[0].moveOneStep((LocalCharacter.Direction)DwarfMoves.Dequeue());
+                    inSceneCharacters[0].moveOneStep((LocalCharacter.Direction)DwarfMoves.Dequeue());
                 }
             }
 
@@ -232,7 +236,7 @@ public class LocalGameManager : MonoBehaviour
                 }
                 else
                 {
-                    gameData.inSceneCharacters[1].moveOneStep((LocalCharacter.Direction)GiantMoves.Dequeue());
+                    inSceneCharacters[1].moveOneStep((LocalCharacter.Direction)GiantMoves.Dequeue());
                 }
             }
 
@@ -245,7 +249,7 @@ public class LocalGameManager : MonoBehaviour
                 }
                 else
                 {
-                    gameData.inSceneCharacters[2].moveOneStep((LocalCharacter.Direction)HumanMoves.Dequeue());
+                    inSceneCharacters[2].moveOneStep((LocalCharacter.Direction)HumanMoves.Dequeue());
                 }
             }
 
@@ -328,7 +332,8 @@ public class LocalGameManager : MonoBehaviour
             bool win = false;
             LocalTile t = eventQueue.Dequeue();
 
-            if (!t.isBarrier)
+            LocalCameraManager.Instance.ChangeTargetCharacter(t.charaList[0].CharacterId);
+            if (t.tileType == LocalTile.TileType.Other)
             {
                 win = Combat.ExecuteCombat(Combat.FightType.Monster, t, uiManager);
             }
@@ -410,13 +415,13 @@ public class LocalGameManager : MonoBehaviour
         switch (index)
         {
             case 0:
-                return gameData.inSceneCharacters[index].config.movement - DwarfPlan.Count;
+                return inSceneCharacters[index].config.movement - DwarfPlan.Count;
 
             case 1:
-                return gameData.inSceneCharacters[index].config.movement - GiantPlan.Count;
+                return inSceneCharacters[index].config.movement - GiantPlan.Count;
 
             case 2:
-                return gameData.inSceneCharacters[index].config.movement - HumanPlan.Count;
+                return inSceneCharacters[index].config.movement - HumanPlan.Count;
 
             default:
                 return -1;
@@ -430,7 +435,7 @@ public class LocalGameManager : MonoBehaviour
             case 0:
                 DwarfPlan.Add(move);
 
-                if(gameData.inSceneCharacters[index].config.movement == DwarfPlan.Count)
+                if(inSceneCharacters[index].config.movement == DwarfPlan.Count)
                 {
                     isFull[index] = true;
                 }
@@ -443,7 +448,7 @@ public class LocalGameManager : MonoBehaviour
             case 1:
                 GiantPlan.Add(move);
 
-                if (gameData.inSceneCharacters[index].config.movement == GiantPlan.Count)
+                if (inSceneCharacters[index].config.movement == GiantPlan.Count)
                 {
                     isFull[index] = true;
                 }
@@ -456,7 +461,7 @@ public class LocalGameManager : MonoBehaviour
             case 2:
                 HumanPlan.Add(move);
 
-                if (gameData.inSceneCharacters[index].config.movement == HumanPlan.Count)
+                if (inSceneCharacters[index].config.movement == HumanPlan.Count)
                 {
                     isFull[index] = true;
                 }

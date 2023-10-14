@@ -1,0 +1,108 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class LocalCameraManager : MonoBehaviour
+{
+    public static LocalCameraManager Instance { get; private set; }
+    public static Camera MainCamera;
+    public GameObject cameraPivot;
+    public LocalGameData gameData;
+    public float cameraMoveSpeed = 0.06f;
+    public float zoomSensitivity = 0.8f;
+
+
+    private Transform targetCharacter;
+    public Vector3 cameraOffset;
+
+    public bool cameraCentered;
+
+
+    float lerpDuration = 3f;
+    float timer;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    void Start()
+    {
+        MainCamera = Camera.main;
+        cameraCentered = true;
+        gameData = FindObjectOfType<LocalGameData>();
+
+        targetCharacter = LocalGameManager.Instance.inSceneCharacters[0].transform;
+        cameraOffset = MainCamera.transform.position - targetCharacter.transform.position;
+    }
+
+    private void Update()
+    {
+
+        if (Input.GetKey(KeyCode.I))
+        {
+            cameraPivot.transform.position += new Vector3(0f, 1 * cameraMoveSpeed, 0f);
+        }
+        if (Input.GetKey(KeyCode.K))
+        {
+            cameraPivot.transform.position += new Vector3(0f, -1 * cameraMoveSpeed, 0f);
+        }
+        if (Input.GetKey(KeyCode.J))
+        {
+            cameraPivot.transform.position += new Vector3(-1 * cameraMoveSpeed / 2, 0f, -1 * cameraMoveSpeed / 2);
+        }
+        if (Input.GetKey(KeyCode.L))
+        {
+            cameraPivot.transform.position += new Vector3(1 * cameraMoveSpeed / 2, 0f, 1 * cameraMoveSpeed / 2);
+        }
+
+    }
+
+    // Update is called once per frame
+    void LateUpdate()
+    {
+
+        //if (GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber && cameraCentered)
+        if (Input.GetKey(KeyCode.T))
+        {
+            cameraPivot.transform.position = targetCharacter.transform.position; //+ cameraOffset;
+        }
+
+        MainCamera.orthographicSize -= Input.GetAxis("Mouse ScrollWheel") * zoomSensitivity;
+        if (MainCamera.orthographicSize <= 1)
+            MainCamera.orthographicSize = 1;
+        if (MainCamera.orthographicSize >= 10)
+            MainCamera.orthographicSize = 10;
+
+
+    }
+
+    public void RecenterCamera()
+    {
+        if (!cameraCentered)
+        {
+            StartCoroutine(RecenterCameraCoroutine());
+        }
+    }
+
+    IEnumerator RecenterCameraCoroutine()
+    {
+        Vector3 target = targetCharacter.transform.position + cameraOffset;
+        float startTime = Time.time;
+        while (Time.time - startTime < lerpDuration)
+        {
+            MainCamera.transform.position = Vector3.Lerp(MainCamera.transform.position, target, (Time.time - startTime) / lerpDuration);
+            yield return new WaitForEndOfFrame();
+        }
+        MainCamera.transform.position = target;
+        cameraCentered = true;
+        yield break;
+    }
+
+    public void ChangeTargetCharacter(int id)
+    {
+        targetCharacter = LocalGameManager.Instance.inSceneCharacters[id].transform;
+        cameraCentered = false;
+        RecenterCamera();
+    }
+}
