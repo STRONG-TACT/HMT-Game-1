@@ -78,20 +78,20 @@ public class MapGenerator : MonoBehaviour
             }
         }
 
-        GameObject wall1 = Instantiate(gameAssets.MapBoundary, new Vector3(mapWidthMid, 0, -1), Quaternion.identity);
+        GameObject wall1 = Instantiate(gameAssets.MapBoundary, new Vector3(-mapWidthMid, 0, 1), Quaternion.identity);
         wall1.GetComponent<BoxCollider>().size = new Vector3(mapWidth, 1, 1);
-        GameObject wall2 = Instantiate(gameAssets.MapBoundary, new Vector3(mapWidthMid, 0, mapLength), Quaternion.identity);
+        GameObject wall2 = Instantiate(gameAssets.MapBoundary, new Vector3(-mapWidthMid, 0, -mapLength), Quaternion.identity);
         wall2.GetComponent<BoxCollider>().size = new Vector3(mapWidth, 1, 1);
-        GameObject wall3 = Instantiate(gameAssets.MapBoundary, new Vector3(-1, 0, mapLengthMid), Quaternion.identity);
+        GameObject wall3 = Instantiate(gameAssets.MapBoundary, new Vector3(1, 0, -mapLengthMid), Quaternion.identity);
         wall3.GetComponent<BoxCollider>().size = new Vector3(1, 1, mapLength);
-        GameObject wall4 = Instantiate(gameAssets.MapBoundary, new Vector3(mapWidth, 0, mapLengthMid), Quaternion.identity);
+        GameObject wall4 = Instantiate(gameAssets.MapBoundary, new Vector3(-mapWidth, 0, -mapLengthMid), Quaternion.identity);
         wall4.GetComponent<BoxCollider>().size = new Vector3(1, 1, mapLength);
     }
 
     private void SpawnTile(int row, int col, string code)
     {
-        float x = col * (gameData.tileSize + gameData.tileGapLength);
-        float z = row * (gameData.tileSize + gameData.tileGapLength);
+        float x = - col * (gameData.tileSize + gameData.tileGapLength);
+        float z = - row * (gameData.tileSize + gameData.tileGapLength);
         string name = SearchSchema(code);
 
         switch (name)

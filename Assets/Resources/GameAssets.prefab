@@ -80,7 +80,11 @@ MonoBehaviour:
   TrapTiles:
   - {fileID: 7221710844014363561, guid: 6aa9873090c0241d28b5c6faa1b52e53, type: 3}
   - {fileID: 5914118010568122004, guid: 520945744428d49caad12b15a5bb9110, type: 3}
-  RockTiles: []
+  RockTiles:
+  - {fileID: 8650430472697255982, guid: aee4999fb5988426faee69d40a989673, type: 3}
+  - {fileID: 6257837338122040717, guid: 3718fa21ad3df41d79ef52a528f0d922, type: 3}
+  - {fileID: 4459639482418607303, guid: 7fa0943a883cd4b16acd004ef9247690, type: 3}
+  - {fileID: 1294591075230484441, guid: 8b2d3d25875e445fc94cdbca93dbb4f6, type: 3}
   MapBoundary: {fileID: 733805391813641436, guid: c6d2da011e7ba4f9692401c53021b507, type: 3}
   Characters:
   - {fileID: 2284675785199134838, guid: 0029e325ca3214438a0e4cb70cd4d0bc, type: 3}
