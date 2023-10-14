@@ -28,7 +28,7 @@ public class LocalGameManager : MonoBehaviour
     public Character mainCharacter;
     //[HideInInspector] public List<int> playerIDs = new List<int>(); // All the characters' Photon ViewID
     public int goalCount; // Goal collected, shown on the UI
-    private int currentActionPoints;
+    private int remainingCharacterCount = 3; // #Characters that are alive
 
     public bool isPlayerTurn = true;
     private int planSubmittedCount = 0;
@@ -66,7 +66,10 @@ public class LocalGameManager : MonoBehaviour
 
     public void setCharaPosition(int ID, float x, float z)
     {
-        inSceneCharacters[ID].transform.position = new Vector3(x, inSceneCharacters[ID].transform.position.y, z);
+        LocalCharacter targetChara = inSceneCharacters[ID];
+        Vector3 newPosition = new Vector3(x, inSceneCharacters[ID].transform.position.y, z);
+        targetChara.transform.position = newPosition;
+        targetChara.setStartPos(newPosition);
     }
 
     // Start is called before the first frame update
@@ -92,6 +95,7 @@ public class LocalGameManager : MonoBehaviour
         //Player start to plan their moves
         isPlayerTurn = true;
         planSubmittedCount = 0;
+        remainingCharacterCount = 3;
 
         DwarfPlan = new List<int>();
         GiantPlan = new List<int>();
@@ -101,17 +105,34 @@ public class LocalGameManager : MonoBehaviour
         isEmpty = new bool[3] { true, true, true };
         isFull = new bool[3] { false, false, false };
 
+        foreach (LocalCharacter chara in inSceneCharacters)
+        {
+            if (chara.dead)
+            {
+                isSubmitted[chara.CharacterId] = true;
+                planSubmittedCount += 1;
+                remainingCharacterCount -= 1;
+            }
+        }
+
         StartPlayerPlanningPhase();
     }
 
     private void StartPlayerPlanningPhase()
     {
         // Local version of player planning stage
-        player.myCharacter = inSceneCharacters[0];
-        player.myCharacter.startPlanning();
-        player.charaSwitched(0, isSubmitted[0], isEmpty[0], isFull[0]);
+        if (remainingCharacterCount > 0)
+        {
+            player.myCharacter = inSceneCharacters[0];
+            player.myCharacter.startPlanning();
+            player.charaSwitched(0, isSubmitted[0], isEmpty[0], isFull[0]);
 
-        uiManager.ShowCharacterPlanUI(inSceneCharacters[0].name, getMovePoints(0));
+            uiManager.ShowCharacterPlanUI(inSceneCharacters[0].name, getMovePoints(0), inSceneCharacters[0].dead);
+        }
+        else
+        {
+            StartCharacterMovingPhase();
+        }
     }
 
     public void newPlayerMovePlan(int index, int move)
@@ -132,7 +153,7 @@ public class LocalGameManager : MonoBehaviour
 
         player.myCharacter = inSceneCharacters[index];
         player.myCharacter.startPlanning();
-        uiManager.ShowCharacterPlanUI(inSceneCharacters[index].name, getMovePoints(index));
+        uiManager.ShowCharacterPlanUI(inSceneCharacters[index].name, getMovePoints(index), inSceneCharacters[index].dead);
         player.charaSwitched(index, isSubmitted[index], isEmpty[index], isFull[index]);
         LocalCameraManager.Instance.ChangeTargetCharacter(index);
     }
@@ -253,7 +274,7 @@ public class LocalGameManager : MonoBehaviour
                 }
             }
 
-            yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(2f);
 
             if (eventQueue.Count != 0)
             {
@@ -311,9 +332,18 @@ public class LocalGameManager : MonoBehaviour
             }
         }
 
-        if (moveFinishedCount == inSceneMonsters.Count && !hasCombat)
+        if (moveFinishedCount >= inSceneMonsters.Count && !hasCombat)
         {
             Debug.Log("Monster moving phase ended.");
+
+            foreach (LocalCharacter chara in inSceneCharacters)
+            {
+                if (chara.dead)
+                {
+                    chara.RespawnCountdown();
+                }
+            }
+
             StartPlayerTurn();
         }
     }
@@ -367,9 +397,21 @@ public class LocalGameManager : MonoBehaviour
                 // If character's turn, all remaining steps should be cleared.
                 Debug.Log("Enemy won.");
 
+                List<LocalCharacter> deadChara = new List<LocalCharacter>();
+                List<LocalCharacter> aliveChara = new List<LocalCharacter>();
+
                 foreach (LocalCharacter c in t.charaList)
                 {
                     c.HealthReduced();
+
+                    if (c.dead)
+                    {
+                        deadChara.Add(c);
+                    }
+                    else
+                    {
+                        aliveChara.Add(c);
+                    }
 
                     if (isPlayerTurn)
                     {
@@ -390,10 +432,17 @@ public class LocalGameManager : MonoBehaviour
                     }
                 }
                 
-                
+                foreach(LocalCharacter c in deadChara)
+                {
+                    t.charaList.Remove(c);
+                }
+                foreach (LocalCharacter c in aliveChara)
+                {
+                    c.withdrawn();
+                }
             }
 
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(2f);
         }
 
         if (isPlayerTurn)
@@ -407,7 +456,10 @@ public class LocalGameManager : MonoBehaviour
 
     public void updateEventQueue(LocalTile tile)
     {
-        eventQueue.Enqueue(tile);
+        if (!eventQueue.Contains(tile))
+        {
+            eventQueue.Enqueue(tile);
+        }
     }
 
     private int getMovePoints(int index)

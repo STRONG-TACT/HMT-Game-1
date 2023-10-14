@@ -46,8 +46,4 @@ public class GameAssets : MonoBehaviour
     public List<GameObject> Characters;
     public List<GameObject> Monsters;
     public List<GameObject> Goals;
-
-    [Header("Character/Monster Config")]
-    public List<CharacterConfig> CharacterConfigs;
-    public List<MonsterConfig> MonsterConfigs;
 }

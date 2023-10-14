@@ -40,14 +40,22 @@ public class LocalUIManager : MonoBehaviour
         LocalGameManager.Instance.StartLevel();
     }
 
-    public void ShowCharacterPlanUI(string charaName, int movePoints)
+    public void ShowCharacterPlanUI(string charaName, int movePoints, bool dead)
     {
-        stageText = string.Format("{0}'s planning - ", charaName);
+        if (!dead) {
+            stageText = string.Format("{0}'s planning - ", charaName);
 
-        text.text = stageText + string.Format("Moves left: {0}", movePoints);
+            text.text = stageText + string.Format("Moves left: {0}", movePoints);
 
-        PlanUI.SetActive(true);
-        SwitchCharaButton.SetActive(true);
+            PlanUI.SetActive(true);
+            SwitchCharaButton.SetActive(true);
+        }
+        else
+        {
+            text.text = string.Format("{0}'s respawning...", charaName);
+            PlanUI.SetActive(true);
+            SwitchCharaButton.SetActive(true);
+        }
     }
 
     public void HideCharacterPlanUI()

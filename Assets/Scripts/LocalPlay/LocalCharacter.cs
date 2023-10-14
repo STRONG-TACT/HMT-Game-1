@@ -12,6 +12,7 @@ public class LocalCharacter : MonoBehaviour
     public float speed;
     private Vector3 movePoint;
     private Vector3 prevMovePointPos;
+    private Vector3 startPos;
 
     private float stepLength;
 
@@ -25,6 +26,10 @@ public class LocalCharacter : MonoBehaviour
     //Health
     public int Health { get { return health; } }
     private int health;
+
+    //Death and death round count down
+    public bool dead = false;
+    public int respawnCountdown = 0;
 
     void Start()
     {
@@ -40,6 +45,11 @@ public class LocalCharacter : MonoBehaviour
         CharacterId = characterId;
 
         stepLength = gameData.tileSize + gameData.tileGapLength;
+    }
+
+    public void setStartPos(Vector3 newPosition)
+    {
+        startPos = newPosition;
     }
 
     public bool CheckMove(Direction direction)
@@ -171,10 +181,19 @@ public class LocalCharacter : MonoBehaviour
                 break;
         }
 
-        prevMovePointPos = movePoint; 
-        movePoint += moveVec * stepLength;
+        if (moveVec != Vector3.zero)
+        {
+            prevMovePointPos = movePoint;
+            movePoint += moveVec * stepLength;
 
-        this.transform.position = movePoint;
+            this.transform.position = movePoint;
+        }
+    }
+
+    public void withdrawn()
+    {
+        this.transform.position = prevMovePointPos;
+        movePoint = prevMovePointPos;
     }
 
     private void OnTriggerEnter(Collider col)
@@ -234,6 +253,25 @@ public class LocalCharacter : MonoBehaviour
         if (health == 0)
         {
             Debug.Log(string.Format("Character {0} Died!", config.characterName));
+            dead = true;
+            respawnCountdown = 2;
+            this.gameObject.SetActive(false);
+            this.transform.position = startPos;
+
+            movePoint = startPos;
+            prevMovePointPos = movePoint;
+        }
+    }
+
+    public void RespawnCountdown()
+    {
+        respawnCountdown -= 1;
+
+        if (respawnCountdown == 0)
+        {
+            dead = false;
+            this.gameObject.SetActive(true);
+            health = 3;
         }
     }
 }

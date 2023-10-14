@@ -43,39 +43,6 @@ public class LocalPlayer : MonoBehaviour
         submitBtn.onClick.AddListener(delegate { submitPlan(); });
     }
 
-    //// Update is called once per frame
-    //void Update()
-    //{
-    //    if (isPlanning)
-    //    {
-    //        if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) == 1f)
-    //        {
-    //            if (Input.GetAxisRaw("Horizontal") < 0 && myCharacter.CheckMove(LocalCharacter.Direction.Left))
-    //            {
-    //                Debug.Log("Moving left");
-
-    //                myCharacter.planNewStep(LocalCharacter.Direction.Left);
-    //            }
-    //            else if (Input.GetAxisRaw("Horizontal") > 0 && myCharacter.CheckMove(LocalCharacter.Direction.Right))
-    //            {
-    //                Debug.Log("Moving right");
-    //            }
-    //        }
-    //        //vertical move
-    //        else if (Mathf.Abs(Input.GetAxisRaw("Vertical")) == 1f)
-    //        {
-    //            if (Input.GetAxisRaw("Vertical") > 0 && myCharacter.CheckMove(LocalCharacter.Direction.Up))
-    //            {
-    //                Debug.Log("Moving up");
-    //            }
-    //            else if (Input.GetAxisRaw("Vertical") < 0 && myCharacter.CheckMove(LocalCharacter.Direction.Down))
-    //            {
-    //                Debug.Log("Moving down");
-    //            }
-    //        }
-    //    }
-    //}
-
     private void switchCharacter(int index)
     {
         LocalGameManager.Instance.switchCharacter(index);
