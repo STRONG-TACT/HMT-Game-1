@@ -61,7 +61,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileType: 2
   localDice: 0
-  diceBonus: 0
+  diceBonus: 4
   row: 0
   col: 0
   enemyList: []

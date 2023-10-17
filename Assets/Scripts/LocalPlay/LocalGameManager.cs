@@ -367,15 +367,13 @@ public class LocalGameManager : MonoBehaviour
             {
                 win = Combat.ExecuteCombat(Combat.FightType.Monster, t, uiManager);
             }
-            else
+            else if (t.tileType == LocalTile.TileType.Trap)
             {
-                if (t.tileType == LocalTile.TileType.Trap)
-                {
-                    win = Combat.ExecuteCombat(Combat.FightType.Trap, t, uiManager);
-                }else if (t.tileType == LocalTile.TileType.Rock)
-                {
-                    win = Combat.ExecuteCombat(Combat.FightType.Rock, t, uiManager);
-                }
+                win = Combat.ExecuteCombat(Combat.FightType.Trap, t, uiManager);
+            }
+            else if (t.tileType == LocalTile.TileType.Rock)
+            {
+                win = Combat.ExecuteCombat(Combat.FightType.Rock, t, uiManager);
             }
 
             if (win)
@@ -383,56 +381,66 @@ public class LocalGameManager : MonoBehaviour
                 // if the character(s) won the battle, destory the enemies
                 Debug.Log("Character won.");
 
-                foreach (LocalMonster m in t.enemyList)
+                if (t.tileType == LocalTile.TileType.Other)
                 {
-                    inSceneMonsters.Remove(m);
-                    Destroy(m.gameObject);
-                }
+                    foreach (LocalMonster m in t.enemyList)
+                    {
+                        inSceneMonsters.Remove(m);
+                        Destroy(m.gameObject);
+                    }
 
-                t.enemyList.Clear();
+                    t.enemyList.Clear();
+                }
+                else if (t.tileType == LocalTile.TileType.Trap || t.tileType == LocalTile.TileType.Rock)
+                {
+                    GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
+                    opentile.GetComponent<LocalTile>().row = t.row;
+                    opentile.GetComponent<LocalTile>().col = t.col;
+
+                    Destroy(t.gameObject);
+                }
             }
             else
             {
-                // If not, reduce health
+                // If not, reduce health except rock
                 // If character's turn, all remaining steps should be cleared.
                 Debug.Log("Enemy won.");
 
                 List<LocalCharacter> deadChara = new List<LocalCharacter>();
                 List<LocalCharacter> aliveChara = new List<LocalCharacter>();
 
-                foreach (LocalCharacter c in t.charaList)
+                if (t.tileType == LocalTile.TileType.Other)
                 {
-                    c.HealthReduced();
+                    reduceCharacterHealth(t.charaList, deadChara, aliveChara);
 
-                    if (c.dead)
+                    if (isPlayerTurn)
                     {
-                        deadChara.Add(c);
+                        clearCharacterMoves(t.charaList);
                     }
-                    else
+                }
+                else if (t.tileType == LocalTile.TileType.Trap)
+                {
+                    reduceCharacterHealth(t.charaList, deadChara, aliveChara);
+
+                    clearCharacterMoves(t.charaList);
+
+                    GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
+                    opentile.GetComponent<LocalTile>().row = t.row;
+                    opentile.GetComponent<LocalTile>().col = t.col;
+
+                    Destroy(t.gameObject);
+                }
+                else if (t.tileType == LocalTile.TileType.Rock)
+                {
+                    foreach (LocalCharacter c in t.charaList)
                     {
                         aliveChara.Add(c);
                     }
 
-                    if (isPlayerTurn)
-                    {
-                        switch (c.CharacterId)
-                        {
-                            case 0:
-                                DwarfMoves.Clear();
-                                break;
-                            case 1:
-                                GiantMoves.Clear();
-                                break;
-                            case 2:
-                                HumanMoves.Clear();
-                                break;
-                            default:
-                                break;
-                        }
-                    }
+                    clearCharacterMoves(t.charaList);
                 }
-                
-                foreach(LocalCharacter c in deadChara)
+
+                foreach (LocalCharacter c in deadChara)
                 {
                     t.charaList.Remove(c);
                 }
@@ -451,6 +459,44 @@ public class LocalGameManager : MonoBehaviour
         }else if (!isPlayerTurn)
         {
             StartCoroutine(MonsterMoveByStep());
+        }
+    }
+
+    private void reduceCharacterHealth(List<LocalCharacter> charaList, List<LocalCharacter> deadChara, List<LocalCharacter> aliveChara)
+    {
+        foreach (LocalCharacter c in charaList)
+        {
+            c.HealthReduced();
+
+            if (c.dead)
+            {
+                deadChara.Add(c);
+            }
+            else
+            {
+                aliveChara.Add(c);
+            }
+        }
+    }
+
+    private void clearCharacterMoves(List<LocalCharacter> charaList)
+    {
+        foreach (LocalCharacter c in charaList)
+        {
+            switch (c.CharacterId)
+            {
+                case 0:
+                    DwarfMoves.Clear();
+                    break;
+                case 1:
+                    GiantMoves.Clear();
+                    break;
+                case 2:
+                    HumanMoves.Clear();
+                    break;
+                default:
+                    break;
+            }
         }
     }
 

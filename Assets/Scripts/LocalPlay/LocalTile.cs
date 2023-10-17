@@ -46,10 +46,11 @@ public class LocalTile : MonoBehaviour
 
         if (tileType == TileType.Trap && charaList.Count != 0)
         {
-
-        }else if (tileType == TileType.Rock && charaList.Count != 0)
+            LocalGameManager.Instance.updateEventQueue(this);
+        }
+        else if (tileType == TileType.Rock && charaList.Count != 0)
         {
-
+            LocalGameManager.Instance.updateEventQueue(this);
         }
     }
 

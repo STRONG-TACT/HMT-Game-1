@@ -28,6 +28,13 @@ public class Combat : MonoBehaviour
         int enemyScore = 0;
         int charaScore = 0;
 
+        foreach (LocalCharacter c in tile.charaList)
+        {
+            int outcome = RollDice((int)c.config.monsterDice);
+            charaScores.Add(outcome);
+            charaScore += outcome;
+        }
+
         if (type == FightType.Monster)
         {
             foreach (LocalMonster m in tile.enemyList)
@@ -36,21 +43,21 @@ public class Combat : MonoBehaviour
                 enemyScores.Add(outcome);
                 enemyScore += outcome;
             }
-
-            foreach (LocalCharacter c in tile.charaList)
-            {
-                int outcome = RollDice((int)c.config.monsterDice);
-                charaScores.Add(outcome);
-                charaScore += outcome;
-            }
-
-            if (enemyScore <= charaScore)
-            {
-                result = true;
-            }
-
-            uiManager.ShowCombatUI(type, charaScores, enemyScores);
         }
+        else if (type == FightType.Trap || type == FightType.Rock)
+        {
+            int outcome = RollDice((int)tile.localDice);
+            enemyScore += outcome;
+            enemyScore += tile.diceBonus;
+            enemyScores.Add(enemyScore);
+        }
+
+        if (enemyScore <= charaScore)
+        {
+            result = true;
+        }
+
+        uiManager.ShowCombatUI(type, charaScores, enemyScores);
 
         return result;
     }

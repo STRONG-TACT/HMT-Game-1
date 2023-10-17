@@ -91,6 +91,36 @@ public class LocalUIManager : MonoBehaviour
                 text.text += string.Format("{0} ", i);
             }
         }
+        else if (type == Combat.FightType.Trap)
+        {
+            text.text = "Combat with trap... Character: ";
+            foreach (int i in charaDice)
+            {
+                text.text += string.Format("{0} ", i);
+            }
+
+            text.text += "Trap: ";
+
+            foreach (int i in enemyDice)
+            {
+                text.text += string.Format("{0} ", i);
+            }
+        }
+        else if (type == Combat.FightType.Rock)
+        {
+            text.text = "Combat with rock... Character: ";
+            foreach (int i in charaDice)
+            {
+                text.text += string.Format("{0} ", i);
+            }
+
+            text.text += "Rock: ";
+
+            foreach (int i in enemyDice)
+            {
+                text.text += string.Format("{0} ", i);
+            }
+        }
     }
 
     public void ShowMonsterTurnUI()
