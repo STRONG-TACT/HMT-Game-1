@@ -48,7 +48,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 59
+  controlID: 18
 --- !u!114 &3
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -224,7 +224,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 60
+  controlID: 19
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -249,7 +249,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 50}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 61
+  controlID: 20
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -795,7 +795,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/NewArt/Stacey/Textures/Monster 1
+    - Assets/NewArt/Stacey/Textures
     m_Globs: []
     m_OriginalText: 
     m_ImportLogFlags: 0
@@ -803,16 +803,16 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/NewArt/Stacey/Textures/Monster 1
+  - Assets/NewArt/Stacey/Textures
   m_LastFoldersGridSize: -1
   m_LastProjectPath: /Applications/Carnegie Mellon/HMT-Game-1
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 79}
-    m_SelectedIDs: f0690000
-    m_LastClickedID: 27120
-    m_ExpandedIDs: 0000000034690000b2690000e0690000ea69000000ca9a3bffffff7f
+    scrollPos: {x: 0, y: 199}
+    m_SelectedIDs: 20740000
+    m_LastClickedID: 29728
+    m_ExpandedIDs: 000000008273000000740000207400002274000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -840,7 +840,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 0000000034690000
+    m_ExpandedIDs: 0000000082730000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -980,9 +980,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
+      m_SelectedIDs: ec7dffff
       m_LastClickedID: 0
-      m_ExpandedIDs: 22fbffff
+      m_ExpandedIDs: 28d0ffff7cd0ffffccd0ffff3ed5ffffa4d5ffffa2d6ffff12f0ffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1349,9 +1349,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 20.528248, y: 0.16792192, z: 8.020823}
+    m_Target: {x: 20.413128, y: 0.03549708, z: 6.815344}
     speed: 2
-    m_Value: {x: 20.528248, y: 0.16792192, z: 8.020823}
+    m_Value: {x: 20.413128, y: 0.03549708, z: 6.815344}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1397,13 +1397,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.19677532, y: -0.12841834, z: 0.026014475, w: -0.9716712}
+    m_Target: {x: -0.13170913, y: 0.057064317, z: -0.0075882208, w: -0.9896331}
     speed: 2
-    m_Value: {x: -0.1967328, y: -0.12987354, z: 0.02630917, w: -0.9714613}
+    m_Value: {x: -0.13319111, y: 0.057051875, z: -0.0076736812, w: -0.9894172}
   m_Size:
-    m_Target: 0.35341614
+    m_Target: 0.08461189
     speed: 2
-    m_Value: 0.35341614
+    m_Value: 0.08461189
   m_Ortho:
     m_Target: 0
     speed: 2
