@@ -18,7 +18,7 @@ MonoBehaviour:
   monsterDice: 8
   trapDice: 6
   stoneDice: 6
-  sightRange: 3
+  sightRange: 2
   cameraPosition: {x: 0, y: 0, z: 0}
   dieFaces: 010000000200000003000000040000000500000006000000
   characterIcon: {fileID: 21300000, guid: 84bedc0588834bb4595092c86e34fbbe, type: 3}
