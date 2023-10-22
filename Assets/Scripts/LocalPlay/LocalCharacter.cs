@@ -20,8 +20,12 @@ public class LocalCharacter : MonoBehaviour
 
     public CharacterConfig config;
     public int CharacterId;
+    private bool maskOn;
 
     public GameObject indicator;
+
+    public Transform characterMask { get; private set; }
+    public Transform visibilityMask { get; private set; }
 
     //Health
     public int Health { get { return health; } }
@@ -35,16 +39,33 @@ public class LocalCharacter : MonoBehaviour
     {
         movePoint = transform.position;
         prevMovePointPos = movePoint;
-
+        characterMask = transform.Find("CharacterMask");
+        visibilityMask = transform.Find("VisibleMask");
         health = 3;
     }
+
+
 
     public void SetUpConfig(CharacterConfig config, int characterId, LocalGameData gameData)
     {
         this.config = config;
+        this.maskOn = gameData.maskOn;
         CharacterId = characterId;
 
         stepLength = gameData.tileSize + gameData.tileGapLength;
+
+        characterMask = transform.Find("CharacterMask");
+        visibilityMask = transform.Find("VisibleMask");
+
+        Vector3 cellScale = new Vector3(gameData.tileSize + 2 * gameData.tileGapLength,
+                                         0,
+                                         gameData.tileSize + 2 * gameData.tileGapLength);
+        Vector3 globalCellScale = new Vector3(cellScale.x / transform.lossyScale.x, cellScale.y / transform.lossyScale.y, cellScale.z / transform.lossyScale.z);
+
+        characterMask.localScale = globalCellScale;
+        visibilityMask.localScale = globalCellScale*(config.sightRange*2f+1f-0.1f);
+        //characterMask.localScale = cellScale;
+        //visibilityMask.localScale = cellScale * config.sightRange;
     }
 
     public void setStartPos(Vector3 newPosition)
@@ -69,16 +90,28 @@ public class LocalCharacter : MonoBehaviour
     public void startPlanning()
     {
         indicator.SetActive(true);
+        if (maskOn == true)
+        {
+            visibilityMask.gameObject.SetActive(true);
+        }
     }
 
     public void pausePlanning()
     {
         indicator.SetActive(false);
+        if (maskOn == true)
+        {
+            visibilityMask.gameObject.SetActive(false);
+        }
     }
 
     public void endPlanning()
     {
         indicator.SetActive(false);
+        if (maskOn == true)
+        {
+            visibilityMask.gameObject.SetActive(true);
+        }
         indicator.transform.position = this.transform.position;
     }
 

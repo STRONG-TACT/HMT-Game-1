@@ -16,6 +16,10 @@ public class CameraManager : MonoBehaviour
     private Transform targetCharacter;
     public Vector3 cameraOffset;
 
+    private GameObject mask;
+    //private bool maskSet = false;
+    private Transform visibleMask;
+
     public bool cameraCentered;
 
 
@@ -32,21 +36,45 @@ public class CameraManager : MonoBehaviour
         cameraCentered = true;
         gameData = FindObjectOfType<GameData>();
 
-
         //targetCharacter = GameManager.Instance.mainCharacter.transform;
-        while (!PlayerMapper.Instance.Inititialized) {
+        while (!PlayerMapper.Instance.Inititialized)
+        {
             yield return null;
         }
 
         targetCharacter = gameData.inSceneCharacters[PlayerMapper.Instance.LocalCharacterNumber].transform;
+
+        if (gameData.maskOn == true)
+        {
+            mask = GameObject.Find("Mask");
+            visibleMask = targetCharacter.Find("VisibleMask");
+            visibleMask.gameObject.SetActive(true);
+        }
         cameraOffset = MainCamera.transform.position - targetCharacter.transform.position;
         yield break;
     }
 
     private void Update()
     {
+        if (gameData.maskOn == true)
+        {
+            /*
+            if (GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber && maskSet == false)
+            {
+                visibleMask = targetCharacter.Find("VisibleMask");
+                visibleMask.gameObject.SetActive(true);
+                maskSet = true;
+            }
 
-        if (Input.GetKey(KeyCode.I)) 
+            else
+            {
+                visibleMask = targetCharacter.Find("VisibleMask");
+                visibleMask.gameObject.SetActive(false);
+            }
+            */
+        }
+
+        if (Input.GetKey(KeyCode.I))
         {
             cameraPivot.transform.position += new Vector3(0f, 1 * cameraMoveSpeed, 0f);
         }
@@ -56,11 +84,11 @@ public class CameraManager : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.J))
         {
-            cameraPivot.transform.position += new Vector3(-1 * cameraMoveSpeed/2, 0f, -1 * cameraMoveSpeed/2);
+            cameraPivot.transform.position += new Vector3(-1 * cameraMoveSpeed / 2, 0f, -1 * cameraMoveSpeed / 2);
         }
         if (Input.GetKey(KeyCode.L))
         {
-            cameraPivot.transform.position += new Vector3(1 * cameraMoveSpeed/2, 0f, 1 * cameraMoveSpeed/2);
+            cameraPivot.transform.position += new Vector3(1 * cameraMoveSpeed / 2, 0f, 1 * cameraMoveSpeed / 2);
         }
 
     }
@@ -68,13 +96,13 @@ public class CameraManager : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        
+
         //if (GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber && cameraCentered)
-        if(Input.GetKey(KeyCode.T))
+        if (Input.GetKey(KeyCode.T))
         {
             cameraPivot.transform.position = targetCharacter.transform.position; //+ cameraOffset;
         }
-        
+
         MainCamera.orthographicSize -= Input.GetAxis("Mouse ScrollWheel") * zoomSensitivity;
         if (MainCamera.orthographicSize <= 1)
             MainCamera.orthographicSize = 1;
@@ -84,16 +112,20 @@ public class CameraManager : MonoBehaviour
 
     }
 
-    public void RecenterCamera() {
-        if(!cameraCentered) {
+    public void RecenterCamera()
+    {
+        if (!cameraCentered)
+        {
             StartCoroutine(RecenterCameraCoroutine());
         }
     }
 
-    IEnumerator RecenterCameraCoroutine() {
+    IEnumerator RecenterCameraCoroutine()
+    {
         Vector3 target = targetCharacter.transform.position + cameraOffset;
         float startTime = Time.time;
-        while(Time.time - startTime < lerpDuration) {
+        while (Time.time - startTime < lerpDuration)
+        {
             MainCamera.transform.position = Vector3.Lerp(MainCamera.transform.position, target, (Time.time - startTime) / lerpDuration);
             yield return new WaitForEndOfFrame();
         }

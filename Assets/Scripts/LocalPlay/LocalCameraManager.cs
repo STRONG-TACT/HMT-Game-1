@@ -15,6 +15,7 @@ public class LocalCameraManager : MonoBehaviour
     private Transform targetCharacter;
     public Vector3 cameraOffset;
 
+
     public bool cameraCentered;
 
 
@@ -34,6 +35,7 @@ public class LocalCameraManager : MonoBehaviour
 
         targetCharacter = LocalGameManager.Instance.inSceneCharacters[0].transform;
         cameraOffset = MainCamera.transform.position - targetCharacter.transform.position;
+
     }
 
     private void Update()
@@ -59,6 +61,11 @@ public class LocalCameraManager : MonoBehaviour
     }
 
     // Update is called once per frame
+    public void centerCamera()
+    {
+        cameraPivot.transform.position = targetCharacter.transform.position;
+    }
+
     void LateUpdate()
     {
 
