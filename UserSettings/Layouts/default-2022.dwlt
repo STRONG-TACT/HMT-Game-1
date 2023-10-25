@@ -795,7 +795,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/NewArt/Stacey/Textures
+    - Assets/NewArt/Stacey/Mon Fin 1
     m_Globs: []
     m_OriginalText: 
     m_ImportLogFlags: 0
@@ -803,16 +803,16 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/NewArt/Stacey/Textures
+  - Assets/NewArt/Stacey/Mon Fin 1
   m_LastFoldersGridSize: -1
   m_LastProjectPath: /Applications/Carnegie Mellon/HMT-Game-1
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 199}
-    m_SelectedIDs: 20740000
-    m_LastClickedID: 29728
-    m_ExpandedIDs: 000000008273000000740000207400002274000000ca9a3bffffff7f
+    scrollPos: {x: 0, y: 79}
+    m_SelectedIDs: 2c570000
+    m_LastClickedID: 22316
+    m_ExpandedIDs: 0000000040560000cc560000ec56000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -840,7 +840,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 0000000082730000
+    m_ExpandedIDs: 0000000040560000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -980,9 +980,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: ec7dffff
+      m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 28d0ffff7cd0ffffccd0ffff3ed5ffffa4d5ffffa2d6ffff12f0ffff
+      m_ExpandedIDs: 60f0ffff22fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1349,9 +1349,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 20.413128, y: 0.03549708, z: 6.815344}
+    m_Target: {x: 21.63664, y: 0.041292455, z: 7.9784365}
     speed: 2
-    m_Value: {x: 20.413128, y: 0.03549708, z: 6.815344}
+    m_Value: {x: 21.63664, y: 0.041292455, z: 7.9784365}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1397,13 +1397,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.13170913, y: 0.057064317, z: -0.0075882208, w: -0.9896331}
+    m_Target: {x: -0.18075094, y: -0.025963511, z: 0.004780261, w: -0.98319286}
     speed: 2
-    m_Value: {x: -0.13319111, y: 0.057051875, z: -0.0076736812, w: -0.9894172}
+    m_Value: {x: -0.1792654, y: -0.027445326, z: 0.0050101257, w: -0.9834051}
   m_Size:
-    m_Target: 0.08461189
+    m_Target: 0.31211075
     speed: 2
-    m_Value: 0.08461189
+    m_Value: 0.31164327
   m_Ortho:
     m_Target: 0
     speed: 2
