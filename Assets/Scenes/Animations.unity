@@ -650,6 +650,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
     - target: {fileID: -329340364626206919, guid: fbbf60dd68d194057a4f034487e4a322, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: fbbf60dd68d194057a4f034487e4a322, type: 3}
       propertyPath: m_Materials.Array.data[2]
       value: 
       objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
@@ -666,11 +670,23 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
     - target: {fileID: -329340364626206919, guid: fbbf60dd68d194057a4f034487e4a322, type: 3}
+      propertyPath: m_Materials.Array.data[8]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: fbbf60dd68d194057a4f034487e4a322, type: 3}
       propertyPath: m_Materials.Array.data[9]
       value: 
       objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
     - target: {fileID: -329340364626206919, guid: fbbf60dd68d194057a4f034487e4a322, type: 3}
+      propertyPath: m_Materials.Array.data[10]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: fbbf60dd68d194057a4f034487e4a322, type: 3}
       propertyPath: m_Materials.Array.data[12]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: fbbf60dd68d194057a4f034487e4a322, type: 3}
+      propertyPath: m_Materials.Array.data[13]
       value: 
       objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
     - target: {fileID: 919132149155446097, guid: fbbf60dd68d194057a4f034487e4a322, type: 3}
@@ -1054,6 +1070,50 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -329340364626206919, guid: f7ec980332af6422c98c4f20f2dd03b3, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e77644813445e4964a4c5bd979385008, type: 2}
+    - target: {fileID: -329340364626206919, guid: f7ec980332af6422c98c4f20f2dd03b3, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: e77644813445e4964a4c5bd979385008, type: 2}
+    - target: {fileID: -329340364626206919, guid: f7ec980332af6422c98c4f20f2dd03b3, type: 3}
+      propertyPath: m_Materials.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100000, guid: e77644813445e4964a4c5bd979385008, type: 2}
+    - target: {fileID: -329340364626206919, guid: f7ec980332af6422c98c4f20f2dd03b3, type: 3}
+      propertyPath: m_Materials.Array.data[5]
+      value: 
+      objectReference: {fileID: 2100000, guid: e77644813445e4964a4c5bd979385008, type: 2}
+    - target: {fileID: -329340364626206919, guid: f7ec980332af6422c98c4f20f2dd03b3, type: 3}
+      propertyPath: m_Materials.Array.data[6]
+      value: 
+      objectReference: {fileID: 2100000, guid: e77644813445e4964a4c5bd979385008, type: 2}
+    - target: {fileID: -329340364626206919, guid: f7ec980332af6422c98c4f20f2dd03b3, type: 3}
+      propertyPath: m_Materials.Array.data[7]
+      value: 
+      objectReference: {fileID: 2100000, guid: e77644813445e4964a4c5bd979385008, type: 2}
+    - target: {fileID: -329340364626206919, guid: f7ec980332af6422c98c4f20f2dd03b3, type: 3}
+      propertyPath: m_Materials.Array.data[8]
+      value: 
+      objectReference: {fileID: 2100000, guid: e77644813445e4964a4c5bd979385008, type: 2}
+    - target: {fileID: -329340364626206919, guid: f7ec980332af6422c98c4f20f2dd03b3, type: 3}
+      propertyPath: m_Materials.Array.data[9]
+      value: 
+      objectReference: {fileID: 2100000, guid: e77644813445e4964a4c5bd979385008, type: 2}
+    - target: {fileID: -329340364626206919, guid: f7ec980332af6422c98c4f20f2dd03b3, type: 3}
+      propertyPath: m_Materials.Array.data[10]
+      value: 
+      objectReference: {fileID: 2100000, guid: e77644813445e4964a4c5bd979385008, type: 2}
+    - target: {fileID: -329340364626206919, guid: f7ec980332af6422c98c4f20f2dd03b3, type: 3}
+      propertyPath: m_Materials.Array.data[12]
+      value: 
+      objectReference: {fileID: 2100000, guid: e77644813445e4964a4c5bd979385008, type: 2}
+    - target: {fileID: -329340364626206919, guid: f7ec980332af6422c98c4f20f2dd03b3, type: 3}
+      propertyPath: m_Materials.Array.data[13]
+      value: 
+      objectReference: {fileID: 2100000, guid: e77644813445e4964a4c5bd979385008, type: 2}
     - target: {fileID: 919132149155446097, guid: f7ec980332af6422c98c4f20f2dd03b3, type: 3}
       propertyPath: m_Name
       value: Monster@Zombie Idle
@@ -1304,6 +1364,50 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -329340364626206919, guid: da15210dbe6e84c1290dbda9f8b6044b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8ecac4700dcf8452db02c78f4c27a517, type: 2}
+    - target: {fileID: -329340364626206919, guid: da15210dbe6e84c1290dbda9f8b6044b, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8ecac4700dcf8452db02c78f4c27a517, type: 2}
+    - target: {fileID: -329340364626206919, guid: da15210dbe6e84c1290dbda9f8b6044b, type: 3}
+      propertyPath: m_Materials.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8ecac4700dcf8452db02c78f4c27a517, type: 2}
+    - target: {fileID: -329340364626206919, guid: da15210dbe6e84c1290dbda9f8b6044b, type: 3}
+      propertyPath: m_Materials.Array.data[4]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8ecac4700dcf8452db02c78f4c27a517, type: 2}
+    - target: {fileID: -329340364626206919, guid: da15210dbe6e84c1290dbda9f8b6044b, type: 3}
+      propertyPath: m_Materials.Array.data[5]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8ecac4700dcf8452db02c78f4c27a517, type: 2}
+    - target: {fileID: -329340364626206919, guid: da15210dbe6e84c1290dbda9f8b6044b, type: 3}
+      propertyPath: m_Materials.Array.data[6]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8ecac4700dcf8452db02c78f4c27a517, type: 2}
+    - target: {fileID: -329340364626206919, guid: da15210dbe6e84c1290dbda9f8b6044b, type: 3}
+      propertyPath: m_Materials.Array.data[7]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8ecac4700dcf8452db02c78f4c27a517, type: 2}
+    - target: {fileID: -329340364626206919, guid: da15210dbe6e84c1290dbda9f8b6044b, type: 3}
+      propertyPath: m_Materials.Array.data[8]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8ecac4700dcf8452db02c78f4c27a517, type: 2}
+    - target: {fileID: -329340364626206919, guid: da15210dbe6e84c1290dbda9f8b6044b, type: 3}
+      propertyPath: m_Materials.Array.data[9]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8ecac4700dcf8452db02c78f4c27a517, type: 2}
+    - target: {fileID: -329340364626206919, guid: da15210dbe6e84c1290dbda9f8b6044b, type: 3}
+      propertyPath: m_Materials.Array.data[10]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8ecac4700dcf8452db02c78f4c27a517, type: 2}
+    - target: {fileID: -329340364626206919, guid: da15210dbe6e84c1290dbda9f8b6044b, type: 3}
+      propertyPath: m_Materials.Array.data[12]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8ecac4700dcf8452db02c78f4c27a517, type: 2}
     - target: {fileID: 919132149155446097, guid: da15210dbe6e84c1290dbda9f8b6044b, type: 3}
       propertyPath: m_Name
       value: Monster@Sword And Shield Death
@@ -1450,6 +1554,50 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -329340364626206919, guid: 476df7a066f5e4268ab1c953166dee61, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: 476df7a066f5e4268ab1c953166dee61, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: 476df7a066f5e4268ab1c953166dee61, type: 3}
+      propertyPath: m_Materials.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: 476df7a066f5e4268ab1c953166dee61, type: 3}
+      propertyPath: m_Materials.Array.data[5]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: 476df7a066f5e4268ab1c953166dee61, type: 3}
+      propertyPath: m_Materials.Array.data[6]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: 476df7a066f5e4268ab1c953166dee61, type: 3}
+      propertyPath: m_Materials.Array.data[7]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: 476df7a066f5e4268ab1c953166dee61, type: 3}
+      propertyPath: m_Materials.Array.data[8]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: 476df7a066f5e4268ab1c953166dee61, type: 3}
+      propertyPath: m_Materials.Array.data[9]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: 476df7a066f5e4268ab1c953166dee61, type: 3}
+      propertyPath: m_Materials.Array.data[10]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: 476df7a066f5e4268ab1c953166dee61, type: 3}
+      propertyPath: m_Materials.Array.data[12]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
+    - target: {fileID: -329340364626206919, guid: 476df7a066f5e4268ab1c953166dee61, type: 3}
+      propertyPath: m_Materials.Array.data[13]
+      value: 
+      objectReference: {fileID: 2100000, guid: f6e876223f0934a719fd382fa5bd258c, type: 2}
     - target: {fileID: 919132149155446097, guid: 476df7a066f5e4268ab1c953166dee61, type: 3}
       propertyPath: m_Name
       value: Monster@Standing Melee Combo Attack Ver. 2
@@ -1690,6 +1838,50 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -329340364626206919, guid: aa08b958e1f5b496cb34577f9a355b4d, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e4cdd54b5ec3d404aa173be34662b05e, type: 2}
+    - target: {fileID: -329340364626206919, guid: aa08b958e1f5b496cb34577f9a355b4d, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: e4cdd54b5ec3d404aa173be34662b05e, type: 2}
+    - target: {fileID: -329340364626206919, guid: aa08b958e1f5b496cb34577f9a355b4d, type: 3}
+      propertyPath: m_Materials.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100000, guid: e4cdd54b5ec3d404aa173be34662b05e, type: 2}
+    - target: {fileID: -329340364626206919, guid: aa08b958e1f5b496cb34577f9a355b4d, type: 3}
+      propertyPath: m_Materials.Array.data[5]
+      value: 
+      objectReference: {fileID: 2100000, guid: e4cdd54b5ec3d404aa173be34662b05e, type: 2}
+    - target: {fileID: -329340364626206919, guid: aa08b958e1f5b496cb34577f9a355b4d, type: 3}
+      propertyPath: m_Materials.Array.data[6]
+      value: 
+      objectReference: {fileID: 2100000, guid: e4cdd54b5ec3d404aa173be34662b05e, type: 2}
+    - target: {fileID: -329340364626206919, guid: aa08b958e1f5b496cb34577f9a355b4d, type: 3}
+      propertyPath: m_Materials.Array.data[7]
+      value: 
+      objectReference: {fileID: 2100000, guid: e4cdd54b5ec3d404aa173be34662b05e, type: 2}
+    - target: {fileID: -329340364626206919, guid: aa08b958e1f5b496cb34577f9a355b4d, type: 3}
+      propertyPath: m_Materials.Array.data[8]
+      value: 
+      objectReference: {fileID: 2100000, guid: e4cdd54b5ec3d404aa173be34662b05e, type: 2}
+    - target: {fileID: -329340364626206919, guid: aa08b958e1f5b496cb34577f9a355b4d, type: 3}
+      propertyPath: m_Materials.Array.data[9]
+      value: 
+      objectReference: {fileID: 2100000, guid: e4cdd54b5ec3d404aa173be34662b05e, type: 2}
+    - target: {fileID: -329340364626206919, guid: aa08b958e1f5b496cb34577f9a355b4d, type: 3}
+      propertyPath: m_Materials.Array.data[10]
+      value: 
+      objectReference: {fileID: 2100000, guid: e4cdd54b5ec3d404aa173be34662b05e, type: 2}
+    - target: {fileID: -329340364626206919, guid: aa08b958e1f5b496cb34577f9a355b4d, type: 3}
+      propertyPath: m_Materials.Array.data[12]
+      value: 
+      objectReference: {fileID: 2100000, guid: e4cdd54b5ec3d404aa173be34662b05e, type: 2}
+    - target: {fileID: -329340364626206919, guid: aa08b958e1f5b496cb34577f9a355b4d, type: 3}
+      propertyPath: m_Materials.Array.data[13]
+      value: 
+      objectReference: {fileID: 2100000, guid: e4cdd54b5ec3d404aa173be34662b05e, type: 2}
     - target: {fileID: 919132149155446097, guid: aa08b958e1f5b496cb34577f9a355b4d, type: 3}
       propertyPath: m_Name
       value: Monster@Standing Taunt Battlecry
