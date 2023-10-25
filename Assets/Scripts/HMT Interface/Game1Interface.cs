@@ -319,14 +319,14 @@ public class Game1Interface : HMTInterface {
             case "interact":
                 if(CombatSystem.Instance.State == CombatSystem.FightState.Waiting) {
                     GameManager.Instance.CallRollDie();
+                    return "OK";
                 }
-                break;
+                else {
+                    return "Not Applicable";
+                }
             default:
                 return string.Format("Unknown Action: {0}", action);
         }
-
-        return string.Empty;
-
     }
 
 }
