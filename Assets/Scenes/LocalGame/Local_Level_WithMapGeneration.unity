@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657838, g: 0.49641234, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1460,7 +1460,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 544811107}
-  - component: {fileID: 544811110}
   - component: {fileID: 544811109}
   - component: {fileID: 544811108}
   m_Layer: 0
@@ -1533,19 +1532,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &544811110
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 544811106}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1.0054456, y: 1, z: 1}
-  m_Center: {x: -0.0027236645, y: 0, z: 0}
 --- !u!1 &586536988
 GameObject:
   m_ObjectHideFlags: 0
@@ -2195,7 +2181,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 945188726}
-  - component: {fileID: 945188729}
   - component: {fileID: 945188728}
   - component: {fileID: 945188727}
   m_Layer: 0
@@ -2268,19 +2253,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &945188729
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 945188725}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1057764381
 GameObject:
   m_ObjectHideFlags: 0
@@ -2615,7 +2587,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1193588818}
-  - component: {fileID: 1193588821}
   - component: {fileID: 1193588820}
   - component: {fileID: 1193588819}
   m_Layer: 0
@@ -2688,19 +2659,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1193588821
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1193588817}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1208523502
 GameObject:
   m_ObjectHideFlags: 0
@@ -3133,7 +3091,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1471060286}
-  - component: {fileID: 1471060289}
   - component: {fileID: 1471060288}
   - component: {fileID: 1471060287}
   m_Layer: 0
@@ -3206,19 +3163,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1471060289
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1471060285}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1513762347
 GameObject:
   m_ObjectHideFlags: 0
@@ -3689,7 +3633,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3027d89920ed4c4484cb31a0c583d2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameLevel: 1
+  levelTextFiles:
+  - {fileID: 4900000, guid: 4dd78d57817c6444eb09fe4c816f645e, type: 3}
+  - {fileID: 4900000, guid: 639404744e3da4b3997394218ee948a6, type: 3}
   characterConfigs:
   - {fileID: 11400000, guid: c6b44fe2a04fe7b44872f86875a07caf, type: 2}
   - {fileID: 11400000, guid: c716ed11fa455404ab8b58937cdf7629, type: 2}
@@ -3719,6 +3665,7 @@ MonoBehaviour:
   player: {fileID: 1764717557}
   debugRPCReceipts: 0
   isFirstLevel: 0
+  currentLevel: 1
   inSceneCharacters:
   - {fileID: 1711279242}
   - {fileID: 55248997}
@@ -4157,7 +4104,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99719bb79365c1b45be6822847d42ae4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelTextFile: {fileID: 4900000, guid: 4dd78d57817c6444eb09fe4c816f645e, type: 3}
   gameAssets: {fileID: 1090566748}
   gameData: {fileID: 1618205929}
   tileParent: {fileID: 775961784}
@@ -4318,7 +4264,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2092988398}
-  - component: {fileID: 2092988401}
   - component: {fileID: 2092988400}
   - component: {fileID: 2092988399}
   m_Layer: 0
@@ -4391,19 +4336,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2092988401
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2092988397}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1.0054456, y: 1, z: 1}
-  m_Center: {x: -0.0027236645, y: 0, z: 0}
 --- !u!1 &2106070397
 GameObject:
   m_ObjectHideFlags: 0
@@ -4547,7 +4479,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2117073855}
-  - component: {fileID: 2117073858}
   - component: {fileID: 2117073857}
   - component: {fileID: 2117073856}
   m_Layer: 0
@@ -4620,16 +4551,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2117073858
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2117073854}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1.0054456, y: 1, z: 1}
-  m_Center: {x: -0.0027236645, y: 0, z: 0}

@@ -44,8 +44,6 @@ public class LocalCharacter : MonoBehaviour
         health = 3;
     }
 
-
-
     public void SetUpConfig(CharacterConfig config, int characterId, LocalGameData gameData)
     {
         this.config = config;
@@ -70,7 +68,10 @@ public class LocalCharacter : MonoBehaviour
 
     public void setStartPos(Vector3 newPosition)
     {
+        this.transform.position = newPosition;
         startPos = newPosition;
+        movePoint = transform.position;
+        prevMovePointPos = movePoint;
     }
 
     public bool CheckMove(Direction direction)
@@ -306,5 +307,13 @@ public class LocalCharacter : MonoBehaviour
             this.gameObject.SetActive(true);
             health = 3;
         }
+    }
+
+    public void QuickRespawn()
+    {
+        respawnCountdown = 0;
+        dead = false;
+        this.gameObject.SetActive(true);
+        health = 3;
     }
 }

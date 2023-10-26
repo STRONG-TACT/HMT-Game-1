@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
 {
-    public TextAsset levelTextFile;
+    public static MapGenerator Instance = null;
     public GameAssets gameAssets;
     public LocalGameData gameData;
     public Transform tileParent;
@@ -31,14 +31,21 @@ public class MapGenerator : MonoBehaviour
         {"R4", "Rock4" },
     };
 
-    // Start is called before the first frame update
     void Awake()
     {
-        LoadLevel();
+        Instance = this;
+        LoadLevel(gameData.levelTextFiles[0]);
     }
 
-    void LoadLevel()
+    public void LoadLevel(TextAsset levelTextFile)
     {
+        while (tileParent.transform.childCount != 0)
+        {
+            Transform child = tileParent.transform.GetChild(0);
+            child.parent = null;
+            Destroy(child.gameObject);
+        }
+
         // Split the file content into lines
         string[] lines = levelTextFile.text.Split('\n');
 
@@ -78,13 +85,13 @@ public class MapGenerator : MonoBehaviour
             }
         }
 
-        GameObject wall1 = Instantiate(gameAssets.MapBoundary, new Vector3(-mapWidthMid, 0, 1), Quaternion.identity);
+        GameObject wall1 = Instantiate(gameAssets.MapBoundary, new Vector3(-mapWidthMid, 0, 1), Quaternion.identity, tileParent);
         wall1.GetComponent<BoxCollider>().size = new Vector3(mapWidth, 1, 1);
-        GameObject wall2 = Instantiate(gameAssets.MapBoundary, new Vector3(-mapWidthMid, 0, -mapLength), Quaternion.identity);
+        GameObject wall2 = Instantiate(gameAssets.MapBoundary, new Vector3(-mapWidthMid, 0, -mapLength), Quaternion.identity, tileParent);
         wall2.GetComponent<BoxCollider>().size = new Vector3(mapWidth, 1, 1);
-        GameObject wall3 = Instantiate(gameAssets.MapBoundary, new Vector3(1, 0, -mapLengthMid), Quaternion.identity);
+        GameObject wall3 = Instantiate(gameAssets.MapBoundary, new Vector3(1, 0, -mapLengthMid), Quaternion.identity, tileParent);
         wall3.GetComponent<BoxCollider>().size = new Vector3(1, 1, mapLength);
-        GameObject wall4 = Instantiate(gameAssets.MapBoundary, new Vector3(-mapWidth, 0, -mapLengthMid), Quaternion.identity);
+        GameObject wall4 = Instantiate(gameAssets.MapBoundary, new Vector3(-mapWidth, 0, -mapLengthMid), Quaternion.identity, tileParent);
         wall4.GetComponent<BoxCollider>().size = new Vector3(1, 1, mapLength);
     }
 

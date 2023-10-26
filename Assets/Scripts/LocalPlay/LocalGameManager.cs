@@ -17,7 +17,8 @@ public class LocalGameManager : MonoBehaviour
     public LocalPlayer player;
     public bool debugRPCReceipts = false;
 
-    public bool isFirstLevel;
+    public bool isFirstLevel = true;
+    public int currentLevel = 1;
 
     [Tooltip("The in-scene pointers to the character prefabs")]
     public List<LocalCharacter> inSceneCharacters = new List<LocalCharacter>();
@@ -54,7 +55,7 @@ public class LocalGameManager : MonoBehaviour
         player = FindObjectOfType<LocalPlayer>();
         goalCount = 0;
 
-        if (gameData.gameLevel == 1)
+        if (currentLevel == 1)
         {
             isFirstLevel = true;
         }
@@ -68,7 +69,6 @@ public class LocalGameManager : MonoBehaviour
     {
         LocalCharacter targetChara = inSceneCharacters[ID];
         Vector3 newPosition = new Vector3(x, inSceneCharacters[ID].transform.position.y, z);
-        targetChara.transform.position = newPosition;
         targetChara.setStartPos(newPosition);
     }
 
@@ -640,5 +640,33 @@ public class LocalGameManager : MonoBehaviour
     public void NextLevel()
     {
         Debug.Log("Moving to next level.");
+        currentLevel += 1;
+
+        if (currentLevel <= gameData.levelTextFiles.Length)
+        {
+            goalCount = 0;
+            remainingCharacterCount = 3;
+
+            foreach (LocalCharacter c in inSceneCharacters)
+            {
+                c.QuickRespawn();
+            }
+
+            Debug.Log("Before monster.");
+            while (inSceneMonsters.Count != 0)
+            {
+                LocalMonster m = inSceneMonsters[0];
+                inSceneMonsters.Remove(m);
+                Destroy(m.gameObject);
+            }
+
+            MapGenerator.Instance.LoadLevel(gameData.levelTextFiles[currentLevel - 1]);
+
+            StartLevel();
+        }
+        else
+        {
+            Debug.Log("Game ends.");
+        }
     }
 }

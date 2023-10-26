@@ -11,7 +11,7 @@ public partial class LocalGameData : MonoBehaviour
 
     public bool Initialized { get; private set; } = false;
 
-    public int gameLevel;
+    public TextAsset[] levelTextFiles;
     [Tooltip("The Configurations of Characters. Original order was: Dwarf, Giant, Human")]
     public CharacterConfig[] characterConfigs;
     //[Tooltip("The in-scene pointers to the character prefabs")]
