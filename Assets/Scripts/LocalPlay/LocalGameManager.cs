@@ -47,6 +47,8 @@ public class LocalGameManager : MonoBehaviour
     private Queue<int> HumanMoves;
     private Queue<LocalTile> eventQueue;
 
+    // When awake, find all the managers and data.
+    // Future update: Set isFirstLevel (currentLevel should by default be 1, may delete this step in future if we stick in the same scene)
     private void Awake()
     {
         Instance = this;
@@ -65,6 +67,8 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
+    // Called by map generator to update characters' position at the beginning of the level.
+    // Characters are pre created in the scene, since they should always be three of them.
     public void setCharaPosition(int ID, float x, float z)
     {
         LocalCharacter targetChara = inSceneCharacters[ID];
@@ -72,7 +76,8 @@ public class LocalGameManager : MonoBehaviour
         targetChara.setStartPos(newPosition);
     }
 
-    // Start is called before the first frame update
+    // When start, play tutorial if the scene begins with level one
+    // Future update: May not need the condition check if it always begin with the level one
     private void Start()
     {
         if (!isFirstLevel)
@@ -84,12 +89,16 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
+    // Start level
     public void StartLevel()
     {
         uiManager.InitGameUI();
         StartPlayerTurn();
     }
 
+    // Start player turn
+    // Reset all the player turn parameters
+    // If there are characters dead, update relevant params so they will skip planning
     private void StartPlayerTurn()
     {
         //Player start to plan their moves
@@ -118,6 +127,8 @@ public class LocalGameManager : MonoBehaviour
         StartPlayerPlanningPhase();
     }
 
+    // Start player planning phase
+    // If there are characters alive, start with the first alive character. All skip planning.
     private void StartPlayerPlanningPhase()
     {
         // Local version of player planning stage
@@ -135,6 +146,8 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
+    // Called by LocalPlayer.addNewMove(), when player press direction buttons.
+    // Add the move to corresponding queue, and confirm with current LocalCharacter.
     public void newPlayerMovePlan(int index, int move)
     {
         if (move >= 0 && move < 5)
@@ -147,6 +160,9 @@ public class LocalGameManager : MonoBehaviour
         uiManager.ShowMoveLeft(getMovePoints(index));
     }
 
+    // Called by LocalPlayer.switchCharacter(), when player press chara buttons.
+    // Update ui text/icon, pass params about current chara planning status to LocalPlayer.
+    // Update changes with camera control.
     public void switchCharacter(int index)
     {
         player.myCharacter.pausePlanning();
@@ -158,6 +174,8 @@ public class LocalGameManager : MonoBehaviour
         LocalCameraManager.Instance.ChangeTargetCharacter(index);
     }
 
+    // Called by LocalPlayer.backOneMove(), when player press back button.
+    // Remove lastest from corresponding queue, and confirm with current LocalCharacter.
     public void backOneMove(int index)
     {
         if (!isEmpty[index])
@@ -170,6 +188,8 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
+    // Called by LocalPlayer.submitPlan(), when player press submit button.
+    // Update params, if all submitted their plan, move to moving phase
     public void newPlanSubmitted(int index)
     {
         // When a player submit move plan
@@ -187,6 +207,7 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
+    // Start charater moving phase
     public void StartCharacterMovingPhase()
     {
         // Local version of character moving
@@ -220,6 +241,8 @@ public class LocalGameManager : MonoBehaviour
         StartCoroutine(CharacterMoveByStep());
     }
 
+    // Characters move step by step
+    // If events happen, deal with all the events and then back to moving
     private IEnumerator CharacterMoveByStep()
     {
         uiManager.ShowCharacterMovingUI();
@@ -293,6 +316,7 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
+    // Start monster moving phase
     private void StartMonsterTurn()
     {
         isPlayerTurn = false;
@@ -306,6 +330,8 @@ public class LocalGameManager : MonoBehaviour
         StartCoroutine(MonsterMoveByStep());
     }
 
+    // Monsters moving step by step
+    // Same with chara move by step, when events happened, deal with them and come back
     private IEnumerator MonsterMoveByStep()
     {
         uiManager.ShowMonsterTurnUI();
@@ -348,11 +374,14 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
+    // Called by LocalMonster.moveOneStep()
     public void monsterMoveFinished()
     {
         moveFinishedCount += 1;
     }
 
+    // Execute all the events happened within one step time
+    // Combat.ExecuteCombat() is the actual combat function
     private IEnumerator ExecuteCombatOneByOne()
     {
         Debug.Log("An event happened.");
@@ -462,6 +491,7 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
+    // Chara failed a combat with monster/trap
     private void reduceCharacterHealth(List<LocalCharacter> charaList, List<LocalCharacter> deadChara, List<LocalCharacter> aliveChara)
     {
         foreach (LocalCharacter c in charaList)
@@ -479,6 +509,7 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
+    // When chara fail a combat, clear all the remaining moves in queue this round
     private void clearCharacterMoves(List<LocalCharacter> charaList)
     {
         foreach (LocalCharacter c in charaList)
@@ -500,6 +531,8 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
+    // Called by LocalTile.OnTriggerEnter(), when an event happens at the tile
+    // The same tile (where an event happens) will only appear in queue once
     public void updateEventQueue(LocalTile tile)
     {
         if (!eventQueue.Contains(tile))
@@ -508,6 +541,7 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
+    // Helper function to get character's remaining action points when planning
     private int getMovePoints(int index)
     {
         switch (index)
@@ -526,6 +560,7 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
+    // Helper function to add new planned move to the current chara's queue
     private void updateActionQueue(int index, int move)
     {
         switch (index)
@@ -577,6 +612,7 @@ public class LocalGameManager : MonoBehaviour
         player.planUpdated(false, false, isFull[index]);
     }
 
+    // Helper function to remove one last move from current chara's queue
     private int moveLastFromActionQueue(int index)
     {
         int move = -1;
@@ -632,11 +668,14 @@ public class LocalGameManager : MonoBehaviour
         return move;
     }
 
+    // Called by LocalCharacter.OnTriggerEnter(), when a character collide with its goal
     public void GoalReached(int charaID)
     {
         goalCount += 1;
     }
 
+    // Called by LocalCharacter.OnTriggerEnter(), when all three goals fetched and one character collide with the door after that
+    // "Move" to next level by reset all relevant constants, delete monsters and tiles (tiles done by map generator) this level, and reset chara status
     public void NextLevel()
     {
         Debug.Log("Moving to next level.");
