@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4284385660779267020}
   - component: {fileID: 7206520222766265684}
   - component: {fileID: -8561390709965716812}
-  m_Layer: 8
+  m_Layer: 6
   m_Name: PondTile3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -45,7 +45,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0.4, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-8561390709965716812
 MonoBehaviour:
   m_ObjectHideFlags: 0

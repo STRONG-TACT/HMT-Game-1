@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6257837338122040716}
   - component: {fileID: -6326066789702253687}
   - component: {fileID: 3237052304872682261}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: RockTile2
   m_TagString: Rock
   m_Icon: {fileID: 0}
@@ -46,7 +46,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0.4, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3237052304872682261
 MonoBehaviour:
   m_ObjectHideFlags: 0
