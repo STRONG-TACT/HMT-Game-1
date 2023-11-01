@@ -23,6 +23,8 @@ public class LocalCharacter : MonoBehaviour
     private bool maskOn;
 
     public GameObject indicator;
+    // how many moves that the character left in this turn
+    private int actionPointsLeft;
 
     public Transform characterMask { get; private set; }
     public Transform visibilityMask { get; private set; }
@@ -54,6 +56,7 @@ public class LocalCharacter : MonoBehaviour
 
         characterMask = transform.Find("CharacterMask");
         visibilityMask = transform.Find("VisibleMask");
+        actionPointsLeft = config.movement;
 
         Vector3 cellScale = new Vector3(gameData.tileSize + 2 * gameData.tileGapLength,
                                          0,
@@ -74,46 +77,19 @@ public class LocalCharacter : MonoBehaviour
         prevMovePointPos = movePoint;
     }
 
-    public bool CheckMove(Direction direction)
+    public void pinNew()
     {
-        Vector3 moveVec = direction switch
-        {
-            Direction.Up => Vector3.forward,
-            Direction.Down => Vector3.back,
-            Direction.Left => Vector3.left,
-            Direction.Right => Vector3.right,
-            _ => Vector3.forward
-        };
-
-        return !Physics.Raycast(indicator.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible"));
+        actionPointsLeft -= 1;
     }
 
-    public void startPlanning()
+    public void startPinning()
     {
-        indicator.SetActive(true);
-        if (maskOn == true)
-        {
-            visibilityMask.gameObject.SetActive(true);
-        }
+        MaskControl(true);
     }
 
-    public void pausePlanning()
+    public void pausePinning()
     {
-        indicator.SetActive(false);
-        if (maskOn == true)
-        {
-            visibilityMask.gameObject.SetActive(false);
-        }
-    }
-
-    public void endPlanning()
-    {
-        indicator.SetActive(false);
-        if (maskOn == true)
-        {
-            visibilityMask.gameObject.SetActive(true);
-        }
-        indicator.transform.position = this.transform.position;
+        MaskControl(false);
     }
 
     public void planNewStep(Direction direction)
@@ -148,6 +124,40 @@ public class LocalCharacter : MonoBehaviour
         }
 
         indicator.transform.position += moveVec * stepLength;
+        actionPointsLeft -= 1;
+    }
+
+    public bool CheckMove(Direction direction)
+    {
+        Vector3 moveVec = direction switch
+        {
+            Direction.Up => Vector3.forward,
+            Direction.Down => Vector3.back,
+            Direction.Left => Vector3.left,
+            Direction.Right => Vector3.right,
+            _ => Vector3.forward
+        };
+
+        return !Physics.Raycast(indicator.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible"));
+    }
+
+    public void startPlanning()
+    {
+        indicator.SetActive(true);
+        MaskControl(true);
+    }
+
+    public void pausePlanning()
+    {
+        indicator.SetActive(false);
+        MaskControl(false);
+    }
+
+    public void endPlanning()
+    {
+        indicator.SetActive(false);
+        MaskControl(true);
+        indicator.transform.position = this.transform.position;
     }
 
     public void backOnePlannedStep(Direction direction)
@@ -182,6 +192,7 @@ public class LocalCharacter : MonoBehaviour
         }
 
         indicator.transform.position += -moveVec * stepLength;
+        actionPointsLeft += 1;
     }
 
     public void moveOneStep(Direction direction)
@@ -228,6 +239,14 @@ public class LocalCharacter : MonoBehaviour
     {
         this.transform.position = prevMovePointPos;
         movePoint = prevMovePointPos;
+    }
+
+    private void MaskControl(bool mask)
+    {
+        if (maskOn == true)
+        {
+            visibilityMask.gameObject.SetActive(mask);
+        }
     }
 
     private void OnTriggerEnter(Collider col)
@@ -315,5 +334,24 @@ public class LocalCharacter : MonoBehaviour
         dead = false;
         this.gameObject.SetActive(true);
         health = 3;
+    }
+
+    public int getActionPoints()
+    {
+        return actionPointsLeft;
+    }
+
+    public int resetActionPoints()
+    {
+        if (dead)
+        {
+            actionPointsLeft = 0;
+        }
+        else
+        {
+            actionPointsLeft = config.movement;
+        }
+
+        return actionPointsLeft;
     }
 }

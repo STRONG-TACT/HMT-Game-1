@@ -11,10 +11,13 @@ using UnityEditor;
 
 public class LocalGameManager : MonoBehaviour
 {
+    public enum GameStatus { GetReady, Player_Pinning, Player_Planning, Player_Moving, Monster_Moving, Animation_Pause, GameEnd }
+
     public static LocalGameManager Instance = null;
     public LocalGameData gameData { get; private set; }
     private LocalUIManager uiManager;
     public LocalPlayer player;
+    public LocalPinningSystem pinningSystem;
     public bool debugRPCReceipts = false;
 
     public bool isFirstLevel = true;
@@ -31,7 +34,8 @@ public class LocalGameManager : MonoBehaviour
     public int goalCount; // Goal collected, shown on the UI
     private int remainingCharacterCount = 3; // #Characters that are alive
 
-    public bool isPlayerTurn = true;
+    public GameStatus gameStatus = GameStatus.GetReady;
+    private int pinningSubmittedCount = 0;
     private int planSubmittedCount = 0;
     private bool[] isSubmitted;
     private bool[] isEmpty;
@@ -55,6 +59,7 @@ public class LocalGameManager : MonoBehaviour
         uiManager = FindObjectOfType<LocalUIManager>();
         gameData = FindObjectOfType<LocalGameData>();
         player = FindObjectOfType<LocalPlayer>();
+        pinningSystem = FindObjectOfType<LocalPinningSystem>();
         goalCount = 0;
 
         if (currentLevel == 1)
@@ -92,19 +97,122 @@ public class LocalGameManager : MonoBehaviour
     // Start level
     public void StartLevel()
     {
+        gameStatus = GameStatus.GetReady;
         uiManager.InitGameUI();
         StartPlayerTurn();
     }
 
     // Start player turn
-    // Reset all the player turn parameters
-    // If there are characters dead, update relevant params so they will skip planning
     private void StartPlayerTurn()
     {
-        //Player start to plan their moves
-        isPlayerTurn = true;
-        planSubmittedCount = 0;
         remainingCharacterCount = 3;
+
+        foreach (LocalCharacter chara in inSceneCharacters)
+        {
+            int actionPoints = chara.resetActionPoints();
+            if (actionPoints == 0)
+            {
+                remainingCharacterCount -= 1;
+            }
+        }
+        PreparePlayerPinningPhase();
+    }
+
+    // Prepare for player pinning phase
+    // Reset all the player pinning parameters
+    // If there are characters dead, update relevant params so they will skip pinning
+    private void PreparePlayerPinningPhase()
+    {
+        //Player start to plan their moves
+        gameStatus = GameStatus.Player_Pinning;
+        pinningSubmittedCount = 3 - remainingCharacterCount;
+
+        isSubmitted = new bool[3] { false, false, false };
+
+        foreach (LocalCharacter chara in inSceneCharacters)
+        {
+            if (chara.dead)
+            {
+                isSubmitted[chara.CharacterId] = true;
+            }
+        }
+
+        StartPlayerPinningPhase();
+    }
+
+    private void StartPlayerPinningPhase()
+    {
+        // Local version of player planning stage
+        if (remainingCharacterCount > 0)
+        {
+            player.myCharacter = inSceneCharacters[0];
+            player.myCharacter.startPinning();
+            player.charaSwitched(0, isSubmitted[0], false, false);
+
+            uiManager.ShowCharacterPinUI(inSceneCharacters[0].name, getActionPoints(0), inSceneCharacters[0].dead);
+        }
+        else
+        {
+            PreparePlayerPlanningPhase();
+        }
+    }
+
+    public void newPlayerPin()
+    {
+        player.myCharacter.pinNew();
+        int actionPoints = getActionPoints(player.myCharacter.CharacterId);
+        if (actionPoints == 0)
+        {
+            player.pinFinished();
+            pinningSubmittedCount += 1;
+        }
+        uiManager.ShowMoveLeft(actionPoints);
+
+        if (pinningSubmittedCount == 3)
+        {
+            endPlayerPinningPhase();
+        }
+    }
+
+    // 
+    // Update params, if all end their pinning, move to planning phase
+    public void newPinFinished(int index)
+    {
+        // When a player finish pinning
+        if (!isSubmitted[index])
+        {
+            pinningSubmittedCount += 1;
+            isSubmitted[index] = true;
+
+            player.pinFinished();
+        }
+
+        if (pinningSubmittedCount == 3)
+        {
+            endPlayerPinningPhase();
+        }
+    }
+
+    private void endPlayerPinningPhase()
+    {
+        Debug.Log("Pinning phase ended.");
+        uiManager.HideCharacterPinUI();
+
+        foreach (LocalCharacter chara in inSceneCharacters)
+        {
+            chara.pausePinning();
+        }
+
+        PreparePlayerPlanningPhase();
+    }
+
+    // Prepare for player planning phase
+    // Reset all the player planning parameters
+    // If there are characters dead, update relevant params so they will skip planning
+    private void PreparePlayerPlanningPhase()
+    {
+        //Player start to plan their moves
+        gameStatus = GameStatus.Player_Planning;
 
         DwarfPlan = new List<int>();
         GiantPlan = new List<int>();
@@ -116,11 +224,11 @@ public class LocalGameManager : MonoBehaviour
 
         foreach (LocalCharacter chara in inSceneCharacters)
         {
-            if (chara.dead)
+            int moveLeft = chara.getActionPoints();
+            if (moveLeft == 0)
             {
                 isSubmitted[chara.CharacterId] = true;
                 planSubmittedCount += 1;
-                remainingCharacterCount -= 1;
             }
         }
 
@@ -138,7 +246,7 @@ public class LocalGameManager : MonoBehaviour
             player.myCharacter.startPlanning();
             player.charaSwitched(0, isSubmitted[0], isEmpty[0], isFull[0]);
 
-            uiManager.ShowCharacterPlanUI(inSceneCharacters[0].name, getMovePoints(0), inSceneCharacters[0].dead);
+            uiManager.ShowCharacterPlanUI(inSceneCharacters[0].name, getActionPoints(0), inSceneCharacters[0].dead);
         }
         else
         {
@@ -157,7 +265,7 @@ public class LocalGameManager : MonoBehaviour
 
         player.myCharacter.planNewStep((LocalCharacter.Direction)move);
 
-        uiManager.ShowMoveLeft(getMovePoints(index));
+        uiManager.ShowMoveLeft(getActionPoints(index));
     }
 
     // Called by LocalPlayer.switchCharacter(), when player press chara buttons.
@@ -165,12 +273,25 @@ public class LocalGameManager : MonoBehaviour
     // Update changes with camera control.
     public void switchCharacter(int index)
     {
-        player.myCharacter.pausePlanning();
+        if (gameStatus == GameStatus.Player_Pinning)
+        {
+            player.myCharacter.pausePinning();
 
-        player.myCharacter = inSceneCharacters[index];
-        player.myCharacter.startPlanning();
-        uiManager.ShowCharacterPlanUI(inSceneCharacters[index].name, getMovePoints(index), inSceneCharacters[index].dead);
-        player.charaSwitched(index, isSubmitted[index], isEmpty[index], isFull[index]);
+            player.myCharacter = inSceneCharacters[index];
+            player.myCharacter.startPinning();
+            uiManager.ShowCharacterPinUI(inSceneCharacters[index].name, getActionPoints(index), inSceneCharacters[index].dead);
+            player.charaSwitched(index, isSubmitted[index], false, false);
+        }
+        else if (gameStatus == GameStatus.Player_Planning)
+        {
+            player.myCharacter.pausePlanning();
+
+            player.myCharacter = inSceneCharacters[index];
+            player.myCharacter.startPlanning();
+            uiManager.ShowCharacterPlanUI(inSceneCharacters[index].name, getActionPoints(index), inSceneCharacters[index].dead);
+            player.charaSwitched(index, isSubmitted[index], isEmpty[index], isFull[index]);
+        }
+
         LocalCameraManager.Instance.ChangeTargetCharacter(index);
     }
 
@@ -184,7 +305,7 @@ public class LocalGameManager : MonoBehaviour
 
             player.myCharacter.backOnePlannedStep((LocalCharacter.Direction)moveRemoved);
 
-            uiManager.ShowMoveLeft(getMovePoints(index));
+            uiManager.ShowMoveLeft(getActionPoints(index));
         }
     }
 
@@ -203,6 +324,15 @@ public class LocalGameManager : MonoBehaviour
 
         if (planSubmittedCount == 3)
         {
+            // Local version of character moving
+            Debug.Log("Planning phase ended.");
+            uiManager.HideCharacterPlanUI();
+
+            foreach (LocalCharacter chara in inSceneCharacters)
+            {
+                chara.endPlanning();
+            }
+
             StartCharacterMovingPhase();
         }
     }
@@ -210,14 +340,7 @@ public class LocalGameManager : MonoBehaviour
     // Start charater moving phase
     public void StartCharacterMovingPhase()
     {
-        // Local version of character moving
-        Debug.Log("Planning phase ended.");
-        uiManager.HideCharacterPlanUI();
-
-        foreach(LocalCharacter chara in inSceneCharacters)
-        {
-            chara.endPlanning();
-        }
+        gameStatus = GameStatus.Player_Moving;
 
         moveFinishedCount = 0;
         DwarfMoves = new Queue<int>();
@@ -312,6 +435,7 @@ public class LocalGameManager : MonoBehaviour
         if (moveFinishedCount == 3 && !hasCombat)
         {
             Debug.Log("Moving phase ended.");
+            pinningSystem.ClearCurrentTurnPins();
             StartMonsterTurn();
         }
     }
@@ -319,7 +443,7 @@ public class LocalGameManager : MonoBehaviour
     // Start monster moving phase
     private void StartMonsterTurn()
     {
-        isPlayerTurn = false;
+        gameStatus = GameStatus.Monster_Moving;
         moveFinishedCount = 0;
 
         foreach (LocalMonster m in inSceneMonsters)
@@ -442,7 +566,7 @@ public class LocalGameManager : MonoBehaviour
                 {
                     reduceCharacterHealth(t.charaList, deadChara, aliveChara);
 
-                    if (isPlayerTurn)
+                    if (gameStatus == GameStatus.Player_Moving)
                     {
                         clearCharacterMoves(t.charaList);
                     }
@@ -482,10 +606,10 @@ public class LocalGameManager : MonoBehaviour
             yield return new WaitForSeconds(2f);
         }
 
-        if (isPlayerTurn)
+        if (gameStatus == GameStatus.Player_Moving)
         {
             StartCoroutine(CharacterMoveByStep());
-        }else if (!isPlayerTurn)
+        }else if (gameStatus == GameStatus.Monster_Moving)
         {
             StartCoroutine(MonsterMoveByStep());
         }
@@ -542,18 +666,18 @@ public class LocalGameManager : MonoBehaviour
     }
 
     // Helper function to get character's remaining action points when planning
-    private int getMovePoints(int index)
+    private int getActionPoints(int index)
     {
         switch (index)
         {
             case 0:
-                return inSceneCharacters[index].config.movement - DwarfPlan.Count;
+                return inSceneCharacters[index].getActionPoints();
 
             case 1:
-                return inSceneCharacters[index].config.movement - GiantPlan.Count;
+                return inSceneCharacters[index].getActionPoints();
 
             case 2:
-                return inSceneCharacters[index].config.movement - HumanPlan.Count;
+                return inSceneCharacters[index].getActionPoints();
 
             default:
                 return -1;
@@ -706,6 +830,7 @@ public class LocalGameManager : MonoBehaviour
         else
         {
             Debug.Log("Game ends.");
+            gameStatus = GameStatus.GameEnd;
         }
     }
 }

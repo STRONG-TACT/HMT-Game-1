@@ -12,6 +12,7 @@ public class LocalUIManager : MonoBehaviour
     private string stageText = "";
 
     public GameObject PlanUI;
+    public GameObject PinFinishBtn;
     public GameObject SwitchCharaButton;
 
     // Start is called before the first frame update
@@ -38,6 +39,31 @@ public class LocalUIManager : MonoBehaviour
         yield return new WaitForSeconds(TutorialTime);
 
         LocalGameManager.Instance.StartLevel();
+    }
+
+    public void ShowCharacterPinUI(string charaName, int movePoints, bool dead)
+    {
+        if (!dead)
+        {
+            stageText = string.Format("{0}'s pinning - ", charaName);
+
+            text.text = stageText + string.Format("Moves left: {0}", movePoints);
+
+            PinFinishBtn.SetActive(true);
+            SwitchCharaButton.SetActive(true);
+        }
+        else
+        {
+            text.text = string.Format("{0}'s respawning...", charaName);
+            PinFinishBtn.SetActive(true);
+            SwitchCharaButton.SetActive(true);
+        }
+    }
+
+    public void HideCharacterPinUI()
+    {
+        PinFinishBtn.SetActive(false);
+        SwitchCharaButton.SetActive(false);
     }
 
     public void ShowCharacterPlanUI(string charaName, int movePoints, bool dead)

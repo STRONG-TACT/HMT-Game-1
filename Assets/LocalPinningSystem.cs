@@ -5,13 +5,14 @@ using UnityEngine.UI;
 
 public class LocalPinningSystem : MonoBehaviour
 {
+    
     private Camera mainCamera;
     private Ray ray;
     private RaycastHit hit;
     private LocalTile tileScript;
     private GameObject tile;
 
-    private GameObject pinWheel;
+    public GameObject pinWheel;
     private Vector3 pinPosition = new Vector3(0,0,0);
     public Sprite[] pinWheelBtnImg = new Sprite[5]; // 0: danger, 1: Assist, 2: OMW, 3: Unknown, 4: cancel; 
     public Sprite[] pinWheelBtnPressedImg = new Sprite[5]; // 0: danger, 1: Assist, 2: OMW, 3: Unknown, 4: cancel; 
@@ -32,23 +33,18 @@ public class LocalPinningSystem : MonoBehaviour
     void Start()
     {
         mainCamera = Camera.main;
-        pinWheel = GameObject.Find("PinWheelUI");
         pinWheel.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.C))
-        {
-            clearPins();
-        }
         if (isPinned)
         {
             pinPosition = mainCamera.WorldToScreenPoint(tile.transform.position + ui_offset);
             pinWheel.transform.position = pinPosition;
         }
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Pinning)
         {
             Debug.Log("mouse clicked at " + Input.mousePosition);
 
@@ -58,10 +54,9 @@ public class LocalPinningSystem : MonoBehaviour
             {
                 if (Physics.Raycast(ray, out hit, 1000f, LayerMask.GetMask("Ground")))  // if raycast on ground
                 {
-                    Vector3 pinPosition = new Vector3(hit.transform.position.x, 1f, hit.transform.position.z);
                     tile = hit.transform.gameObject;
                     tileScript = tile.GetComponent<LocalTile>();
-                    Debug.LogFormat("tile location: ", tileScript.row, tileScript.col);
+                    Debug.LogFormat("tile location: {0}, {1}", tileScript.row, tileScript.col);
                     Debug.Log(tileScript.row);
                     Debug.Log(tileScript.col);
                     Debug.LogFormat("Mouse hit object {0}", hit.transform.gameObject.name);
@@ -72,7 +67,12 @@ public class LocalPinningSystem : MonoBehaviour
         }
     }
 
-    public void clearPins()
+    public void ClearCurrentTurnPins()
+    {
+        clearPins();
+    }
+
+    private void clearPins()
     {
         for (int i=0; i<pinList.Count; i++)
         {
@@ -92,21 +92,25 @@ public class LocalPinningSystem : MonoBehaviour
     {
         pinWheel.transform.GetChild(0).GetComponent<Image>().sprite = pinWheelBtnPressedImg[0];
         AddPin(dangerPinPrefab, 0);
+        LocalGameManager.Instance.newPlayerPin();
     }
     public void Assist()
     {
         pinWheel.transform.GetChild(1).GetComponent<Image>().sprite = pinWheelBtnPressedImg[1];
         AddPin(assistPinPrefab, 1);
+        LocalGameManager.Instance.newPlayerPin();
     }
     public void OMW()
     {
         pinWheel.transform.GetChild(2).GetComponent<Image>().sprite = pinWheelBtnPressedImg[2];
         AddPin(omwPinPrefab, 2);
+        LocalGameManager.Instance.newPlayerPin();
     }
     public void Unknown()
     {
-        pinWheel.transform.GetChild(4).GetComponent<Image>().sprite = pinWheelBtnPressedImg[3];
+        pinWheel.transform.GetChild(3).GetComponent<Image>().sprite = pinWheelBtnPressedImg[3];
         AddPin(unknownPinPrefab, 3);
+        LocalGameManager.Instance.newPlayerPin();
     }
 
     public void AddPin(GameObject pinPrefab, int iconType)

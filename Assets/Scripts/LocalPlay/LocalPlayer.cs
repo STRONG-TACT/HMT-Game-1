@@ -6,9 +6,9 @@ public class LocalPlayer : MonoBehaviour
 {
     public LocalCharacter myCharacter { set; get; }
 
-    public bool isPlanning = false;
-
     public int charaID { get { return myCharacter.CharacterId; } }
+
+    public Button pinFinishBtn;
 
     public Button dwarfBtn;
     public Button gaintBtn;
@@ -27,7 +27,7 @@ public class LocalPlayer : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
 
-        isPlanning = false;
+        pinFinishBtn.onClick.AddListener(delegate { finishPinning(); });
 
         dwarfBtn.onClick.AddListener(delegate { switchCharacter(0); });
         gaintBtn.onClick.AddListener(delegate { switchCharacter(1); });
@@ -71,7 +71,36 @@ public class LocalPlayer : MonoBehaviour
                 break;
         }
 
-        checkBtnStatus(submitted, isEmpty, isFull);
+        if (LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Pinning)
+        {
+            checkPinBtnStatus(submitted);
+        }
+        else if (LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Planning)
+        {
+            checkPlanBtnStatus(submitted, isEmpty, isFull);
+        }
+    }
+
+    private void finishPinning()
+    {
+        LocalGameManager.Instance.newPinFinished(charaID);
+    }
+
+    public void pinFinished()
+    {
+        checkPinBtnStatus(true);
+    }
+
+    private void checkPinBtnStatus(bool submitted)
+    {
+        if (submitted)
+        {
+            disablePinBtn();
+        }
+        else
+        {
+            enablePinBtn();
+        }
     }
 
     public void addNewMove(int move)
@@ -87,7 +116,7 @@ public class LocalPlayer : MonoBehaviour
 
     public void planUpdated(bool submitted, bool isEmpty, bool isFull)
     {
-        checkBtnStatus(submitted, isEmpty, isFull);
+        checkPlanBtnStatus(submitted, isEmpty, isFull);
     }
 
     public void backOneMove()
@@ -100,7 +129,7 @@ public class LocalPlayer : MonoBehaviour
         LocalGameManager.Instance.newPlanSubmitted(charaID);
     }
 
-    private void checkBtnStatus(bool submitted, bool isEmpty, bool isFull)
+    private void checkPlanBtnStatus(bool submitted, bool isEmpty, bool isFull)
     {
         if (submitted)
         {
@@ -118,6 +147,16 @@ public class LocalPlayer : MonoBehaviour
         {
             someMovePlaned();
         }
+    }
+
+    public void disablePinBtn()
+    {
+        pinFinishBtn.interactable = false;
+    }
+
+    public void enablePinBtn()
+    {
+        pinFinishBtn.interactable = true;
     }
 
     public void lastMovePlaned()
