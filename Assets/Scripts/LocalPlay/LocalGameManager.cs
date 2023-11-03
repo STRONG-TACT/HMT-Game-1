@@ -692,7 +692,7 @@ public class LocalGameManager : MonoBehaviour
             case 0:
                 DwarfPlan.Add(move);
 
-                if(inSceneCharacters[index].config.movement == DwarfPlan.Count)
+                if(inSceneCharacters[index].getActionPoints() == 0)
                 {
                     isFull[index] = true;
                 }
@@ -705,7 +705,7 @@ public class LocalGameManager : MonoBehaviour
             case 1:
                 GiantPlan.Add(move);
 
-                if (inSceneCharacters[index].config.movement == GiantPlan.Count)
+                if (inSceneCharacters[index].getActionPoints() == 0)
                 {
                     isFull[index] = true;
                 }
@@ -718,7 +718,7 @@ public class LocalGameManager : MonoBehaviour
             case 2:
                 HumanPlan.Add(move);
 
-                if (inSceneCharacters[index].config.movement == HumanPlan.Count)
+                if (inSceneCharacters[index].getActionPoints() == 0)
                 {
                     isFull[index] = true;
                 }
