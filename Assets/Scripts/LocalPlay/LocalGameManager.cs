@@ -260,10 +260,9 @@ public class LocalGameManager : MonoBehaviour
     {
         if (move >= 0 && move < 5)
         {
+            player.myCharacter.planNewStep((LocalCharacter.Direction)move);
             updateActionQueue(index, move);
         }
-
-        player.myCharacter.planNewStep((LocalCharacter.Direction)move);
 
         uiManager.ShowMoveLeft(getActionPoints(index));
     }
