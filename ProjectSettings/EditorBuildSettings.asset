@@ -5,37 +5,40 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Loading.unity
     guid: cf53289df6635784e94197877e92bac8
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Lobby.unity
     guid: fadd25839eb02294e8f560b056cab658
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Tutorial.unity
     guid: fbbbb674333a8c5489eb926cecf9ad61
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Level_1.unity
     guid: 50d83712eef3f5c4cad1ce4a3265eb7c
   - enabled: 0
     path: Assets/Scenes/Old Scenes/Level_1_OLD.unity
     guid: bd314accb64c14b4ba7e9fb0df08984f
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Level_2.unity
     guid: cf249f3997e3b8d43a4d0b93a085c3e0
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Level_3.unity
     guid: 1c815d47a359f5140b92e9d96248252d
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Level_4.unity
     guid: c01fe7475cc5a7446aaeb49c6e134c45
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Level_5.unity
     guid: f3354c7bc0cb565489e7532d8edfff54
   - enabled: 0
     path: Assets/Scenes/Game.unity
     guid: f1327528c32d423448726f8f1abf3088
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/EndGame.unity
     guid: ef4a9b25b8337904fab862bc8fe3682c
+  - enabled: 1
+    path: Assets/Scenes/LocalGame/Local_Level_WithMapGeneration.unity
+    guid: e7909662e8e844214a7268797925404b
   m_configObjects: {}
