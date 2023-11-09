@@ -23,6 +23,8 @@ public class LocalGameManager : MonoBehaviour
     public bool isFirstLevel = true;
     public int currentLevel = 1;
 
+    public float excecutionStepTime = 1;
+
     [Tooltip("The in-scene pointers to the character prefabs")]
     public List<LocalCharacter> inSceneCharacters = new List<LocalCharacter>();
 
@@ -42,13 +44,13 @@ public class LocalGameManager : MonoBehaviour
     private bool[] isFull;
     public int moveFinishedCount = 0;
 
-    private List<int> DwarfPlan;
-    private List<int> GiantPlan;
-    private List<int> HumanPlan;
+    //private List<LocalCharacter.Direction> DwarfPlan;
+    //private List<LocalCharacter.Direction> GiantPlan;
+    //private List<LocalCharacter.Direction> HumanPlan;
 
-    private Queue<int> DwarfMoves;
-    private Queue<int> GiantMoves;
-    private Queue<int> HumanMoves;
+    //private Queue<LocalCharacter.Direction> DwarfMoves;
+    //private Queue<LocalCharacter.Direction> GiantMoves;
+    //private Queue<LocalCharacter.Direction> HumanMoves;
     private Queue<LocalTile> eventQueue;
 
     // When awake, find all the managers and data.
@@ -214,9 +216,9 @@ public class LocalGameManager : MonoBehaviour
         //Player start to plan their moves
         gameStatus = GameStatus.Player_Planning;
 
-        DwarfPlan = new List<int>();
-        GiantPlan = new List<int>();
-        HumanPlan = new List<int>();
+        //DwarfPlan = new List<LocalCharacter.Direction>();
+        //GiantPlan = new List<LocalCharacter.Direction>();
+        //HumanPlan = new List<LocalCharacter.Direction>();
 
         isSubmitted = new bool[3] { false, false, false };
         isEmpty = new bool[3] { true, true, true };
@@ -224,7 +226,8 @@ public class LocalGameManager : MonoBehaviour
 
         foreach (LocalCharacter chara in inSceneCharacters)
         {
-            int moveLeft = chara.getActionPoints();
+            chara.ResetPlan();
+            int moveLeft = chara.ActionPointsRemaining;
             if (moveLeft == 0)
             {
                 isSubmitted[chara.CharacterId] = true;
@@ -254,15 +257,20 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
-    // Called by LocalPlayer.addNewMove(), when player press direction buttons.
+    // Called by LocalPlayer.AddMoveToFocusedCharacter(), when player press direction buttons.
     // Add the move to corresponding queue, and confirm with current LocalCharacter.
-    public void newPlayerMovePlan(int index, int move)
+    public void newPlayerMovePlan(int index, LocalCharacter.Direction move)
     {
-        if (move >= 0 && move < 5)
-        {
-            player.myCharacter.planNewStep((LocalCharacter.Direction)move);
-            updateActionQueue(index, move);
+     
+        player.myCharacter.AddActionToPlan(move);
+        if (inSceneCharacters[index].ActionPointsRemaining == 0) {
+            isFull[index] = true;
         }
+        else if (inSceneCharacters[index].ActionPlan.Count == 1) {
+            isEmpty[index] = false;
+        }
+        player.UpdatePlanUI(false, false, isFull[index]);
+
 
         uiManager.ShowMoveLeft(getActionPoints(index));
     }
@@ -294,20 +302,6 @@ public class LocalGameManager : MonoBehaviour
         LocalCameraManager.Instance.ChangeTargetCharacter(index);
     }
 
-    // Called by LocalPlayer.backOneMove(), when player press back button.
-    // Remove lastest from corresponding queue, and confirm with current LocalCharacter.
-    public void backOneMove(int index)
-    {
-        if (!isEmpty[index])
-        {
-            int moveRemoved = moveLastFromActionQueue(index);
-
-            player.myCharacter.backOnePlannedStep((LocalCharacter.Direction)moveRemoved);
-
-            uiManager.ShowMoveLeft(getActionPoints(index));
-        }
-    }
-
     // Called by LocalPlayer.submitPlan(), when player press submit button.
     // Update params, if all submitted their plan, move to moving phase
     public void newPlanSubmitted(int index)
@@ -318,7 +312,7 @@ public class LocalGameManager : MonoBehaviour
             planSubmittedCount += 1;
             isSubmitted[index] = true;
 
-            player.planUpdated(true, false, true);
+            player.UpdatePlanUI(true, false, true);
         }
 
         if (planSubmittedCount == 3)
@@ -340,25 +334,8 @@ public class LocalGameManager : MonoBehaviour
     public void StartCharacterMovingPhase()
     {
         gameStatus = GameStatus.Player_Moving;
-
-        moveFinishedCount = 0;
-        DwarfMoves = new Queue<int>();
-        GiantMoves = new Queue<int>();
-        HumanMoves = new Queue<int>();
+        moveFinishedCount = 0;       
         eventQueue = new Queue<LocalTile>();
-
-        for (int i = 0; i < DwarfPlan.Count; i ++)
-        {
-            DwarfMoves.Enqueue(DwarfPlan[i]);
-        }
-        for (int i = 0; i < GiantPlan.Count; i++)
-        {
-            GiantMoves.Enqueue(GiantPlan[i]);
-        }
-        for (int i = 0; i < HumanPlan.Count; i++)
-        {
-            HumanMoves.Enqueue(HumanPlan[i]);
-        }
 
         StartCoroutine(CharacterMoveByStep());
     }
@@ -377,55 +354,33 @@ public class LocalGameManager : MonoBehaviour
             isEmpty = new bool[3] { false, false, false };
         }
 
-        while (moveFinishedCount < 3)
-        {
-            if (!isEmpty[0])
-            {
-                //Debug.Log("In Loop.");
-                if (DwarfMoves.Count == 0)
-                {
-                    isEmpty[0] = true;
-                    moveFinishedCount += 1;
-                }
-                else
-                {
-                    inSceneCharacters[0].moveOneStep((LocalCharacter.Direction)DwarfMoves.Dequeue());
-                }
+        while (moveFinishedCount < 3) {
+            foreach (LocalCharacter chara in inSceneCharacters) {
+                StartCoroutine(chara.TakeNextMove(excecutionStepTime));
             }
-
-            if (!isEmpty[1])
-            {
-                if (GiantMoves.Count == 0)
-                {
-                    isEmpty[1] = true;
-                    moveFinishedCount += 1;
+            bool doneMoving;
+            do {
+                
+                doneMoving = true;
+                foreach (LocalCharacter chara in inSceneCharacters) {
+                    if (chara.moving) {
+                        doneMoving = false;
+                    }
                 }
-                else
-                {
-                    inSceneCharacters[1].moveOneStep((LocalCharacter.Direction)GiantMoves.Dequeue());
-                }
-            }
+                yield return null;
+            } while(!doneMoving);
 
-            if (!isEmpty[2])
-            {
-                if (HumanMoves.Count == 0)
-                {
-                    isEmpty[2] = true;
-                    moveFinishedCount += 1;
-                }
-                else
-                {
-                    inSceneCharacters[2].moveOneStep((LocalCharacter.Direction)HumanMoves.Dequeue());
-                }
-            }
-
-            yield return new WaitForSeconds(2f);
-
-            if (eventQueue.Count != 0)
-            {
-                StartCoroutine(ExecuteCombatOneByOne());
+            if (eventQueue.Count != 0) {
+                yield return ExecuteCombatOneByOne();
                 hasCombat = true;
                 break;
+            }
+
+            moveFinishedCount = 0;
+            foreach(LocalCharacter character in inSceneCharacters) {
+                if (character.ActionPlan.Count == 0) {
+                    moveFinishedCount += 1;
+                }
             }
         }
 
@@ -462,16 +417,21 @@ public class LocalGameManager : MonoBehaviour
 
         while (moveFinishedCount < inSceneMonsters.Count)
         {
-            foreach(LocalMonster m in inSceneMonsters)
-            {
-                if (!m.turnFinished)
-                {
-                    // if monster still have moves
-                    m.moveOneStep();
+            foreach(LocalMonster m in inSceneMonsters) {
+                if (!m.turnFinished) {
+                    StartCoroutine(m.TakeNextMove(excecutionStepTime));
                 }
             }
-
-            yield return new WaitForSeconds(1.2f);
+            bool doneMoving;
+            do {
+                doneMoving = true;
+                foreach(LocalMonster m in inSceneMonsters) {
+                    if (m.moving) {
+                        doneMoving = false;
+                    }
+                }
+                yield return null;
+            } while (!doneMoving);
 
             if (eventQueue.Count != 0)
             {
@@ -633,24 +593,24 @@ public class LocalGameManager : MonoBehaviour
     }
 
     // When chara fail a combat, clear all the remaining moves in queue this round
-    private void clearCharacterMoves(List<LocalCharacter> charaList)
-    {
-        foreach (LocalCharacter c in charaList)
-        {
-            switch (c.CharacterId)
-            {
-                case 0:
-                    DwarfMoves.Clear();
-                    break;
-                case 1:
-                    GiantMoves.Clear();
-                    break;
-                case 2:
-                    HumanMoves.Clear();
-                    break;
-                default:
-                    break;
-            }
+    private void clearCharacterMoves(List<LocalCharacter> charaList ) {
+        foreach (LocalCharacter c in charaList) {
+            c.ActionPlan.Clear();
+
+            //switch (c.CharacterId)
+            //{
+            //    case 0:
+            //        DwarfMoves.Clear();
+            //        break;
+            //    case 1:
+            //        GiantMoves.Clear();
+            //        break;
+            //    case 2:
+            //        HumanMoves.Clear();
+            //        break;
+            //    default:
+            //        break;
+            //}
         }
     }
 
@@ -665,130 +625,8 @@ public class LocalGameManager : MonoBehaviour
     }
 
     // Helper function to get character's remaining action points when planning
-    private int getActionPoints(int index)
-    {
-        switch (index)
-        {
-            case 0:
-                return inSceneCharacters[index].getActionPoints();
-
-            case 1:
-                return inSceneCharacters[index].getActionPoints();
-
-            case 2:
-                return inSceneCharacters[index].getActionPoints();
-
-            default:
-                return -1;
-        }
-    }
-
-    // Helper function to add new planned move to the current chara's queue
-    private void updateActionQueue(int index, int move)
-    {
-        switch (index)
-        {
-            case 0:
-                DwarfPlan.Add(move);
-
-                if(inSceneCharacters[index].getActionPoints() == 0)
-                {
-                    isFull[index] = true;
-                }
-                else if (DwarfPlan.Count == 1)
-                {
-                    isEmpty[index] = false;
-                }
-
-                break;
-            case 1:
-                GiantPlan.Add(move);
-
-                if (inSceneCharacters[index].getActionPoints() == 0)
-                {
-                    isFull[index] = true;
-                }
-                else if (GiantPlan.Count == 1)
-                {
-                    isEmpty[index] = false;
-                }
-
-                break;
-            case 2:
-                HumanPlan.Add(move);
-
-                if (inSceneCharacters[index].getActionPoints() == 0)
-                {
-                    isFull[index] = true;
-                }
-                else if (HumanPlan.Count == 1)
-                {
-                    isEmpty[index] = false;
-                }
-
-
-                break;
-            default:
-                break;
-        }
-
-        player.planUpdated(false, false, isFull[index]);
-    }
-
-    // Helper function to remove one last move from current chara's queue
-    private int moveLastFromActionQueue(int index)
-    {
-        int move = -1;
-        switch (index)
-        {
-            case 0:
-                move = DwarfPlan[DwarfPlan.Count - 1];
-                DwarfPlan.RemoveAt(DwarfPlan.Count - 1);
-
-                if (DwarfPlan.Count == 0)
-                {
-                    isEmpty[index] = true;
-                }
-                if (isFull[index])
-                {
-                    isFull[index] = false;
-                }
-                
-                break;
-            case 1:
-                move = GiantPlan[GiantPlan.Count - 1];
-                GiantPlan.RemoveAt(GiantPlan.Count - 1);
-
-                if (GiantPlan.Count == 0)
-                {
-                    isEmpty[index] = true;
-                }
-                if (isFull[index])
-                {
-                    isFull[index] = false;
-                }
-
-                break;
-            case 2:
-                move = HumanPlan[HumanPlan.Count - 1];
-                HumanPlan.RemoveAt(HumanPlan.Count - 1);
-
-                if (HumanPlan.Count == 0)
-                {
-                    isEmpty[index] = true;
-                }
-                if (isFull[index])
-                {
-                    isFull[index] = false;
-                }
-
-                break;
-            default:
-                break;
-        }
-
-        player.planUpdated(false, isEmpty[index], false);
-        return move;
+    private int getActionPoints(int index) {
+        return inSceneCharacters[index].ActionPointsRemaining;
     }
 
     // Called by LocalCharacter.OnTriggerEnter(), when a character collide with its goal

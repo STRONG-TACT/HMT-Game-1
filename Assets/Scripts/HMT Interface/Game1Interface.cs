@@ -288,7 +288,7 @@ public class Game1Interface : HMTInterface {
         }
     }
 
-    public override string ExecuteAction(JObject actionJob) {
+    public override string ExecuteAction(string target, JObject actionJob) {
         if (!MyTurn) {
             return "Not your turn";
         }

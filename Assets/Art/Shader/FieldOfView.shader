@@ -2,7 +2,7 @@ Shader "Unlit/FieldOfView"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        _MainTex ("Texture", 2D) = "clear" {}
     }
     SubShader
     {

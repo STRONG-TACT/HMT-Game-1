@@ -16,10 +16,26 @@ namespace HMT {
 
         public static HMTInterface Instance { get; private set; }
 
+        [Header("AI Socket Settings")]
+        public bool StartServerOnStart = false;
+        public string url = "ws://localhost";
+        public int socketPort = 4649;
+        public string serviceName = "hmt";
+        public string[] serviceTargets = new string[0];
+
+        [Header("Hot Keys")]
+        public KeyCode[] OpenHMTInterfaceWindowHotKey;
+        public KeyCode[] PrintCurrentStateHotKey;
+
+
+        private bool isOpen = false;
+        private Vector2 scrollPos = Vector2.zero;
+
+
 #if HMT_BUILD
         private WebSocketServer server = null;
 
-        public ConcurrentQueue<JObject> CommandQueue = new ConcurrentQueue<JObject>();
+        public ConcurrentQueue<Command> CommandQueue = new ConcurrentQueue<Command>();
 
         public ArgParser ArgParser = new ArgParser();
 
@@ -52,12 +68,27 @@ namespace HMT {
             if (socketPort == 80) {
                 Debug.LogWarning("Socket set to Port 80, which will probably have permissions issues.");
             }
-            server = new WebSocketServer(url + ":" + socketPort);
+
+            if(url == string.Empty) {
+                Debug.LogWarning("url empty so opening socket equivalent local context.");
+                server = new WebSocketServer(socketPort);
+            }
+            else {
+                server = new WebSocketServer(url + ":" + socketPort);
+            }
+            
+            foreach(string target in serviceTargets) {
+                server.AddWebSocketService<HMTService>("/" + serviceName + "/" + target);
+            }
+
 
             server.AddWebSocketService<HMTService>("/" + serviceName);
-            server.Start(); 
-            Debug.LogFormat("[HMTInterface] Websocket for HMTService at url {0}:{1}/{2}",
-                url, socketPort, serviceName);
+            server.Start();
+
+            foreach (string target in serviceTargets) {
+                Debug.LogFormat("[HMTInterface] Agent Target available at: {0}:{1}/{2}/{3}",
+                    url == string.Empty ? "ws://localhost" : url, socketPort, serviceName, target);
+            }
         }
 
         virtual protected void OnDestroy() {
@@ -76,9 +107,9 @@ namespace HMT {
             }
 
             while(CommandQueue.Count > 0)  {
-                if (CommandQueue.TryDequeue(out JObject command))
+                if (CommandQueue.TryDequeue(out Command command))
                 {
-                   string resp = ProcessCommand(command["command"].ToString(), command);
+                   string resp = ProcessCommand(command);
                     if(resp != string.Empty)
                     {
                         server.WebSocketServices.Broadcast(resp);
@@ -164,19 +195,7 @@ namespace HMT {
 #endif
 
 
-        [Header("AI Socket Settings")]
-        public bool StartServerOnStart = false;
-        public string url = "ws://localhost";
-        public int socketPort = 4649;
-        public string serviceName = "hmt";
-
-        [Header("Hot Keys")]
-        public KeyCode[] OpenHMTInterfaceWindowHotKey;
-        public KeyCode[] PrintCurrentStateHotKey;
-
-
-        private bool isOpen = false;
-        private Vector2 scrollPos = Vector2.zero;
+       
 
         protected bool CheckHotKey(KeyCode[] code) {
             foreach (KeyCode key in code) {
@@ -207,7 +226,7 @@ namespace HMT {
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public abstract string ExecuteAction(JObject action);
+        public abstract string ExecuteAction(string target, JObject action);
 
         /// <summary>
         /// Process a command comming off of the Websocket Protocol.
@@ -222,23 +241,22 @@ namespace HMT {
         /// </summary>
         /// <param name="command"></param>
         /// <param name="json"></param>
-        /// <param name="preventDefault"></param>
+        /// <param name="supressDefault"></param>
         /// <returns></returns>
-        public virtual string ProcessCommand(string command, JObject json, bool preventDefault = false) {
+        public virtual string ProcessCommand(Command command) {
             string response = string.Empty;
-            switch (command) {
+            switch (command.command) {
                 case "get_state":
                     response = GetState();
                     break;
                 case "execute_action":
                     //TODO this is just a stub API for now. Actions' will likely be much more complex.
-                    string action = json["action"].ToString();
-                    response = ExecuteAction(json);
+                    response = ExecuteAction(command.target,  command.json);
                     //do the action
                     //respond with result?
                     break;
                 default:
-                    if (!preventDefault) {
+                    if (!command.supressDefault) {
                         Debug.LogErrorFormat("[{0}] Unrecognized Command: {1}", "HMTInterface", command);
                         response = string.Format("Unrecognized Command: {0}", command);
                     }
@@ -257,13 +275,36 @@ namespace HMT {
     /// handled by the ProcessCommand virtual method in the main HMTInterface class.
     /// </summary>
     public class HMTService : WebSocketBehavior {
+
         protected override void OnMessage(MessageEventArgs e) {
-            string response = string.Empty;
             Debug.LogFormat("[HMTInterface] recieved command: {0}", e.Data);
-            JObject json = JObject.Parse(e.Data);
-            HMTInterface.Instance.CommandQueue.Enqueue(json);
+
+            JObject json;
+            try { 
+                json = JObject.Parse(e.Data);
+            }
+            catch (Newtonsoft.Json.JsonReaderException ex) {
+                Debug.LogErrorFormat("[HMTInterface] Error parsing JSON: {0}", ex.Message);
+                json = new JObject{
+                    {"command","JSON_PARSE_ERROR" },
+                    { "supressDefault", true}
+                };
+            }
+            Command newCommand = new Command();
+
+            
 
 
+            newCommand.target = this.Context.RequestUri.Segments[Context.RequestUri.Segments.Length - 1];
+            newCommand.command = json["command"].ToString();
+            newCommand.json = json;
+            newCommand.supressDefault = json.ContainsKey("supressDefault") && json["supressDefault"].ToString().ToLower().Equals("true");
+
+
+
+            HMTInterface.Instance.CommandQueue.Enqueue(newCommand);
+
+            
 
             /*string command = json["command"].ToString();
 
@@ -284,6 +325,13 @@ namespace HMT {
             Debug.LogErrorFormat("[HMTInterface] Error: {0}", e.Message);
             Debug.LogException(e.Exception);
         }
+    }
+
+    public struct Command {
+        public string target;
+        public string command;
+        public bool supressDefault;
+        public JObject json;
     }
 
 #endif

@@ -33,13 +33,13 @@ public class LocalPlayer : MonoBehaviour
         gaintBtn.onClick.AddListener(delegate { switchCharacter(1); });
         humanBtn.onClick.AddListener(delegate { switchCharacter(2); });
 
-        upBtn.onClick.AddListener(delegate { addNewMove(1); });
-        downBtn.onClick.AddListener(delegate { addNewMove(2); });
-        leftBtn.onClick.AddListener(delegate { addNewMove(3); });
-        rightBtn.onClick.AddListener(delegate { addNewMove(4); });
-        waitBtn.onClick.AddListener(delegate { addNewMove(0); });
+        upBtn.onClick.AddListener(delegate { AddMoveToFocusedCharacter(LocalCharacter.Direction.Up); });
+        downBtn.onClick.AddListener(delegate { AddMoveToFocusedCharacter(LocalCharacter.Direction.Down); });
+        leftBtn.onClick.AddListener(delegate { AddMoveToFocusedCharacter(LocalCharacter.Direction.Left); });
+        rightBtn.onClick.AddListener(delegate { AddMoveToFocusedCharacter(LocalCharacter.Direction.Right); });
+        waitBtn.onClick.AddListener(delegate { AddMoveToFocusedCharacter(LocalCharacter.Direction.Wait); });
 
-        backBtn.onClick.AddListener(delegate { backOneMove(); });
+        backBtn.onClick.AddListener(delegate { UndoPlanStep(); });
         submitBtn.onClick.AddListener(delegate { submitPlan(); });
     }
 
@@ -77,7 +77,7 @@ public class LocalPlayer : MonoBehaviour
         }
         else if (LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Planning)
         {
-            checkPlanBtnStatus(submitted, isEmpty, isFull);
+            UpdatePlanUI(submitted, isEmpty, isFull);
         }
     }
 
@@ -103,25 +103,16 @@ public class LocalPlayer : MonoBehaviour
         }
     }
 
-    public void addNewMove(int move)
-    {
-        if(move > 0 && move < 5 && myCharacter.CheckMove((LocalCharacter.Direction)move))
-        {
-            LocalGameManager.Instance.newPlayerMovePlan(charaID, move);
-        }else if (move == 0)
-        {
+    public void AddMoveToFocusedCharacter(LocalCharacter.Direction move) {
+        if (myCharacter.CheckMove(move)) {
             LocalGameManager.Instance.newPlayerMovePlan(charaID, move);
         }
     }
 
-    public void planUpdated(bool submitted, bool isEmpty, bool isFull)
-    {
-        checkPlanBtnStatus(submitted, isEmpty, isFull);
-    }
-
-    public void backOneMove()
-    {
-        LocalGameManager.Instance.backOneMove(charaID);
+    public void UndoPlanStep() {
+        //LocalGameManager.Instance.undoMove(charaID);
+        myCharacter.UndoPlanStep();
+        UpdatePlanUI(false, myCharacter.ActionPlan.Count == 0, false);
     }
 
     public void submitPlan()
@@ -129,7 +120,7 @@ public class LocalPlayer : MonoBehaviour
         LocalGameManager.Instance.newPlanSubmitted(charaID);
     }
 
-    private void checkPlanBtnStatus(bool submitted, bool isEmpty, bool isFull)
+    public void UpdatePlanUI(bool submitted, bool isEmpty, bool isFull)
     {
         if (submitted)
         {

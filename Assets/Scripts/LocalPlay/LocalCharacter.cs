@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,7 +10,6 @@ public class LocalCharacter : MonoBehaviour
         Up = 1, Down = 2, Left = 3, Right = 4, Wait = 0
     }
 
-    public float speed;
     private Vector3 movePoint;
     private Vector3 prevMovePointPos;
     private Vector3 startPos;
@@ -23,6 +23,7 @@ public class LocalCharacter : MonoBehaviour
     private bool maskOn;
 
     public GameObject indicator;
+    public List<Direction> ActionPlan = new List<Direction>();
     // how many moves that the character left in this turn
     private int actionPointsLeft;
 
@@ -36,6 +37,9 @@ public class LocalCharacter : MonoBehaviour
     //Death and death round count down
     public bool dead = false;
     public int respawnCountdown = 0;
+
+
+    public bool moving = false;
 
     void Start()
     {
@@ -92,45 +96,30 @@ public class LocalCharacter : MonoBehaviour
         MaskControl(false);
     }
 
-    public void planNewStep(Direction direction)
+    public void AddActionToPlan(Direction direction)
     {
-        Vector3 moveVec = Vector3.zero;
-        //Quaternion rot = Quaternion.identity;
-
-        switch (direction)
-        {
-            case Direction.Up:
-                moveVec = Vector3.forward;
-                //rot = Quaternion.Euler(0, 0, 0);
-                break;
-
-            case Direction.Down:
-                moveVec = Vector3.back;
-                //rot = Quaternion.Euler(0, 180, 0);
-                break;
-
-            case Direction.Left:
-                moveVec = Vector3.left;
-                //rot = Quaternion.Euler(0, 270, 0);
-                break;
-
-            case Direction.Right:
-                moveVec = Vector3.right;
-                //rot = Quaternion.Euler(0, 90, 0);
-                break;
-
-            default:
-                break;
-        }
+        Vector3 moveVec = direction switch {
+            Direction.Up => Vector3.forward,
+            Direction.Down => Vector3.back,
+            Direction.Left => Vector3.left,
+            Direction.Right => Vector3.right,
+            _ => Vector3.zero,
+        };
 
         indicator.transform.position += moveVec * stepLength;
+        ActionPlan.Add(direction);
         actionPointsLeft -= 1;
     }
 
-    public bool CheckMove(Direction direction)
-    {
-        Vector3 moveVec = direction switch
-        {
+    public void ResetPlan() {
+        ActionPlan.Clear();
+        actionPointsLeft = config.movement;
+    }
+
+    public bool CheckMove(Direction direction) {
+        if (direction == Direction.Wait) return true;
+
+        Vector3 moveVec = direction switch {
             Direction.Up => Vector3.forward,
             Direction.Down => Vector3.back,
             Direction.Left => Vector3.left,
@@ -160,79 +149,50 @@ public class LocalCharacter : MonoBehaviour
         indicator.transform.position = this.transform.position;
     }
 
-    public void backOnePlannedStep(Direction direction)
-    {
-        Vector3 moveVec = Vector3.zero;
-        //Quaternion rot = Quaternion.identity;
-
-        switch (direction)
-        {
-            case Direction.Up:
-                moveVec = Vector3.forward;
-                //rot = Quaternion.Euler(0, 0, 0);
-                break;
-
-            case Direction.Down:
-                moveVec = Vector3.back;
-                //rot = Quaternion.Euler(0, 180, 0);
-                break;
-
-            case Direction.Left:
-                moveVec = Vector3.left;
-                //rot = Quaternion.Euler(0, 270, 0);
-                break;
-
-            case Direction.Right:
-                moveVec = Vector3.right;
-                //rot = Quaternion.Euler(0, 90, 0);
-                break;
-
-            default:
-                break;
+    
+    public void UndoPlanStep() {
+        if (ActionPlan.Count == 0) {
+            return;
         }
-
+        Direction lastMove = ActionPlan[ActionPlan.Count - 1];
+        ActionPlan.RemoveAt(ActionPlan.Count - 1);
+        Vector3 moveVec = lastMove switch {
+            Direction.Up => Vector3.forward,
+            Direction.Down => Vector3.back,
+            Direction.Left => Vector3.left,
+            Direction.Right => Vector3.right,
+            _ => Vector3.zero
+        };
         indicator.transform.position += -moveVec * stepLength;
         actionPointsLeft += 1;
     }
 
-    public void moveOneStep(Direction direction)
-    {
-        Vector3 moveVec = Vector3.zero;
-        //Quaternion rot = Quaternion.identity;
-
-        switch (direction)
-        {
-            case Direction.Up:
-                moveVec = Vector3.forward;
-                //rot = Quaternion.Euler(0, 0, 0);
-                break;
-
-            case Direction.Down:
-                moveVec = Vector3.back;
-                //rot = Quaternion.Euler(0, 180, 0);
-                break;
-
-            case Direction.Left:
-                moveVec = Vector3.left;
-                //rot = Quaternion.Euler(0, 270, 0);
-                break;
-
-            case Direction.Right:
-                moveVec = Vector3.right;
-                //rot = Quaternion.Euler(0, 90, 0);
-                break;
-
-            default:
-                break;
+    public IEnumerator TakeNextMove(float stepTime) {
+        if(ActionPlan.Count == 0) {
+            yield break;
         }
-
-        if (moveVec != Vector3.zero)
-        {
-            prevMovePointPos = movePoint;
-            movePoint += moveVec * stepLength;
-
-            this.transform.position = movePoint;
+        moving = true;
+        float timeStart = Time.time;
+        Direction nextMove = ActionPlan[0];
+        ActionPlan.RemoveAt(0);
+        Vector3 moveVec = nextMove switch {
+            Direction.Up => Vector3.forward,
+            Direction.Down => Vector3.back,
+            Direction.Left => Vector3.left,
+            Direction.Right => Vector3.right,
+            _ => Vector3.zero
+        };
+        if (moveVec != Vector3.zero) {
+            Vector3 origin = transform.position;
+            Vector3 target = transform.position + moveVec * stepLength;
+            while(Time.time - timeStart < stepTime) {
+                float t = (Time.time - timeStart) / stepTime;
+                transform.position = Vector3.Lerp(origin, target, t);
+                yield return null;
+            }
+            transform.position = target;
         }
+        moving = false;
     }
 
     public void withdrawn()
@@ -336,10 +296,7 @@ public class LocalCharacter : MonoBehaviour
         health = 3;
     }
 
-    public int getActionPoints()
-    {
-        return actionPointsLeft;
-    }
+    public int ActionPointsRemaining => actionPointsLeft;
 
     public int resetActionPoints()
     {
