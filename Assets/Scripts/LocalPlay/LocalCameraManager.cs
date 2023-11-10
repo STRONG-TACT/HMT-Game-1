@@ -94,14 +94,14 @@ public class LocalCameraManager : MonoBehaviour
 
     IEnumerator RecenterCameraCoroutine()
     {
-        Vector3 target = targetCharacter.transform.position + cameraOffset;
+        Vector3 target = targetCharacter.transform.position;// + cameraOffset;
         float startTime = Time.time;
         while (Time.time - startTime < lerpDuration)
         {
-            MainCamera.transform.position = Vector3.Lerp(MainCamera.transform.position, target, (Time.time - startTime) / lerpDuration);
+            cameraPivot.transform.position = Vector3.Lerp(cameraPivot.transform.position, target, (Time.time - startTime) / lerpDuration);
             yield return new WaitForEndOfFrame();
         }
-        MainCamera.transform.position = target;
+        cameraPivot.transform.position = target;
         cameraCentered = true;
         yield break;
     }
