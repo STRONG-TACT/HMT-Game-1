@@ -15,9 +15,15 @@ MonoBehaviour:
   characterName: Dwarf
   type: 1
   movement: 6
-  monsterDice: 6
-  trapDice: 8
-  stoneDice: 4
+  monsterDice:
+    type: 6
+    bonus: 0
+  trapDice:
+    type: 8
+    bonus: 0
+  stoneDice:
+    type: 4
+    bonus: 0
   sightRange: 1
   cameraPosition: {x: 0, y: 0, z: 0}
   dieFaces: 010000000100000002000000020000000300000003000000

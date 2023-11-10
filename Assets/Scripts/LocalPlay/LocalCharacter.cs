@@ -1,6 +1,8 @@
-using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using System.Linq;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 public class LocalCharacter : MonoBehaviour
@@ -195,7 +197,7 @@ public class LocalCharacter : MonoBehaviour
         moving = false;
     }
 
-    public void withdrawn()
+    public void Retreat()
     {
         this.transform.position = prevMovePointPos;
         movePoint = prevMovePointPos;
@@ -310,5 +312,20 @@ public class LocalCharacter : MonoBehaviour
         }
 
         return actionPointsLeft;
+    }
+
+    public JObject HMTStateRep() {
+        return new JObject {
+            {"name", config.characterName},
+            {"type", config.type.ToString()},
+            {"sightRange", config.sightRange },
+            {"monsterDice", config.monsterDice.ToString()},
+            {"trapDice", config.trapDice.ToString() },
+            {"stoneDice", config.stoneDice.ToString() },
+            {"health", health},
+            {"dead", dead},
+            {"actionPoints", actionPointsLeft},
+            {"actionPlan", new JArray(ActionPlan.Select(d => d.ToString())) }
+        };
     }
 }

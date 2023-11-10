@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4049360142575093112}
   - component: {fileID: 5963104646285469686}
   - component: {fileID: -1146966863426514084}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: VillageTile2
   m_TagString: Untagged
   m_Icon: {fileID: 0}

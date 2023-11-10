@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -173,5 +174,15 @@ public class LocalMonster : MonoBehaviour
         };
 
         return !Physics.Raycast(this.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible"));
+    }
+
+    public JObject HMTStateRep() {
+        return new JObject {
+            {"name", "monster" + monsterId },
+            {"type", config.type.ToString() },
+            {"actionPoints", config.movement },
+            {"combatDice", config.combatDice.ToString() }
+
+        };
     }
 }

@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Pun.UtilityScripts;
 
+#if DEPRECATED
+
 public class PinningSystem : MonoBehaviour
 {
     private PhotonView photonView;
@@ -217,3 +219,4 @@ public class PinningSystem : MonoBehaviour
 
     /* -------------- PinUI setUp */
 }
+#endif

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 458854253063774720}
   - component: {fileID: 8219650406614538394}
   - component: {fileID: 4198626127295763174}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: PondTile2
   m_TagString: Untagged
   m_Icon: {fileID: 0}

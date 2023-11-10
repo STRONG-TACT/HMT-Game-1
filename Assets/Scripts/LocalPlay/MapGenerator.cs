@@ -8,6 +8,7 @@ public class MapGenerator : MonoBehaviour
     public GameAssets gameAssets;
     public LocalGameData gameData;
     public Transform tileParent;
+    public LocalTile[,] Map;
 
     public Dictionary<string, string> AlternateSchema = new Dictionary<string, string>()
     {
@@ -69,6 +70,9 @@ public class MapGenerator : MonoBehaviour
 
         int rowCount = tiles.Count;
         int colCount = tiles[0].Count;
+        
+        Map = new LocalTile[rowCount, colCount];
+
         // Calculate map width and length
         float mapWidth = colCount * (gameData.tileSize + gameData.tileGapLength) - gameData.tileGapLength;
         float mapLength = rowCount * (gameData.tileSize + gameData.tileGapLength) - gameData.tileGapLength;
@@ -81,7 +85,7 @@ public class MapGenerator : MonoBehaviour
             Debug.Log("New Line");
             for (int j = 0; j < colCount; j++) {
                 Debug.Log(tiles[i][j]);
-                SpawnTile(i, j, tiles[i][j]);
+                Map[i,j] = SpawnTile(i, j, tiles[i][j]);
             }
         }
 
@@ -95,67 +99,51 @@ public class MapGenerator : MonoBehaviour
         wall4.GetComponent<BoxCollider>().size = new Vector3(1, 1, mapLength);
     }
 
-    private void SpawnTile(int row, int col, string code)
+    private LocalTile SpawnTile(int row, int col, string code)
     {
         float x = - col * (gameData.tileSize + gameData.tileGapLength);
         float z = - row * (gameData.tileSize + gameData.tileGapLength);
         string name = SearchSchema(code);
 
+        GameObject tileObj = null;
+
         switch (name)
         {
             case "Open":
-                GameObject opentile = Instantiate(gameAssets.OpenTile, new Vector3(x, 0, z), Quaternion.identity, tileParent);
-                opentile.GetComponent<LocalTile>().row = row;
-                opentile.GetComponent<LocalTile>().col = col;
+                tileObj = Instantiate(gameAssets.OpenTile, new Vector3(x, 0, z), Quaternion.identity, tileParent);
                 break;
 
             case "Wall":
                 int randomIndex = Random.Range(0, gameAssets.WallTiles.Count);
-                GameObject walltile = Instantiate(gameAssets.WallTiles[randomIndex], new Vector3(x, 0, z), Quaternion.identity, tileParent);
-                walltile.GetComponent<LocalTile>().row = row;
-                walltile.GetComponent<LocalTile>().col = col;
+                tileObj = Instantiate(gameAssets.WallTiles[randomIndex], new Vector3(x, 0, z), Quaternion.identity, tileParent);
                 break;
 
             case "Door":
-                GameObject doortile = Instantiate(gameAssets.DoorTile, new Vector3(x, 0, z), Quaternion.identity, tileParent);
-                doortile.GetComponent<LocalTile>().row = row;
-                doortile.GetComponent<LocalTile>().col = col;
+                tileObj = Instantiate(gameAssets.DoorTile, new Vector3(x, 0, z), Quaternion.identity, tileParent);
                 break;
 
             case "Trap1":
-                GameObject traptile1 = Instantiate(gameAssets.TrapTiles[0], new Vector3(x, 0, z), Quaternion.identity, tileParent);
-                traptile1.GetComponent<LocalTile>().row = row;
-                traptile1.GetComponent<LocalTile>().col = col;
+                tileObj = Instantiate(gameAssets.TrapTiles[0], new Vector3(x, 0, z), Quaternion.identity, tileParent);
                 break;
 
             case "Trap2":
-                GameObject traptile2 = Instantiate(gameAssets.TrapTiles[1], new Vector3(x, 0, z), Quaternion.identity, tileParent);
-                traptile2.GetComponent<LocalTile>().row = row;
-                traptile2.GetComponent<LocalTile>().col = col;
+                tileObj = Instantiate(gameAssets.TrapTiles[1], new Vector3(x, 0, z), Quaternion.identity, tileParent);
                 break;
 
             case "Rock1":
-                GameObject rocktile1 = Instantiate(gameAssets.RockTiles[0], new Vector3(x, 0, z), Quaternion.identity, tileParent);
-                rocktile1.GetComponent<LocalTile>().row = row;
-                rocktile1.GetComponent<LocalTile>().col = col;
+                tileObj = Instantiate(gameAssets.RockTiles[0], new Vector3(x, 0, z), Quaternion.identity, tileParent);
                 break;
 
             case "Rock2":
-                GameObject rocktile2 = Instantiate(gameAssets.RockTiles[1], new Vector3(x, 0, z), Quaternion.identity, tileParent);
-                rocktile2.GetComponent<LocalTile>().row = row;
-                rocktile2.GetComponent<LocalTile>().col = col;
+                tileObj = Instantiate(gameAssets.RockTiles[1], new Vector3(x, 0, z), Quaternion.identity, tileParent);
                 break;
 
             case "Rock3":
-                GameObject rocktile3 = Instantiate(gameAssets.RockTiles[2], new Vector3(x, 0, z), Quaternion.identity, tileParent);
-                rocktile3.GetComponent<LocalTile>().row = row;
-                rocktile3.GetComponent<LocalTile>().col = col;
+                tileObj = Instantiate(gameAssets.RockTiles[2], new Vector3(x, 0, z), Quaternion.identity, tileParent);
                 break;
 
             case "Rock4":
-                GameObject rocktile4 = Instantiate(gameAssets.RockTiles[3], new Vector3(x, 0, z), Quaternion.identity, tileParent);
-                rocktile4.GetComponent<LocalTile>().row = row;
-                rocktile4.GetComponent<LocalTile>().col = col;
+                tileObj = Instantiate(gameAssets.RockTiles[3], new Vector3(x, 0, z), Quaternion.identity, tileParent);
                 break;
 
             case "":
@@ -163,12 +151,21 @@ public class MapGenerator : MonoBehaviour
                 break;
 
             default:
-                GameObject openbase = Instantiate(gameAssets.OpenTile, new Vector3(x, 0, z), Quaternion.identity, tileParent);
+                tileObj = Instantiate(gameAssets.OpenTile, new Vector3(x, 0, z), Quaternion.identity, tileParent);
                 SpawnEntity(name, x, z);
-                openbase.GetComponent<LocalTile>().row = row;
-                openbase.GetComponent<LocalTile>().col = col;
                 break;
         }
+
+        if (tileObj != null) {
+            LocalTile tile = tileObj.GetComponent<LocalTile>();
+            tile.row = row;
+            tile.col = col;
+            return tile;
+        }
+        else {
+            return null;
+        }
+
     }
 
     private string SearchSchema(string code)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
+#if DEPRECATED
 public class PinView : MonoBehaviour
 {
     PhotonView view;
@@ -38,3 +39,4 @@ public class PinView : MonoBehaviour
         }
     }
 }
+#endif

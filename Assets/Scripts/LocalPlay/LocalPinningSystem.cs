@@ -20,7 +20,7 @@ public class LocalPinningSystem : MonoBehaviour
     public Vector3 ui_offset = new Vector3(0,0.3f,0);
     public Vector3 pin_icon_offset = new Vector3(0.3f, 0.3f, 0.3f);
     // stores a list of 
-    public List<GameObject> pinList = new List<GameObject>();
+    public List<LocalPin> pinList = new List<LocalPin>();
 
     // 3D pin
     public GameObject unknownPinPrefab;
@@ -67,18 +67,11 @@ public class LocalPinningSystem : MonoBehaviour
         }
     }
 
-    public void ClearCurrentTurnPins()
-    {
-        clearPins();
-    }
-
-    private void clearPins()
-    {
-        for (int i=0; i<pinList.Count; i++)
-        {
-            Destroy(pinList[i]);
-        }
-        pinList = new List<GameObject>();
+    public void ClearCurrentTurnPins() {
+        foreach (LocalPin pin in pinList) {
+            Destroy(pin.gameObject);
+        }       
+        pinList = new List<LocalPin>();
     }
 
     /* PinWheel choice button clicked ---------------- */
@@ -116,10 +109,12 @@ public class LocalPinningSystem : MonoBehaviour
     public void AddPin(GameObject pinPrefab, int iconType)
     {
         GameObject pinObj;
-        GameObject pinUIObj;
         pinObj = Instantiate(pinPrefab, tile.transform.position + pin_icon_offset, Quaternion.Euler(0, 180, 0));
         pinObj.transform.SetParent(tile.transform);
-        pinList.Add(pinObj);
+        LocalPin pin = pinObj.GetComponent<LocalPin>();
+        pinList.Add(pin);
+        tileScript.pinList.Add(pinObj.GetComponent<LocalPin>());
+        pin.locationTile = tileScript;
         pinObj.transform.localScale = new Vector3(4f, 4f, 4f);
         //PinWindow.Instance.AddPing(new Vector3(hit.transform.position.x, 0, hit.transform.position.z), 1);
         //pinUIObj = AddPinUI(pinPosition, iconType, PhotonNetwork.LocalPlayer.ActorNumber - 1); // Actor targetValues starts from 1, List index start from 0

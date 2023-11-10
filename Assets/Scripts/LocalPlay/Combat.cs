@@ -11,13 +11,43 @@ public class Combat : MonoBehaviour
         Monster = 2
     }
 
-    public enum DiceType
+    public enum DiceSize
     {
         D0 = 0,
         D4 = 4,
         D6 = 6,
         D8 = 8,
         D10 = 10
+    }
+
+    [System.Serializable]
+    public class Dice {
+        public DiceSize type;
+        public int bonus;
+        public Dice(DiceSize type, int bonus = 0) {
+            this.type = type;
+            this.bonus = bonus;
+        }
+
+        public override string ToString() {
+            string result = type.ToString();
+            if (bonus > 0) {
+                result += "+" + bonus.ToString();
+            }
+            else {
+                result += bonus.ToString();
+            }
+            return result;
+        }
+
+        public int Roll() {
+            if (type == DiceSize.D0) {
+                return bonus;
+            }
+            else {
+                return Random.Range(1, (int)type + 1) + bonus;
+            }
+        }
     }
 
     public static bool ExecuteCombat(FightType type, LocalTile tile, LocalUIManager uiManager)
@@ -30,7 +60,7 @@ public class Combat : MonoBehaviour
 
         foreach (LocalCharacter c in tile.charaList)
         {
-            int outcome = RollDice((int)c.config.monsterDice);
+            int outcome = c.config.monsterDice.Roll();
             charaScores.Add(outcome);
             charaScore += outcome;
         }
@@ -39,16 +69,16 @@ public class Combat : MonoBehaviour
         {
             foreach (LocalMonster m in tile.enemyList)
             {
-                int outcome = RollDice((int)m.config.combatDice);
+                int outcome = m.config.combatDice.Roll();
                 enemyScores.Add(outcome);
                 enemyScore += outcome;
             }
         }
         else if (type == FightType.Trap || type == FightType.Rock)
         {
-            int outcome = RollDice((int)tile.localDice);
+            int outcome = tile.dice.Roll();
             enemyScore += outcome;
-            enemyScore += tile.diceBonus;
+            //enemyScore += tile.diceBonus;
             enemyScores.Add(enemyScore);
         }
 
@@ -58,18 +88,6 @@ public class Combat : MonoBehaviour
         }
 
         uiManager.ShowCombatUI(type, charaScores, enemyScores);
-
-        return result;
-    }
-
-    public static int RollDice(int dice)
-    {
-        int result = 0;
-
-        if (dice != 0)
-        {
-            result = Random.Range(1, dice + 1);
-        }
 
         return result;
     }

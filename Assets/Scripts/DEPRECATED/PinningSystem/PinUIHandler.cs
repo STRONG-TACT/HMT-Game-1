@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 
+#if DEPRECATED
 public class PinUIHandler : MonoBehaviour
 {
     public int playerPinnedIndex; // Character that made this pin
@@ -79,3 +80,4 @@ public class PinUIHandler : MonoBehaviour
         }
     }
 }
+#endif

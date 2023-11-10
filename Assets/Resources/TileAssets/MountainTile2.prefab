@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1984093338750683292}
   - component: {fileID: 5761632246159208502}
   - component: {fileID: -4494659100181591993}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: MountainTile2
   m_TagString: Untagged
   m_Icon: {fileID: 0}

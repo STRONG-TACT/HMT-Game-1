@@ -727,12 +727,12 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 1d577f5f266b84e059e68ab106e5b86a, type: 3}
   - {fileID: 21300000, guid: 2d2ee983e9050439e8984469c9a4b51d, type: 3}
   ui_offset: {x: 0, y: 0.3, z: 0}
-  pin_icon_offset: {x: 0.3, y: 0.3, z: 0.3}
+  pin_icon_offset: {x: 0, y: 1, z: 0}
   pinList: []
-  unknownPinPrefab: {fileID: 919132149155446097, guid: 8fdc8bf9ef98d344db01b5c56a1284a9, type: 3}
-  dangerPinPrefab: {fileID: 919132149155446097, guid: eb7d5256727947b4f8d30727475e9dab, type: 3}
-  assistPinPrefab: {fileID: 919132149155446097, guid: 2fa13d8e7f14aef4987f0faf188187f6, type: 3}
-  omwPinPrefab: {fileID: 919132149155446097, guid: 893db338ea1c09b468a21c95a20db3da, type: 3}
+  unknownPinPrefab: {fileID: 6099151916383471026, guid: 719bff3c132bdf14cbb179c4de5d8a20, type: 3}
+  dangerPinPrefab: {fileID: 9008908807479991329, guid: 5d09c91e2dbf6aa4b890b9d0e8b7e917, type: 3}
+  assistPinPrefab: {fileID: 3856196415462018541, guid: bce215c54d3efba4c8fd9597851c3667, type: 3}
+  omwPinPrefab: {fileID: 1475608043689062852, guid: 5dc48400de08ccc43b8030954fb7000c, type: 3}
 --- !u!4 &282351984
 Transform:
   m_ObjectHideFlags: 0
@@ -5379,10 +5379,7 @@ MonoBehaviour:
   - giant
   - dwarf
   - human
-  OpenHMTInterfaceWindowHotKey: 
-  PrintCurrentStateHotKey: 
   IgnoreScenes: []
-  RecaptureHotKey: 
 --- !u!4 &1955315220
 Transform:
   m_ObjectHideFlags: 0

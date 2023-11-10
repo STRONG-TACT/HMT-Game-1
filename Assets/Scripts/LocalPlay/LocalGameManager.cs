@@ -433,9 +433,8 @@ public class LocalGameManager : MonoBehaviour
                 yield return null;
             } while (!doneMoving);
 
-            if (eventQueue.Count != 0)
-            {
-                StartCoroutine(ExecuteCombatOneByOne());
+            if (eventQueue.Count != 0) {
+                yield return ExecuteCombatOneByOne();
                 hasCombat = true;
                 break;
             }
@@ -475,103 +474,95 @@ public class LocalGameManager : MonoBehaviour
             LocalTile t = eventQueue.Dequeue();
 
             LocalCameraManager.Instance.ChangeTargetCharacter(t.charaList[0].CharacterId);
-            if (t.tileType == LocalTile.TileType.Other)
-            {
-                win = Combat.ExecuteCombat(Combat.FightType.Monster, t, uiManager);
-            }
-            else if (t.tileType == LocalTile.TileType.Trap)
-            {
-                win = Combat.ExecuteCombat(Combat.FightType.Trap, t, uiManager);
-            }
-            else if (t.tileType == LocalTile.TileType.Rock)
-            {
-                win = Combat.ExecuteCombat(Combat.FightType.Rock, t, uiManager);
+            switch (t.tileType) {
+                case LocalTile.ObstacleType.None:
+                    win = Combat.ExecuteCombat(Combat.FightType.Monster, t, uiManager);
+                    break;
+                case LocalTile.ObstacleType.Trap:
+                    win = Combat.ExecuteCombat(Combat.FightType.Trap, t, uiManager);
+                    break;
+                case LocalTile.ObstacleType.Rock:
+                    win = Combat.ExecuteCombat(Combat.FightType.Rock, t, uiManager);
+                    break;
             }
 
-            if (win)
-            {
+            if (win) {
                 // if the character(s) won the battle, destory the enemies
                 Debug.Log("Character won.");
-
-                if (t.tileType == LocalTile.TileType.Other)
-                {
-                    foreach (LocalMonster m in t.enemyList)
-                    {
-                        inSceneMonsters.Remove(m);
-                        Destroy(m.gameObject);
-                    }
-
-                    t.enemyList.Clear();
-                }
-                else if (t.tileType == LocalTile.TileType.Trap || t.tileType == LocalTile.TileType.Rock)
-                {
-                    GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
-                    opentile.GetComponent<LocalTile>().row = t.row;
-                    opentile.GetComponent<LocalTile>().col = t.col;
-
-                    Destroy(t.gameObject);
+                switch (t.tileType) {
+                    case LocalTile.ObstacleType.None:
+                        foreach (LocalMonster m in t.enemyList) {
+                            inSceneMonsters.Remove(m);
+                            Destroy(m.gameObject);
+                        }
+                        t.enemyList.Clear();
+                        break;
+                    case LocalTile.ObstacleType.Trap:
+                    case LocalTile.ObstacleType.Rock:
+                        GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
+                        LocalTile newTile = opentile.GetComponent<LocalTile>();
+                        newTile.row = t.row;
+                        newTile.col = t.col;
+                        MapGenerator.Instance.Map[newTile.row, newTile.col] = newTile;
+                        Destroy(t.gameObject);
+                        break;
                 }
             }
-            else
-            {
+            else {
                 // If not, reduce health except rock
                 // If character's turn, all remaining steps should be cleared.
                 Debug.Log("Enemy won.");
 
                 List<LocalCharacter> deadChara = new List<LocalCharacter>();
                 List<LocalCharacter> aliveChara = new List<LocalCharacter>();
-
-                if (t.tileType == LocalTile.TileType.Other)
-                {
-                    reduceCharacterHealth(t.charaList, deadChara, aliveChara);
-
-                    if (gameStatus == GameStatus.Player_Moving)
-                    {
+                switch (t.tileType) {
+                    case LocalTile.ObstacleType.None:
+                        reduceCharacterHealth(t.charaList, deadChara, aliveChara);
+                        if (gameStatus == GameStatus.Player_Moving) {
+                            clearCharacterMoves(t.charaList);
+                        }
+                        break;
+                    case LocalTile.ObstacleType.Trap:
+                        reduceCharacterHealth(t.charaList, deadChara, aliveChara);
                         clearCharacterMoves(t.charaList);
-                    }
-                }
-                else if (t.tileType == LocalTile.TileType.Trap)
-                {
-                    reduceCharacterHealth(t.charaList, deadChara, aliveChara);
+                        GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
+                        LocalTile newTile = opentile.GetComponent<LocalTile>();
+                        newTile.row = t.row;
+                        newTile.col = t.col;
+                        MapGenerator.Instance.Map[newTile.row, newTile.col] = newTile;
+                        Destroy(t.gameObject);
+                        break;
+                    case LocalTile.ObstacleType.Rock:
+                        foreach (LocalCharacter c in t.charaList) {
+                            aliveChara.Add(c);
+                        }
 
-                    clearCharacterMoves(t.charaList);
-
-                    GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
-                    opentile.GetComponent<LocalTile>().row = t.row;
-                    opentile.GetComponent<LocalTile>().col = t.col;
-
-                    Destroy(t.gameObject);
-                }
-                else if (t.tileType == LocalTile.TileType.Rock)
-                {
-                    foreach (LocalCharacter c in t.charaList)
-                    {
-                        aliveChara.Add(c);
-                    }
-
-                    clearCharacterMoves(t.charaList);
+                        clearCharacterMoves(t.charaList);
+                        break;
                 }
 
-                foreach (LocalCharacter c in deadChara)
-                {
+                foreach (LocalCharacter c in deadChara) {
                     t.charaList.Remove(c);
                 }
-                foreach (LocalCharacter c in aliveChara)
-                {
-                    c.withdrawn();
+                foreach (LocalCharacter c in aliveChara) {
+                    c.Retreat();
                 }
             }
 
-            yield return new WaitForSeconds(2f);
+            //TODO this should probably be waiting for a button click in the future.
+            yield return new WaitForSeconds(2*excecutionStepTime);
         }
+        yield break;
 
-        if (gameStatus == GameStatus.Player_Moving)
-        {
-            StartCoroutine(CharacterMoveByStep());
-        }else if (gameStatus == GameStatus.Monster_Moving)
-        {
-            StartCoroutine(MonsterMoveByStep());
-        }
+        // This should only be called as a sub-coroutine of the main moving one so it
+        // doesn't need to restart them, it should just yield break
+        //if (gameStatus == GameStatus.Player_Moving)
+        //{
+        //    StartCoroutine(CharacterMoveByStep());
+        //}else if (gameStatus == GameStatus.Monster_Moving)
+        //{
+        //    StartCoroutine(MonsterMoveByStep());
+        //}
     }
 
     // Chara failed a combat with monster/trap
@@ -614,8 +605,8 @@ public class LocalGameManager : MonoBehaviour
         }
     }
 
-    // Called by LocalTile.OnTriggerEnter(), when an event happens at the tile
-    // The same tile (where an event happens) will only appear in queue once
+    // Called by LocalTile.OnTriggerEnter(), when an event happens at the newTile
+    // The same newTile (where an event happens) will only appear in queue once
     public void updateEventQueue(LocalTile tile)
     {
         if (!eventQueue.Contains(tile))

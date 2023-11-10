@@ -1,5 +1,7 @@
 using UnityEngine;
 
+
+#if DEPRECATED
 public class Pin : MonoBehaviour
 {
     public int pinObjId; // 3D
@@ -11,3 +13,4 @@ public class Pin : MonoBehaviour
         pinUIId = _pinUIId;
     }
 }
+#endif

@@ -15,9 +15,15 @@ MonoBehaviour:
   characterName: Human
   type: 0
   movement: 4
-  monsterDice: 8
-  trapDice: 6
-  stoneDice: 6
+  monsterDice:
+    type: 8
+    bonus: 0
+  trapDice:
+    type: 6
+    bonus: 0
+  stoneDice:
+    type: 6
+    bonus: 0
   sightRange: 2
   cameraPosition: {x: 0, y: 0, z: 0}
   dieFaces: 010000000200000003000000040000000500000006000000
