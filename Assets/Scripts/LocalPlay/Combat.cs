@@ -30,6 +30,7 @@ public class Combat : MonoBehaviour
 
         foreach (LocalCharacter c in tile.charaList)
         {
+            c.State = LocalCharacter.CharacterState.Attacking;
             int outcome = RollDice((int)c.config.monsterDice);
             charaScores.Add(outcome);
             charaScore += outcome;
@@ -58,8 +59,10 @@ public class Combat : MonoBehaviour
         }
 
         uiManager.ShowCombatUI(type, charaScores, enemyScores);
-
-        return result;
+        foreach (LocalCharacter c in tile.charaList) {
+            c.State = LocalCharacter.CharacterState.Idle;
+        }
+            return result;
     }
 
     public static int RollDice(int dice)

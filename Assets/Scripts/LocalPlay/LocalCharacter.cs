@@ -38,6 +38,51 @@ public class LocalCharacter : MonoBehaviour
     public bool dead = false;
     public int respawnCountdown = 0;
 
+    private Animator animator;
+    private CharacterState characterState;
+
+    public enum CharacterState
+    {
+        Idle, Walking, Attacking, Die
+    }
+
+
+    public CharacterState State
+    {
+        get { return characterState; }
+        set
+        {
+            if (value != characterState)
+            {
+                characterState = value;
+                switch (value)
+                {
+                    case CharacterState.Idle:
+                        animator.SetBool("Idle", true);
+                        animator.SetBool("Attack", false);
+                        animator.SetBool("Walk", false);
+                        break;
+                    case CharacterState.Walking:
+                        animator.SetBool("Idle", false);
+                        animator.SetBool("Attack", false);
+                        animator.SetBool("Walk", true);
+                        break;
+                    case CharacterState.Attacking:
+                        animator.SetBool("Idle", false);
+                        animator.SetBool("Attack", true);
+                        animator.SetBool("Walk", false);
+                        break;
+                    case CharacterState.Die:
+                        animator.SetBool("Idle", false);
+                        animator.SetBool("Attack", false);
+                        animator.SetBool("Walk", false);
+                        animator.SetBool("Die", true);
+                        break;
+                }
+            }
+        }
+    }
+
 
     public bool moving = false;
 
@@ -48,6 +93,10 @@ public class LocalCharacter : MonoBehaviour
         characterMask = transform.Find("CharacterMask");
         visibilityMask = transform.Find("VisibleMask");
         health = 3;
+
+        animator = GetComponentInChildren<Animator>();
+        animator.SetBool("Idle", true);
+        State = CharacterState.Idle;
     }
 
     public void SetUpConfig(CharacterConfig config, int characterId, LocalGameData gameData)
@@ -183,15 +232,21 @@ public class LocalCharacter : MonoBehaviour
             _ => Vector3.zero
         };
         if (moveVec != Vector3.zero) {
+            State = CharacterState.Walking;
+
             Vector3 origin = transform.position;
             Vector3 target = transform.position + moveVec * stepLength;
-            while(Time.time - timeStart < stepTime) {
+            Quaternion targetRotation = Quaternion.LookRotation(moveVec, Vector3.up);
+            while (Time.time - timeStart < stepTime) {
                 float t = (Time.time - timeStart) / stepTime;
                 transform.position = Vector3.Lerp(origin, target, t);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, t);
                 yield return null;
             }
             transform.position = target;
+            transform.rotation = targetRotation;
         }
+        State = CharacterState.Idle;
         moving = false;
     }
 
@@ -266,14 +321,28 @@ public class LocalCharacter : MonoBehaviour
         if (health == 0)
         {
             Debug.Log(string.Format("Character {0} Died!", config.characterName));
-            dead = true;
-            respawnCountdown = 2;
-            this.gameObject.SetActive(false);
-            this.transform.position = startPos;
-
-            movePoint = startPos;
-            prevMovePointPos = movePoint;
+            StartCoroutine(characterDeath());
         }
+    }
+
+
+    public IEnumerator characterDeath() {
+        State = CharacterState.Die;
+        float animationLength = 0f;
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        animationLength = stateInfo.length;
+
+        // Wait for the duration of the animation
+        yield return new WaitForSeconds(animationLength);
+        State = CharacterState.Idle;
+
+        dead = true;
+        respawnCountdown = 2;
+        this.gameObject.SetActive(false);
+        this.transform.position = startPos;
+
+        movePoint = startPos;
+        prevMovePointPos = movePoint;
     }
 
     public void RespawnCountdown()
