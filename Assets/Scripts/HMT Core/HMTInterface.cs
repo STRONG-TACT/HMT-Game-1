@@ -23,21 +23,12 @@ namespace HMT {
         public string serviceName = "hmt";
         public string[] serviceTargets = new string[0];
 
-        [Header("Hot Keys")]
-        public KeyCode[] OpenHMTInterfaceWindowHotKey;
-        public KeyCode[] PrintCurrentStateHotKey;
-
-
-        private bool isOpen = false;
-        private Vector2 scrollPos = Vector2.zero;
-
-
 #if HMT_BUILD
-        private WebSocketServer server = null;
+        internal WebSocketServer server = null;
 
         public ConcurrentQueue<Command> CommandQueue = new ConcurrentQueue<Command>();
 
-        public ArgParser ArgParser = new ArgParser();
+        public ArgParser Args = new ArgParser();
 
         // Start is called before the first frame update
         virtual protected void Start() {
@@ -50,10 +41,10 @@ namespace HMT {
             }
             
 
-            ArgParser.AddArg("hmtsocketurl", ArgParser.ArgType.One);
-            ArgParser.AddArg("hmtsocketport", ArgParser.ArgType.One);
+            Args.AddArg("hmtsocketurl", ArgParser.ArgType.One);
+            Args.AddArg("hmtsocketport", ArgParser.ArgType.One);
 
-            ArgParser.ParseArgs();
+            Args.ParseArgs();
 
             DontDestroyOnLoad(this);
             if (StartServerOnStart) {
@@ -62,8 +53,8 @@ namespace HMT {
         }
 
         public void StartSocketServer() {
-            socketPort = ArgParser.GetArgValue("hmtsocketport", socketPort);
-            url = ArgParser.GetArgValue("hmtsocketurl", url);
+            socketPort = Args.GetArgValue("hmtsocketport", socketPort);
+            url = Args.GetArgValue("hmtsocketurl", url);
 
             if (socketPort == 80) {
                 Debug.LogWarning("Socket set to Port 80, which will probably have permissions issues.");
@@ -99,12 +90,7 @@ namespace HMT {
 
         // Update is called once per frame
         virtual protected void Update() {
-            if (CheckHotKey(OpenHMTInterfaceWindowHotKey)) {
-                isOpen = !isOpen;
-            }
-            if (CheckHotKey(PrintCurrentStateHotKey)) {
-                Debug.LogFormat("[HMTInterface] State Hotkey: {0}", GetState(false));
-            }
+            
 
             while(CommandQueue.Count > 0)  {
                 if (CommandQueue.TryDequeue(out Command command))
@@ -118,71 +104,6 @@ namespace HMT {
             }
         }
 
-        private string lastState = string.Empty;
-
-        private void OnGUI() {
-            if (isOpen) {
-                GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
-                scrollPos = GUILayout.BeginScrollView(scrollPos);
-                GUILayout.BeginVertical();
-
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Close")) {
-                    isOpen = !isOpen;
-                }
-
-                if(server == null) {
-                    if(GUILayout.Button("Start Socket Server")) {
-                        StartSocketServer();
-                    }
-                }
-                else {
-                    if (server.IsListening) {
-                        if (GUILayout.Button("Stop Socket Server")) {
-                            server.Stop();
-                        }
-                    }
-                    else {
-                        if(GUILayout.Button("Start Socket Server")) {
-                            server.Start();
-                        }
-                    }
-                }
-
-                GUILayout.EndHorizontal();
-
-                GUILayout.Label("Socket Server Status");
-                if (server == null) {
-                    GUILayout.Label("Server NOT connected.");
-                    GUILayout.Label(string.Format("URL: {0}", ArgParser.GetArgValue("hmtsocketurl", url)));
-                    GUILayout.Label(string.Format("Port: {0}", ArgParser.GetArgValue("hmtsocketport", socketPort)));
-                }
-                else {
-                    GUILayout.Label(string.Format("Address: {0}", server.Address.ToString()));
-                    GUILayout.Label(string.Format("Listening: {0}", server.IsListening));
-                    GUILayout.Label(string.Format("Secure: {0}", server.IsSecure));
-                    GUILayout.Label(string.Format("WaitTime: {0}", server.WaitTime));
-                }
-
-                GUILayout.Space(50);
-                
-                GUILayout.Label("STATE:");
-                if(GUILayout.Button("Snap State")) {
-                    lastState = GetState(true);
-                }
-                if(lastState != string.Empty) {
-                    if(GUILayout.Button("Copy State")) {
-                        GUIUtility.systemCopyBuffer = lastState;
-                    }
-                }
-                GUILayout.Label(lastState);
-                GUILayout.EndVertical();
-                GUILayout.EndScrollView();
-                GUILayout.EndArea();
-            }
-        }
-
-
 #else 
         virtual protected void Start() {
             Debug.LogWarning("HMT_BUILD flag not set. Destroying HMTInterface");
@@ -191,21 +112,10 @@ namespace HMT {
 
         virtual protected void Update() { }
 
+        public void StartSocketServer() {}
+
 
 #endif
-
-
-       
-
-        protected bool CheckHotKey(KeyCode[] code) {
-            foreach (KeyCode key in code) {
-                if (!Input.GetKey(key)) {
-                    return false;
-                }
-            }
-            return code.Length > 0;
-        }
-
         /// <summary>
         /// Captures a representation of the current game state to send to an agent.
         /// 

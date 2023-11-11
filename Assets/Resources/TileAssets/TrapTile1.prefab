@@ -61,12 +61,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileType: 1
-  localDice: 4
-  diceBonus: 1
+  dice:
+    type: 4
+    bonus: 2
   row: 0
   col: 0
   enemyList: []
   charaList: []
+  pinList: []
 --- !u!1001 &7221710844581792528
 PrefabInstance:
   m_ObjectHideFlags: 0

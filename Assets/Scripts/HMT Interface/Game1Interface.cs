@@ -6,20 +6,14 @@ using HMT;
 using Photon.Pun.Demo.PunBasics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Threading;
 using Photon.Pun;
-using Photon.Pun.Demo.Cockpit.Forms;
 using System.Linq;
 
 public class Game1Interface : HMTInterface {
 
     [Header("Game Specific Settings")]
     public string[] IgnoreScenes; 
-    
-    public KeyCode[] RecaptureHotKey;
-
-    
-    
+        
     GameObject[] monsters;
     GameObject[] stones;
     GameObject[] traps;
@@ -36,14 +30,6 @@ public class Game1Interface : HMTInterface {
         base.Start();
         SceneManager.activeSceneChanged += OnSceneChange;
         //FindKeyObjects();
-    }
-
-    protected override void Update() {
-        base.Update();
-        if (CheckHotKey(RecaptureHotKey)) {
-            Debug.Log("Recapturing KeyObjects");
-            FindKeyObjects();
-        }
     }
 
     public Vector2Int WorldPointToGridPosition(Vector3 point, float tileSize, float tileGap, Vector3 zeroPoint, bool ceil) {

@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ebdd62046cdc4c2f8c858a08d3669b3, type: 3}
   m_Name: Monster_M
   m_EditorClassIdentifier: 
-  monsterName: M_Monster
   type: 1
   movement: 1
-  combatDice: 6
+  combatDice:
+    type: 6
+    bonus: 0
   MonsterIcon: {fileID: 0}

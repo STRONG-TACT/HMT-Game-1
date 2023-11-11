@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 438455888594864230}
   - component: {fileID: -4126707594874147725}
   - component: {fileID: 4665229814655901530}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: ForestTile4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
