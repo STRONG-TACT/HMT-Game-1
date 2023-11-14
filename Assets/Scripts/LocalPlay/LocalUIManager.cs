@@ -95,7 +95,7 @@ public class LocalUIManager : MonoBehaviour
         text.text = "Characters moving...";
     }
 
-    public void ShowMoveLeft(int movePoints)
+    public void UpdateActionPointsRemaining(int movePoints)
     {
         text.text = stageText + string.Format("Moves left: {0}", movePoints);
     }

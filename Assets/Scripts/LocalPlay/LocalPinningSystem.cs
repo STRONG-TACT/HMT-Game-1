@@ -106,8 +106,7 @@ public class LocalPinningSystem : MonoBehaviour
         LocalGameManager.Instance.newPlayerPin();
     }
 
-    public void AddPin(GameObject pinPrefab, int iconType)
-    {
+    public void AddPin(GameObject pinPrefab, int iconType) {
         GameObject pinObj;
         pinObj = Instantiate(pinPrefab, tile.transform.position + pin_icon_offset, Quaternion.Euler(0, 180, 0));
         pinObj.transform.SetParent(tile.transform);
@@ -115,6 +114,7 @@ public class LocalPinningSystem : MonoBehaviour
         pinList.Add(pin);
         tileScript.pinList.Add(pinObj.GetComponent<LocalPin>());
         pin.locationTile = tileScript;
+        pin.placingCharacter = LocalGameManager.Instance.player.myCharacter;
         pinObj.transform.localScale = new Vector3(4f, 4f, 4f);
         //PinWindow.Instance.AddPing(new Vector3(hit.transform.position.x, 0, hit.transform.position.z), 1);
         //pinUIObj = AddPinUI(pinPosition, iconType, PhotonNetwork.LocalPlayer.ActorNumber - 1); // Actor targetValues starts from 1, List index start from 0

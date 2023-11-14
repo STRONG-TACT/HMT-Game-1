@@ -1,5 +1,6 @@
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using System.Collections;
 #if HMT_BUILD
 using WebSocketSharp;
 using WebSocketSharp.Server;
@@ -93,13 +94,8 @@ namespace HMT {
             
 
             while(CommandQueue.Count > 0)  {
-                if (CommandQueue.TryDequeue(out Command command))
-                {
-                   string resp = ProcessCommand(command);
-                    if(resp != string.Empty)
-                    {
-                        server.WebSocketServices.Broadcast(resp);
-                    }
+                if (CommandQueue.TryDequeue(out Command command)) {
+                   StartCoroutine(ProcessCommand(command));
                 }
             }
         }
@@ -136,7 +132,7 @@ namespace HMT {
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public abstract string ExecuteAction(string target, JObject action);
+        public abstract IEnumerator ExecuteAction(Command command);
 
         /// <summary>
         /// Process a command comming off of the Websocket Protocol.
@@ -153,26 +149,24 @@ namespace HMT {
         /// <param name="json"></param>
         /// <param name="supressDefault"></param>
         /// <returns></returns>
-        public virtual string ProcessCommand(Command command) {
-            string response = string.Empty;
+        public virtual IEnumerator ProcessCommand(Command command) {
             switch (command.command) {
                 case "get_state":
-                    response = GetState();
-                    break;
+                    string response = GetState();
+                    command.SendOKResponse(response);
+                    yield break;
                 case "execute_action":
                     //TODO this is just a stub API for now. Actions' will likely be much more complex.
-                    response = ExecuteAction(command.target,  command.json);
-                    //do the action
-                    //respond with result?
+                    yield return ExecuteAction(command);
                     break;
                 default:
                     if (!command.supressDefault) {
                         Debug.LogErrorFormat("[{0}] Unrecognized Command: {1}", "HMTInterface", command);
-                        response = string.Format("Unrecognized Command: {0}", command);
+                        command.SendErrorResponse(string.Format("Unrecognized Command: {0}", command));
                     }
                     break;
             }
-            return response;
+            yield break;
         }
     }
 
@@ -209,7 +203,7 @@ namespace HMT {
             newCommand.command = json["command"].ToString();
             newCommand.json = json;
             newCommand.supressDefault = json.ContainsKey("supressDefault") && json["supressDefault"].ToString().ToLower().Equals("true");
-
+            newCommand.originService = this;
 
 
             HMTInterface.Instance.CommandQueue.Enqueue(newCommand);
@@ -242,6 +236,17 @@ namespace HMT {
         public string command;
         public bool supressDefault;
         public JObject json;
+        public WebSocketBehavior originService;
+
+        public void SendOKResponse(string message) {
+            string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"OK\", \"message\":\"{1}\"}}", command, message);
+            originService.Context.WebSocket.Send(mess);
+        }
+
+        public void SendErrorResponse(string message) {
+            string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"ERROR\", \"message\":\"{1}\"}}", command, message);
+            originService.Context.WebSocket.Send(mess);
+        }
     }
 
 #endif

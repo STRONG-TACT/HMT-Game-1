@@ -84,7 +84,7 @@ public class LocalMonster : MonoBehaviour
             if (moveCount >= config.movement) {
                 Debug.Log(string.Format("monsterID: {0}, turnFinished", monsterId));
                 turnFinished = true;
-                LocalGameManager.Instance.monsterMoveFinished();
+                //LocalGameManager.Instance.monsterMoveFinished();
             }
             Debug.Log(string.Format("monsterID: {0}, direction: {1}, movement: {2}, count: {3}", monsterId, direction, config.movement, moveCount));
         }

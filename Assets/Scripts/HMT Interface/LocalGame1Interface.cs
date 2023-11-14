@@ -12,6 +12,11 @@ public class LocalGame1Interface : HMTInterface {
 
     [Header("Game Specific Settings")]
     public string[] IgnoreScenes; 
+
+    public int giantID = 0;
+    public int dwarfID = 1;
+    public int humanID = 2;
+
     GameData gameData;
 
     protected override void Start() {
@@ -43,18 +48,6 @@ public class LocalGame1Interface : HMTInterface {
         }
     }
 
-    //public void ConstructGrid() {
-    //    Vector3 lowerLeft = door.transform.position;
-    //    Vector3 upperRight = door.transform.position;
-    //    foreach(GameObject wall in walls) {
-    //        Bounds b = wall.GetComponent<BoxCollider>().bounds;
-    //        lowerLeft = Vector3.Min(lowerLeft, b.max);
-    //        upperRight = Vector3.Max(upperRight, b.min);
-    //    }
-
-    //    var boardWidth = upperRight.x - lowerLeft.x;
-    //    var boardHeight = upperRight.z - lowerLeft.z;
-    //}
 
     /*
      * TODO: Add an "Action_in_progess" flag to the state
@@ -62,11 +55,8 @@ public class LocalGame1Interface : HMTInterface {
      */ 
 
     public override string GetState(bool formated) {
-
-
         MapGenerator map = MapGenerator.Instance;
         LocalGameManager gameManager = LocalGameManager.Instance;
-
 
         JObject ret = new JObject();
         ret["gameData"] = new JObject {
@@ -230,7 +220,6 @@ public class LocalGame1Interface : HMTInterface {
         //    }); ;
         //}
 
-
         ret["scene"] = scene;
         if (formated) {
             return JsonConvert.SerializeObject(ret, Formatting.Indented);
@@ -240,60 +229,116 @@ public class LocalGame1Interface : HMTInterface {
         }
     }
 
-    public bool MyTurn {
-        get {
-            return GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber;
+    public override IEnumerator ExecuteAction(Command command) {
+        LocalGameManager manager = LocalGameManager.Instance;
+        switch (manager.gameStatus) {
+            case LocalGameManager.GameStatus.GetReady:
+                command.SendErrorResponse("Game not started yet");
+                yield break;
+            case LocalGameManager.GameStatus.Player_Pinning:
+                yield return ExecuteActionInPinning(command);
+                break;
+            case LocalGameManager.GameStatus.Player_Planning:
+                yield return ExecuteActionInPlanning(command);
+                break;
+            case LocalGameManager.GameStatus.Player_Moving:
+                //TODO maybe we accept a next or submit action for combat 
+                command.SendErrorResponse("Actions Not Accepted on Monster Turn");
+                yield break;
+            case LocalGameManager.GameStatus.Monster_Moving:
+                //TODO maybe we accept a next or submit action for combat 
+                command.SendErrorResponse("Actions Not Accepted on Monster Turn");
+                yield break;
+            case LocalGameManager.GameStatus.Animation_Pause:
+                command.SendErrorResponse("Animation Pause Phase SHOULD be unreachable, report this.");
+                yield break;
+            case LocalGameManager.GameStatus.GameEnd:
+                command.SendErrorResponse("Game is Over");
+                yield break;
+            default:
+                Debug.LogWarningFormat("Execute Action called in Unknown Game State {0}", manager.gameStatus);
+                command.SendErrorResponse("Unknown Game State");
+                yield break;
         }
     }
 
-    public Character LocalCharacter {
-        get {
-            if (gameData != null && gameData.Initialized && PlayerMapper.Instance.Inititialized) {
-                return gameData.inSceneCharacters[PlayerMapper.Instance.LocalCharacterNumber];
-            }
-            else {
+    private LocalCharacter GetTargetCharacter(string target) {
+        switch (target.ToLower()) {
+            case "giant":
+                return LocalGameManager.Instance.inSceneCharacters[giantID];
+            case "human":
+                return LocalGameManager.Instance.inSceneCharacters[humanID];
+            case "dwarf":
+                return LocalGameManager.Instance.inSceneCharacters[dwarfID];
+            default:
                 return null;
-            }
         }
     }
 
-    public override string ExecuteAction(string target, JObject actionJob) {
-        if (!MyTurn) {
-            return "Not your turn";
+    private IEnumerator ExecuteActionInPinning(Command command) {
+        string action = command.json["action"].ToString();
+        LocalCharacter target = GetTargetCharacter(command.target);
+        if (target == null) {
+            command.SendErrorResponse(string.Format("Unknown target {0} in pinning phase. This shouldn't be possible...", command.target));
+            yield break;
         }
-
-        string action = actionJob["action"].ToString();
-        switch (action.ToLower()) {
-            case "move":
-                string direction = ((JArray)actionJob["inputs"])[0].ToString();
-                switch (direction.ToLower()) {
-                    case "up":
-                        GameManager.Instance.CallMoveCharacter(PlayerMapper.Instance.LocalCharacterNumber, Character.Direction.Up);
-                        break;
-                    case "down":
-                        GameManager.Instance.CallMoveCharacter(PlayerMapper.Instance.LocalCharacterNumber, Character.Direction.Down);
-                        break;
-                    case "left":
-                        GameManager.Instance.CallMoveCharacter(PlayerMapper.Instance.LocalCharacterNumber, Character.Direction.Left);
-                        break;
-                    case "right":
-                        GameManager.Instance.CallMoveCharacter(PlayerMapper.Instance.LocalCharacterNumber, Character.Direction.Right);
-                        break;
-                    default:
-                        return string.Format("Unknown Direction: {0}", direction);
-                }
-                return "OK";
-            case "interact":
-                if(CombatSystem.Instance.State == CombatSystem.FightState.Waiting) {
-                    GameManager.Instance.CallRollDie();
+        LocalGameManager manager = LocalGameManager.Instance; 
+        switch (action) {
+            case "ping":
+                //TODO do the ping
+                break;
+            case "submit":
+                //TODO end ping phase
+                break;
+            case "up":
+            case "down":
+            case "left":
+            case "right":
+                if (!target.MovePingCusor(action)) {
+                    command.SendErrorResponse("No Action Points remaining so not moving ping cursor");
+                    yield break;
                 }
                 break;
+            case "undo":
+                command.SendErrorResponse(string.Format("Received {0} action in pinning phase", action));
+                yield break;
             default:
-                return string.Format("Unknown Action: {0}", action);
+                command.SendErrorResponse(string.Format("Unknown action {0} in pinning phase", action));
+                yield break;
         }
+        yield break;
+    }
 
-        return string.Empty;
-
+    private IEnumerator ExecuteActionInPlanning(Command command) {
+        string action = command.json["action"].ToString();
+        LocalGameManager manager = LocalGameManager.Instance;
+        switch (action) {
+            case "ping":
+                command.SendErrorResponse("Received ping action in planning phase");
+                yield break;
+            case "submit":
+                //TODO end ping phase
+                break;
+            case "up":
+                //TODO move character up
+                break;
+            case "down":
+                //TODO move character down
+                break;
+            case "left":
+                //TODO move character left
+                break;
+            case "right":
+                //TODO move character right
+                break;
+            case "undo":
+                //TODO undo last move
+                break;
+            default:
+                command.SendErrorResponse(string.Format("Unknown action {0} in pinning phase", action));
+                yield break;
+        }
+        yield break;
     }
 
 }

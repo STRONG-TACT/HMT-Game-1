@@ -29,6 +29,11 @@ public class LocalCharacter : MonoBehaviour
     // how many moves that the character left in this turn
     private int actionPointsLeft;
 
+    //This is only used for AI characters
+    public Vector2Int pingCursor;
+
+    public bool ReadyForNextPhase = false;
+
     public Transform characterMask { get; private set; }
     public Transform visibilityMask { get; private set; }
 
@@ -132,19 +137,33 @@ public class LocalCharacter : MonoBehaviour
         prevMovePointPos = movePoint;
     }
 
-    public void pinNew()
-    {
+    public void PlacePin() {
         actionPointsLeft -= 1;
+        pingCursor = Vector2Int.zero;
+        if (actionPointsLeft == 0) {
+            ReadyForNextPhase = true;
+        }
     }
 
-    public void startPinning()
-    {
+    public void FocusCharacter() {
         MaskControl(true);
+        if(LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Planning) {
+            indicator.SetActive(true);
+        }
     }
 
-    public void pausePinning()
-    {
+    public void UnFocusCharacter() {
         MaskControl(false);
+        indicator.SetActive(false);
+    }
+
+    public void StartPingPhase() {
+        pingCursor = Vector2Int.zero;
+        ReadyForNextPhase = dead;
+    }
+
+    public void EndPingPhase() {
+        pingCursor = Vector2Int.zero;
     }
 
     public void AddActionToPlan(Direction direction)
@@ -181,23 +200,14 @@ public class LocalCharacter : MonoBehaviour
         return !Physics.Raycast(indicator.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible"));
     }
 
-    public void startPlanning()
-    {
-        indicator.SetActive(true);
-        MaskControl(true);
+    public void StartPlanningPhase() {
+        ResetPlan();
+        ReadyForNextPhase = ActionPointsRemaining == 0 || dead;
     }
 
-    public void pausePlanning()
-    {
-        indicator.SetActive(false);
-        MaskControl(false);
-    }
-
-    public void endPlanning()
-    {
-        indicator.SetActive(false);
-        MaskControl(true);
+    public void EndPlanning() {
         indicator.transform.position = this.transform.position;
+
     }
 
     
@@ -315,7 +325,7 @@ public class LocalCharacter : MonoBehaviour
         }
     }
 
-    public void HealthReduced()
+    public void DecrementHealth()
     {
         health -= 1;
         Debug.Log(string.Format("Character {0} health: {1}", config.characterName, health));
@@ -367,6 +377,32 @@ public class LocalCharacter : MonoBehaviour
         health = 3;
     }
 
+    public bool MovePingCusor(string direction) {
+        if(actionPointsLeft <= 0) {
+            return false;
+        }
+        else {
+            switch(direction) {
+                case "up":
+                    pingCursor += Vector2Int.up;
+                    break;
+                case "down":
+                    pingCursor += Vector2Int.down;
+                    break;
+                case "left":
+                    pingCursor = Vector2Int.left;
+                    break;
+                case "right":
+                    pingCursor = Vector2Int.right;
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+        }
+
+    }
+
     public int ActionPointsRemaining => actionPointsLeft;
 
     public int resetActionPoints()
@@ -386,6 +422,7 @@ public class LocalCharacter : MonoBehaviour
     public JObject HMTStateRep() {
         return new JObject {
             {"name", config.characterName},
+            {"characterId", CharacterId },
             {"type", config.type.ToString()},
             {"sightRange", config.sightRange },
             {"monsterDice", config.monsterDice.ToString()},

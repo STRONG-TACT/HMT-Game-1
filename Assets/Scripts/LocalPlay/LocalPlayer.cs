@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Linq;
+using Photon.Realtime;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,11 +29,11 @@ public class LocalPlayer : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
 
-        pinFinishBtn.onClick.AddListener(delegate { finishPinning(); });
+        pinFinishBtn.onClick.AddListener(delegate { SubmitPings(); });
 
-        dwarfBtn.onClick.AddListener(delegate { switchCharacter(0); });
-        gaintBtn.onClick.AddListener(delegate { switchCharacter(1); });
-        humanBtn.onClick.AddListener(delegate { switchCharacter(2); });
+        dwarfBtn.onClick.AddListener(delegate { SwitchCharacter(0); });
+        gaintBtn.onClick.AddListener(delegate { SwitchCharacter(1); });
+        humanBtn.onClick.AddListener(delegate { SwitchCharacter(2); });
 
         upBtn.onClick.AddListener(delegate { AddMoveToFocusedCharacter(LocalCharacter.Direction.Up); });
         downBtn.onClick.AddListener(delegate { AddMoveToFocusedCharacter(LocalCharacter.Direction.Down); });
@@ -41,18 +42,18 @@ public class LocalPlayer : MonoBehaviour
         waitBtn.onClick.AddListener(delegate { AddMoveToFocusedCharacter(LocalCharacter.Direction.Wait); });
 
         backBtn.onClick.AddListener(delegate { UndoPlanStep(); });
-        submitBtn.onClick.AddListener(delegate { submitPlan(); });
+        submitBtn.onClick.AddListener(delegate { SubmitPlan(); });
     }
 
-    private void switchCharacter(int index)
+    private void SwitchCharacter(int index)
     {
-        LocalGameManager.Instance.switchCharacter(index);
+        LocalGameManager.Instance.SwitchCharacter(index);
     }
 
-    public void charaSwitched(int index, bool submitted, bool isEmpty, bool isFull)
-    {
+    public void UpdateCharacterUI(int index, LocalCharacter character) {
         switch (index)
         {
+            //TODO  disable buttons for characters that have already submitted or are dead
             case 0:
                 dwarfBtn.interactable = false;
                 gaintBtn.interactable = true;
@@ -72,41 +73,33 @@ public class LocalPlayer : MonoBehaviour
                 break;
         }
 
-        if (LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Pinning)
-        {
-            checkPinBtnStatus(submitted);
+        if (LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Pinning) {
+            UpdatePinBtnStatus(character.ReadyForNextPhase);
         }
-        else if (LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Planning)
-        {
-            UpdatePlanUI(submitted, isEmpty, isFull);
+        else if (LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Planning) {
+            UpdatePlanUI(character.ReadyForNextPhase, 
+                         character.ActionPlan.Count == 0, 
+                         character.ActionPointsRemaining == 0);
         }
     }
 
-    private void finishPinning()
-    {
-        LocalGameManager.Instance.newPinFinished(charaID);
+    private void SubmitPings() {
+        myCharacter.ReadyForNextPhase = true;
+        LocalGameManager.Instance.CheckPingPhaseEnd();
     }
 
-    public void pinFinished()
-    {
-        checkPinBtnStatus(true);
+    private void UpdatePinBtnStatus(bool submitted) {
+        pinFinishBtn.interactable = !submitted;
     }
 
-    private void checkPinBtnStatus(bool submitted)
-    {
-        if (submitted)
-        {
-            disablePinBtn();
-        }
-        else
-        {
-            enablePinBtn();
-        }
+    public void PlacePinByFocusedCharacter() {
+        myCharacter.PlacePin();
+        UpdatePinBtnStatus(myCharacter.ReadyForNextPhase);
     }
 
     public void AddMoveToFocusedCharacter(LocalCharacter.Direction move) {
         if (myCharacter.CheckMove(move)) {
-            LocalGameManager.Instance.newPlayerMovePlan(charaID, move);
+            LocalGameManager.Instance.UpdateFocusPlayPlan(charaID, move);
         }
     }
 
@@ -116,9 +109,10 @@ public class LocalPlayer : MonoBehaviour
         UpdatePlanUI(false, myCharacter.ActionPlan.Count == 0, false);
     }
 
-    public void submitPlan()
-    {
-        LocalGameManager.Instance.newPlanSubmitted(charaID);
+    public void SubmitPlan() {
+        myCharacter.ReadyForNextPhase = true;
+        LocalGameManager.Instance.CheckPlanPhaseEnd();
+        UpdatePlanUI(true, false, true);
     }
 
     public void UpdatePlanUI(bool submitted, bool isEmpty, bool isFull)
@@ -139,16 +133,6 @@ public class LocalPlayer : MonoBehaviour
         {
             someMovePlaned();
         }
-    }
-
-    public void disablePinBtn()
-    {
-        pinFinishBtn.interactable = false;
-    }
-
-    public void enablePinBtn()
-    {
-        pinFinishBtn.interactable = true;
     }
 
     public void lastMovePlaned()

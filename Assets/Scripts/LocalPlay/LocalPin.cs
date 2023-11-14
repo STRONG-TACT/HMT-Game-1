@@ -19,6 +19,9 @@ public class LocalPin : MonoBehaviour
     [HideInInspector]
     public LocalTile locationTile;
 
+    [HideInInspector]
+    public LocalCharacter placingCharacter;
+
     float rotationSpeed = 10f;
     float floatSpeed = 2f;
     Vector3 spawnPosition = new Vector3(0, 0, 0);
@@ -43,7 +46,8 @@ public class LocalPin : MonoBehaviour
 
     public JObject HMTStateRep() {
         return new JObject {
-            { "type", pinType.ToString() }
+            { "type", pinType.ToString()},
+            {"placedBy", placingCharacter.CharacterId }
         };
     }
 }
