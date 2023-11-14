@@ -8,6 +8,9 @@ using static UnityEditorInternal.VersionControl.ListControl;
 namespace HMT {
     public class HMTDebugGUI : MonoBehaviour {
 
+
+
+#if HMT_BUILD
         [Header("Hot Keys")]
         public KeyCode[] OpenHMTInterfaceWindowHotKey;
         public KeyCode[] PrintCurrentStateHotKey;
@@ -103,4 +106,10 @@ namespace HMT {
         }
     }
 
+#else
+        private void Start() {
+            Destroy(this);
+        }
+#endif
+    }
 }

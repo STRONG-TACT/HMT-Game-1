@@ -145,9 +145,7 @@ namespace HMT {
         /// unrecognized command can be prevented.
         /// 
         /// </summary>
-        /// <param name="command"></param>
-        /// <param name="json"></param>
-        /// <param name="supressDefault"></param>
+        /// <param name="command">A struct containing relevant Command Parameters</param>
         /// <returns></returns>
         public virtual IEnumerator ProcessCommand(Command command) {
             switch (command.command) {
@@ -167,6 +165,22 @@ namespace HMT {
                     break;
             }
             yield break;
+        }
+    }
+
+    /// <summary>
+    /// A placeholder version of the Command struct used for when the HMT Interface is turned off.
+    /// </summary>
+    public struct Command { 
+        public string command;
+        public string target;
+        public JObject json;
+        public bool supressDefault;
+        public void SendOKResponse(string message) {
+            return;    
+        }
+        public void SendErrorResponse(string message) {
+            return;
         }
     }
 

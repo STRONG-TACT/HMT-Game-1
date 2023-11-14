@@ -85,6 +85,7 @@ public class LocalPlayer : MonoBehaviour
 
     private void SubmitPings() {
         myCharacter.ReadyForNextPhase = true;
+        UpdatePinBtnStatus(myCharacter.ReadyForNextPhase);
         LocalGameManager.Instance.CheckPingPhaseEnd();
     }
 
@@ -156,7 +157,7 @@ public class LocalPlayer : MonoBehaviour
         waitBtn.interactable = true;
 
         backBtn.interactable = false;
-        submitBtn.interactable = false;
+        submitBtn.interactable = true;
     }
 
     public void someMovePlaned()
@@ -168,7 +169,7 @@ public class LocalPlayer : MonoBehaviour
         waitBtn.interactable = true;
 
         backBtn.interactable = true;
-        submitBtn.interactable = false;
+        submitBtn.interactable = true;
     }
 
     public void shutDownPlanButtons()

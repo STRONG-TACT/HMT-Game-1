@@ -51,7 +51,7 @@ public class LocalGameManager : MonoBehaviour
     //private Queue<LocalCharacter.Direction> DwarfMoves;
     //private Queue<LocalCharacter.Direction> GiantMoves;
     //private Queue<LocalCharacter.Direction> HumanMoves;
-    private Queue<LocalTile> eventQueue;
+    private Queue<LocalTile> eventQueue = new Queue<LocalTile>();
 
     // When awake, find all the managers and data.
     // Future update: Set isFirstLevel (currentLevel should by default be 1, may delete this step in future if we stick in the same scene)
@@ -205,9 +205,7 @@ public class LocalGameManager : MonoBehaviour
         }
 
         if (remainingCharacterCount > 0) {
-            player.myCharacter = inSceneCharacters[0];
-            player.myCharacter.FocusCharacter();
-            uiManager.ShowCharacterPlanUI(player.myCharacter.name, player.myCharacter.ActionPointsRemaining, player.myCharacter.dead);
+            SwitchCharacter(0);
         }
         else {
             StartCharacterMovingPhase();
@@ -266,7 +264,7 @@ public class LocalGameManager : MonoBehaviour
         uiManager.HideCharacterPlanUI();
 
         foreach (LocalCharacter chara in inSceneCharacters) {
-            chara.UnFocusCharacter();
+            //chara.UnFocusCharacter();
             chara.EndPlanning();
         }
 
@@ -388,19 +386,6 @@ public class LocalGameManager : MonoBehaviour
         StartPlayerTurn();
     }
 
-    private IEnumerator MonsterDie(LocalMonster m) {
-        m.State = LocalMonster.CharacterState.Die;
-        Animator monster_animator = m.GetComponentInChildren<Animator>();
-        float animationLength = 0f;
-        AnimatorStateInfo stateInfo = monster_animator.GetCurrentAnimatorStateInfo(0);
-        animationLength = stateInfo.length;
-        // Wait for the duration of the animation
-        yield return new WaitForSeconds(animationLength-2f);
-        inSceneMonsters.Remove(m);
-        Destroy(m.gameObject);
-    }
-
-
     // Execute all the events happened within one step time
     // Combat.ExecuteCombat() is the actual combat function
     private IEnumerator ExecuteCombatOneByOne()
@@ -431,8 +416,8 @@ public class LocalGameManager : MonoBehaviour
                 switch (t.tileType) {
                     case LocalTile.ObstacleType.None:
                         foreach (LocalMonster m in t.enemyList) {
-                            StartCoroutine(MonsterDie(m));
-
+                            m.Kill(excecutionStepTime);
+                            inSceneMonsters.Remove(m);
                         }
                         t.enemyList.Clear();
                         break;

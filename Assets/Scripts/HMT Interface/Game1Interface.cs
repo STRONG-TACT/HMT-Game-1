@@ -274,15 +274,17 @@ public class Game1Interface : HMTInterface {
         }
     }
 
-    public override string ExecuteAction(string target, JObject actionJob) {
+    public override IEnumerator ExecuteAction(Command command) {
+
+
         if (!MyTurn) {
-            return "Not your turn";
+            command.SendErrorResponse("Not your turn");
         }
 
-        string action = actionJob["action"].ToString();
+        string action = command.json["action"].ToString();
         switch (action.ToLower()) {
             case "move":
-                string direction = ((JArray)actionJob["inputs"])[0].ToString();
+                string direction = ((JArray)command.json["inputs"])[0].ToString();
                 switch (direction.ToLower()) {
                     case "up":
                         GameManager.Instance.CallMoveCharacter(PlayerMapper.Instance.LocalCharacterNumber, Character.Direction.Up);
@@ -297,19 +299,22 @@ public class Game1Interface : HMTInterface {
                         GameManager.Instance.CallMoveCharacter(PlayerMapper.Instance.LocalCharacterNumber, Character.Direction.Right);
                         break;
                     default:
-                        return string.Format("Unknown Direction: {0}", direction);
+                        command.SendErrorResponse(string.Format("Unknown Direction: {0}", direction));
+                        break;
                 }
-                return "OK";
+                command.SendOKResponse("OK");
+                yield break;
             case "interact":
                 if(CombatSystem.Instance.State == CombatSystem.FightState.Waiting) {
                     GameManager.Instance.CallRollDie();
                 }
-                break;
+                yield break;
             default:
-                return string.Format("Unknown Action: {0}", action);
+                command.SendErrorResponse(string.Format("Unknown Action: {0}", action));
+                yield break;
         }
 
-        return string.Empty;
+        yield break;
 
     }
 
