@@ -18,10 +18,63 @@ public class LocalMonster : MonoBehaviour
 
     private float stepLength;
 
+
+    private Animator animator;
+    private CharacterState characterState;
+
+    public enum CharacterState
+    {
+        Idle, Walking, Attacking, Die
+    }
+
+
+    public CharacterState State
+    {
+        get { return characterState; }
+        set
+        {
+            if (value != characterState)
+            {
+                characterState = value;
+                switch (value)
+                {
+                    case CharacterState.Idle:
+                        animator.SetBool("Idle", true);
+                        animator.SetBool("Attack", false);
+                        animator.SetBool("Walk", false);
+                        break;
+                    case CharacterState.Walking:
+                        animator.SetBool("Idle", false);
+                        animator.SetBool("Attack", false);
+                        animator.SetBool("Walk", true);
+                        break;
+                    case CharacterState.Attacking:
+                        animator.SetBool("Idle", false);
+                        animator.SetBool("Attack", true);
+                        animator.SetBool("Walk", false);
+                        break;
+                    case CharacterState.Die:
+                        animator.SetBool("Idle", false);
+                        animator.SetBool("Attack", false);
+                        animator.SetBool("Walk", false);
+                        animator.SetBool("Die", true);
+                        break;
+                }
+            }
+        }
+    }
+
+
+
     void Start()
     {
         movePoint = transform.position;
         prevMovePointPos = movePoint;
+        animator = GetComponentInChildren<Animator>();
+        animator.SetBool("Idle", true);
+        State = CharacterState.Idle;
+        //State = CharacterState.Die;
+        animator.speed = Random.Range(0.8f, 1.2f); // Randomize speed within a range
     }
 
     public void SetUpConfig(MonsterConfig config, int MonsterId, LocalGameData data)
@@ -72,14 +125,18 @@ public class LocalMonster : MonoBehaviour
 
         float timeStart = Time.time;
         if (moveVec != Vector3.zero) {
+            State = CharacterState.Walking;
             Vector3 origin = transform.position;
             Vector3 target = transform.position + moveVec * stepLength;
+            Quaternion targetRotation = Quaternion.LookRotation(moveVec, Vector3.up);
             while (Time.time - timeStart < stepTime) {
                 float t = (Time.time - timeStart) / stepTime;
                 transform.position = Vector3.Lerp(origin, target, t);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, t);
                 yield return null;
             }
             transform.position = target;
+            transform.rotation = targetRotation;
             moveCount += 1;
             if (moveCount >= config.movement) {
                 Debug.Log(string.Format("monsterID: {0}, turnFinished", monsterId));
@@ -88,6 +145,7 @@ public class LocalMonster : MonoBehaviour
             }
             Debug.Log(string.Format("monsterID: {0}, direction: {1}, movement: {2}, count: {3}", monsterId, direction, config.movement, moveCount));
         }
+        State = CharacterState.Idle;
         moving = false;
     }
 

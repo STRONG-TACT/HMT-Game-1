@@ -104,6 +104,7 @@ public class LocalCharacter : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         animator.SetBool("Idle", true);
         State = CharacterState.Idle;
+        //State = CharacterState.Walking;
     }
 
     public void SetUpConfig(CharacterConfig config, int characterId, LocalGameData gameData)
