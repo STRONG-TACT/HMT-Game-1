@@ -462,6 +462,19 @@ public class LocalGameManager : MonoBehaviour
         moveFinishedCount += 1;
     }
 
+    private IEnumerator MonsterDie(LocalMonster m) {
+        m.State = LocalMonster.CharacterState.Die;
+        Animator monster_animator = m.GetComponentInChildren<Animator>();
+        float animationLength = 0f;
+        AnimatorStateInfo stateInfo = monster_animator.GetCurrentAnimatorStateInfo(0);
+        animationLength = stateInfo.length;
+        // Wait for the duration of the animation
+        yield return new WaitForSeconds(animationLength-2f);
+        inSceneMonsters.Remove(m);
+        Destroy(m.gameObject);
+    }
+
+
     // Execute all the events happened within one step time
     // Combat.ExecuteCombat() is the actual combat function
     private IEnumerator ExecuteCombatOneByOne()
@@ -492,8 +505,8 @@ public class LocalGameManager : MonoBehaviour
                 switch (t.tileType) {
                     case LocalTile.ObstacleType.None:
                         foreach (LocalMonster m in t.enemyList) {
-                            inSceneMonsters.Remove(m);
-                            Destroy(m.gameObject);
+                            StartCoroutine(MonsterDie(m));
+
                         }
                         t.enemyList.Clear();
                         break;

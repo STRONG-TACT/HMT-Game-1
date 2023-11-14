@@ -200,31 +200,31 @@ public class MapGenerator : MonoBehaviour
                 break;
 
             case "1Goal":
-                Instantiate(gameAssets.Goals[0], new Vector3(x, 0.2f, z), Quaternion.identity);
+                Instantiate(gameAssets.Goals[0], new Vector3(x, 0f, z), Quaternion.identity);
                 break;
 
             case "2Goal":
-                Instantiate(gameAssets.Goals[1], new Vector3(x, 0.2f, z), Quaternion.identity);
+                Instantiate(gameAssets.Goals[1], new Vector3(x, 0f, z), Quaternion.identity);
                 break;
 
             case "3Goal":
-                Instantiate(gameAssets.Goals[2], new Vector3(x, 0.2f, z), Quaternion.identity);
+                Instantiate(gameAssets.Goals[2], new Vector3(x, 0f, z), Quaternion.identity);
                 break;
 
             case "Monster1":
-                GameObject monster1 = Instantiate(gameAssets.Monsters[0], new Vector3(x, 0.5f, z), Quaternion.identity);
+                GameObject monster1 = Instantiate(gameAssets.Monsters[0], new Vector3(x, 0f, z), Quaternion.identity);
                 LocalGameManager.Instance.inSceneMonsters.Add(monster1.GetComponent<LocalMonster>());
                 monster1.GetComponent<LocalMonster>().SetUpConfig(gameData.monsterConfigs[0], LocalGameManager.Instance.inSceneMonsters.Count - 1, gameData);
                 break;
 
             case "Monster2":
-                GameObject monster2 = Instantiate(gameAssets.Monsters[1], new Vector3(x, 0.5f, z), Quaternion.identity);
+                GameObject monster2 = Instantiate(gameAssets.Monsters[1], new Vector3(x, 0f, z), Quaternion.identity);
                 LocalGameManager.Instance.inSceneMonsters.Add(monster2.GetComponent<LocalMonster>());
                 monster2.GetComponent<LocalMonster>().SetUpConfig(gameData.monsterConfigs[1], LocalGameManager.Instance.inSceneMonsters.Count - 1, gameData);
                 break;
 
             case "Monster3":
-                GameObject monster3 = Instantiate(gameAssets.Monsters[2], new Vector3(x, 0.5f, z), Quaternion.identity);
+                GameObject monster3 = Instantiate(gameAssets.Monsters[2], new Vector3(x, 0f, z), Quaternion.identity);
                 LocalGameManager.Instance.inSceneMonsters.Add(monster3.GetComponent<LocalMonster>());
                 monster3.GetComponent<LocalMonster>().SetUpConfig(gameData.monsterConfigs[2], LocalGameManager.Instance.inSceneMonsters.Count - 1, gameData);
                 break;
