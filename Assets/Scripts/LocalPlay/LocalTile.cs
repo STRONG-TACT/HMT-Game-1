@@ -5,7 +5,7 @@ using UnityEngine;
 public class LocalTile : MonoBehaviour
 {
     public enum ObstacleType {
-        None, Trap, Rock
+        None, Trap, Rock, Wall
     }
 
     // The type of this tile

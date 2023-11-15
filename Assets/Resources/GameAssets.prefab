@@ -91,16 +91,10 @@ MonoBehaviour:
   - {fileID: 2958692308354745720, guid: 2daec67310b2a4e6487d722fb37b1851, type: 3}
   - {fileID: 814971363674059150, guid: 786c6b4cdb24c479d914df36d458cf89, type: 3}
   Monsters:
-  - {fileID: 8414332739641434188, guid: d249ffcb9ef9d44048ae0307d619d9b6, type: 3}
-  - {fileID: 3266103959046910403, guid: de429b9d68cb44eaa90fbdbf52bb2698, type: 3}
+  - {fileID: 6420842695932332083, guid: 93410dc0679a87140ae1427232e7754b, type: 3}
+  - {fileID: 6422928321250116657, guid: 3c93fad8f5f7da0438bfea971e483f12, type: 3}
+  - {fileID: 7741471954033257679, guid: 57439934da097324185497b2335ca96e, type: 3}
   Goals:
   - {fileID: 8362223678440659000, guid: 977b3e1ccab1d41c3bf33f30e78164d3, type: 3}
   - {fileID: 7350101868502248773, guid: 915585588ce0b4eaea95a87e0d83c750, type: 3}
   - {fileID: 5065180891822975960, guid: ed3ae3283b9394fa7b4ae297e86cb384, type: 3}
-  CharacterConfigs:
-  - {fileID: 11400000, guid: c6b44fe2a04fe7b44872f86875a07caf, type: 2}
-  - {fileID: 11400000, guid: c716ed11fa455404ab8b58937cdf7629, type: 2}
-  - {fileID: 11400000, guid: ddef099a6c3811c4c91188e77be96c42, type: 2}
-  MonsterConfigs:
-  - {fileID: 11400000, guid: e723aa6405680499d97c2d73e1e96a99, type: 2}
-  - {fileID: 11400000, guid: c11dc880b9f0e414fb0e611dd1add381, type: 2}
