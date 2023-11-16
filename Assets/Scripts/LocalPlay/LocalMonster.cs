@@ -18,7 +18,7 @@ public class LocalMonster : MonoBehaviour
 
     private float stepLength;
 
-
+    private Transform model;
     private Animator animator;
     private CharacterState characterState;
 
@@ -73,6 +73,12 @@ public class LocalMonster : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         animator.SetBool("Idle", true);
         State = CharacterState.Idle;
+
+        model = transform.Find("Model");
+        if (model == null) {
+            Debug.LogErrorFormat("Character {0} has no Model child object", gameObject.name);
+        }
+
         //State = CharacterState.Die;
         animator.speed = Random.Range(0.8f, 1.2f); // Randomize speed within a range
     }
@@ -104,17 +110,22 @@ public class LocalMonster : MonoBehaviour
             LocalCharacter.Direction.Down,
             LocalCharacter.Direction.Left,
             LocalCharacter.Direction.Right};
+        
+        // shuffle directions
+        for (int i = 0; i < directions.Count; i++) {
+            int j = Random.Range(i, directions.Count);
+            LocalCharacter.Direction temp = directions[i];
+            directions[i] = directions[j];
+            directions[j] = temp;
+        }
 
-        while (directions.Count != 0) {
-            int i = Random.Range(0,4);
+        for (int i =0; i < directions.Count; i++) {
             if (CheckMove(directions[i])) {
                 direction = directions[i];
                 break;
             }
-            else {
-                directions.RemoveAt(i);
-            }
         }
+
         Vector3 moveVec = direction switch {
             LocalCharacter.Direction.Up => Vector3.forward,
             LocalCharacter.Direction.Down => Vector3.back,
@@ -132,11 +143,11 @@ public class LocalMonster : MonoBehaviour
             while (Time.time - timeStart < stepTime) {
                 float t = (Time.time - timeStart) / stepTime;
                 transform.position = Vector3.Lerp(origin, target, t);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, t);
+                model.rotation = Quaternion.Slerp(model.rotation, targetRotation, t);
                 yield return null;
             }
             transform.position = target;
-            transform.rotation = targetRotation;
+            model.rotation = targetRotation;
             moveCount += 1;
             if (moveCount >= config.movement) {
                 Debug.Log(string.Format("monsterID: {0}, turnFinished", monsterId));

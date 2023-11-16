@@ -52,6 +52,7 @@ public class LocalGameManager : MonoBehaviour
     //private Queue<LocalCharacter.Direction> GiantMoves;
     //private Queue<LocalCharacter.Direction> HumanMoves;
     private Queue<LocalTile> eventQueue = new Queue<LocalTile>();
+    private Coroutine currentCoroutine = null;
 
     // When awake, find all the managers and data.
     // Future update: Set isFirstLevel (currentLevel should by default be 1, may delete this step in future if we stick in the same scene)
@@ -79,7 +80,7 @@ public class LocalGameManager : MonoBehaviour
     public void setCharaPosition(int ID, float x, float z)
     {
         LocalCharacter targetChara = inSceneCharacters[ID];
-        Vector3 newPosition = new Vector3(x, inSceneCharacters[ID].transform.position.y, z);
+        Vector3 newPosition = new Vector3(x, targetChara.transform.position.y, z);
         targetChara.setStartPos(newPosition);
     }
 
@@ -277,7 +278,7 @@ public class LocalGameManager : MonoBehaviour
         //moveFinishedCount = 0;       
         eventQueue = new Queue<LocalTile>();
 
-        StartCoroutine(CharacterMoveByStep());
+        currentCoroutine = StartCoroutine(CharacterMoveByStep());
     }
 
     // Characters move step by step
@@ -336,7 +337,7 @@ public class LocalGameManager : MonoBehaviour
             m.MonsterTurnStart();
         }
 
-        StartCoroutine(MonsterMoveByStep());
+        currentCoroutine = StartCoroutine(MonsterMoveByStep());
     }
 
     // Monsters moving step by step
@@ -390,12 +391,14 @@ public class LocalGameManager : MonoBehaviour
     // Combat.ExecuteCombat() is the actual combat function
     private IEnumerator ExecuteCombatOneByOne()
     {
-        Debug.Log("An event happened.");
+        Debug.LogFormat("Exectuing {0} events in queue.", eventQueue.Count);
 
         while (eventQueue.Count != 0)
         {
             bool win = false;
             LocalTile t = eventQueue.Dequeue();
+
+            Debug.LogFormat("Processing Event at {0}, {1}", t.row, t.col);
 
             LocalCameraManager.Instance.ChangeTargetCharacter(t.charaList[0].CharacterId);
             switch (t.tileType) {
@@ -516,10 +519,14 @@ public class LocalGameManager : MonoBehaviour
 
     // Called by LocalTile.OnTriggerEnter(), when an event happens at the newTile
     // The same newTile (where an event happens) will only appear in queue once
-    public void updateEventQueue(LocalTile tile)
-    {
-        if (!eventQueue.Contains(tile))
-        {
+    public void updateEventQueue(LocalTile tile) {
+        if(gameStatus != GameStatus.Player_Moving && gameStatus != GameStatus.Monster_Moving) {
+            Debug.LogWarningFormat("Event Generated during the {0} Phase, ignoring it.", gameStatus);
+            return;
+        }
+
+        Debug.LogFormat("Event generated at {0}, {1}, of type {2}", tile.row, tile.col, tile.tileType);
+        if (!eventQueue.Contains(tile)) {
             eventQueue.Enqueue(tile);
         }
     }
@@ -542,13 +549,14 @@ public class LocalGameManager : MonoBehaviour
         Debug.Log("Moving to next level.");
         currentLevel += 1;
 
-        if (currentLevel <= gameData.levelTextFiles.Length)
-        {
+        if (currentLevel <= gameData.levelTextFiles.Length) {
             goalCount = 0;
             remainingCharacterCount = 3;
+            eventQueue.Clear();
+            StopAllCoroutines();
 
-            foreach (LocalCharacter c in inSceneCharacters)
-            {
+            foreach (LocalCharacter c in inSceneCharacters) {
+                c.StopAllCoroutines();
                 c.QuickRespawn();
             }
 

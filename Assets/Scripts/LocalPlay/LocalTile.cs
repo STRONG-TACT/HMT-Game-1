@@ -22,8 +22,12 @@ public class LocalTile : MonoBehaviour
     public List<LocalCharacter> charaList;
     public List<LocalPin> pinList;
 
-    private void OnTriggerEnter(Collider col)
-    {
+    private void OnTriggerEnter(Collider col) {
+        //if(!(LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Moving || 
+        //    LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Pinning)) {
+        //    return;
+        //}
+
         switch (col.gameObject.tag)
         {
             case "Monster":

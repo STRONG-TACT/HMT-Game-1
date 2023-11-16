@@ -45,6 +45,7 @@ public class LocalCharacter : MonoBehaviour
     public bool dead = false;
     public int respawnCountdown = 0;
 
+    private Transform model;
     private Animator animator;
     private CharacterState characterState;
 
@@ -62,29 +63,30 @@ public class LocalCharacter : MonoBehaviour
             if (value != characterState)
             {
                 characterState = value;
-                switch (value)
-                {
-                    case CharacterState.Idle:
-                        animator.SetBool("Idle", true);
-                        animator.SetBool("Attack", false);
-                        animator.SetBool("Walk", false);
-                        break;
-                    case CharacterState.Walking:
-                        animator.SetBool("Idle", false);
-                        animator.SetBool("Attack", false);
-                        animator.SetBool("Walk", true);
-                        break;
-                    case CharacterState.Attacking:
-                        animator.SetBool("Idle", false);
-                        animator.SetBool("Attack", true);
-                        animator.SetBool("Walk", false);
-                        break;
-                    case CharacterState.Die:
-                        animator.SetBool("Idle", false);
-                        animator.SetBool("Attack", false);
-                        animator.SetBool("Walk", false);
-                        animator.SetBool("Die", true);
-                        break;
+                if (animator != null) {
+                    switch (value) {
+                        case CharacterState.Idle:
+                            animator.SetBool("Idle", true);
+                            animator.SetBool("Attack", false);
+                            animator.SetBool("Walk", false);
+                            break;
+                        case CharacterState.Walking:
+                            animator.SetBool("Idle", false);
+                            animator.SetBool("Attack", false);
+                            animator.SetBool("Walk", true);
+                            break;
+                        case CharacterState.Attacking:
+                            animator.SetBool("Idle", false);
+                            animator.SetBool("Attack", true);
+                            animator.SetBool("Walk", false);
+                            break;
+                        case CharacterState.Die:
+                            animator.SetBool("Idle", false);
+                            animator.SetBool("Attack", false);
+                            animator.SetBool("Walk", false);
+                            animator.SetBool("Die", true);
+                            break;
+                    }
                 }
             }
         }
@@ -100,6 +102,11 @@ public class LocalCharacter : MonoBehaviour
         characterMask = transform.Find("CharacterMask");
         visibilityMask = transform.Find("VisibleMask");
         health = 3;
+
+        model = transform.Find("Model");
+        if(model == null) {
+            Debug.LogErrorFormat("Character {0} has no Model child object", gameObject.name);
+        }
 
         animator = GetComponentInChildren<Animator>();
         animator.SetBool("Idle", true);
@@ -253,11 +260,11 @@ public class LocalCharacter : MonoBehaviour
             while (Time.time - timeStart < stepTime) {
                 float t = (Time.time - timeStart) / stepTime;
                 transform.position = Vector3.Lerp(origin, target, t);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, t);
+                model.rotation = Quaternion.Slerp(model.rotation, targetRotation, t);
                 yield return null;
             }
             transform.position = target;
-            transform.rotation = targetRotation;
+            model.rotation = targetRotation;
         }
         State = CharacterState.Idle;
         moving = false;
@@ -372,6 +379,8 @@ public class LocalCharacter : MonoBehaviour
 
     public void QuickRespawn()
     {
+        ActionPlan.Clear();
+        State = CharacterState.Idle;
         respawnCountdown = 0;
         dead = false;
         this.gameObject.SetActive(true);
