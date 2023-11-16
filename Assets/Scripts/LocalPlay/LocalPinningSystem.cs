@@ -5,11 +5,11 @@ using UnityEngine.UI;
 
 public class LocalPinningSystem : MonoBehaviour
 {
-    
+    public static LocalPinningSystem Instance { get; private set; }
     private Camera mainCamera;
     private Ray ray;
     private RaycastHit hit;
-    private LocalTile tileScript;
+    private LocalTile focusedTile;
     private GameObject tile;
 
     public GameObject pinWheel;
@@ -32,6 +32,7 @@ public class LocalPinningSystem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Instance = this;
         mainCamera = Camera.main;
         pinWheel.SetActive(false);
     }
@@ -55,10 +56,10 @@ public class LocalPinningSystem : MonoBehaviour
                 if (Physics.Raycast(ray, out hit, 1000f, LayerMask.GetMask("Ground")))  // if raycast on ground
                 {
                     tile = hit.transform.gameObject;
-                    tileScript = tile.GetComponent<LocalTile>();
-                    Debug.LogFormat("tile location: {0}, {1}", tileScript.row, tileScript.col);
-                    Debug.Log(tileScript.row);
-                    Debug.Log(tileScript.col);
+                    focusedTile = tile.GetComponent<LocalTile>();
+                    Debug.LogFormat("tile location: {0}, {1}", focusedTile.row, focusedTile.col);
+                    Debug.Log(focusedTile.row);
+                    Debug.Log(focusedTile.col);
                     Debug.LogFormat("Mouse hit object {0}", hit.transform.gameObject.name);
                     pinWheel.transform.gameObject.SetActive(true);
                     isPinned = true;
@@ -84,42 +85,68 @@ public class LocalPinningSystem : MonoBehaviour
     public void Danger()
     {
         //pinWheel.transform.GetChild(0).GetComponent<Image>().sprite = pinWheelBtnPressedImg[0];
-        AddPin(dangerPinPrefab, 0);
-        LocalGameManager.Instance.newPlayerPin();
-    }
-    public void Assist()
-    {
-        //pinWheel.transform.GetChild(1).GetComponent<Image>().sprite = pinWheelBtnPressedImg[1];
-        AddPin(assistPinPrefab, 1);
-        LocalGameManager.Instance.newPlayerPin();
-    }
-    public void OMW()
-    {
-        //pinWheel.transform.GetChild(2).GetComponent<Image>().sprite = pinWheelBtnPressedImg[2];
-        AddPin(omwPinPrefab, 2);
-        LocalGameManager.Instance.newPlayerPin();
-    }
-    public void Unknown()
-    {
-        //pinWheel.transform.GetChild(3).GetComponent<Image>().sprite = pinWheelBtnPressedImg[3];
-        AddPin(unknownPinPrefab, 3);
+        AddPin(dangerPinPrefab, focusedTile, LocalGameManager.Instance.player.myCharacter);
         LocalGameManager.Instance.newPlayerPin();
     }
 
-    public void AddPin(GameObject pinPrefab, int iconType) {
+    public void DangerAt(int x, int y, LocalCharacter placingCharacter) {
+        LocalTile targetTile = MapGenerator.Instance.Map[x, y];
+        AddPin(dangerPinPrefab, targetTile, placingCharacter, false);
+    }
+
+    public void Assist()
+    {
+        //pinWheel.transform.GetChild(1).GetComponent<Image>().sprite = pinWheelBtnPressedImg[1];
+        AddPin(assistPinPrefab, focusedTile, LocalGameManager.Instance.player.myCharacter);
+        LocalGameManager.Instance.newPlayerPin();
+    }
+
+    public void AssistAt(int x, int y, LocalCharacter placingCharacter) {
+        LocalTile targetTile = MapGenerator.Instance.Map[x, y];
+        AddPin(assistPinPrefab, targetTile, placingCharacter, false);
+    }
+
+    public void OMW()
+    {
+        //pinWheel.transform.GetChild(2).GetComponent<Image>().sprite = pinWheelBtnPressedImg[2];
+        AddPin(omwPinPrefab, focusedTile, LocalGameManager.Instance.player.myCharacter);
+        LocalGameManager.Instance.newPlayerPin();
+    }
+
+    public void OMWAt(int x, int y, LocalCharacter placingCharacter) {
+        LocalTile targetTile = MapGenerator.Instance.Map[x, y];
+        AddPin(omwPinPrefab, targetTile, placingCharacter, false);
+    }
+
+    public void Unknown()
+    {
+        //pinWheel.transform.GetChild(3).GetComponent<Image>().sprite = pinWheelBtnPressedImg[3];
+        AddPin(unknownPinPrefab, focusedTile, LocalGameManager.Instance.player.myCharacter);
+        LocalGameManager.Instance.newPlayerPin();
+    }
+
+    public void UnknownAt(int x, int y, LocalCharacter placingCharacter) {
+        LocalTile targetTile = MapGenerator.Instance.Map[x, y];
+        AddPin(unknownPinPrefab, targetTile, placingCharacter, false);
+    }
+
+    public void AddPin(GameObject pinPrefab, LocalTile targetTile, LocalCharacter placingCharacter, bool isUI=true) {
         GameObject pinObj;
-        pinObj = Instantiate(pinPrefab, tile.transform.position + pin_icon_offset, Quaternion.Euler(0, 180, 0));
-        pinObj.transform.SetParent(tile.transform);
+
+        pinObj = Instantiate(pinPrefab, targetTile.transform.position + pin_icon_offset, Quaternion.Euler(0, 180, 0));
+        pinObj.transform.SetParent(targetTile.transform);
         LocalPin pin = pinObj.GetComponent<LocalPin>();
         pinList.Add(pin);
-        tileScript.pinList.Add(pinObj.GetComponent<LocalPin>());
-        pin.locationTile = tileScript;
-        pin.placingCharacter = LocalGameManager.Instance.player.myCharacter;
+        targetTile.pinList.Add(pinObj.GetComponent<LocalPin>());
+        pin.locationTile = targetTile;
+        pin.placingCharacter = placingCharacter;
         pinObj.transform.localScale = new Vector3(4f, 4f, 4f);
         //PinWindow.Instance.AddPing(new Vector3(hit.transform.position.x, 0, hit.transform.position.z), 1);
         //pinUIObj = AddPinUI(pinPosition, iconType, PhotonNetwork.LocalPlayer.ActorNumber - 1); // Actor targetValues starts from 1, List index start from 0
         //AddPinToList(pinObj.GetPhotonView().ViewID, pinUIObj.GetPhotonView().ViewID);
-        Cancel();
+        if (isUI) {
+            Cancel();
+        }
     }
 
 }

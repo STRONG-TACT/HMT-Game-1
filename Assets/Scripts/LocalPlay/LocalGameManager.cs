@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
 using UnityEngine.UIElements;
-using UnityEngine.Rendering;
 using Photon.Pun.Demo.PunBasics;
 using UnityEditor;
 
@@ -112,9 +111,8 @@ public class LocalGameManager : MonoBehaviour
 
         foreach (LocalCharacter chara in inSceneCharacters)
         {
-            int actionPoints = chara.resetActionPoints();
-            if (actionPoints == 0)
-            {
+            chara.ResetActionPoints();
+            if (chara.ActionPointsRemaining == 0) {
                 remainingCharacterCount -= 1;
             }
         }
@@ -430,7 +428,7 @@ public class LocalGameManager : MonoBehaviour
                         LocalTile newTile = opentile.GetComponent<LocalTile>();
                         newTile.row = t.row;
                         newTile.col = t.col;
-                        MapGenerator.Instance.Map[newTile.row, newTile.col] = newTile;
+                        MapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
                         Destroy(t.gameObject);
                         break;
                 }
@@ -456,7 +454,7 @@ public class LocalGameManager : MonoBehaviour
                         LocalTile newTile = opentile.GetComponent<LocalTile>();
                         newTile.row = t.row;
                         newTile.col = t.col;
-                        MapGenerator.Instance.Map[newTile.row, newTile.col] = newTile;
+                        MapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
                         Destroy(t.gameObject);
                         break;
                     case LocalTile.ObstacleType.Rock:

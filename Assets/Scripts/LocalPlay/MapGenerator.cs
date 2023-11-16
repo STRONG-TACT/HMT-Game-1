@@ -38,6 +38,33 @@ public class MapGenerator : MonoBehaviour
         LoadLevel(gameData.levelTextFiles[0]);
     }
 
+
+    public LocalTile GetTileAt(int x, int y) {
+        if (!InMap(x, y)) { 
+            Debug.LogWarningFormat("Trying to get tile at invalid position ({0}, {1})", x, y);
+            return null;
+        }
+        return Map[x, y];
+    }
+
+    public bool SetTileAt(int x, int y, LocalTile tile) {
+        if (!InMap(x,y)) {
+            Debug.LogWarningFormat("Trying to set tile at invalid position ({0}, {1})", x, y);
+            return false;
+        }
+        Map[x, y] = tile;
+        return true;
+    }
+
+    public bool InMap(int x, int y) {
+        return x >= 0 && x < Map.GetLength(0) && y >= 0 && y < Map.GetLength(1);
+    }
+
+    public bool InMap(Vector2Int pos) {
+        return InMap(pos.x, pos.y);
+    }
+
+
     public void LoadLevel(TextAsset levelTextFile)
     {
         while (tileParent.transform.childCount != 0)

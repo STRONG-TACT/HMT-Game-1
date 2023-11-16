@@ -18,6 +18,8 @@ public class LocalMonster : MonoBehaviour
 
     private float stepLength;
 
+    public LocalTile currentTile;
+
     private Transform model;
     private Animator animator;
     private CharacterState characterState;

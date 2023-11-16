@@ -275,6 +275,27 @@ public class LocalGame1Interface : HMTInterface {
         }
     }
 
+    private int resolvePinType(string pinType) {
+        switch (pinType.ToLower()) {
+            case "danger":
+            case "a":
+                return 0;
+            case "assist":
+            case "b":
+                return 1;
+            case "way":
+            case "omw":
+            case "c":
+                return 2;
+            case "unknown":
+            case "question":
+            case "d":
+                return 3;
+            default:
+                return -1;
+        }
+    }
+
     private IEnumerator ExecuteActionInPinning(Command command) {
         string action = command.json["action"].ToString();
         LocalCharacter target = GetTargetCharacter(command.target);
@@ -282,23 +303,85 @@ public class LocalGame1Interface : HMTInterface {
             command.SendErrorResponse(string.Format("Unknown target {0} in pinning phase. This shouldn't be possible...", command.target));
             yield break;
         }
-        LocalGameManager manager = LocalGameManager.Instance; 
-        switch (action) {
+        LocalGameManager manager = LocalGameManager.Instance;
+        JObject inputs = null;
+        switch (action.ToLower()) {
+            case "pinga":
+                command.json["inputs"] = new JObject { {"type", "danger" } };
+                goto case "ping";
+            case "pingb":
+                command.json["inputs"] = new JObject { {"type", "assist" } };
+                goto case "ping";
+            case "pingc":
+                command.json["inputs"] = new JObject { {"type", "way" } };
+                goto case "ping";
+            case "pingd":
+                command.json["inputs"] = new JObject { {"type", "unknown" } };
+                goto case "ping";
             case "ping":
-                //TODO do the ping
-                break;
+                try {
+                    inputs = command.json["inputs"] as JObject;
+                }
+                catch {
+                    inputs = null;
+                }
+                if (inputs == null) {
+                    command.SendErrorResponse("Error parsing pin parameters");
+                    yield break;
+                }
+
+                int pinType = resolvePinType(inputs["type"].ToString());
+                Vector2Int pos = target.currentTile.GridPosition + target.pingCursor;                
+                pinType = resolvePinType(inputs["type"].ToString());
+             
+               
+                if (inputs.ContainsKey("x")) {
+                    pos.x = (int)inputs["x"];
+                    pos.y = (int)inputs["y"];
+                }
+
+                if (!MapGenerator.Instance.InMap(pos)) {
+                    command.SendErrorResponse(string.Format("Attempting to Ping outside of map {0}, {1}", pos.x, pos.y));
+                    yield break;
+                }
+
+                switch (pinType) {
+                    case 0:
+                        LocalPinningSystem.Instance.DangerAt(pos.x, pos.y, target);
+                        command.SendOKResponse("Ping Placed");
+                        yield break;
+                    case 1:
+                        LocalPinningSystem.Instance.AssistAt(pos.x, pos.y, target);
+                        command.SendOKResponse("Ping Placed");
+                        yield break;
+                    case 2:
+                        LocalPinningSystem.Instance.OMWAt(pos.x, pos.y, target);
+                        command.SendOKResponse("Ping Placed");
+                        yield break;
+                    case 3:
+                        LocalPinningSystem.Instance.UnknownAt(pos.x, pos.y, target);
+                        command.SendOKResponse("Ping Placed");
+                        yield break;
+                    default:
+                        command.SendErrorResponse("Unrecognized Pin Type Given");
+                        yield break;
+                }
             case "submit":
-                //TODO end ping phase
+                target.ReadyForNextPhase = true;
+                manager.CheckPingPhaseEnd();
                 break;
             case "up":
             case "down":
             case "left":
             case "right":
-                if (!target.MovePingCusor(action)) {
+                if(target.ActionPointsRemaining == 0) {
                     command.SendErrorResponse("No Action Points remaining so not moving ping cursor");
-                    yield break;
                 }
-                break;
+                else {
+                    target.MovePingCusor(action);
+                    command.SendOKResponse("Ping Cursor Moved");
+                }
+                yield break;
             case "undo":
                 command.SendErrorResponse(string.Format("Received {0} action in pinning phase", action));
                 yield break;
@@ -312,28 +395,79 @@ public class LocalGame1Interface : HMTInterface {
     private IEnumerator ExecuteActionInPlanning(Command command) {
         string action = command.json["action"].ToString();
         LocalGameManager manager = LocalGameManager.Instance;
-        switch (action) {
+        LocalCharacter target = GetTargetCharacter(command.target);
+        if (target == null) {
+            command.SendErrorResponse(string.Format("Unknown target {0} in pinning phase. This shouldn't be possible...", command.target));
+            yield break;
+        }
+        switch (action.ToLower()) {
             case "ping":
                 command.SendErrorResponse("Received ping action in planning phase");
                 yield break;
             case "submit":
-                //TODO end ping phase
+                target.ReadyForNextPhase = true;
+                manager.CheckPlanPhaseEnd();
                 break;
             case "up":
-                //TODO move character up
-                break;
+                if(target.ActionPointsRemaining > 0) {
+                    target.AddActionToPlan(LocalCharacter.Direction.Up);
+                    command.SendOKResponse("Action Added");
+                    yield break;
+                }
+                else {
+                    command.SendErrorResponse("Out of Action Points");
+                    yield break;
+                }
             case "down":
-                //TODO move character down
-                break;
+                 if (target.ActionPointsRemaining > 0) {
+                    target.AddActionToPlan(LocalCharacter.Direction.Down);
+                    command.SendOKResponse("Action Added");
+                    yield break;
+                }
+                else {
+                    command.SendErrorResponse("Out of Action Points");
+                    yield break;
+                }
             case "left":
-                //TODO move character left
-                break;
+                if (target.ActionPointsRemaining > 0) {
+                    target.AddActionToPlan(LocalCharacter.Direction.Left);
+                    command.SendOKResponse("Action Added");
+                    yield break;
+                }
+                else {
+                    command.SendErrorResponse("Out of Action Points");
+                    yield break;
+                }
             case "right":
-                //TODO move character right
-                break;
+                if (target.ActionPointsRemaining > 0) {
+                    target.AddActionToPlan(LocalCharacter.Direction.Right);
+                    command.SendOKResponse("Action Added");
+                    yield break;
+                }
+                else {
+                    command.SendErrorResponse("Out of Action Points");
+                    yield break;
+                }
+            case "wait":
+                if (target.ActionPointsRemaining > 0) {
+                    target.AddActionToPlan(LocalCharacter.Direction.Wait);
+                    command.SendOKResponse("Action Added");
+                    yield break;
+                }
+                else {
+                    command.SendErrorResponse("Out of Action Points");
+                    yield break;
+                }
             case "undo":
-                //TODO undo last move
-                break;
+                if (!target.ReadyForNextPhase) {
+                    target.UndoPlanStep();
+                    command.SendOKResponse("Action Undone");
+                    yield break;
+                }
+                else {
+                    command.SendErrorResponse("Cannot undo action after submitting");
+                    yield break;
+                }
             default:
                 command.SendErrorResponse(string.Format("Unknown action {0} in pinning phase", action));
                 yield break;

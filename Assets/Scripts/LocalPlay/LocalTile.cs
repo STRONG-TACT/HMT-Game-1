@@ -17,6 +17,12 @@ public class LocalTile : MonoBehaviour
     public int row;
     public int col;
 
+    public Vector2Int GridPosition {
+        get {
+            return new Vector2Int(row, col);
+        }
+    }
+
     // Lists of enemies and characters on this tile
     public List<LocalMonster> enemyList;
     public List<LocalCharacter> charaList;
@@ -32,11 +38,15 @@ public class LocalTile : MonoBehaviour
         {
             case "Monster":
                 //Debug.Log("A monster enters.");
-                enemyList.Add(col.gameObject.GetComponent<LocalMonster>());
+                LocalMonster monster = col.gameObject.GetComponent<LocalMonster>();
+                monster.currentTile = this;
+                enemyList.Add(monster);
                 break;
             case "Character":
                 //Debug.Log("A character enters.");
-                charaList.Add(col.gameObject.GetComponent<LocalCharacter>());
+                LocalCharacter character = col.gameObject.GetComponent<LocalCharacter>();
+                character.currentTile = this;
+                charaList.Add(character);
                 break;
             default:
                 Debug.LogFormat("Tile Hit Trigger: {0}", col.gameObject.tag);

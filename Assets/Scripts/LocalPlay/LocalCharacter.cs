@@ -24,13 +24,23 @@ public class LocalCharacter : MonoBehaviour
     public int CharacterId;
     private bool maskOn;
 
+    public LocalTile currentTile;
+
     public GameObject indicator;
     public List<Direction> ActionPlan = new List<Direction>();
     // how many moves that the character left in this turn
-    private int actionPointsLeft;
+    //private int actionPointsLeft;
 
     //This is only used for AI characters
     public Vector2Int pingCursor;
+    private int pinsPlaced = 0;
+
+
+    public int ActionPointsRemaining {
+        get {
+            return config.movement - ActionPlan.Count - pinsPlaced;
+        }
+    }
 
     public bool ReadyForNextPhase = false;
 
@@ -124,8 +134,8 @@ public class LocalCharacter : MonoBehaviour
 
         characterMask = transform.Find("CharacterMask");
         visibilityMask = transform.Find("VisibleMask");
-        actionPointsLeft = config.movement;
-
+        ResetActionPoints();
+        
         Vector3 cellScale = new Vector3(gameData.tileSize + 2 * gameData.tileGapLength,
                                          0,
                                          gameData.tileSize + 2 * gameData.tileGapLength);
@@ -146,9 +156,9 @@ public class LocalCharacter : MonoBehaviour
     }
 
     public void PlacePin() {
-        actionPointsLeft -= 1;
+        pinsPlaced += 1;
         pingCursor = Vector2Int.zero;
-        if (actionPointsLeft == 0) {
+        if (ActionPointsRemaining == 0) {
             ReadyForNextPhase = true;
         }
     }
@@ -174,8 +184,10 @@ public class LocalCharacter : MonoBehaviour
         pingCursor = Vector2Int.zero;
     }
 
-    public void AddActionToPlan(Direction direction)
+    public bool AddActionToPlan(Direction direction)
     {
+        if (ActionPointsRemaining <= 0) return false;
+
         Vector3 moveVec = direction switch {
             Direction.Up => Vector3.forward,
             Direction.Down => Vector3.back,
@@ -186,12 +198,11 @@ public class LocalCharacter : MonoBehaviour
 
         indicator.transform.position += moveVec * stepLength;
         ActionPlan.Add(direction);
-        actionPointsLeft -= 1;
+        return true;
     }
 
     public void ResetPlan() {
         ActionPlan.Clear();
-        actionPointsLeft = config.movement;
     }
 
     public bool CheckMove(Direction direction) {
@@ -219,9 +230,9 @@ public class LocalCharacter : MonoBehaviour
     }
 
     
-    public void UndoPlanStep() {
-        if (ActionPlan.Count == 0) {
-            return;
+    public bool UndoPlanStep() {
+        if (ReadyForNextPhase) {
+            return false;
         }
         Direction lastMove = ActionPlan[ActionPlan.Count - 1];
         ActionPlan.RemoveAt(ActionPlan.Count - 1);
@@ -233,7 +244,7 @@ public class LocalCharacter : MonoBehaviour
             _ => Vector3.zero
         };
         indicator.transform.position += -moveVec * stepLength;
-        actionPointsLeft += 1;
+        return true;
     }
 
     public IEnumerator TakeNextMove(float stepTime) {
@@ -388,7 +399,7 @@ public class LocalCharacter : MonoBehaviour
     }
 
     public bool MovePingCusor(string direction) {
-        if(actionPointsLeft <= 0) {
+        if(ActionPointsRemaining <= 0) {
             return false;
         }
         else {
@@ -413,20 +424,18 @@ public class LocalCharacter : MonoBehaviour
 
     }
 
-    public int ActionPointsRemaining => actionPointsLeft;
 
-    public int resetActionPoints()
-    {
-        if (dead)
-        {
-            actionPointsLeft = 0;
+    public void ResetActionPoints() {
+        if (dead) {
+            ActionPlan.Clear();
+            for(int i = 0; i <config.movement; i++) {
+                ActionPlan.Add(Direction.Wait);
+            }
         }
-        else
-        {
-            actionPointsLeft = config.movement;
+        else {
+            pinsPlaced = 0;
+            ActionPlan.Clear();
         }
-
-        return actionPointsLeft;
     }
 
     public JObject HMTStateRep() {
@@ -440,7 +449,7 @@ public class LocalCharacter : MonoBehaviour
             {"stoneDice", config.stoneDice.ToString() },
             {"health", health},
             {"dead", dead},
-            {"actionPoints", actionPointsLeft},
+            {"actionPoints", ActionPointsRemaining},
             {"actionPlan", new JArray(ActionPlan.Select(d => d.ToString())) }
         };
     }
