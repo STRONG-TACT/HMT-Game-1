@@ -65,9 +65,9 @@ public class LocalGame1Interface : HMTInterface {
             {"boardHeight", map.Map.GetLength(1)},
             //{"gridWidth",  Mathf.CeilToInt((boardWidth - gameData.tileGapLength) / (gameData.tileSize + gameData.tileGapLength))},
             //{"gridHeight", Mathf.CeilToInt((boardHeight- gameData.tileGapLength) / (gameData.tileSize + gameData.tileGapLength))},
-            {"level", gameData.gameLevel },
-            {"currentPlayer", GameManager.Instance.CurrentTurnPlayerNum },
-            {"localPlayerId", PhotonNetwork.LocalPlayer.ActorNumber },
+            {"level", gameManager.currentLevel },
+            //{"currentPlayer", GameManager.Instance.CurrentTurnPlayerNum },
+            //{"localPlayerId", PhotonNetwork.LocalPlayer.ActorNumber },
             {"currentPhase", gameManager.gameStatus.ToString() }
         };
         

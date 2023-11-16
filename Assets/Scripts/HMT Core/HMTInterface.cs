@@ -168,21 +168,7 @@ namespace HMT {
         }
     }
 
-    /// <summary>
-    /// A placeholder version of the Command struct used for when the HMT Interface is turned off.
-    /// </summary>
-    public struct Command { 
-        public string command;
-        public string target;
-        public JObject json;
-        public bool supressDefault;
-        public void SendOKResponse(string message) {
-            return;    
-        }
-        public void SendErrorResponse(string message) {
-            return;
-        }
-    }
+
 
 #if HMT_BUILD
 
@@ -260,6 +246,23 @@ namespace HMT {
         public void SendErrorResponse(string message) {
             string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"ERROR\", \"message\":\"{1}\"}}", command, message);
             originService.Context.WebSocket.Send(mess);
+        }
+    }
+
+#else 
+    /// <summary>
+    /// A placeholder version of the Command struct used for when the HMT Interface is turned off.
+    /// </summary>
+    public struct Command { 
+        public string command;
+        public string target;
+        public JObject json;
+        public bool supressDefault;
+        public void SendOKResponse(string message) {
+            return;    
+        }
+        public void SendErrorResponse(string message) {
+            return;
         }
     }
 
