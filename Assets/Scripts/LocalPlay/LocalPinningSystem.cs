@@ -77,31 +77,31 @@ public class LocalPinningSystem : MonoBehaviour
     /* PinWheel choice button clicked ---------------- */
     public void Cancel()
     {
-        pinWheel.transform.GetChild(4).GetComponent<Image>().sprite = pinWheelBtnPressedImg[4];
+        //pinWheel.transform.GetChild(4).GetComponent<Image>().sprite = pinWheelBtnPressedImg[4];
         pinWheel.SetActive(false);
         isPinned = false;
     }
     public void Danger()
     {
-        pinWheel.transform.GetChild(0).GetComponent<Image>().sprite = pinWheelBtnPressedImg[0];
+        //pinWheel.transform.GetChild(0).GetComponent<Image>().sprite = pinWheelBtnPressedImg[0];
         AddPin(dangerPinPrefab, 0);
         LocalGameManager.Instance.newPlayerPin();
     }
     public void Assist()
     {
-        pinWheel.transform.GetChild(1).GetComponent<Image>().sprite = pinWheelBtnPressedImg[1];
+        //pinWheel.transform.GetChild(1).GetComponent<Image>().sprite = pinWheelBtnPressedImg[1];
         AddPin(assistPinPrefab, 1);
         LocalGameManager.Instance.newPlayerPin();
     }
     public void OMW()
     {
-        pinWheel.transform.GetChild(2).GetComponent<Image>().sprite = pinWheelBtnPressedImg[2];
+        //pinWheel.transform.GetChild(2).GetComponent<Image>().sprite = pinWheelBtnPressedImg[2];
         AddPin(omwPinPrefab, 2);
         LocalGameManager.Instance.newPlayerPin();
     }
     public void Unknown()
     {
-        pinWheel.transform.GetChild(3).GetComponent<Image>().sprite = pinWheelBtnPressedImg[3];
+        //pinWheel.transform.GetChild(3).GetComponent<Image>().sprite = pinWheelBtnPressedImg[3];
         AddPin(unknownPinPrefab, 3);
         LocalGameManager.Instance.newPlayerPin();
     }
