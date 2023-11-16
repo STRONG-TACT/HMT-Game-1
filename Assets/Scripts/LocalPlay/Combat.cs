@@ -31,7 +31,7 @@ public class Combat : MonoBehaviour
 
         public override string ToString() {
             string result = type.ToString();
-            if (bonus > 0) {
+            if (bonus >= 0) {
                 result += "+" + bonus.ToString();
             }
             else {

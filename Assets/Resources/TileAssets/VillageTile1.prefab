@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7170740331973633913}
   m_Layer: 8
   m_Name: VillageTile1
-  m_TagString: Untagged
+  m_TagString: Walls
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -58,13 +58,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ec7680e4eb404863bfe9f85944de786, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileType: 0
-  localDice: 0
-  diceBonus: 0
+  tileType: 3
+  dice:
+    type: 0
+    bonus: 0
   row: 0
   col: 0
   enemyList: []
   charaList: []
+  pinList: []
 --- !u!1001 &7850342880143912966
 PrefabInstance:
   m_ObjectHideFlags: 0
