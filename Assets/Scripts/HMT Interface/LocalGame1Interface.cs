@@ -103,6 +103,8 @@ public class LocalGame1Interface : HMTInterface {
                     JObject rep = character.HMTStateRep();
                     rep["x"] = x;
                     rep["y"] = y;
+                    rep["pinCursorX"] = character.pingCursor.x + x;
+                    rep["pinCursorY"] = character.pingCursor.y + x;
                     scene.Add(rep);
                 }
                 foreach (LocalMonster monster in tile.enemyList) {
