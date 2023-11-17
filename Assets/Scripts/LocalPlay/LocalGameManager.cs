@@ -126,6 +126,7 @@ public class LocalGameManager : MonoBehaviour
     {
         //Player start to plan their moves
         gameStatus = GameStatus.Player_Pinning;
+        uiManager.UpdateGamePhaseInfo();
         pinningSubmittedCount = 3 - remainingCharacterCount;
 
         foreach (LocalCharacter chara in inSceneCharacters) {
@@ -144,9 +145,9 @@ public class LocalGameManager : MonoBehaviour
             player.UpdateCharacterUI(0, player.myCharacter);
 
 
-            uiManager.ShowCharacterPinUI(player.myCharacter.name, 
-                                         player.myCharacter.ActionPointsRemaining,
-                                         player.myCharacter.dead);
+            uiManager.ShowCharacterPinUI(player.myCharacter.CharacterId,
+                                         player.myCharacter.Health,
+                                         player.myCharacter.ActionPointsRemaining);
         }
         else {
             PreparePlayerPlanningPhase();
@@ -199,6 +200,7 @@ public class LocalGameManager : MonoBehaviour
     {
         //Player start to plan their moves
         gameStatus = GameStatus.Player_Planning;
+        uiManager.UpdateGamePhaseInfo();
         foreach (LocalCharacter chara in inSceneCharacters) {
             chara.StartPlanningPhase();
         }
@@ -229,7 +231,7 @@ public class LocalGameManager : MonoBehaviour
             player.myCharacter.UnFocusCharacter();
             player.myCharacter = inSceneCharacters[index];
             player.myCharacter.FocusCharacter();
-            uiManager.ShowCharacterPinUI(player.myCharacter.name, player.myCharacter.ActionPointsRemaining, player.myCharacter.dead);
+            uiManager.ShowCharacterPinUI(player.myCharacter.CharacterId, player.myCharacter.Health, player.myCharacter.ActionPointsRemaining);
             player.UpdateCharacterUI(index, player.myCharacter);
         }
         else if (gameStatus == GameStatus.Player_Planning)
@@ -237,7 +239,7 @@ public class LocalGameManager : MonoBehaviour
             player.myCharacter.UnFocusCharacter();
             player.myCharacter = inSceneCharacters[index];
             player.myCharacter.FocusCharacter();
-            uiManager.ShowCharacterPlanUI(player.myCharacter.name, player.myCharacter.ActionPointsRemaining, player.myCharacter.dead);
+            uiManager.ShowCharacterPlanUI(player.myCharacter.CharacterId, player.myCharacter.Health, player.myCharacter.ActionPointsRemaining);
             player.UpdateCharacterUI(index, player.myCharacter);
         }
 
@@ -273,6 +275,7 @@ public class LocalGameManager : MonoBehaviour
     // Start charater moving phase
     public void StartCharacterMovingPhase() {
         gameStatus = GameStatus.Player_Moving;
+        uiManager.UpdateGamePhaseInfo();
         //moveFinishedCount = 0;       
         eventQueue = new Queue<LocalTile>();
 
@@ -282,7 +285,6 @@ public class LocalGameManager : MonoBehaviour
     // Characters move step by step
     // If events happen, deal with all the events and then back to moving
     private IEnumerator CharacterMoveByStep() {
-        uiManager.ShowCharacterMovingUI();
 
         //// A flag, whether this round of step triggers a combat
         //bool hasCombat = false;
@@ -329,6 +331,7 @@ public class LocalGameManager : MonoBehaviour
     private void StartMonsterTurn()
     {
         gameStatus = GameStatus.Monster_Moving;
+        uiManager.UpdateGamePhaseInfo();
         //moveFinishedCount = 0;
 
         foreach (LocalMonster m in inSceneMonsters) {
@@ -341,7 +344,6 @@ public class LocalGameManager : MonoBehaviour
     // Monsters moving step by step
     // Same with chara move by step, when events happened, deal with them and come back
     private IEnumerator MonsterMoveByStep() {
-        uiManager.ShowMonsterTurnUI();
         bool allMonstersDone = false;
 
 
@@ -476,6 +478,8 @@ public class LocalGameManager : MonoBehaviour
 
             //TODO this should probably be waiting for a button click in the future.
             yield return new WaitForSeconds(2*excecutionStepTime);
+
+            uiManager.HideCombatUI();
         }
         yield break;
 

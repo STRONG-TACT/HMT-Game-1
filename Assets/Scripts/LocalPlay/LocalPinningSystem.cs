@@ -14,8 +14,8 @@ public class LocalPinningSystem : MonoBehaviour
 
     public GameObject pinWheel;
     private Vector3 pinPosition = new Vector3(0,0,0);
-    public Sprite[] pinWheelBtnImg = new Sprite[5]; // 0: danger, 1: Assist, 2: OMW, 3: Unknown, 4: cancel; 
-    public Sprite[] pinWheelBtnPressedImg = new Sprite[5]; // 0: danger, 1: Assist, 2: OMW, 3: Unknown, 4: cancel; 
+    //public Sprite[] pinWheelBtnImg = new Sprite[5]; // 0: danger, 1: Assist, 2: OMW, 3: Unknown, 4: cancel; 
+    //public Sprite[] pinWheelBtnPressedImg = new Sprite[5]; // 0: danger, 1: Assist, 2: OMW, 3: Unknown, 4: cancel; 
     private bool isPinned;
     public Vector3 ui_offset = new Vector3(0,0.3f,0);
     public Vector3 pin_icon_offset = new Vector3(0.3f, 0.3f, 0.3f);

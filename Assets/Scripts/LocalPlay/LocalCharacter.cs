@@ -226,7 +226,7 @@ public class LocalCharacter : MonoBehaviour
 
     public void EndPlanning() {
         indicator.transform.position = this.transform.position;
-
+        indicator.SetActive(false);
     }
 
     
@@ -244,6 +244,9 @@ public class LocalCharacter : MonoBehaviour
             _ => Vector3.zero
         };
         indicator.transform.position += -moveVec * stepLength;
+
+        // TODO: Think about the best way to call ui manager
+        FindObjectOfType<LocalUIManager>().UpdateActionPointsRemaining(ActionPointsRemaining);
         return true;
     }
 
@@ -326,15 +329,15 @@ public class LocalCharacter : MonoBehaviour
 
     private bool CheckRightGoal(GameObject goal)
     {
-        if (config.type == CharacterConfig.CharacterType.Dwarf && goal.name.Contains("DwarfGoal"))
+        if (config.type == CharacterConfig.CharacterType.Dwarf && goal.name.Contains("Dwarf"))
         {
             return true;
         }
-        else if (config.type == CharacterConfig.CharacterType.Giant && goal.name.Contains("GiantGoal"))
+        else if (config.type == CharacterConfig.CharacterType.Giant && goal.name.Contains("Giant"))
         {
             return true;
         }
-        else if (config.type == CharacterConfig.CharacterType.Human && goal.name.Contains("HumanGoal"))
+        else if (config.type == CharacterConfig.CharacterType.Human && goal.name.Contains("Human"))
         {
             return true;
         }
