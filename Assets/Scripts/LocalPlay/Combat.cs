@@ -53,6 +53,7 @@ public class Combat : MonoBehaviour
     public static bool ExecuteCombat(FightType type, LocalTile tile, LocalUIManager uiManager)
     {
         bool result = false;
+        List<int> charaIDs = new List<int>();
         List<int> enemyScores = new List<int>();
         List<int> charaScores = new List<int>();
         int enemyScore = 0;
@@ -60,7 +61,7 @@ public class Combat : MonoBehaviour
 
         foreach (LocalCharacter c in tile.charaList)
         {
-
+            charaIDs.Add(c.CharacterId);
             c.State = LocalCharacter.CharacterState.Attacking;
             int outcome = c.config.monsterDice.Roll();
             charaScores.Add(outcome);
@@ -89,7 +90,7 @@ public class Combat : MonoBehaviour
             result = true;
         }
 
-        uiManager.ShowCombatUI(type, charaScores, enemyScores);
+        uiManager.ShowCombatUI(type, charaIDs, charaScores, enemyScores, charaScore, enemyScore, result);
         foreach (LocalCharacter c in tile.charaList) {
             c.State = LocalCharacter.CharacterState.Idle;
         }

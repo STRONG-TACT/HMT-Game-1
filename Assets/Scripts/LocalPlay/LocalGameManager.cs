@@ -478,6 +478,8 @@ public class LocalGameManager : MonoBehaviour
 
             //TODO this should probably be waiting for a button click in the future.
             yield return new WaitForSeconds(2*excecutionStepTime);
+
+            uiManager.HideCombatUI();
         }
         yield break;
 

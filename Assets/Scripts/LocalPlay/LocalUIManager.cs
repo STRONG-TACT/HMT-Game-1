@@ -16,9 +16,17 @@ public class LocalUIManager : MonoBehaviour
     public GameObject PinFinishBtn;
     public GameObject SwitchCharaButton;
 
+    public GameObject CharacterInfo;
     public Image YouAreInfo;
     public GameObject HealthPanel;
     public GameObject ActionPanel;
+
+    public GameObject CombatUI;
+    public GameObject[] PlayerCombatSlots = new GameObject[3];
+    public GameObject[] EnemyCombatSlots = new GameObject[4];
+    public TMP_Text PlayerFinalScore;
+    public TMP_Text EnemyFinalScore;
+    public TMP_Text ResultMessage;
 
     // Start is called before the first frame update
     void Start()
@@ -88,6 +96,7 @@ public class LocalUIManager : MonoBehaviour
 
         PinFinishBtn.SetActive(true);
         SwitchCharaButton.SetActive(true);
+        CharacterInfo.SetActive(true);
 
         // TODO check the case when health == 0
 
@@ -111,6 +120,7 @@ public class LocalUIManager : MonoBehaviour
     {
         PinFinishBtn.SetActive(false);
         SwitchCharaButton.SetActive(false);
+        CharacterInfo.SetActive(false);
         HealthPanel.SetActive(false);
         ActionPanel.SetActive(false);
     }
@@ -132,6 +142,7 @@ public class LocalUIManager : MonoBehaviour
 
         PlanUI.SetActive(true);
         SwitchCharaButton.SetActive(true);
+        CharacterInfo.SetActive(true);
 
         // TODO check the case when health == 0
 
@@ -155,6 +166,7 @@ public class LocalUIManager : MonoBehaviour
     {
         PlanUI.SetActive(false);
         SwitchCharaButton.SetActive(false);
+        CharacterInfo.SetActive(false);
         HealthPanel.SetActive(false);
         ActionPanel.SetActive(false);
     }
@@ -164,53 +176,84 @@ public class LocalUIManager : MonoBehaviour
         UpdateActionPanel(movePoints);
     }
 
-    public void ShowCombatUI(Combat.FightType type, List<int> charaDice, List<int> enemyDice)
+    public void ShowCombatUI(Combat.FightType type, List<int> charaIDs, List<int> charaDice, List<int> enemyDice,
+                             int playerScore, int enemyScore, bool win)
     {
+        for (int i = 0; i < charaIDs.Count; i++)
+        {
+            switch (charaIDs[i])
+            {
+                case 0:
+                    PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.dwarfIcon;
+                    PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    PlayerCombatSlots[i].SetActive(true);
+                    break;
+                case 1:
+                    PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.giantIcon;
+                    PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    PlayerCombatSlots[i].SetActive(true);
+                    break;
+                case 2:
+                    PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.humanIcon;
+                    PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    PlayerCombatSlots[i].SetActive(true);
+                    break;
+                default:
+                    Debug.Log("Character ID out of scope in ShowCombatUI");
+                    break;
+            }
+        }
+
         if (type == Combat.FightType.Monster)
         {
-            text.text = "Combat with monster... Character: ";
-            foreach (int i in charaDice)
+            // TODO: differenciate monster types
+            for (int i = 0; i < charaDice.Count; i++)
             {
-                text.text += string.Format("{0} ", i);
-            }
-
-            text.text += "Monster: ";
-
-            foreach (int i in enemyDice)
-            {
-                text.text += string.Format("{0} ", i);
+                EnemyCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.monsterIcon;
+                EnemyCombatSlots[i].GetComponentInChildren<TMP_Text>().text = enemyDice[0].ToString();
+                EnemyCombatSlots[i].SetActive(true);
             }
         }
         else if (type == Combat.FightType.Trap)
         {
-            text.text = "Combat with trap... Character: ";
-            foreach (int i in charaDice)
-            {
-                text.text += string.Format("{0} ", i);
-            }
-
-            text.text += "Trap: ";
-
-            foreach (int i in enemyDice)
-            {
-                text.text += string.Format("{0} ", i);
-            }
+            EnemyCombatSlots[0].GetComponentInChildren<Image>().sprite = gameAssets.trapIcon;
+            EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>().text = enemyDice[0].ToString();
+            EnemyCombatSlots[0].SetActive(true);
         }
         else if (type == Combat.FightType.Rock)
         {
-            text.text = "Combat with rock... Character: ";
-            foreach (int i in charaDice)
-            {
-                text.text += string.Format("{0} ", i);
-            }
-
-            text.text += "Rock: ";
-
-            foreach (int i in enemyDice)
-            {
-                text.text += string.Format("{0} ", i);
-            }
+            EnemyCombatSlots[0].GetComponentInChildren<Image>().sprite = gameAssets.rockIcon;
+            EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>().text = enemyDice[0].ToString();
+            EnemyCombatSlots[0].SetActive(true);
         }
+
+        PlayerFinalScore.text = playerScore.ToString();
+        EnemyFinalScore.text = enemyScore.ToString();
+
+        if (win)
+        {
+            ResultMessage.text = "You defeated the enemy!";
+        }
+        else
+        {
+            ResultMessage.text = "Oops...";
+        }
+
+        CombatUI.SetActive(true);
+    }
+
+    public void HideCombatUI()
+    {
+        foreach (GameObject slot in PlayerCombatSlots)
+        {
+            slot.SetActive(false);
+        }
+        foreach (GameObject slot in EnemyCombatSlots)
+        {
+            slot.SetActive(false);
+        }
+
+        CombatUI.SetActive(false);
     }
 
     private void UpdateHealthPanel(int health)

@@ -20,6 +20,11 @@ public class GameAssets : MonoBehaviour
     public Sprite giantIcon;
     public Sprite humanIcon;
 
+    [Header("EnemyIcon UI Assets")]
+    public Sprite monsterIcon;
+    public Sprite trapIcon;
+    public Sprite rockIcon;
+
     [Header("YouAre UI Assets")]
     public Sprite youAreDwarf;
     public Sprite youAreGiant;
