@@ -207,7 +207,7 @@ public class LocalUIManager : MonoBehaviour
         if (type == Combat.FightType.Monster)
         {
             // TODO: differenciate monster types
-            for (int i = 0; i < charaDice.Count; i++)
+            for (int i = 0; i < enemyDice.Count; i++)
             {
                 EnemyCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.monsterIcon;
                 EnemyCombatSlots[i].GetComponentInChildren<TMP_Text>().text = enemyDice[0].ToString();
