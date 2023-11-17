@@ -244,6 +244,9 @@ public class LocalCharacter : MonoBehaviour
             _ => Vector3.zero
         };
         indicator.transform.position += -moveVec * stepLength;
+
+        // TODO: Think about the best way to call ui manager
+        FindObjectOfType<LocalUIManager>().UpdateActionPointsRemaining(ActionPointsRemaining);
         return true;
     }
 
