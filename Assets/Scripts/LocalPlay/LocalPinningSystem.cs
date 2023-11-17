@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class LocalPinningSystem : MonoBehaviour
@@ -45,8 +46,14 @@ public class LocalPinningSystem : MonoBehaviour
             pinPosition = mainCamera.WorldToScreenPoint(tile.transform.position + ui_offset);
             pinWheel.transform.position = pinPosition;
         }
+        
+
         if (Input.GetMouseButtonDown(0) && LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Pinning)
         {
+            if (EventSystem.current.IsPointerOverGameObject()) {
+                Debug.Log("mouse clicked on UI");
+                return;
+            }
             Debug.Log("mouse clicked at " + Input.mousePosition);
 
             ray = mainCamera.ScreenPointToRay(Input.mousePosition);
