@@ -117,6 +117,12 @@ public class LocalGame1Interface : HMTInterface {
                     rep["y"] = y;
                     scene.Add(rep);
                 }
+                if(tile.shrine != null) {
+                    JObject rep = tile.shrine.HMTStateRep();
+                    rep["x"] = x;
+                    rep["y"] = y;
+                    scene.Add(rep);
+                }
             }
         }
 

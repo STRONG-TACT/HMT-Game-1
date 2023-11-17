@@ -27,6 +27,7 @@ public class LocalTile : MonoBehaviour
     public List<LocalMonster> enemyList;
     public List<LocalCharacter> charaList;
     public List<LocalPin> pinList;
+    public LocalShrine shrine = null;
 
     private void OnTriggerEnter(Collider col) {
         //if(!(LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Moving || 

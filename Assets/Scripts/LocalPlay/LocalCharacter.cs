@@ -305,10 +305,9 @@ public class LocalCharacter : MonoBehaviour
         {
             case "Goal":
                 //Debug.Log("Triggered Goal");
-                if (CheckRightGoal(col.gameObject))
-                {
+                LocalShrine shrine = col.gameObject.GetComponent<LocalShrine>();
+                if(shrine != null && shrine.CheckShrineType(this)) {
                     LocalGameManager.Instance.GoalReached(CharacterId);
-                    Destroy(col.gameObject);
                 }
                 break;
 
@@ -324,26 +323,6 @@ public class LocalCharacter : MonoBehaviour
             default:
                 //Debug.LogFormat("Character Hit Trigger: {0}", col.gameObject.tag);
                 break;
-        }
-    }
-
-    private bool CheckRightGoal(GameObject goal)
-    {
-        if (config.type == CharacterConfig.CharacterType.Dwarf && goal.name.Contains("Dwarf"))
-        {
-            return true;
-        }
-        else if (config.type == CharacterConfig.CharacterType.Giant && goal.name.Contains("Giant"))
-        {
-            return true;
-        }
-        else if (config.type == CharacterConfig.CharacterType.Human && goal.name.Contains("Human"))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
         }
     }
 

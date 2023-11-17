@@ -30,6 +30,10 @@ public class MapGenerator : MonoBehaviour
         {"R2", "Rock2" },
         {"R3", "Rock3" },
         {"R4", "Rock4" },
+        {"S1", "Rock1" }, //The S in the schema can also stand for stone, though in hindsight R is better
+        {"S2", "Rock2" },
+        {"S3", "Rock3" },
+        {"S4", "Rock4" },
     };
 
     void Awake()
@@ -179,7 +183,7 @@ public class MapGenerator : MonoBehaviour
 
             default:
                 tileObj = Instantiate(gameAssets.OpenTile, new Vector3(x, 0, z), Quaternion.identity, tileParent);
-                SpawnEntity(name, x, z);
+                SpawnEntity(name, x, z, tileObj.GetComponent<LocalTile>());
                 break;
         }
 
@@ -197,20 +201,16 @@ public class MapGenerator : MonoBehaviour
 
     private string SearchSchema(string code)
     {
-        string tileName = AlternateSchema[code];
-
-        if (tileName != null)
-        {
-            return tileName;
+        if (AlternateSchema.ContainsKey(code)) {
+            return AlternateSchema[code];
         }
-        else
-        {
-            Debug.Log(string.Format("A unknown code {0} in level map file.", code));
+        else {
+            Debug.LogErrorFormat("A unknown code {0} in level map file.", code);
             return "";
         }
     }
 
-    private void SpawnEntity(string tileName, float x, float z)
+    private void SpawnEntity(string tileName, float x, float z, LocalTile tileObj)
     {
         switch (tileName)
         {
@@ -227,15 +227,21 @@ public class MapGenerator : MonoBehaviour
                 break;
 
             case "1Goal":
-                Instantiate(gameAssets.Goals[0], new Vector3(x, 0f, z), Quaternion.identity);
+                GameObject goal1 = Instantiate(gameAssets.Goals[0], new Vector3(x, 0f, z), Quaternion.identity);
+                tileObj.shrine = goal1.GetComponent<LocalShrine>();
+                goal1.transform.parent = tileObj.transform;
                 break;
 
             case "2Goal":
-                Instantiate(gameAssets.Goals[1], new Vector3(x, 0f, z), Quaternion.identity);
+                GameObject goal2 = Instantiate(gameAssets.Goals[1], new Vector3(x, 0f, z), Quaternion.identity);
+                tileObj.shrine = goal2.GetComponent<LocalShrine>();
+                goal2.transform.parent = tileObj.transform;
                 break;
 
             case "3Goal":
-                Instantiate(gameAssets.Goals[2], new Vector3(x, 0f, z), Quaternion.identity);
+                GameObject goal3 = Instantiate(gameAssets.Goals[2], new Vector3(x, 0f, z), Quaternion.identity);
+                tileObj.shrine = goal3.GetComponent<LocalShrine>();
+                goal3.transform.parent = tileObj.transform;
                 break;
 
             case "Monster1":
