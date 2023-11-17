@@ -7402,6 +7402,7 @@ GameObject:
   - component: {fileID: 1618205931}
   - component: {fileID: 1618205930}
   - component: {fileID: 1618205929}
+  - component: {fileID: 1618205932}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -7434,6 +7435,7 @@ MonoBehaviour:
   monsterConfigs:
   - {fileID: 11400000, guid: e723aa6405680499d97c2d73e1e96a99, type: 2}
   - {fileID: 11400000, guid: c11dc880b9f0e414fb0e611dd1add381, type: 2}
+  - {fileID: 11400000, guid: 497c12a0bcb59144fb203cb22d63f7ce, type: 2}
   tileSize: 1
   tileGapLength: 0.05
   maskOn: 1
@@ -7481,6 +7483,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1618205932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1618205928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00c89b4af6b7aab40bf19f2510541c2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1620771011
 GameObject:
   m_ObjectHideFlags: 0
