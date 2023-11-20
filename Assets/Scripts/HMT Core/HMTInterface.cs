@@ -151,7 +151,7 @@ namespace HMT {
             switch (command.command) {
                 case "get_state":
                     string response = GetState();
-                    command.SendOKResponse(response);
+                    command.SendOKResponse("Full State", response);
                     yield break;
                 case "execute_action":
                     //TODO this is just a stub API for now. Actions' will likely be much more complex.
@@ -238,13 +238,13 @@ namespace HMT {
         public JObject json;
         public WebSocketBehavior originService;
 
-        public void SendOKResponse(string message) {
-            string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"OK\", \"message\":\"{1}\"}}", command, message);
+        public void SendOKResponse(string message, string content = "") {
+            string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"OK\", \"message\":\"{1}\", \"content\":{2}}", command, message, content);
             originService.Context.WebSocket.Send(mess);
         }
 
-        public void SendErrorResponse(string message) {
-            string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"ERROR\", \"message\":\"{1}\"}}", command, message);
+        public void SendErrorResponse(string message, string content = "") {
+            string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"ERROR\", \"message\":\"{1}\", \"content\":{2}}}", command, message, content);
             originService.Context.WebSocket.Send(mess);
         }
     }
