@@ -4700,7 +4700,10 @@ MonoBehaviour:
   url: ws://localhost
   socketPort: 4649
   serviceName: hmt
-  serviceTargets: []
+  serviceTargets:
+  - dwarf
+  - giant
+  - human
   IgnoreScenes: []
   giantID: 0
   dwarfID: 1
