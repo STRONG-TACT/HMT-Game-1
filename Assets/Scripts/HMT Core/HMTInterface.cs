@@ -196,9 +196,6 @@ namespace HMT {
             }
             Command newCommand = new Command();
 
-            
-
-
             newCommand.target = this.Context.RequestUri.Segments[Context.RequestUri.Segments.Length - 1];
             newCommand.command = json["command"].ToString();
             newCommand.json = json;
@@ -239,7 +236,7 @@ namespace HMT {
         public WebSocketBehavior originService;
 
         public void SendOKResponse(string message, string content = "") {
-            string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"OK\", \"message\":\"{1}\", \"content\":{2}}", command, message, content);
+            string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"OK\", \"message\":\"{1}\", \"content\":{2} }}", command, message, content);
             originService.Context.WebSocket.Send(mess);
         }
 
