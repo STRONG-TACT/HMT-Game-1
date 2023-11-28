@@ -297,7 +297,6 @@ public class LocalGameManager : MonoBehaviour
             }
             bool doneMoving;
             do {
-                
                 doneMoving = true;
                 foreach (LocalCharacter chara in inSceneCharacters) {
                     if (chara.moving) {
@@ -310,7 +309,6 @@ public class LocalGameManager : MonoBehaviour
             if (eventQueue.Count != 0) {
                 yield return ExecuteCombatOneByOne();
                 //hasCombat = true;
-                break;
             }
 
             allCharactersDone = true;
@@ -515,6 +513,7 @@ public class LocalGameManager : MonoBehaviour
     // When chara fail a combat, clear all the remaining moves in queue this round
     private void clearCharacterMoves(List<LocalCharacter> charaList ) {
         foreach (LocalCharacter c in charaList) {
+            //Debug.LogFormat("Clear plan: {0}", c.name);
             c.ActionPlan.Clear();
         }
     }
