@@ -455,7 +455,8 @@ public class LocalGameManager : MonoBehaviour
                 switch (t.tileType) {
                     case LocalTile.ObstacleType.None:
                         reduceCharacterHealth(t.charaList, deadChara, aliveChara);
-                        if (gameStatus == GameStatus.Player_Moving) {
+                        if (gameStatus == GameStatus.Player_Moving)
+                        {
                             clearCharacterMoves(t.charaList);
                         }
                         break;
@@ -481,8 +482,19 @@ public class LocalGameManager : MonoBehaviour
                 foreach (LocalCharacter c in deadChara) {
                     t.charaList.Remove(c);
                 }
-                foreach (LocalCharacter c in aliveChara) {
-                    c.Retreat();
+                if (gameStatus == GameStatus.Player_Moving)
+                {
+                    foreach (LocalCharacter c in aliveChara)
+                    {
+                        c.Retreat();
+                    }
+                }
+                else if (gameStatus == GameStatus.Monster_Moving && aliveChara.Count > 0)
+                {
+                    foreach (LocalMonster m in t.enemyList)
+                    {
+                        m.Retreat();
+                    }
                 }
             }
 

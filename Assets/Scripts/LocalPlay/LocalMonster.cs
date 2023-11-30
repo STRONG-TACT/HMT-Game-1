@@ -163,6 +163,12 @@ public class LocalMonster : MonoBehaviour
         yield break;
     }
 
+    public void Retreat()
+    {
+        this.transform.position = prevMovePointPos;
+        movePoint = prevMovePointPos;
+    }
+
     public void Kill(float stepTime) {
         State = CharacterState.Die;
         StartCoroutine(KillCoroutine(stepTime));
