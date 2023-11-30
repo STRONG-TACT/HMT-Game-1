@@ -207,6 +207,7 @@ public class LocalGameManager : MonoBehaviour
 
         if (remainingCharacterCount > 0) {
             SwitchCharacter(0);
+            CheckPlanPhaseEnd();
         }
         else {
             StartCharacterMovingPhase();
