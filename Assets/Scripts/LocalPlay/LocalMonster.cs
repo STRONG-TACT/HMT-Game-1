@@ -42,22 +42,22 @@ public class LocalMonster : MonoBehaviour
                 {
                     case CharacterState.Idle:
                         animator.SetBool("Idle", true);
-                        animator.SetBool("Attack", false);
+                        animator.SetBool("Attacking", false);
                         animator.SetBool("Walk", false);
                         break;
                     case CharacterState.Walking:
                         animator.SetBool("Idle", false);
-                        animator.SetBool("Attack", false);
+                        animator.SetBool("Attacking", false);
                         animator.SetBool("Walk", true);
                         break;
                     case CharacterState.Attacking:
                         animator.SetBool("Idle", false);
-                        animator.SetBool("Attack", true);
+                        animator.SetBool("Attacking", true);
                         animator.SetBool("Walk", false);
                         break;
                     case CharacterState.Die:
                         animator.SetBool("Idle", false);
-                        animator.SetBool("Attack", false);
+                        animator.SetBool("Attacking", false);
                         animator.SetBool("Walk", false);
                         animator.SetBool("Die", true);
                         break;

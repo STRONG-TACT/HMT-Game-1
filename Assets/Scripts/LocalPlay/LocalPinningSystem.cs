@@ -92,49 +92,73 @@ public class LocalPinningSystem : MonoBehaviour
     public void Danger()
     {
         //pinWheel.transform.GetChild(0).GetComponent<Image>().sprite = pinWheelBtnPressedImg[0];
-        AddPin(dangerPinPrefab, focusedTile, LocalGameManager.Instance.player.myCharacter);
-        LocalGameManager.Instance.newPlayerPin();
+        if (LocalGameManager.Instance.player.myCharacter.ActionPointsRemaining > 0)
+        {
+            AddPin(dangerPinPrefab, focusedTile, LocalGameManager.Instance.player.myCharacter);
+            LocalGameManager.Instance.newPlayerPin();
+        }
     }
 
     public void DangerAt(int x, int y, LocalCharacter placingCharacter) {
-        LocalTile targetTile = MapGenerator.Instance.Map[x, y];
-        AddPin(dangerPinPrefab, targetTile, placingCharacter, false);
+        if (LocalGameManager.Instance.player.myCharacter.ActionPointsRemaining > 0)
+        {
+            LocalTile targetTile = MapGenerator.Instance.Map[x, y];
+            AddPin(dangerPinPrefab, targetTile, placingCharacter, false);
+        }
     }
 
     public void Assist()
     {
         //pinWheel.transform.GetChild(1).GetComponent<Image>().sprite = pinWheelBtnPressedImg[1];
-        AddPin(assistPinPrefab, focusedTile, LocalGameManager.Instance.player.myCharacter);
-        LocalGameManager.Instance.newPlayerPin();
+        if (LocalGameManager.Instance.player.myCharacter.ActionPointsRemaining > 0)
+        {
+            AddPin(assistPinPrefab, focusedTile, LocalGameManager.Instance.player.myCharacter);
+            LocalGameManager.Instance.newPlayerPin();
+        }
     }
 
     public void AssistAt(int x, int y, LocalCharacter placingCharacter) {
-        LocalTile targetTile = MapGenerator.Instance.Map[x, y];
-        AddPin(assistPinPrefab, targetTile, placingCharacter, false);
+        if (LocalGameManager.Instance.player.myCharacter.ActionPointsRemaining > 0)
+        {
+            LocalTile targetTile = MapGenerator.Instance.Map[x, y];
+            AddPin(assistPinPrefab, targetTile, placingCharacter, false);
+        }
     }
 
     public void OMW()
     {
         //pinWheel.transform.GetChild(2).GetComponent<Image>().sprite = pinWheelBtnPressedImg[2];
-        AddPin(omwPinPrefab, focusedTile, LocalGameManager.Instance.player.myCharacter);
-        LocalGameManager.Instance.newPlayerPin();
+        if (LocalGameManager.Instance.player.myCharacter.ActionPointsRemaining > 0)
+        {
+            AddPin(omwPinPrefab, focusedTile, LocalGameManager.Instance.player.myCharacter);
+            LocalGameManager.Instance.newPlayerPin();
+        }
     }
 
     public void OMWAt(int x, int y, LocalCharacter placingCharacter) {
-        LocalTile targetTile = MapGenerator.Instance.Map[x, y];
-        AddPin(omwPinPrefab, targetTile, placingCharacter, false);
+        if (LocalGameManager.Instance.player.myCharacter.ActionPointsRemaining > 0)
+        {
+            LocalTile targetTile = MapGenerator.Instance.Map[x, y];
+            AddPin(omwPinPrefab, targetTile, placingCharacter, false);
+        }
     }
 
     public void Unknown()
     {
         //pinWheel.transform.GetChild(3).GetComponent<Image>().sprite = pinWheelBtnPressedImg[3];
-        AddPin(unknownPinPrefab, focusedTile, LocalGameManager.Instance.player.myCharacter);
-        LocalGameManager.Instance.newPlayerPin();
+        if (LocalGameManager.Instance.player.myCharacter.ActionPointsRemaining > 0)
+        {
+            AddPin(unknownPinPrefab, focusedTile, LocalGameManager.Instance.player.myCharacter);
+            LocalGameManager.Instance.newPlayerPin();
+        }
     }
 
     public void UnknownAt(int x, int y, LocalCharacter placingCharacter) {
-        LocalTile targetTile = MapGenerator.Instance.Map[x, y];
-        AddPin(unknownPinPrefab, targetTile, placingCharacter, false);
+        if (LocalGameManager.Instance.player.myCharacter.ActionPointsRemaining > 0)
+        {
+            LocalTile targetTile = MapGenerator.Instance.Map[x, y];
+            AddPin(unknownPinPrefab, targetTile, placingCharacter, false);
+        }
     }
 
     public void AddPin(GameObject pinPrefab, LocalTile targetTile, LocalCharacter placingCharacter, bool isUI=true) {

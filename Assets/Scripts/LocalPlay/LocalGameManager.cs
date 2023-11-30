@@ -410,7 +410,18 @@ public class LocalGameManager : MonoBehaviour
                     win = Combat.ExecuteCombat(Combat.FightType.Rock, t, uiManager);
                     break;
             }
-
+            //play attack animation for all characters and monster on the tile
+            //make a copy of the characters and monsters that are originally in the tile. So that if a character or monster moves elsewhere, we can still find it
+            List<LocalCharacter> copiedCharacters = new List<LocalCharacter>(t.charaList);
+            List<LocalMonster> copiedEnemies = new List<LocalMonster>(t.enemyList);
+            foreach (LocalCharacter c in copiedCharacters)
+            {
+                c.State = LocalCharacter.CharacterState.Attacking;
+            }
+            foreach (LocalMonster mo in copiedEnemies) {
+                mo.State = LocalMonster.CharacterState.Attacking;
+            }
+                
             if (win) {
                 // if the character(s) won the battle, destory the enemies
                 Debug.Log("Character won.");
@@ -476,7 +487,20 @@ public class LocalGameManager : MonoBehaviour
 
             //TODO this should probably be waiting for a button click in the future.
             yield return new WaitForSeconds(2*excecutionStepTime);
-
+            foreach (LocalCharacter c in copiedCharacters)
+            {
+                if (c != null)
+                {
+                    c.State = LocalCharacter.CharacterState.Idle;
+                }
+            }
+            foreach (LocalMonster mo in copiedEnemies)
+            {
+                if(mo != null)
+                {
+                    mo.State = LocalMonster.CharacterState.Idle;
+                }
+            }
             uiManager.HideCombatUI();
         }
         yield break;
