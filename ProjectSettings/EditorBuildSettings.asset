@@ -36,9 +36,12 @@ EditorBuildSettings:
     path: Assets/Scenes/Game.unity
     guid: f1327528c32d423448726f8f1abf3088
   - enabled: 0
+    path: Assets/Scenes/LocalGame/Local_Level_WithMapGeneration.unity
+    guid: e7909662e8e844214a7268797925404b
+  - enabled: 0
     path: Assets/Scenes/EndGame.unity
     guid: ef4a9b25b8337904fab862bc8fe3682c
   - enabled: 1
-    path: Assets/Scenes/LocalGame/Local_Level_WithMapGeneration.unity
-    guid: e7909662e8e844214a7268797925404b
+    path: Assets/Scenes/LocalGame/Local_Animated.unity
+    guid: 528f45a96ee793547b710d072bd61fb9
   m_configObjects: {}
