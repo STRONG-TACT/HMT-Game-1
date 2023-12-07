@@ -376,6 +376,7 @@ public class LocalGame1Interface : HMTInterface {
                 }
             case "submit":
                 target.ReadyForNextPhase = true;
+                command.SendOKResponse("Pings Submited");
                 manager.CheckPingPhaseEnd();
                 break;
             case "up":
@@ -414,6 +415,7 @@ public class LocalGame1Interface : HMTInterface {
                 yield break;
             case "submit":
                 target.ReadyForNextPhase = true;
+                command.SendOKResponse("Plan Submited");
                 manager.CheckPlanPhaseEnd();
                 break;
             case "up":
