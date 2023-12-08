@@ -255,10 +255,10 @@ namespace HMT {
         public string target;
         public JObject json;
         public bool supressDefault;
-        public void SendOKResponse(string message) {
+        public void SendOKResponse(string message, string content ="") {
             return;    
         }
-        public void SendErrorResponse(string message) {
+        public void SendErrorResponse(string message, string content = "") {
             return;
         }
     }
