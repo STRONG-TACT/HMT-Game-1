@@ -301,28 +301,25 @@ public class LocalCharacter : MonoBehaviour
     private void OnTriggerEnter(Collider col)
     {
         //Debug.LogFormat("Character Hit Trigger: {0}", col.gameObject.tag);
-        switch (col.gameObject.tag)
+        if (col.gameObject.tag == "Goal")
         {
-            case "Goal":
-                //Debug.Log("Triggered Goal");
-                LocalShrine shrine = col.gameObject.GetComponent<LocalShrine>();
-                if(shrine != null && shrine.CheckShrineType(this)) {
-                    LocalGameManager.Instance.GoalReached(CharacterId);
-                }
-                break;
+            //Debug.Log("Triggered Goal");
+            LocalShrine shrine = col.gameObject.GetComponent<LocalShrine>();
+            if (shrine != null && shrine.CheckShrineType(this))
+            {
+                LocalGameManager.Instance.GoalReached(CharacterId);
+            }
+        }
+    }
 
-            case "Door":
-                //Debug.Log("Triggered Door");
-                //After collect all the goal, the door can be stepped and end game
-                if (LocalGameManager.Instance.goalCount == 3)
-                { //take th econditional logic out of the character and move it to the Manager
-                    LocalGameManager.Instance.NextLevel();
-                }
-                break;
-
-            default:
-                //Debug.LogFormat("Character Hit Trigger: {0}", col.gameObject.tag);
-                break;
+    private void OnTriggerStay(Collider col)
+    {
+        if (col.gameObject.tag == "Door")
+        {
+            if (LocalGameManager.Instance.goalCount == 3)
+            { //take th econditional logic out of the character and move it to the Manager
+                LocalGameManager.Instance.NextLevel();
+            }
         }
     }
 
