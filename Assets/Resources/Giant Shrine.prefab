@@ -54,7 +54,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: c55f20224110d477f98b284dae7db91b, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: a548b8b3a74369b49b8abb0474387e39, type: 2}
+      objectReference: {fileID: 2100000, guid: 642276987a8c5324d9f64348ea47bf9a, type: 2}
     - target: {fileID: 919132149155446097, guid: c55f20224110d477f98b284dae7db91b, type: 3}
       propertyPath: m_Name
       value: ShrineStone

@@ -86,9 +86,9 @@ SkinnedMeshRenderer:
   - {fileID: -4402262434076607990, guid: 2115a20f3e0e3410390b09c584cff391, type: 3}
   - {fileID: 426081126853439684, guid: 2115a20f3e0e3410390b09c584cff391, type: 3}
   - {fileID: 4998782044525278437, guid: 2115a20f3e0e3410390b09c584cff391, type: 3}
-  - {fileID: -8238026751118474858, guid: 2115a20f3e0e3410390b09c584cff391, type: 3}
-  - {fileID: 1924278445164864403, guid: 2115a20f3e0e3410390b09c584cff391, type: 3}
-  - {fileID: 7998868024716546197, guid: 2115a20f3e0e3410390b09c584cff391, type: 3}
+  - {fileID: 2100000, guid: 54601a69e5e59435ca70841b6e8d263c, type: 2}
+  - {fileID: 2100000, guid: d18dc46c9bd45446096e529f3e3700d8, type: 2}
+  - {fileID: 2100000, guid: 54601a69e5e59435ca70841b6e8d263c, type: 2}
   - {fileID: 5561349426305759274, guid: 2115a20f3e0e3410390b09c584cff391, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -757,6 +757,7 @@ MonoBehaviour:
   playerId: 1
   config: {fileID: 0}
   CharacterId: 0
+  currentTile: {fileID: 0}
   indicator: {fileID: 3199317867740391378}
   ActionPlan: 
   pingCursor: {x: 0, y: 0}
