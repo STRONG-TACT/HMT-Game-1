@@ -18,6 +18,8 @@ public class LocalUIManager : MonoBehaviour
 
     public GameObject CharacterInfo;
     public Image YouAreInfo;
+    public GameObject[] DiceStats = new GameObject[3];
+    public GameObject[] BonusStats = new GameObject[3];
     public GameObject HealthPanel;
     public GameObject ActionPanel;
 
@@ -27,6 +29,9 @@ public class LocalUIManager : MonoBehaviour
     public TMP_Text PlayerFinalScore;
     public TMP_Text EnemyFinalScore;
     public TMP_Text ResultMessage;
+
+    public GameObject GoalPanel; 
+    public GameObject[] GoalStatus = new GameObject[3];
 
     // Start is called before the first frame update
     void Start()
@@ -43,6 +48,7 @@ public class LocalUIManager : MonoBehaviour
     public void InitGameUI()
     {
         text.text = "Level Starting";
+        GoalPanel.SetActive(true);
     }
 
     public void UpdateGamePhaseInfo()
@@ -79,9 +85,9 @@ public class LocalUIManager : MonoBehaviour
         LocalGameManager.Instance.StartLevel();
     }
 
-    public void ShowCharacterPinUI(int charaID, int health, int movePoints)
+    public void ShowCharacterPinUI(LocalCharacter currentCharacter)
     {
-        switch (charaID)
+        switch (currentCharacter.CharacterId)
         {
             case 0:
                 YouAreInfo.sprite = gameAssets.youAreDwarf;
@@ -96,13 +102,12 @@ public class LocalUIManager : MonoBehaviour
 
         PinFinishBtn.SetActive(true);
         SwitchCharaButton.SetActive(true);
-        CharacterInfo.SetActive(true);
 
         // TODO check the case when health == 0
 
-        UpdateHealthPanel(health);
+        UpdateHealthPanel(currentCharacter.Health);
 
-        UpdateActionPanel(movePoints);
+        UpdateActionPanel(currentCharacter.ActionPointsRemaining);
         //if (!dead)
         //{
         //    PinFinishBtn.SetActive(true);
@@ -114,6 +119,9 @@ public class LocalUIManager : MonoBehaviour
         //    PinFinishBtn.SetActive(true);
         //    SwitchCharaButton.SetActive(true);
         //}
+
+        UpdateCharacterStats(currentCharacter);
+        CharacterInfo.SetActive(true);
     }
 
     public void HideCharacterPinUI()
@@ -125,9 +133,9 @@ public class LocalUIManager : MonoBehaviour
         ActionPanel.SetActive(false);
     }
 
-    public void ShowCharacterPlanUI(int charaID, int health, int movePoints)
+    public void ShowCharacterPlanUI(LocalCharacter currentCharacter)
     {
-        switch (charaID)
+        switch (currentCharacter.CharacterId)
         {
             case 0:
                 YouAreInfo.sprite = gameAssets.youAreDwarf;
@@ -142,13 +150,12 @@ public class LocalUIManager : MonoBehaviour
 
         PlanUI.SetActive(true);
         SwitchCharaButton.SetActive(true);
-        CharacterInfo.SetActive(true);
 
         // TODO check the case when health == 0
 
-        UpdateHealthPanel(health);
+        UpdateHealthPanel(currentCharacter.Health);
 
-        UpdateActionPanel(movePoints);
+        UpdateActionPanel(currentCharacter.ActionPointsRemaining);
 
         //if (!dead) {
         //    PlanUI.SetActive(true);
@@ -160,6 +167,9 @@ public class LocalUIManager : MonoBehaviour
         //    PlanUI.SetActive(true);
         //    SwitchCharaButton.SetActive(true);
         //}
+
+        UpdateCharacterStats(currentCharacter);
+        CharacterInfo.SetActive(true);
     }
 
     public void HideCharacterPlanUI()
@@ -290,5 +300,29 @@ public class LocalUIManager : MonoBehaviour
         }
 
         ActionPanel.gameObject.SetActive(true);
+    }
+
+    private void UpdateCharacterStats(LocalCharacter currentCharacter)
+    {
+        DiceStats[0].GetComponent<Image>().sprite = gameAssets.GetDiceIcon(currentCharacter.config.monsterDice.type);
+        DiceStats[1].GetComponent<Image>().sprite = gameAssets.GetDiceIcon(currentCharacter.config.stoneDice.type);
+        DiceStats[2].GetComponent<Image>().sprite = gameAssets.GetDiceIcon(currentCharacter.config.trapDice.type);
+
+        BonusStats[0].GetComponent<TMP_Text>().text = currentCharacter.config.monsterDice.bonus.ToString();
+        BonusStats[1].GetComponent<TMP_Text>().text = currentCharacter.config.stoneDice.bonus.ToString();
+        BonusStats[2].GetComponent<TMP_Text>().text = currentCharacter.config.trapDice.bonus.ToString();
+    }
+
+    public void UpdateGoalStatus(int CharaID)
+    {
+        GoalStatus[CharaID].GetComponent<Image>().sprite = gameAssets.GetGoalFilled(CharaID);
+    }
+
+    public void ResetGoalStatus()
+    {
+        GoalPanel.SetActive(false);
+        GoalStatus[0].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(0);
+        GoalStatus[1].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(1);
+        GoalStatus[2].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(2);
     }
 }

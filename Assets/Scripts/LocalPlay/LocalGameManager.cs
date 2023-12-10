@@ -145,9 +145,7 @@ public class LocalGameManager : MonoBehaviour
             player.UpdateCharacterUI(0, player.myCharacter);
 
 
-            uiManager.ShowCharacterPinUI(player.myCharacter.CharacterId,
-                                         player.myCharacter.Health,
-                                         player.myCharacter.ActionPointsRemaining);
+            uiManager.ShowCharacterPinUI(player.myCharacter);
         }
         else {
             PreparePlayerPlanningPhase();
@@ -232,7 +230,7 @@ public class LocalGameManager : MonoBehaviour
             player.myCharacter.UnFocusCharacter();
             player.myCharacter = inSceneCharacters[index];
             player.myCharacter.FocusCharacter();
-            uiManager.ShowCharacterPinUI(player.myCharacter.CharacterId, player.myCharacter.Health, player.myCharacter.ActionPointsRemaining);
+            uiManager.ShowCharacterPinUI(player.myCharacter);
             player.UpdateCharacterUI(index, player.myCharacter);
         }
         else if (gameStatus == GameStatus.Player_Planning)
@@ -240,7 +238,7 @@ public class LocalGameManager : MonoBehaviour
             player.myCharacter.UnFocusCharacter();
             player.myCharacter = inSceneCharacters[index];
             player.myCharacter.FocusCharacter();
-            uiManager.ShowCharacterPlanUI(player.myCharacter.CharacterId, player.myCharacter.Health, player.myCharacter.ActionPointsRemaining);
+            uiManager.ShowCharacterPlanUI(player.myCharacter);
             player.UpdateCharacterUI(index, player.myCharacter);
         }
 
@@ -577,6 +575,7 @@ public class LocalGameManager : MonoBehaviour
     // Called by LocalCharacter.OnTriggerEnter(), when a character collide with its goal
     public void GoalReached(int charaID)
     {
+        uiManager.UpdateGoalStatus(charaID);
         goalCount += 1;
     }
 
@@ -606,6 +605,7 @@ public class LocalGameManager : MonoBehaviour
                 Destroy(m.gameObject);
             }
 
+            uiManager.ResetGoalStatus();
             MapGenerator.Instance.LoadLevel(gameData.levelTextFiles[currentLevel - 1]);
 
             StartLevel();
