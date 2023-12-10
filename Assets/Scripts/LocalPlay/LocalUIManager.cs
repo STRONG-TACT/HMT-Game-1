@@ -29,6 +29,8 @@ public class LocalUIManager : MonoBehaviour
     public TMP_Text PlayerFinalScore;
     public TMP_Text EnemyFinalScore;
     public TMP_Text ResultMessage;
+    public GameObject WinBG;
+    public GameObject LoseBG;
 
     public GameObject GoalPanel; 
     public GameObject[] GoalStatus = new GameObject[3];
@@ -242,10 +244,14 @@ public class LocalUIManager : MonoBehaviour
 
         if (win)
         {
+            WinBG.SetActive(true);
+            LoseBG.SetActive(false);
             ResultMessage.text = "You defeated the enemy!";
         }
         else
         {
+            WinBG.SetActive(false);
+            LoseBG.SetActive(true);
             ResultMessage.text = "Oops...";
         }
 
