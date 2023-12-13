@@ -366,6 +366,50 @@ public class LocalGameManager : MonoBehaviour
                 break;
             }
 
+            //after all combat done, if multiple monster oppcuies the same tile, they move until every tile contains at most 1 monster
+            foreach (LocalMonster mon in inSceneMonsters)
+            {
+                LocalTile currentTile = mon.currentTile;
+                if (currentTile.enemyList.Count > 1)
+                {
+                    int startRow = currentTile.row;
+                    int startCol = currentTile.col;
+                    bool foundSpot = false;
+                    //move monster to nearest avaiable tile where there is no character and no other monster on it
+                    for (int distance = 1; distance < Math.Max(MapGenerator.Instance.Map.GetLength(0), MapGenerator.Instance.Map.GetLength(1)); distance++)
+                    {
+                        if(!foundSpot)
+                        {
+                            List<LocalTile> availablePos = new List<LocalTile>();
+                            for (int rowOffset = distance * -1; rowOffset < distance + 1; rowOffset++)
+                            {
+                                for (int colOffset = distance * -1; colOffset < distance + 1; colOffset++)
+                                {
+                                    int targetRow = startRow + rowOffset;
+                                    int targetCol = startCol + colOffset;
+                                    if (MapGenerator.Instance.InMap(targetRow, targetCol))
+                                    {
+                                        LocalTile targetTile = MapGenerator.Instance.GetTileAt(targetRow, targetCol);
+                                        if (targetTile.tileType == LocalTile.ObstacleType.None && targetTile.enemyList.Count == 0 && targetTile.charaList.Count == 0)
+                                        {
+                                            availablePos.Add(targetTile);
+                                        }
+                                    }
+                                }
+                            }
+                            if (availablePos.Count > 0)
+                            {
+                                foundSpot = true;
+                                //select a random tile in the avaiable positions to move
+                                int randomIndex = UnityEngine.Random.Range(0, availablePos.Count);
+                                LocalTile selectedTile = availablePos[randomIndex];
+                                yield return StartCoroutine(mon.moveToTargetLocation(selectedTile.transform.position, excecutionStepTime));
+                            }
+                        }
+                    }
+                }
+            }
+
             allMonstersDone = true;
             foreach(LocalMonster m in inSceneMonsters) {
                 if (!m.turnFinished) {
@@ -383,6 +427,7 @@ public class LocalGameManager : MonoBehaviour
         }
         StartPlayerTurn();
     }
+
 
     // Execute all the events happened within one step time
     // Combat.ExecuteCombat() is the actual combat function

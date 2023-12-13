@@ -163,6 +163,35 @@ public class LocalMonster : MonoBehaviour
         yield break;
     }
 
+    public IEnumerator moveToTargetLocation(Vector3 target, float stepTime)
+    {
+        float timeStart = Time.time;
+
+        State = CharacterState.Walking;
+        Vector3 origin = transform.position;
+        //Vector3 target = transform.position + moveVec * stepLength;
+        Vector3 direction = target - origin;
+        // Normalize the direction
+        direction.Normalize();
+        if (direction != Vector3.zero)
+        {
+            // Create a rotation that looks in the direction of movement
+            moving = true;
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            model.rotation = targetRotation;
+            while (Time.time - timeStart < stepTime)
+            {
+                float t = (Time.time - timeStart) / stepTime;
+                transform.position = Vector3.Lerp(origin, target, t);
+                yield return null;
+            }
+            transform.position = target;
+            model.rotation = targetRotation;
+        }
+        State = CharacterState.Idle;
+        moving = false;
+    }
+
     public void Retreat()
     {
         this.transform.position = prevMovePointPos;
@@ -265,8 +294,13 @@ public class LocalMonster : MonoBehaviour
             LocalCharacter.Direction.Right => Vector3.right,
             _ => Vector3.forward
         };
-
-        return !Physics.Raycast(this.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible"));
+        bool passible = true;
+        if (Physics.Raycast(this.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible")) ) 
+        {
+            passible = false;
+        }
+        //return !Physics.Raycast(this.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible"));
+        return passible;
     }
 
     public JObject HMTStateRep() {
