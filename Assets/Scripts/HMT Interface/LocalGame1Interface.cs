@@ -356,18 +356,22 @@ public class LocalGame1Interface : HMTInterface {
                 switch (pinType) {
                     case 0:
                         LocalPinningSystem.Instance.DangerAt(pos.x, pos.y, target);
+                        target.PlacePin();
                         command.SendOKResponse("Ping Placed");
                         yield break;
                     case 1:
                         LocalPinningSystem.Instance.AssistAt(pos.x, pos.y, target);
+                        target.PlacePin();
                         command.SendOKResponse("Ping Placed");
                         yield break;
                     case 2:
                         LocalPinningSystem.Instance.OMWAt(pos.x, pos.y, target);
+                        target.PlacePin();
                         command.SendOKResponse("Ping Placed");
                         yield break;
                     case 3:
                         LocalPinningSystem.Instance.UnknownAt(pos.x, pos.y, target);
+                        target.PlacePin();
                         command.SendOKResponse("Ping Placed");
                         yield break;
                     default:
