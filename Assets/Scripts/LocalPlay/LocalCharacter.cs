@@ -26,7 +26,11 @@ public class LocalCharacter : MonoBehaviour
 
     public LocalTile currentTile;
 
+    private float path_indicator_offset;
+    public GameObject path_indicator;
     public GameObject indicator;
+    private Stack<GameObject> path_indicator_list = new Stack<GameObject>();
+    private List<Vector3> path_indicator_positions = new List<Vector3>();
     public List<Direction> ActionPlan = new List<Direction>();
     // how many moves that the character left in this turn
     //private int actionPointsLeft;
@@ -35,6 +39,14 @@ public class LocalCharacter : MonoBehaviour
     public Vector2Int pingCursor;
     private int pinsPlaced = 0;
 
+
+    private Vector3 RoundPosition(Vector3 position, float precision)
+    {
+        float x = Mathf.Round(position.x / precision) * precision;
+        float y = Mathf.Round(position.y / precision) * precision;
+        float z = Mathf.Round(position.z / precision) * precision;
+        return new Vector3(x, y, z);
+    }
 
     public int ActionPointsRemaining {
         get {
@@ -129,7 +141,7 @@ public class LocalCharacter : MonoBehaviour
         this.config = config;
         this.maskOn = gameData.maskOn;
         CharacterId = characterId;
-
+        path_indicator_offset = gameData.tileSize * 0.15f;
         stepLength = gameData.tileSize + gameData.tileGapLength;
 
         characterMask = transform.Find("CharacterMask");
@@ -167,12 +179,20 @@ public class LocalCharacter : MonoBehaviour
         MaskControl(true);
         if(LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Planning) {
             indicator.SetActive(true);
+            foreach (GameObject one_path_indicator in path_indicator_list)
+            {
+                one_path_indicator.SetActive(true); 
+            }
         }
     }
 
     public void UnFocusCharacter() {
         MaskControl(false);
         indicator.SetActive(false);
+        foreach (GameObject one_path_indicator in path_indicator_list)
+        {
+            one_path_indicator.SetActive(false);
+        }
     }
 
     public void StartPingPhase() {
@@ -195,8 +215,21 @@ public class LocalCharacter : MonoBehaviour
             Direction.Right => Vector3.right,
             _ => Vector3.zero,
         };
+        Vector3 old_indicator_position = indicator.transform.position;
 
         indicator.transform.position += moveVec * stepLength;
+        Vector3 midpoint = (old_indicator_position + indicator.transform.position) / 2;
+        Vector3 path_indicator_direction = (indicator.transform.position - old_indicator_position).normalized;
+        midpoint = RoundPosition(midpoint, 0.001f);
+        while (path_indicator_positions.Contains(midpoint))
+        {
+            midpoint += (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) * path_indicator_offset;
+        }
+        path_indicator_positions.Add(midpoint);
+        GameObject new_path_indicator = Instantiate(path_indicator, midpoint, Quaternion.LookRotation(path_indicator_direction));
+
+        new_path_indicator.transform.Rotate(90, 0, 0);
+        path_indicator_list.Push(new_path_indicator);
         ActionPlan.Add(direction);
         return true;
     }
@@ -227,6 +260,12 @@ public class LocalCharacter : MonoBehaviour
     public void EndPlanning() {
         indicator.transform.position = this.transform.position;
         indicator.SetActive(false);
+        while (path_indicator_list.Count > 0)
+        {
+            GameObject one_path_indicator = path_indicator_list.Pop(); 
+            Destroy(one_path_indicator); 
+        }
+        path_indicator_positions.Clear();
     }
 
     
@@ -244,6 +283,10 @@ public class LocalCharacter : MonoBehaviour
             _ => Vector3.zero
         };
         indicator.transform.position += -moveVec * stepLength;
+        GameObject one_path_indicator = path_indicator_list.Pop();
+        //Vector3 one_path_indicator_position = RoundPosition(one_path_indicator.transform.position, 0.001f);
+        path_indicator_positions.Remove(one_path_indicator.transform.position);
+        Destroy(one_path_indicator); 
 
         // TODO: Think about the best way to call ui manager
         FindObjectOfType<LocalUIManager>().UpdateActionPointsRemaining(ActionPointsRemaining);
