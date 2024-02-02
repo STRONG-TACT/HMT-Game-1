@@ -215,21 +215,25 @@ public class LocalCharacter : MonoBehaviour
             Direction.Right => Vector3.right,
             _ => Vector3.zero,
         };
-        Vector3 old_indicator_position = indicator.transform.position;
-
-        indicator.transform.position += moveVec * stepLength;
-        Vector3 midpoint = (old_indicator_position + indicator.transform.position) / 2;
-        Vector3 path_indicator_direction = (indicator.transform.position - old_indicator_position).normalized;
-        midpoint = RoundPosition(midpoint, 0.001f);
-        while (path_indicator_positions.Contains(midpoint))
+        if (direction != LocalCharacter.Direction.Wait)
         {
-            midpoint += (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) * path_indicator_offset;
-        }
-        path_indicator_positions.Add(midpoint);
-        GameObject new_path_indicator = Instantiate(path_indicator, midpoint, Quaternion.LookRotation(path_indicator_direction));
+            Vector3 old_indicator_position = indicator.transform.position;
 
-        new_path_indicator.transform.Rotate(90, 0, 0);
-        path_indicator_list.Push(new_path_indicator);
+            indicator.transform.position += moveVec * stepLength;
+            Vector3 midpoint = (old_indicator_position + indicator.transform.position) / 2;
+            Vector3 path_indicator_direction = (indicator.transform.position - old_indicator_position).normalized;
+            midpoint = RoundPosition(midpoint, 0.001f);
+            while (path_indicator_positions.Contains(midpoint))
+            {
+                midpoint += (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) * path_indicator_offset;
+            }
+            path_indicator_positions.Add(midpoint);
+            GameObject new_path_indicator = Instantiate(path_indicator, midpoint, Quaternion.LookRotation(path_indicator_direction));
+
+            new_path_indicator.transform.Rotate(90, 0, 0);
+            path_indicator_list.Push(new_path_indicator);
+        }
+
         ActionPlan.Add(direction);
         return true;
     }
@@ -283,10 +287,14 @@ public class LocalCharacter : MonoBehaviour
             _ => Vector3.zero
         };
         indicator.transform.position += -moveVec * stepLength;
-        GameObject one_path_indicator = path_indicator_list.Pop();
-        //Vector3 one_path_indicator_position = RoundPosition(one_path_indicator.transform.position, 0.001f);
-        path_indicator_positions.Remove(one_path_indicator.transform.position);
-        Destroy(one_path_indicator); 
+        if(lastMove != LocalCharacter.Direction.Wait)
+        {
+            GameObject one_path_indicator = path_indicator_list.Pop();
+            //Vector3 one_path_indicator_position = RoundPosition(one_path_indicator.transform.position, 0.001f);
+            path_indicator_positions.Remove(one_path_indicator.transform.position);
+            Destroy(one_path_indicator);
+        }
+
 
         // TODO: Think about the best way to call ui manager
         FindObjectOfType<LocalUIManager>().UpdateActionPointsRemaining(ActionPointsRemaining);
