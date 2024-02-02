@@ -433,10 +433,10 @@ public class LocalCharacter : MonoBehaviour
                     pingCursor += Vector2Int.down;
                     break;
                 case "left":
-                    pingCursor = Vector2Int.left;
+                    pingCursor += Vector2Int.left;
                     break;
                 case "right":
-                    pingCursor = Vector2Int.right;
+                    pingCursor += Vector2Int.right;
                     break;
                 default:
                     return false;
