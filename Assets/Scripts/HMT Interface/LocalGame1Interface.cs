@@ -11,10 +11,13 @@ using System.Linq;
 public class LocalGame1Interface : HMTInterface {
 
     [Header("Game Specific Settings")]
-    public string[] IgnoreScenes; 
+    public string[] IgnoreScenes;
 
-    public int giantID = 0;
-    public int dwarfID = 1;
+    [Tooltip("The Index of the Dwarf Character in the GameManager's inScheneCharaters Array")]
+    public int dwarfID = 0;
+    [Tooltip("The Index of the Giant Character in the GameManager's inScheneCharaters Array")]
+    public int giantID = 1;
+    [Tooltip("The Index of the Human Character in the GameManager's inScheneCharaters Array")]
     public int humanID = 2;
 
     GameData gameData;
@@ -423,55 +426,20 @@ public class LocalGame1Interface : HMTInterface {
                 manager.CheckPlanPhaseEnd();
                 break;
             case "up":
-                if(target.ActionPointsRemaining > 0) {
-                    target.AddActionToPlan(LocalCharacter.Direction.Up);
-                    command.SendOKResponse("Action Added");
-                    yield break;
-                }
-                else {
-                    command.SendErrorResponse("Out of Action Points");
-                    yield break;
-                }
+                CheckAndAddMove(target, LocalCharacter.Direction.Up, command);
+                yield break;
             case "down":
-                 if (target.ActionPointsRemaining > 0) {
-                    target.AddActionToPlan(LocalCharacter.Direction.Down);
-                    command.SendOKResponse("Action Added");
-                    yield break;
-                }
-                else {
-                    command.SendErrorResponse("Out of Action Points");
-                    yield break;
-                }
+                CheckAndAddMove(target, LocalCharacter.Direction.Down, command);
+                yield break;
             case "left":
-                if (target.ActionPointsRemaining > 0) {
-                    target.AddActionToPlan(LocalCharacter.Direction.Left);
-                    command.SendOKResponse("Action Added");
-                    yield break;
-                }
-                else {
-                    command.SendErrorResponse("Out of Action Points");
-                    yield break;
-                }
+                CheckAndAddMove(target, LocalCharacter.Direction.Left, command);
+                yield break;
             case "right":
-                if (target.ActionPointsRemaining > 0) {
-                    target.AddActionToPlan(LocalCharacter.Direction.Right);
-                    command.SendOKResponse("Action Added");
-                    yield break;
-                }
-                else {
-                    command.SendErrorResponse("Out of Action Points");
-                    yield break;
-                }
+                CheckAndAddMove(target, LocalCharacter.Direction.Right, command);
+                yield break;
             case "wait":
-                if (target.ActionPointsRemaining > 0) {
-                    target.AddActionToPlan(LocalCharacter.Direction.Wait);
-                    command.SendOKResponse("Action Added");
-                    yield break;
-                }
-                else {
-                    command.SendErrorResponse("Out of Action Points");
-                    yield break;
-                }
+                CheckAndAddMove(target, LocalCharacter.Direction.Wait, command);
+                yield break;
             case "undo":
                 if (!target.ReadyForNextPhase) {
                     target.UndoPlanStep();
@@ -489,4 +457,19 @@ public class LocalGame1Interface : HMTInterface {
         yield break;
     }
 
+
+    private void CheckAndAddMove(LocalCharacter target, LocalCharacter.Direction move , Command command) {
+        if (target.ActionPointsRemaining > 0) {
+            if (target.CheckMove(move)) {
+                target.AddActionToPlan(move);
+                command.SendOKResponse("Action Added");
+            }
+            else {
+                command.SendErrorResponse("Illegal Move, Target is Impassible");
+            }
+        }
+        else {
+            command.SendErrorResponse("Illegal Move, Out of Action Points");
+        }
+    }
 }
