@@ -26,9 +26,12 @@ public class LocalCharacter : MonoBehaviour
 
     public LocalTile currentTile;
 
+    private Vector3 indicator_offset;
     private float path_indicator_offset;
     public GameObject path_indicator;
     public GameObject indicator;
+    public GameObject combat_indicator;
+    private Stack<GameObject> combat_indicator_list = new Stack<GameObject>();
     private Stack<GameObject> path_indicator_list = new Stack<GameObject>();
     private List<Vector3> path_indicator_positions = new List<Vector3>();
     public List<Direction> ActionPlan = new List<Direction>();
@@ -143,7 +146,10 @@ public class LocalCharacter : MonoBehaviour
         CharacterId = characterId;
         path_indicator_offset = gameData.tileSize * 0.15f;
         stepLength = gameData.tileSize + gameData.tileGapLength;
-
+        
+        indicator_offset = new Vector3(0.1f, 0.5f, -0.1f) * gameData.tileSize;
+        Debug.Log(indicator_offset);
+        indicator.transform.position += indicator_offset;
         characterMask = transform.Find("CharacterMask");
         visibilityMask = transform.Find("VisibleMask");
         ResetActionPoints();
@@ -183,6 +189,10 @@ public class LocalCharacter : MonoBehaviour
             {
                 one_path_indicator.SetActive(true); 
             }
+            foreach (GameObject one_combat_indicator in combat_indicator_list)
+            {
+                one_combat_indicator.SetActive(true);
+            }
         }
     }
 
@@ -192,6 +202,10 @@ public class LocalCharacter : MonoBehaviour
         foreach (GameObject one_path_indicator in path_indicator_list)
         {
             one_path_indicator.SetActive(false);
+        }
+        foreach (GameObject one_combat_indicator in combat_indicator_list)
+        {
+            one_combat_indicator.SetActive(false);
         }
     }
 
@@ -217,20 +231,35 @@ public class LocalCharacter : MonoBehaviour
         };
         if (direction != LocalCharacter.Direction.Wait)
         {
-            Vector3 old_indicator_position = indicator.transform.position;
 
+            Vector3 old_indicator_position = indicator.transform.position;
             indicator.transform.position += moveVec * stepLength;
             Vector3 midpoint = (old_indicator_position + indicator.transform.position) / 2;
             Vector3 path_indicator_direction = (indicator.transform.position - old_indicator_position).normalized;
             midpoint = RoundPosition(midpoint, 0.001f);
+            midpoint -= (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) * 0.4f*path_indicator_offset;
+            //midpoint += (Vector3.Cross(path_indicator_direction, Vector3.back).normalized)  * path_indicator_offset;
             while (path_indicator_positions.Contains(midpoint))
             {
-                midpoint += (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) * path_indicator_offset;
+                midpoint -= (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) *path_indicator_offset;
             }
+
+            RaycastHit hit;
+            // Raycast downwards from the indicator's position
+            if (Physics.Raycast(indicator.transform.position, -Vector3.up, out hit))
+            {
+                if (hit.collider.gameObject.tag == "Monster") {
+                    Vector3 combat_indicator_position = indicator.transform.position + indicator_offset;
+                    GameObject new_combat_indicator = Instantiate(combat_indicator, combat_indicator_position, Quaternion.identity);
+                    combat_indicator_list.Push(new_combat_indicator);
+                }
+            }
+
             path_indicator_positions.Add(midpoint);
             GameObject new_path_indicator = Instantiate(path_indicator, midpoint, Quaternion.LookRotation(path_indicator_direction));
 
-            new_path_indicator.transform.Rotate(90, 0, 0);
+            new_path_indicator.transform.Rotate(0, -180, 0);
+            new_path_indicator.transform.position = midpoint;
             path_indicator_list.Push(new_path_indicator);
         }
 
@@ -263,11 +292,17 @@ public class LocalCharacter : MonoBehaviour
 
     public void EndPlanning() {
         indicator.transform.position = this.transform.position;
+        indicator.transform.position += indicator_offset;
         indicator.SetActive(false);
         while (path_indicator_list.Count > 0)
         {
             GameObject one_path_indicator = path_indicator_list.Pop(); 
             Destroy(one_path_indicator); 
+        }
+        while (combat_indicator_list.Count > 0)
+        {
+            GameObject one_combat_indicator = combat_indicator_list.Pop();
+            Destroy(one_combat_indicator);
         }
         path_indicator_positions.Clear();
     }
@@ -286,16 +321,23 @@ public class LocalCharacter : MonoBehaviour
             Direction.Right => Vector3.right,
             _ => Vector3.zero
         };
-        indicator.transform.position += -moveVec * stepLength;
-        if(lastMove != LocalCharacter.Direction.Wait)
+        if (lastMove != LocalCharacter.Direction.Wait)
         {
             GameObject one_path_indicator = path_indicator_list.Pop();
             //Vector3 one_path_indicator_position = RoundPosition(one_path_indicator.transform.position, 0.001f);
             path_indicator_positions.Remove(one_path_indicator.transform.position);
             Destroy(one_path_indicator);
+            RaycastHit hit;
+            if (Physics.Raycast(indicator.transform.position, -Vector3.up, out hit))
+            {
+                if (hit.collider.gameObject.tag == "Monster")
+                {
+                    GameObject one_combat_indicator = combat_indicator_list.Pop();
+                    Destroy(one_combat_indicator);
+                }
+            }
         }
-
-
+        indicator.transform.position += -moveVec * stepLength;
         // TODO: Think about the best way to call ui manager
         FindObjectOfType<LocalUIManager>().UpdateActionPointsRemaining(ActionPointsRemaining);
         return true;
