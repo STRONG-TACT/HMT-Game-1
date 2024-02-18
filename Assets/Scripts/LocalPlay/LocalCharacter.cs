@@ -153,14 +153,17 @@ public class LocalCharacter : MonoBehaviour
         characterMask = transform.Find("CharacterMask");
         visibilityMask = transform.Find("VisibleMask");
         ResetActionPoints();
-        
-        Vector3 cellScale = new Vector3(gameData.tileSize + 2 * gameData.tileGapLength,
-                                         0,
-                                         gameData.tileSize + 2 * gameData.tileGapLength);
-        Vector3 globalCellScale = new Vector3(cellScale.x / transform.lossyScale.x, cellScale.y / transform.lossyScale.y, cellScale.z / transform.lossyScale.z);
 
+        /*
+        Vector3 cellScale = new Vector3(gameData.tileSize + 2 * gameData.tileGapLength, 0, gameData.tileSize + 2 * gameData.tileGapLength);
+        Vector3 globalCellScale = new Vector3(cellScale.x / transform.lossyScale.x, cellScale.y / transform.lossyScale.y, cellScale.z / transform.lossyScale.z);
         characterMask.localScale = globalCellScale;
-        visibilityMask.localScale = globalCellScale*(config.sightRange*2f+1f-0.1f);
+        visibilityMask.localScale = globalCellScale*(config.sightRange*2f+1f);
+        */
+        float maskScale = gameData.tileSize * (config.sightRange * 2f + 1f) + gameData.tileGapLength * (config.sightRange * 2f);
+        characterMask.localScale = new Vector3(gameData.tileSize, 0, gameData.tileSize);
+        visibilityMask.localScale = new Vector3(maskScale,0,maskScale);
+
         //characterMask.localScale = cellScale;
         //visibilityMask.localScale = cellScale * config.sightRange;
     }
@@ -183,7 +186,8 @@ public class LocalCharacter : MonoBehaviour
 
     public void FocusCharacter() {
         MaskControl(true);
-        if(LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Planning) {
+        MapGenerator.Instance.updateFogOfWar_map(CharacterId);
+        if (LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Planning) {
             indicator.SetActive(true);
             foreach (GameObject one_path_indicator in path_indicator_list)
             {

@@ -67,6 +67,7 @@ MonoBehaviour:
   enemyList: []
   charaList: []
   pinList: []
+  shrine: {fileID: 0}
 --- !u!1001 &5489681041711999487
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -130,9 +131,61 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8551654070373378105, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -4405099995303774716, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3540495426589365078, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3137722172632951806, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -2874765826992384646, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -2519092360280523269, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1640387438592477178, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1558721567721526513, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: f8abd5794a083409fb1080946f19de96, type: 3}
       propertyPath: m_Name
       value: pond1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1835210009659533079, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7103153012782714218, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8578709097331664583, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9141816029861474070, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_TagString
+      value: TileGround
+      objectReference: {fileID: 0}
+    - target: {fileID: 9217234437682292332, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f8abd5794a083409fb1080946f19de96, type: 3}

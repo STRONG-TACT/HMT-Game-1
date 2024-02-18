@@ -17,6 +17,8 @@ TagManager:
   - Door
   - Corner
   - Character
+  - VisibleMask
+  - TileGround
   layers:
   - Default
   - TransparentFX
@@ -27,7 +29,7 @@ TagManager:
   - Ground
   - Dice
   - Impassible
-  - 
+  - NoCollision
   - 
   - 
   - 
