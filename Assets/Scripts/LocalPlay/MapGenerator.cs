@@ -42,6 +42,11 @@ public class MapGenerator : MonoBehaviour
         LoadLevel(gameData.levelTextFiles[0]);
     }
 
+    public void updateFogOfWar_map(int characterID) {
+        foreach (LocalTile tile in Map) {
+            tile.updateFogOfWar_tile(characterID);
+        }
+    }
 
     public LocalTile GetTileAt(int x, int y) {
         if (!InMap(x, y)) { 
@@ -191,6 +196,10 @@ public class MapGenerator : MonoBehaviour
             LocalTile tile = tileObj.GetComponent<LocalTile>();
             tile.row = row;
             tile.col = col;
+            tile.fogOfWarDictionary = new Dictionary<int, LocalTile.FogOfWarState>();
+            tile.fogOfWarDictionary.Add(0, LocalTile.FogOfWarState.Unseen);
+            tile.fogOfWarDictionary.Add(1, LocalTile.FogOfWarState.Unseen);
+            tile.fogOfWarDictionary.Add(2, LocalTile.FogOfWarState.Unseen);
             return tile;
         }
         else {

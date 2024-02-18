@@ -67,6 +67,7 @@ MonoBehaviour:
   enemyList: []
   charaList: []
   pinList: []
+  shrine: {fileID: 0}
 --- !u!1001 &5959802270303341056
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -133,6 +134,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 35839112ec68e441a9b647af6096f6dc, type: 3}
       propertyPath: m_Name
       value: mountain1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504409719310791647, guid: 35839112ec68e441a9b647af6096f6dc, type: 3}
+      propertyPath: m_TagString
+      value: TileGround
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 35839112ec68e441a9b647af6096f6dc, type: 3}

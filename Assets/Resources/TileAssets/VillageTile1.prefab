@@ -67,6 +67,7 @@ MonoBehaviour:
   enemyList: []
   charaList: []
   pinList: []
+  shrine: {fileID: 0}
 --- !u!1001 &7850342880143912966
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -129,6 +130,10 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 8cf4cca55071847c39c59c1af7a2b2e0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7648502956408741331, guid: 8cf4cca55071847c39c59c1af7a2b2e0, type: 3}
+      propertyPath: m_TagString
+      value: TileGround
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 8cf4cca55071847c39c59c1af7a2b2e0, type: 3}
       propertyPath: m_Name
