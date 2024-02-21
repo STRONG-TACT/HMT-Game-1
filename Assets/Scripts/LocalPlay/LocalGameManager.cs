@@ -132,8 +132,8 @@ public class LocalGameManager : MonoBehaviour
         foreach (LocalCharacter chara in inSceneCharacters) {
             chara.StartPingPhase();
         }
-
-        StartPlayerPinningPhase();
+        //StartCoroutine(CharacterMoveByStep());
+    StartPlayerPinningPhase();
     }
 
     private void StartPlayerPinningPhase()
@@ -143,9 +143,8 @@ public class LocalGameManager : MonoBehaviour
             player.myCharacter = inSceneCharacters[0];
             player.myCharacter.FocusCharacter();
             player.UpdateCharacterUI(0, player.myCharacter);
-
-
             uiManager.ShowCharacterPinUI(player.myCharacter);
+            //MapGenerator.Instance.updateFogOfWar_map(player.myCharacter.CharacterId);
         }
         else {
             PreparePlayerPlanningPhase();

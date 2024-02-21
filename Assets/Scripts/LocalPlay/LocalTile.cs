@@ -37,6 +37,37 @@ public class LocalTile : MonoBehaviour
     public LocalShrine shrine = null;
     public Dictionary<int, FogOfWarState> fogOfWarDictionary;
 
+    private Dictionary<Renderer, Material[]> originalMaterials = new Dictionary<Renderer, Material[]>();
+    public Material seen_material;
+    public Material unseen_material;
+
+    private void Awake() {
+        seen_material = Resources.Load<Material>("seen");
+        unseen_material = Resources.Load<Material>("unseen");
+        fogOfWarDictionary = new Dictionary<int, LocalTile.FogOfWarState>();
+        fogOfWarDictionary.Add(0, LocalTile.FogOfWarState.Unseen);
+        fogOfWarDictionary.Add(1, LocalTile.FogOfWarState.Unseen);
+        fogOfWarDictionary.Add(2, LocalTile.FogOfWarState.Unseen);
+    }
+    private void Start() {
+        Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+        foreach (Renderer renderer in renderers) {
+            // Store the original materials
+            originalMaterials[renderer] = renderer.materials;
+        }
+    }
+
+    private void OnTriggerStay(Collider col)
+    {
+        if (col.gameObject.tag == "VisibleMask") {
+            LocalCharacter mask_character = col.gameObject.transform.parent.GetComponent<LocalCharacter>();
+            //Debug.Log(mask_character.CharacterId);
+            fogOfWarDictionary[mask_character.CharacterId] = FogOfWarState.Visible;
+
+        }
+    }
+
+
     private void OnTriggerEnter(Collider col) {
         //if(!(LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Moving || 
         //    LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Pinning)) {
@@ -51,6 +82,7 @@ public class LocalTile : MonoBehaviour
                 //Debug.Log(fogOfWarDictionary[mask_character.CharacterId]);
                 //Debug.Log("CharacterID: -------------------------");
                 //Debug.Log(mask_character.CharacterId);
+                Debug.Log(mask_character.CharacterId);
                 fogOfWarDictionary[mask_character.CharacterId] = FogOfWarState.Visible;
                 //setRenderer(true);
                 break;
@@ -114,8 +146,10 @@ public class LocalTile : MonoBehaviour
     }
 
 
-    private void setRenderer(bool active) {
-        //Get characters currently on the tile.
+    private void setRenderer(FogOfWarState state) {
+        bool active;
+        if (state == FogOfWarState.Unseen) active = false; else active = true;
+        //turn off renderer for characters on the tile
         foreach (LocalCharacter character in charaList) {
             Animator[] char_animators = character.GetComponentsInChildren<Animator>(true);
             foreach (Animator char_animator in char_animators)
@@ -138,7 +172,7 @@ public class LocalTile : MonoBehaviour
                 }
             }
         }
-        //Get monsters currently on the tile.
+        //turn off renderer for monsters on the tile.
         foreach (LocalMonster monster in enemyList)
         {
             Animator[] mons_animators = monster.GetComponentsInChildren<Animator>(true);
@@ -146,7 +180,6 @@ public class LocalTile : MonoBehaviour
             {
                 if (mons_animator != null)
                 {
-
                     mons_animator.enabled = active;
                 }
             }
@@ -162,6 +195,8 @@ public class LocalTile : MonoBehaviour
                 }
             }
         }
+
+        //handle the stationary objects on the tile
         // Get all Animator components in children GameObjects, include inactive ones
         Animator[] animators = GetComponentsInChildren<Animator>(true);
         foreach (Animator animator in animators)
@@ -178,10 +213,77 @@ public class LocalTile : MonoBehaviour
         {
             if (renderer != null)
             {
-                if (renderer.gameObject.tag != "TileGround")
+                //if state is Unseen, turn off renderer for all objects except for tileGround and apply unseen shader
+                if (state == FogOfWarState.Unseen)
+                {
+                    if (renderer.gameObject.tag != "TileGround")
+                    {
+                        renderer.enabled = active;
+                    }
+                    else
+                    {
+                        Material[] overideMaterials = new Material[renderer.materials.Length];
+                        Material newMaterial = unseen_material;
+                        for (int i = 0; i < overideMaterials.Length; i++)
+                        {
+                            // Assign the new material to each material slot
+                            overideMaterials[i] = newMaterial;
+                        }
+                        // Apply the new material array to the renderer
+                        renderer.materials = overideMaterials;
+                    }
+
+                }
+                //if state is seen, turn on renderers for all stationary objects and apply seen shader
+                else if (state == FogOfWarState.Seen)
                 {
                     renderer.enabled = active;
+                    Material[] overideMaterials = new Material[renderer.materials.Length];
+                    Material newMaterial = seen_material;
+                    for (int i = 0; i < overideMaterials.Length; i++)
+                    {
+                        // Assign the new material to each material slot
+                        overideMaterials[i] = newMaterial;
+                    }
+                    // Apply the new material array to the renderer
+                    renderer.materials = overideMaterials;
                 }
+                //if state is visiable, turn on renderers for all stationary objects and revert to original shader
+                else if (state == FogOfWarState.Visible) {
+                    renderer.enabled = active;
+                    foreach (var kvp in originalMaterials)
+                    {
+                        // Revert the materials back to the original ones
+                        kvp.Key.materials = kvp.Value;
+                    }
+                }
+                else Debug.Log("Fog of War State Error in LocalTile");
+                //if state is "unseen" or "seen", change the material for tile ground
+                /*
+                else if (state == FogOfWarState.Unseen || state == FogOfWarState.Seen)
+                {
+                    // Create an array to hold the new materials, which will override the orivinal ones
+                    Material[] overideMaterials = new Material[renderer.materials.Length];
+                    Material newMaterial;
+                    if (state == FogOfWarState.Unseen) newMaterial = unseen_material; else newMaterial = seen_material;
+                    for (int i = 0; i < overideMaterials.Length; i++)
+                    {
+                        // Assign the new material to each material slot
+                        overideMaterials[i] = newMaterial;
+                    }
+                    // Apply the new material array to the renderer
+                    renderer.materials = overideMaterials;
+                }
+                //if state is "visible", revert material for tile ground to original look
+                else
+                {
+                    foreach (var kvp in originalMaterials)
+                    {
+                        // Revert the materials back to the original ones
+                        kvp.Key.materials = kvp.Value;
+                    }
+                }
+                */
             }
         }
     }
@@ -189,12 +291,16 @@ public class LocalTile : MonoBehaviour
 
 
     public void updateFogOfWar_tile(int characterID) {
-        if (this.fogOfWarDictionary[characterID] == FogOfWarState.Unseen || this.fogOfWarDictionary[characterID] == FogOfWarState.Seen)
+        if (this.fogOfWarDictionary[characterID] == FogOfWarState.Unseen)
         {
-            setRenderer(false);
+            setRenderer(FogOfWarState.Unseen);
         }
-        else if (this.fogOfWarDictionary[characterID] == FogOfWarState.Visible) {
-            setRenderer(true);
+        else if (this.fogOfWarDictionary[characterID] == FogOfWarState.Seen) {
+            setRenderer(FogOfWarState.Seen);
+        }
+        else if (this.fogOfWarDictionary[characterID] == FogOfWarState.Visible)
+        {
+            setRenderer(FogOfWarState.Visible);
         }
     }
 
