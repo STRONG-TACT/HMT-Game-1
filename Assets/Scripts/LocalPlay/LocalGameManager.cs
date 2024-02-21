@@ -116,6 +116,13 @@ public class LocalGameManager : MonoBehaviour
                 remainingCharacterCount -= 1;
             }
         }
+        StartCoroutine(WaitBeforeStartPlayerTurn());
+    }
+
+    //wait for a few second for new map to load (in order for fog of war to work correctly)
+    private IEnumerator WaitBeforeStartPlayerTurn()
+    {
+        yield return new WaitForSeconds(2f);
         PreparePlayerPinningPhase();
     }
 
@@ -132,9 +139,9 @@ public class LocalGameManager : MonoBehaviour
         foreach (LocalCharacter chara in inSceneCharacters) {
             chara.StartPingPhase();
         }
-        //StartCoroutine(CharacterMoveByStep());
-    StartPlayerPinningPhase();
+        StartPlayerPinningPhase();
     }
+
 
     private void StartPlayerPinningPhase()
     {
