@@ -185,7 +185,7 @@ public class LocalCharacter : MonoBehaviour
     }
 
     public void FocusCharacter() {
-        MaskControl(true);
+        //MaskControl(true);
         MapGenerator.Instance.updateFogOfWar_map(CharacterId);
         if (LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Planning) {
             indicator.SetActive(true);
@@ -201,7 +201,7 @@ public class LocalCharacter : MonoBehaviour
     }
 
     public void UnFocusCharacter() {
-        MaskControl(false);
+        //MaskControl(false);
         indicator.SetActive(false);
         foreach (GameObject one_path_indicator in path_indicator_list)
         {
@@ -377,6 +377,7 @@ public class LocalCharacter : MonoBehaviour
             transform.position = target;
             model.rotation = targetRotation;
         }
+        MapGenerator.Instance.updateFogOfWar_map(CharacterId);
         State = CharacterState.Idle;
         moving = false;
     }
@@ -384,6 +385,7 @@ public class LocalCharacter : MonoBehaviour
     public void Retreat()
     {
         this.transform.position = prevMovePointPos;
+        MapGenerator.Instance.updateFogOfWar_map(CharacterId);
         movePoint = prevMovePointPos;
     }
 

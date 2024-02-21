@@ -52,7 +52,7 @@ public class LocalTile : MonoBehaviour
                 //Debug.Log("CharacterID: -------------------------");
                 //Debug.Log(mask_character.CharacterId);
                 fogOfWarDictionary[mask_character.CharacterId] = FogOfWarState.Visible;
-                setRenderer(true);
+                //setRenderer(true);
                 break;
             case "Monster":
                 //Debug.Log("A monster enters.");
@@ -97,7 +97,7 @@ public class LocalTile : MonoBehaviour
                 //Debug.Log("CharacterID: -------------------------");
                 //Debug.Log(mask_character.CharacterId);
                 fogOfWarDictionary[mask_character.CharacterId] = FogOfWarState.Seen;
-                setRenderer(false);
+                //setRenderer(false);
                 break;
             case "Monster":
                 //Debug.Log("A monster exits.");
@@ -131,7 +131,7 @@ public class LocalTile : MonoBehaviour
             {
                 if (char_renderer != null)
                 {
-                    if (char_renderer.gameObject.tag != "TileGround")
+                    if (char_renderer.gameObject.tag != "TileGround" && char_renderer.gameObject.tag != "VisibleMask")
                     {
                         char_renderer.enabled = active;
                     }
