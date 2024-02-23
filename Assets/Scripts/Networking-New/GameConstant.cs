@@ -8,6 +8,7 @@ namespace GameConstant
     {
         public const int LOCAL_TEST_LEVEL = 1;
         public const int ROOM_LEVEL = 2;
+        public const int GAME_LEVEL = 3;
     }
     
     public enum OnBoardingState
