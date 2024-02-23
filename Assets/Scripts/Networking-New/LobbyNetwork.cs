@@ -49,4 +49,51 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
         Debug.Log("Disconnecting");
         PhotonNetwork.Disconnect();
     }
+    
+    // =============
+    public void TryJoinLobby()
+    {
+        Debug.Log("Try Join Lobby");
+        PhotonNetwork.JoinLobby();
+    }
+
+    public override void OnJoinedLobby()
+    {
+        Debug.Log("Joined Lobby");
+        NetworkLobbyManager.S.OnJoinLobbySucceed();
+    }
+
+    public void TryJoinRoom(string roomName)
+    {
+        Debug.Log($"Trying to join room {roomName}");
+        PhotonNetwork.JoinRoom(roomName);
+    }
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        Debug.Log("Join room failed, attempt to create one");
+        NetworkLobbyManager.S.OnJoinRoomAttemptFailed();
+    }
+
+    public void TryCreateRoom(string roomName)
+    {
+        Debug.Log($"Trying to create room {roomName}");
+        PhotonNetwork.CreateRoom(roomName, new RoomOptions { MaxPlayers = 3 });
+    }
+
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        Debug.Log("Failed to create a room");
+        NetworkLobbyManager.S.OnCreateRoomFailed();
+    }
+
+    public override void OnCreatedRoom()
+    {
+        NetworkLobbyManager.S.OnRoomEntered();
+    }
+
+    public override void OnJoinedRoom()
+    {
+        NetworkLobbyManager.S.OnRoomEntered();
+    }
 }

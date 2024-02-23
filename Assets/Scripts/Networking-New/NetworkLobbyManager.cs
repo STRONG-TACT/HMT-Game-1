@@ -52,6 +52,62 @@ public class NetworkLobbyManager : MonoBehaviour
         LobbyUI.S.ShowDisconnectedUI();
     }
     
+    // ============ Join/Create Room Handle ============
+
+    public void CreateOrJoinRoomSelected()
+    {
+        onBoardingState = OnBoardingState.Loading;
+        LobbyNetwork.S.TryJoinLobby();
+        LobbyUI.S.ShowLoadingUI();
+    }
+
+    public void OnJoinLobbySucceed()
+    {
+        onBoardingState = OnBoardingState.CreateOrJoinRoom;
+        LobbyUI.S.ShowCreateJoinRoomUI();
+    }
+    
+    /* TODO: !!!!!!!!!!!!!!!!
+       Current hacky solution: join & create is the same button. Will try to join room with name
+       first. If failed a room will be created with the same name. This is obviously NOT SAFE
+       but it works for testing purposes*/
+    public void JoinRoomAttempt()
+    {
+        string roomName = LobbyUI.S.GetRoomNameEntered();
+        // TODO: Handle for names that are too long
+        if (roomName != "")
+        {
+            onBoardingState = OnBoardingState.Loading;
+            LobbyNetwork.S.TryJoinRoom(roomName);
+            LobbyUI.S.ShowLoadingUI();
+        }
+    }
+
+    public void OnJoinRoomAttemptFailed()
+    {
+        LobbyUI.S.ShowLoadingUI("Room Does Not Exist, Creating One...");
+        LobbyNetwork.S.TryCreateRoom(LobbyUI.S.GetRoomNameEntered());
+    }
+
+    public void OnCreateRoomFailed()
+    {
+        StartCoroutine(CreateRoomFailed());
+    }
+
+    IEnumerator CreateRoomFailed()
+    {
+        LobbyUI.S.ShowLoadingUI("Create/Join Room Failed, this is most likely the room name already exist and is closed.");
+        yield return new WaitForSeconds(3.0f);
+        onBoardingState = OnBoardingState.CreateOrJoinRoom;
+        LobbyUI.S.ShowCreateJoinRoomUI();
+    }
+
+    public void OnRoomEntered()
+    {
+        Debug.Log("Joined a room, initiating travel to room");
+        SceneManager.LoadScene(GlobalConstant.ROOM_LEVEL);
+    }
+
     // ============ Back Button Logic ============
 
     public void BackButtonClicked()
