@@ -22,4 +22,16 @@ namespace GameConstant
         Loading, 
         Disconnected
     };
+
+    public enum GameStatus
+    {
+        GetReady, 
+        Player_Pinning, 
+        Player_Planning, 
+        Player_Moving, 
+        Monster_Moving, 
+        Animation_Pause, 
+        GameEnd
+    }
+
 }

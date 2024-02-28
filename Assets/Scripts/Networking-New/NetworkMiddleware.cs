@@ -7,9 +7,10 @@ using Random = UnityEngine.Random;
 
 public class NetworkMiddleware : MonoBehaviourPunCallbacks
 {
+    // ======== Used During Room ========
+    
     // Actor 2 character map
     // public Dictionary<int, int> actor2character;
-    // TODO: Maybe we don't need this?
 
     // random seed, set to be the same across the network
     // so that (hopefully) we don't need to sync random dice rolls separately
@@ -17,6 +18,11 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     
     // referenced by game manager
     public int myCharacterID = -1;
+    
+    // ======== Used During Gameplay ========
+    
+    
+    
 
     public static NetworkMiddleware S;
 
