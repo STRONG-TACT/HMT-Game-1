@@ -147,8 +147,10 @@ public class LocalTile : MonoBehaviour
 
 
     private void setRenderer(FogOfWarState state) {
-        bool active;
-        if (state == FogOfWarState.Unseen) active = false; else active = true;
+        bool object_active;
+        bool agent_active;
+        if (state == FogOfWarState.Unseen) object_active = false; else object_active = true;
+        if (state == FogOfWarState.Visible) agent_active = true; else agent_active = false;
         //turn off renderer for characters on the tile
         foreach (LocalCharacter character in charaList) {
             Animator[] char_animators = character.GetComponentsInChildren<Animator>(true);
@@ -157,7 +159,7 @@ public class LocalTile : MonoBehaviour
                 if (char_animator != null)
                 {
 
-                    char_animator.enabled = active;
+                    char_animator.enabled = agent_active;
                 }
             }
             Renderer[] char_renderers = character.GetComponentsInChildren<Renderer>(true);
@@ -167,7 +169,7 @@ public class LocalTile : MonoBehaviour
                 {
                     if (char_renderer.gameObject.tag != "TileGround" && char_renderer.gameObject.tag != "VisibleMask")
                     {
-                        char_renderer.enabled = active;
+                        char_renderer.enabled = agent_active;
                     }
                 }
             }
@@ -180,7 +182,7 @@ public class LocalTile : MonoBehaviour
             {
                 if (mons_animator != null)
                 {
-                    mons_animator.enabled = active;
+                    mons_animator.enabled = agent_active;
                 }
             }
             Renderer[] mons_renderers = monster.GetComponentsInChildren<Renderer>(true);
@@ -190,7 +192,7 @@ public class LocalTile : MonoBehaviour
                 {
                     if (mons_renderer.gameObject.tag != "TileGround")
                     {
-                        mons_renderer.enabled = active;
+                        mons_renderer.enabled = agent_active;
                     }
                 }
             }
@@ -204,7 +206,7 @@ public class LocalTile : MonoBehaviour
             if (animator != null)
             {
 
-                animator.enabled = active;
+                animator.enabled = object_active;
             }
         }
         // Get all Renderer components in children GameObjects, include inactive ones
@@ -216,11 +218,11 @@ public class LocalTile : MonoBehaviour
                 //if state is Unseen, turn off renderer for all objects except for tileGround and apply unseen shader
                 if (state == FogOfWarState.Unseen)
                 {
-                    if (renderer.gameObject.tag != "TileGround")
+                    if (renderer.gameObject.tag != "TileGround" && renderer.gameObject.tag != "Ping")
                     {
-                        renderer.enabled = active;
+                        renderer.enabled = object_active;
                     }
-                    else
+                    else if (renderer.gameObject.tag != "Ping")
                     {
                         Material[] overideMaterials = new Material[renderer.materials.Length];
                         Material newMaterial = unseen_material;
@@ -232,25 +234,29 @@ public class LocalTile : MonoBehaviour
                         // Apply the new material array to the renderer
                         renderer.materials = overideMaterials;
                     }
-
+                    else { }
                 }
                 //if state is seen, turn on renderers for all stationary objects and apply seen shader
                 else if (state == FogOfWarState.Seen)
                 {
-                    renderer.enabled = active;
-                    Material[] overideMaterials = new Material[renderer.materials.Length];
-                    Material newMaterial = seen_material;
-                    for (int i = 0; i < overideMaterials.Length; i++)
+                    if (renderer.gameObject.tag != "Ping")
                     {
-                        // Assign the new material to each material slot
-                        overideMaterials[i] = newMaterial;
+                        renderer.enabled = object_active;
+                        Material[] overideMaterials = new Material[renderer.materials.Length];
+                        Material newMaterial = seen_material;
+                        for (int i = 0; i < overideMaterials.Length; i++)
+                        {
+                            // Assign the new material to each material slot
+                            overideMaterials[i] = newMaterial;
+                        }
+                        // Apply the new material array to the renderer
+                        renderer.materials = overideMaterials;
                     }
-                    // Apply the new material array to the renderer
-                    renderer.materials = overideMaterials;
+                    else { }
                 }
                 //if state is visiable, turn on renderers for all stationary objects and revert to original shader
                 else if (state == FogOfWarState.Visible) {
-                    renderer.enabled = active;
+                    renderer.enabled = object_active;
                     foreach (var kvp in originalMaterials)
                     {
                         // Revert the materials back to the original ones

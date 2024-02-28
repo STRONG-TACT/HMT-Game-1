@@ -512,8 +512,14 @@ public class LocalGameManager : MonoBehaviour
                     case LocalTile.ObstacleType.Trap:
                         reduceCharacterHealth(t.charaList, deadChara, aliveChara);
                         clearCharacterMoves(t.charaList);
+                        Dictionary<int, LocalTile.FogOfWarState> fogOfWarDictionary = new Dictionary<int, LocalTile.FogOfWarState>();
+                        foreach (KeyValuePair<int, LocalTile.FogOfWarState> entry in t.fogOfWarDictionary)
+                        {
+                            fogOfWarDictionary.Add(entry.Key, entry.Value);
+                        }
                         GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
                         LocalTile newTile = opentile.GetComponent<LocalTile>();
+                        newTile.fogOfWarDictionary = fogOfWarDictionary;
                         newTile.row = t.row;
                         newTile.col = t.col;
                         MapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);

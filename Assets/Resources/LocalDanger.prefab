@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2499958527495751875}
   m_Layer: 0
   m_Name: LocalDanger
-  m_TagString: Untagged
+  m_TagString: Ping
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -96,3 +96,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pinType: 0
   animate: 1
+  locationTile: {fileID: 0}
+  placingCharacter: {fileID: 0}

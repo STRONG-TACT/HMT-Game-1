@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3970224559919238393}
   m_Layer: 0
   m_Name: LocalAssist
-  m_TagString: Untagged
+  m_TagString: Ping
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -97,3 +97,4 @@ MonoBehaviour:
   pinType: 1
   animate: 1
   locationTile: {fileID: 0}
+  placingCharacter: {fileID: 0}
