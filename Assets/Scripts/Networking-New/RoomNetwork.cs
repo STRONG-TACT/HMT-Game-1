@@ -64,6 +64,7 @@ public class RoomNetwork : MonoBehaviourPunCallbacks
     [PunRPC]
     private void SetupNetworkMiddleware(int randomSeed, int characterID)
     {
+        if (NetworkMiddleware.S.myCharacterID != -1) return;
         NetworkMiddleware.S.SetupMiddleware(randomSeed, characterID);
     }
 

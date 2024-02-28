@@ -39,7 +39,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     public void SetupMiddleware(int randomSeed_, int characterID_)
     {
         randomSeed = randomSeed_;
-        myCharacterID = characterID_;
+        myCharacterID = characterID_ - 1;
         Random.InitState(randomSeed);
         Debug.Log($"Player {characterID_} middleware setup with random seed {randomSeed}");
     }

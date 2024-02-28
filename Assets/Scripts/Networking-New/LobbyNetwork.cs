@@ -89,7 +89,7 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
 
     public override void OnCreatedRoom()
     {
-        NetworkLobbyManager.S.OnRoomEntered();
+        // NetworkLobbyManager.S.OnRoomEntered();
     }
 
     public override void OnJoinedRoom()
