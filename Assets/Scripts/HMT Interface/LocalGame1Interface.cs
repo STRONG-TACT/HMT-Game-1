@@ -442,8 +442,13 @@ public class LocalGame1Interface : HMTInterface {
                 yield break;
             case "undo":
                 if (!target.ReadyForNextPhase) {
-                    target.UndoPlanStep();
-                    command.SendOKResponse("Action Undone");
+                    if (target.ActionPlan.Count == 0) {
+                        command.SendErrorResponse("Cannot undo action, no actions to undo");
+                    }
+                    else {
+                        target.UndoPlanStep();
+                        command.SendOKResponse("Action Undone");
+                    }
                     yield break;
                 }
                 else {
