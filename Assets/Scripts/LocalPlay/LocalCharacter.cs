@@ -253,9 +253,13 @@ public class LocalCharacter : MonoBehaviour
             if (Physics.Raycast(indicator.transform.position, -Vector3.up, out hit))
             {
                 if (hit.collider.gameObject.tag == "Monster") {
-                    Vector3 combat_indicator_position = indicator.transform.position + indicator_offset;
-                    GameObject new_combat_indicator = Instantiate(combat_indicator, combat_indicator_position, Quaternion.identity);
-                    combat_indicator_list.Push(new_combat_indicator);
+                    //if the tile is visible to player, drop a combat indicator
+                    if (hit.collider.gameObject.GetComponent< LocalMonster>().currentTile.fogOfWarDictionary[CharacterId] == LocalTile.FogOfWarState.Visible) {
+                        Vector3 combat_indicator_position = indicator.transform.position + indicator_offset;
+                        GameObject new_combat_indicator = Instantiate(combat_indicator, combat_indicator_position, Quaternion.identity);
+                        combat_indicator_list.Push(new_combat_indicator);
+                    }
+
                 }
             }
 
@@ -336,8 +340,11 @@ public class LocalCharacter : MonoBehaviour
             {
                 if (hit.collider.gameObject.tag == "Monster")
                 {
-                    GameObject one_combat_indicator = combat_indicator_list.Pop();
-                    Destroy(one_combat_indicator);
+                    if (hit.collider.gameObject.GetComponent<LocalMonster>().currentTile.fogOfWarDictionary[CharacterId] == LocalTile.FogOfWarState.Visible)
+                    {
+                        GameObject one_combat_indicator = combat_indicator_list.Pop();
+                        Destroy(one_combat_indicator);
+                    }
                 }
             }
         }
