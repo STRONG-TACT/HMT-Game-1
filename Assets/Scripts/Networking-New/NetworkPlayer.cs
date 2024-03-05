@@ -53,9 +53,9 @@ public class NetworkPlayer : MonoBehaviour
     }
 
     private void SubmitPings() {
-        myCharacter.ReadyForNextPhase = true;
+        NetworkMiddleware.S.ReadyForNextPhaseLocal(myCharacter.CharacterId, true);
         UpdatePinBtnStatus(myCharacter.ReadyForNextPhase);
-        LocalGameManager.Instance.CheckPingPhaseEnd();
+        NetworkGameManager.S.CheckPingPhaseEnd();
     }
 
     private void UpdatePinBtnStatus(bool submitted) {

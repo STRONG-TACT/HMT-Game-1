@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using GameConstant;
 using Photon.Pun;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -21,9 +22,6 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     
     // ======== Used During Gameplay ========
     
-    
-    
-
     public static NetworkMiddleware S;
 
     private void Awake()
@@ -42,5 +40,23 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         myCharacterID = characterID_ - 1;
         Random.InitState(randomSeed);
         Debug.Log($"Player {characterID_} middleware setup with random seed {randomSeed}");
+    }
+
+    public void ReadyForNextPhaseLocal(int CharID, bool ready)
+    {
+        photonView.RPC("ReadyForNextPhaseRPC", RpcTarget.All, CharID, ready);
+    }
+
+    [PunRPC]
+    private void ReadyForNextPhaseRPC(int CharID, bool ready)
+    {
+        NetworkGameManager.S.inSceneCharacters[CharID].ReadyForNextPhase = ready;
+        if (ready)
+        {
+            if (NetworkGameManager.S.gameStatus == GameStatus.Player_Pinning)
+            {
+                NetworkGameManager.S.CheckPingPhaseEnd();
+            }
+        }
     }
 }

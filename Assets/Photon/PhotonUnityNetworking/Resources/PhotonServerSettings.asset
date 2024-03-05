@@ -68,6 +68,8 @@ MonoBehaviour:
   - SetupNetworkMiddleware
   - RegisterPlayerReady
   - TravelToGameLevel
+  - AddPin
+  - ReadyForNextPhaseRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

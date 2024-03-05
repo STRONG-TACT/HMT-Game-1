@@ -3644,8 +3644,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 282351983}
-        m_TargetAssemblyTypeName: LocalPinningSystem, Assembly-CSharp
+      - m_Target: {fileID: 1726500803}
+        m_TargetAssemblyTypeName: NetworkPinningSystem, Assembly-CSharp
         m_MethodName: Cancel
         m_Mode: 1
         m_Arguments:
@@ -4069,8 +4069,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 282351983}
-        m_TargetAssemblyTypeName: LocalPinningSystem, Assembly-CSharp
+      - m_Target: {fileID: 1726500803}
+        m_TargetAssemblyTypeName: NetworkPinningSystem, Assembly-CSharp
         m_MethodName: OMW
         m_Mode: 1
         m_Arguments:
@@ -5571,8 +5571,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 282351983}
-        m_TargetAssemblyTypeName: LocalPinningSystem, Assembly-CSharp
+      - m_Target: {fileID: 1726500803}
+        m_TargetAssemblyTypeName: NetworkPinningSystem, Assembly-CSharp
         m_MethodName: Assist
         m_Mode: 1
         m_Arguments:
@@ -5716,8 +5716,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 282351983}
-        m_TargetAssemblyTypeName: LocalPinningSystem, Assembly-CSharp
+      - m_Target: {fileID: 1726500803}
+        m_TargetAssemblyTypeName: NetworkPinningSystem, Assembly-CSharp
         m_MethodName: Unknown
         m_Mode: 1
         m_Arguments:
@@ -9711,6 +9711,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1726500802}
   - component: {fileID: 1726500803}
+  - component: {fileID: 1726500804}
   m_Layer: 0
   m_Name: n_PiningSystem
   m_TagString: Untagged
@@ -9745,6 +9746,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pinWheel: {fileID: 1120016807}
+  ui_offset: {x: 0, y: 0.3, z: 0}
+  pin_icon_offset: {x: 0, y: 0.3, z: 0}
+  pinList: []
+  unknownPinPrefab: {fileID: 6099151916383471026, guid: cdec057ce5f534b469fb29525f33f163, type: 3}
+  dangerPinPrefab: {fileID: 9008908807479991329, guid: f6f7555638fe14f07be533f3092ea3a5, type: 3}
+  assistPinPrefab: {fileID: 3856196415462018541, guid: 309e60385c932406d9dc198c363e66c5, type: 3}
+  omwPinPrefab: {fileID: 1475608043689062852, guid: 1802e555e2d894369917890da17c33f4, type: 3}
+--- !u!114 &1726500804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1726500801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 4
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1764717556
 GameObject:
   m_ObjectHideFlags: 0
@@ -11351,8 +11381,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 282351983}
-        m_TargetAssemblyTypeName: LocalPinningSystem, Assembly-CSharp
+      - m_Target: {fileID: 1726500803}
+        m_TargetAssemblyTypeName: NetworkPinningSystem, Assembly-CSharp
         m_MethodName: Danger
         m_Mode: 1
         m_Arguments:

@@ -145,6 +145,9 @@ public class NetworkUIManager : MonoBehaviour
         CharacterInfo.SetActive(true);
     }
     
-    
+    public void UpdateActionPointsRemaining(int movePoints)
+    {
+        UpdateActionPanel(movePoints);
+    }
     
 }

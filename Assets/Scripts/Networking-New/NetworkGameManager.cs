@@ -99,6 +99,36 @@ public class NetworkGameManager : MonoBehaviour
         }
     }
 
+    public void NewPlayerPin()
+    {
+        player.PlacePinByFocusedCharacter();
+        uiManager.UpdateActionPointsRemaining(localChar.ActionPointsRemaining);
+        CheckPingPhaseEnd();
+    }
+    
+    public void CheckPingPhaseEnd() {
+        bool phaseEnd = true;
+        foreach(NetworkCharacter character in inSceneCharacters) {
+            if (!character.ReadyForNextPhase) {
+                phaseEnd = false;
+            }
+        }
+        if (phaseEnd) {
+            EndPlayerPinningPhase();
+        }
+    }
+    
+    private void EndPlayerPinningPhase() {
+        Debug.Log("Pinning phase ended.");
+
+        foreach (NetworkCharacter chara in inSceneCharacters) {
+            chara.EndPingPhase();
+        }
+
+        PreparePlayerPlanningPhase();
+        Debug.Log("Should start planning phase here.");
+    }
+
     private void PreparePlayerPlanningPhase()
     {
         

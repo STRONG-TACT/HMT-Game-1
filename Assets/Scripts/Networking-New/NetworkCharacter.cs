@@ -140,12 +140,20 @@ public class NetworkCharacter : MonoBehaviour
     
     public void StartPingPhase() {
         pingCursor = Vector2Int.zero;
-        ReadyForNextPhase = dead;
+        NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, dead);
+    }
+    
+    public void EndPingPhase() {
+        pingCursor = Vector2Int.zero;
     }
 
     public void PlacePin()
     {
-        
+        pinsPlaced += 1;
+        pingCursor = Vector2Int.zero;
+        if (ActionPointsRemaining == 0) {
+            NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, true);
+        }
     }
     
     private void MaskControl(bool mask)
@@ -196,4 +204,5 @@ public class NetworkCharacter : MonoBehaviour
         //characterMask.localScale = cellScale;
         //visibilityMask.localScale = cellScale * config.sightRange;
     }
+    
 }
