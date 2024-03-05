@@ -63,9 +63,9 @@ public class NetworkGameManager : MonoBehaviour
     IEnumerator StartLevel()
     {
         // TODO: should use this time to do some setup
-        yield return new WaitForSeconds(1.5f);
         gameStatus = GameStatus.GetReady;
         uiManager.InitGameUI();
+        yield return new WaitForSeconds(1.0f);
         StartPlayerTurn();
     }
 

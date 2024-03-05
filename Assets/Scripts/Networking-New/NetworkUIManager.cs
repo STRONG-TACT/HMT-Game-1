@@ -15,7 +15,6 @@ public class NetworkUIManager : MonoBehaviour
 
     public GameObject PlanUI;
     public GameObject PinFinishBtn;
-    public GameObject SwitchCharaButton;
 
     public GameObject CharacterInfo;
     public Image YouAreInfo;
@@ -39,7 +38,11 @@ public class NetworkUIManager : MonoBehaviour
     public void InitGameUI()
     {
         text.text = "Level Starting";
+        CombatUI.SetActive(false);
+        
         GoalPanel.SetActive(true);
+        CharacterInfo.SetActive(true);
+        
     }
     
     public void UpdateGamePhaseInfo()
@@ -133,10 +136,10 @@ public class NetworkUIManager : MonoBehaviour
         }
 
         PinFinishBtn.SetActive(true);
-        SwitchCharaButton.SetActive(true);
 
         // TODO check the case when health == 0
         UpdateHealthPanel(currentCharacter.Health);
+        Debug.Log($"Health: {currentCharacter.Health}");
         UpdateActionPanel(currentCharacter.ActionPointsRemaining);
         UpdateCharacterStats();
         CharacterInfo.SetActive(true);

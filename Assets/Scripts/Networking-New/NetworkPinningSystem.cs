@@ -1,18 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class NetworkPinningSystem : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public GameObject pinWheel;
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        
+        pinWheel.SetActive(false);
     }
 }

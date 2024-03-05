@@ -61,7 +61,7 @@ public class NetworkCharacter : MonoBehaviour
 
     //Health
     public int Health { get { return health; } }
-    private int health;
+    private int health = 3;
 
     //Death and death round count down
     public bool dead = false;

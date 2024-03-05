@@ -12,10 +12,6 @@ public class NetworkPlayer : MonoBehaviour
 
     public Button pinFinishBtn;
 
-    public Button dwarfBtn;
-    public Button gaintBtn;
-    public Button humanBtn;
-
     public Button upBtn;
     public Button downBtn;
     public Button leftBtn;
