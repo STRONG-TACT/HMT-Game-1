@@ -102,6 +102,7 @@ public class NetworkMonster : MonoBehaviour
             yield break;
         }
         moving = true;
+        prevMovePointPos = transform.position;
         NetworkCharacter.Direction direction = NetworkCharacter.Direction.Wait;
         List<NetworkCharacter.Direction> directions = new List<NetworkCharacter.Direction>() { 
             NetworkCharacter.Direction.Up,

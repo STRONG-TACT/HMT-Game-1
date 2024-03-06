@@ -307,6 +307,7 @@ public class NetworkCharacter : MonoBehaviour
             yield break;
         }
         moving = true;
+        prevMovePointPos = transform.position;
         float timeStart = Time.time;
         Direction nextMove = ActionPlan[0];
         ActionPlan.RemoveAt(0);

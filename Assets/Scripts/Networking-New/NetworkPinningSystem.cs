@@ -101,7 +101,7 @@ public class NetworkPinningSystem : MonoBehaviourPunCallbacks
     //TODO: GameManager should call this when chars start to move
     public void ClearCurrentTurnPins() {
         foreach (NetworkPin pin in pinList) {
-            Destroy(pin.gameObject);
+            if (pin != null) Destroy(pin.gameObject);
         }       
         pinList = new List<NetworkPin>();
     }
