@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7804813560140647840}
   m_Layer: 0
   m_Name: n_Unknown
-  m_TagString: Untagged
+  m_TagString: Ping
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
