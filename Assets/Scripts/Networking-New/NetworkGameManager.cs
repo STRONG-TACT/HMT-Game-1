@@ -287,10 +287,10 @@ public class NetworkGameManager : MonoBehaviour
                     case NetworkTile.ObstacleType.Trap:
                     case NetworkTile.ObstacleType.Rock:
                         GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
-                        LocalTile newTile = opentile.GetComponent<LocalTile>();
+                        NetworkTile newTile = opentile.GetComponent<NetworkTile>();
                         newTile.row = t.row;
                         newTile.col = t.col;
-                        MapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
+                        NetworkMapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
                         Destroy(t.gameObject);
                         break;
                 }
@@ -314,10 +314,10 @@ public class NetworkGameManager : MonoBehaviour
                         reduceCharacterHealth(t.charaList, deadChara, aliveChara);
                         clearCharacterMoves(t.charaList);
                         GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
-                        LocalTile newTile = opentile.GetComponent<LocalTile>();
+                        NetworkTile newTile = opentile.GetComponent<NetworkTile>();
                         newTile.row = t.row;
                         newTile.col = t.col;
-                        MapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
+                        NetworkMapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
                         Destroy(t.gameObject);
                         break;
                     case NetworkTile.ObstacleType.Rock:
@@ -450,7 +450,7 @@ public class NetworkGameManager : MonoBehaviour
             uiManager.ResetGoalStatus();
             NetworkMapGenerator.Instance.LoadLevel(gameData.levelTextFiles[currentLevel - 1]);
 
-            StartLevel();
+            StartCoroutine(StartLevel());
         }
         else
         {
