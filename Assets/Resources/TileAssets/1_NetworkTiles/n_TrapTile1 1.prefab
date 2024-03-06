@@ -215,6 +215,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: cell
       objectReference: {fileID: 0}
+    - target: {fileID: 3617665961071644646, guid: 0ba341f82ef9c4bd6a8b5b5940c76677, type: 3}
+      propertyPath: m_TagString
+      value: TileGround
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0ba341f82ef9c4bd6a8b5b5940c76677, type: 3}
 --- !u!4 &7183824959385392075 stripped

@@ -135,6 +135,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: gate
       objectReference: {fileID: 0}
+    - target: {fileID: 6352735497805452668, guid: 3d6989ab03d024002bb37f1d7578ad01, type: 3}
+      propertyPath: m_TagString
+      value: TileGround
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3d6989ab03d024002bb37f1d7578ad01, type: 3}
 --- !u!4 &5527648187240502781 stripped

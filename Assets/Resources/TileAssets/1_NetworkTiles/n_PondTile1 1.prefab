@@ -135,6 +135,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: pond1
       objectReference: {fileID: 0}
+    - target: {fileID: 9141816029861474070, guid: f8abd5794a083409fb1080946f19de96, type: 3}
+      propertyPath: m_TagString
+      value: TileGround
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f8abd5794a083409fb1080946f19de96, type: 3}
 --- !u!4 &5451038553994546708 stripped

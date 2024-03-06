@@ -135,6 +135,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: mountain2
       objectReference: {fileID: 0}
+    - target: {fileID: 3455292422214010178, guid: a97b0d97686a14b52a7eb180e0e9444e, type: 3}
+      propertyPath: m_TagString
+      value: TileGround
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a97b0d97686a14b52a7eb180e0e9444e, type: 3}
 --- !u!4 &2018266963326669279 stripped

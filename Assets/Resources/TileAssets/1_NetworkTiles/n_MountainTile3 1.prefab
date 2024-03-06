@@ -75,6 +75,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9153439007067548605}
     m_Modifications:
+    - target: {fileID: -9203324390398772745, guid: 8a40fcb07ef084418875154ac552d96b, type: 3}
+      propertyPath: m_TagString
+      value: TileGround
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8a40fcb07ef084418875154ac552d96b, type: 3}
       propertyPath: m_RootOrder
       value: 0

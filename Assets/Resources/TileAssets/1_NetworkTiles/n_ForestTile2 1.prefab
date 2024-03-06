@@ -131,6 +131,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -4906838889796845047, guid: c1d1acae052ff4421a4e4906e967a684, type: 3}
+      propertyPath: m_TagString
+      value: TileGround
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c1d1acae052ff4421a4e4906e967a684, type: 3}
       propertyPath: m_Name
       value: forest2
