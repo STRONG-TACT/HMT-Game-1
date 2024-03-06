@@ -156,6 +156,8 @@ public class NetworkCharacter : MonoBehaviour
             pinsPlaced = 0;
             ActionPlan.Clear();
         }
+
+        moving = false;
     }
     
     public void StartPingPhase() {
@@ -387,6 +389,18 @@ public class NetworkCharacter : MonoBehaviour
 
         movePoint = startPos;
         prevMovePointPos = movePoint;
+    }
+    
+    public void RespawnCountdown()
+    {
+        respawnCountdown -= 1;
+
+        if (respawnCountdown == 0)
+        {
+            dead = false;
+            gameObject.SetActive(true);
+            health = 3;
+        }
     }
     
     public void QuickRespawn()

@@ -234,7 +234,111 @@ public class NetworkGameManager : MonoBehaviour
 
         Debug.Log("Moving phase ended.");
         pinningSystem.ClearCurrentTurnPins();
-        //  StartMonsterTurn();
+        StartMonsterTurn();
+        // StartPlayerTurn();
+    }
+    
+    // Start monster moving phase
+    private void StartMonsterTurn()
+    {
+        gameStatus = GameStatus.Monster_Moving;
+        uiManager.UpdateGamePhaseInfo();
+        //moveFinishedCount = 0;
+
+        foreach (NetworkMonster m in inSceneMonsters) {
+            m.MonsterTurnStart();
+        }
+
+        currentCoroutine = StartCoroutine(MonsterMoveByStep());
+    }
+
+    // Monsters moving step by step
+    // Same with chara move by step, when events happened, deal with them and come back
+    private IEnumerator MonsterMoveByStep() {
+        bool allMonstersDone = false;
+
+
+        while (!allMonstersDone) {
+            foreach(NetworkMonster m in inSceneMonsters) {
+                if (!m.turnFinished) {
+                    StartCoroutine(m.TakeNextMove(excecutionStepTime));
+                }
+            }
+            bool doneMoving;
+            do {
+                doneMoving = true;
+                foreach(NetworkMonster m in inSceneMonsters) {
+                    if (m.moving) {
+                        doneMoving = false;
+                    }
+                }
+                yield return null;
+            } while (!doneMoving);
+
+            if (eventQueue.Count != 0) {
+                yield return ExecuteCombatOneByOne();
+                break;
+            }
+
+            //after all combat done, if multiple monster oppcuies the same tile, they move until every tile contains at most 1 monster
+            foreach (NetworkMonster mon in inSceneMonsters)
+            {
+                NetworkTile currentTile = mon.currentTile;
+                if (currentTile.enemyList.Count > 1)
+                {
+                    int startRow = currentTile.row;
+                    int startCol = currentTile.col;
+                    bool foundSpot = false;
+                    //move monster to nearest avaiable tile where there is no character and no other monster on it
+                    for (int distance = 1; distance < Math.Max(NetworkMapGenerator.Instance.Map.GetLength(0), NetworkMapGenerator.Instance.Map.GetLength(1)); distance++)
+                    {
+                        if(!foundSpot)
+                        {
+                            List<NetworkTile> availablePos = new List<NetworkTile>();
+                            for (int rowOffset = distance * -1; rowOffset < distance + 1; rowOffset++)
+                            {
+                                for (int colOffset = distance * -1; colOffset < distance + 1; colOffset++)
+                                {
+                                    int targetRow = startRow + rowOffset;
+                                    int targetCol = startCol + colOffset;
+                                    if (NetworkMapGenerator.Instance.InMap(targetRow, targetCol))
+                                    {
+                                        NetworkTile targetTile = NetworkMapGenerator.Instance.GetTileAt(targetRow, targetCol);
+                                        if (targetTile.tileType == NetworkTile.ObstacleType.None && targetTile.enemyList.Count == 0 && targetTile.charaList.Count == 0)
+                                        {
+                                            availablePos.Add(targetTile);
+                                        }
+                                    }
+                                }
+                            }
+                            if (availablePos.Count > 0)
+                            {
+                                foundSpot = true;
+                                //select a random tile in the avaiable positions to move
+                                int randomIndex = UnityEngine.Random.Range(0, availablePos.Count);
+                                NetworkTile selectedTile = availablePos[randomIndex];
+                                yield return StartCoroutine(mon.moveToTargetLocation(selectedTile.transform.position, excecutionStepTime));
+                            }
+                        }
+                    }
+                }
+            }
+
+            allMonstersDone = true;
+            foreach(NetworkMonster m in inSceneMonsters) {
+                if (!m.turnFinished) {
+                    allMonstersDone = false;
+                    break;
+                }
+            }
+        }
+
+        Debug.Log("Monster moving phase ended.");
+        foreach (NetworkCharacter chara in inSceneCharacters) {
+            if (chara.dead) {
+                chara.RespawnCountdown();
+            }
+        }
         StartPlayerTurn();
     }
     

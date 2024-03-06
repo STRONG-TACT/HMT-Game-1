@@ -91,6 +91,102 @@ public class NetworkMonster : MonoBehaviour
         stepLength = data.tileSize + data.tileGapLength;
     }
     
+    public void MonsterTurnStart()
+    {
+        turnFinished = false;
+        moveCount = 0;
+    }
+    
+    public IEnumerator TakeNextMove(float stepTime) {
+        if(moveCount >= config.movement) {
+            yield break;
+        }
+        moving = true;
+        NetworkCharacter.Direction direction = NetworkCharacter.Direction.Wait;
+        List<NetworkCharacter.Direction> directions = new List<NetworkCharacter.Direction>() { 
+            NetworkCharacter.Direction.Up,
+            NetworkCharacter.Direction.Down,
+            NetworkCharacter.Direction.Left,
+            NetworkCharacter.Direction.Right};
+        
+        // shuffle directions
+        for (int i = 0; i < directions.Count; i++) {
+            int j = Random.Range(i, directions.Count);
+            NetworkCharacter.Direction temp = directions[i];
+            directions[i] = directions[j];
+            directions[j] = temp;
+        }
+
+        for (int i =0; i < directions.Count; i++) {
+            if (CheckMove(directions[i])) {
+                direction = directions[i];
+                break;
+            }
+        }
+
+        Vector3 moveVec = direction switch {
+            NetworkCharacter.Direction.Up => Vector3.forward,
+            NetworkCharacter.Direction.Down => Vector3.back,
+            NetworkCharacter.Direction.Left => Vector3.left,
+            NetworkCharacter.Direction.Right => Vector3.right,
+            _ => Vector3.zero
+        };
+
+        float timeStart = Time.time;
+        if (moveVec != Vector3.zero) {
+            State = CharacterState.Walking;
+            Vector3 origin = transform.position;
+            Vector3 target = transform.position + moveVec * stepLength;
+            Quaternion targetRotation = Quaternion.LookRotation(moveVec, Vector3.up);
+            while (Time.time - timeStart < stepTime) {
+                float t = (Time.time - timeStart) / stepTime;
+                transform.position = Vector3.Lerp(origin, target, t);
+                model.rotation = Quaternion.Slerp(model.rotation, targetRotation, t);
+                yield return null;
+            }
+            transform.position = target;
+            model.rotation = targetRotation;
+            moveCount += 1;
+            if (moveCount >= config.movement) {
+                Debug.Log(string.Format("monsterID: {0}, turnFinished", monsterId));
+                turnFinished = true;
+            }
+            Debug.Log(string.Format("monsterID: {0}, direction: {1}, movement: {2}, count: {3}", monsterId, direction, config.movement, moveCount));
+        }
+        State = CharacterState.Idle;
+        moving = false;
+        yield break;
+    }
+    
+    public IEnumerator moveToTargetLocation(Vector3 target, float stepTime)
+    {
+        float timeStart = Time.time;
+
+        State = CharacterState.Walking;
+        Vector3 origin = transform.position;
+        //Vector3 target = transform.position + moveVec * stepLength;
+        Vector3 direction = target - origin;
+        // Normalize the direction
+        direction.Normalize();
+        if (direction != Vector3.zero)
+        {
+            // Create a rotation that looks in the direction of movement
+            moving = true;
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            model.rotation = targetRotation;
+            while (Time.time - timeStart < stepTime)
+            {
+                float t = (Time.time - timeStart) / stepTime;
+                transform.position = Vector3.Lerp(origin, target, t);
+                yield return null;
+            }
+            transform.position = target;
+            model.rotation = targetRotation;
+        }
+        State = CharacterState.Idle;
+        moving = false;
+    }
+    
     public void Kill(float stepTime) {
         State = CharacterState.Die;
         StartCoroutine(KillCoroutine(stepTime));
@@ -110,5 +206,24 @@ public class NetworkMonster : MonoBehaviour
     {
         transform.position = prevMovePointPos;
         movePoint = prevMovePointPos;
+    }
+    
+    public bool CheckMove(NetworkCharacter.Direction direction)
+    {
+        Vector3 moveVec = direction switch
+        {
+            NetworkCharacter.Direction.Up => Vector3.forward,
+            NetworkCharacter.Direction.Down => Vector3.back,
+            NetworkCharacter.Direction.Left => Vector3.left,
+            NetworkCharacter.Direction.Right => Vector3.right,
+            _ => Vector3.forward
+        };
+        bool passible = true;
+        if (Physics.Raycast(this.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible")) ) 
+        {
+            passible = false;
+        }
+        //return !Physics.Raycast(this.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible"));
+        return passible;
     }
 }
