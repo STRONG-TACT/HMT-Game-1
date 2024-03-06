@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using GameConstant;
 
 public class Combat : MonoBehaviour
 {
@@ -48,6 +49,15 @@ public class Combat : MonoBehaviour
                 return Random.Range(1, (int)type + 1) + bonus;
             }
         }
+        
+        public int NetworkRoll() {
+            if (type == DiceSize.D0) {
+                return bonus;
+            }
+            else {
+                return NetworkMiddleware.S.NextRandomInt(1, (int)type + 1) + bonus;
+            }
+        }
     }
 
     public static bool ExecuteCombat(FightType type, LocalTile tile, LocalUIManager uiManager)
@@ -91,5 +101,47 @@ public class Combat : MonoBehaviour
 
         uiManager.ShowCombatUI(type, charaIDs, charaScores, enemyScores, charaScore, enemyScore, result);
             return result;
+    }
+    
+    public static bool ExecuteCombat(FightType type, NetworkTile tile, NetworkUIManager uiManager)
+    {
+        bool result = false;
+        List<int> charaIDs = new List<int>();
+        List<int> enemyScores = new List<int>();
+        List<int> charaScores = new List<int>();
+        int enemyScore = 0;
+        int charaScore = 0;
+
+        foreach (NetworkCharacter c in tile.charaList)
+        {
+            charaIDs.Add(c.CharacterId);
+            int outcome = c.config.monsterDice.NetworkRoll();
+            charaScores.Add(outcome);
+            charaScore += outcome;
+        }
+
+        if (type == FightType.Monster)
+        {
+            foreach (NetworkMonster m in tile.enemyList)
+            {
+                int outcome = m.config.combatDice.NetworkRoll();
+                enemyScores.Add(outcome);
+                enemyScore += outcome;
+            }
+        }
+        else if (type == FightType.Trap || type == FightType.Rock)
+        {
+            int outcome = tile.dice.NetworkRoll();
+            enemyScore += outcome;
+            enemyScores.Add(enemyScore);
+        }
+
+        if (enemyScore <= charaScore)
+        {
+            result = true;
+        }
+
+        uiManager.ShowCombatUI(type, charaIDs, charaScores, enemyScores, charaScore, enemyScore, result);
+        return result;
     }
 }

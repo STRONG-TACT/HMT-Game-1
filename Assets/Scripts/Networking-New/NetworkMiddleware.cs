@@ -42,6 +42,11 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         Debug.Log($"Player {characterID_} middleware setup with random seed {randomSeed}");
     }
 
+    public int NextRandomInt(int min, int max)
+    {
+        return Random.Range(min, max);
+    }
+
     public void ReadyForNextPhaseLocal(int CharID, bool ready)
     {
         photonView.RPC("ReadyForNextPhaseRPC", RpcTarget.All, CharID, ready);
@@ -57,6 +62,50 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
             {
                 NetworkGameManager.S.CheckPingPhaseEnd();
             }
+
+            if (NetworkGameManager.S.gameStatus == GameStatus.Player_Planning)
+            {
+                NetworkGameManager.S.CheckPlanPhaseEnd();
+            }
+        }
+    }
+
+    public void AddMoveToCharacterLocal(NetworkCharacter.Direction direction, int charID)
+    {
+        photonView.RPC("AddMoveToCharacterRPC", RpcTarget.All, direction, charID);
+    }
+
+    [PunRPC]
+    private void AddMoveToCharacterRPC(NetworkCharacter.Direction direction, int charID)
+    {
+        if (charID != myCharacterID)
+        {
+            NetworkGameManager.S.inSceneCharacters[charID].ActionPlan.Add(direction);
+        }
+        else
+        {
+            NetworkGameManager.S.localChar.AddActionToPlan(direction);
+            NetworkGameManager.S.player.UpdateCharacterUI();
+            NetworkGameManager.S.uiManager.UpdateActionPointsRemaining(NetworkGameManager.S.localChar.ActionPointsRemaining);
+        }
+    }
+
+    public void UndoPlanStepLocal(int charID)
+    {
+        photonView.RPC("UndoPlanStepRpc", RpcTarget.All, charID);
+    }
+
+    [PunRPC]
+    private void UndoPlanStepRpc(int charID)
+    {
+        if (charID != myCharacterID)
+        {
+            NetworkGameManager.S.inSceneCharacters[charID].ActionPlan.RemoveAt(NetworkGameManager.S.inSceneCharacters[charID].ActionPlan.Count-1);
+        }
+        else
+        {
+            NetworkGameManager.S.localChar.UndoPlanStep();
+            NetworkGameManager.S.uiManager.UpdateActionPointsRemaining(NetworkGameManager.S.localChar.ActionPointsRemaining);
         }
     }
 }

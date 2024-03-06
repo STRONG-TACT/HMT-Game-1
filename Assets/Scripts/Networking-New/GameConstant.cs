@@ -33,5 +33,4 @@ namespace GameConstant
         Animation_Pause, 
         GameEnd
     }
-
 }

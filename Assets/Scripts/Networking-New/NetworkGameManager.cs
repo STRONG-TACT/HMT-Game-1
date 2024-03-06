@@ -21,6 +21,7 @@ public class NetworkGameManager : MonoBehaviour
     private int pinningSubmittedCount = 0;
     private int planSubmittedCount = 0;
     private Queue<NetworkTile> eventQueue = new Queue<NetworkTile>();
+    private Coroutine currentCoroutine = null;
     
     // ======== Pointer to In Game Prefabs ========
     [Header("In Game Prefabs")]
@@ -32,6 +33,8 @@ public class NetworkGameManager : MonoBehaviour
     [HideInInspector] public NetworkCharacter localChar;
 
     public static NetworkGameManager S;
+    
+    public float excecutionStepTime = 1;
 
     private void Awake()
     {
@@ -125,13 +128,276 @@ public class NetworkGameManager : MonoBehaviour
             chara.EndPingPhase();
         }
 
-        PreparePlayerPlanningPhase();
         Debug.Log("Should start planning phase here.");
+        PreparePlayerPlanningPhase();
     }
 
+    // Prepare for player planning phase
+    // Reset all the player planning parameters
+    // If there are characters dead, update relevant params so they will skip planning
     private void PreparePlayerPlanningPhase()
     {
+        gameStatus = GameStatus.Player_Planning;
+        uiManager.UpdateGamePhaseInfo();
         
+        foreach (NetworkCharacter chara in inSceneCharacters) {
+            chara.StartPlanningPhase();
+        }
+        
+        if (remainingCharacterCount > 0) {
+            CheckPlanPhaseEnd();
+            player.UpdateCharacterUI();
+        }
+        else {
+            StartCharacterMovingPhase();
+        }
+    }
+    
+    public void CheckPlanPhaseEnd() {
+        bool phaseEnd = true;
+        foreach (NetworkCharacter character in inSceneCharacters) {
+            if (!character.ReadyForNextPhase) {
+                phaseEnd = false;
+            }
+        }
+        if (phaseEnd) {
+            EndPlayerPlanningPhase();
+        }
+    }
+    
+    private void EndPlayerPlanningPhase() {
+        Debug.Log("Planning phase ended.");
+        uiManager.HideCharacterPlanUI();
+
+        foreach (NetworkCharacter chara in inSceneCharacters) {
+            chara.EndPlanning();
+        }
+
+        StartCharacterMovingPhase();
+    }
+
+    private void StartCharacterMovingPhase() {
+        gameStatus = GameStatus.Player_Moving;
+        uiManager.UpdateGamePhaseInfo();
+        //moveFinishedCount = 0;       
+        eventQueue = new Queue<NetworkTile>();
+
+        currentCoroutine = StartCoroutine(CharacterMoveByStep());
+    }
+    
+    // Characters move step by step
+    // If events happen, deal with all the events and then back to moving
+    private IEnumerator CharacterMoveByStep() {
+
+        //// A flag, whether this round of step triggers a combat
+        //bool hasCombat = false;
+
+        bool allCharactersDone = false;
+        
+        while (!allCharactersDone) {
+            foreach (NetworkCharacter chara in inSceneCharacters) {
+                StartCoroutine(chara.TakeNextMove(excecutionStepTime));
+            }
+            bool doneMoving;
+            do {
+                doneMoving = true;
+                foreach (NetworkCharacter chara in inSceneCharacters) {
+                    if (chara.moving) {
+                        doneMoving = false;
+                    }
+                }
+                yield return null;
+            } while(!doneMoving);
+
+            if (eventQueue.Count != 0) {
+                yield return ExecuteCombatOneByOne();
+                //hasCombat = true;
+            }
+
+            allCharactersDone = true;
+            foreach(NetworkCharacter character in inSceneCharacters) {
+                if (character.ActionPlan.Count > 0) {
+                    allCharactersDone = false;
+                    break;
+                }
+            }
+        }
+
+        Debug.Log("Moving phase ended.");
+        pinningSystem.ClearCurrentTurnPins();
+        //  StartMonsterTurn();
+    }
+    
+    private IEnumerator ExecuteCombatOneByOne()
+    {
+        Debug.LogFormat("Exectuing {0} events in queue.", eventQueue.Count);
+
+        while (eventQueue.Count != 0)
+        {
+            bool win = false;
+            NetworkTile t = eventQueue.Dequeue();
+
+            Debug.LogFormat("Processing Event at {0}, {1}", t.row, t.col);
+
+            NetworkCameraManager.S.ChangeTargetCharacter(t.charaList[0].CharacterId);
+            switch (t.tileType) {
+                case NetworkTile.ObstacleType.None:
+                    win = Combat.ExecuteCombat(Combat.FightType.Monster, t, uiManager);
+                    break;
+                case NetworkTile.ObstacleType.Trap:
+                    win = Combat.ExecuteCombat(Combat.FightType.Trap, t, uiManager);
+                    break;
+                case NetworkTile.ObstacleType.Rock:
+                    win = Combat.ExecuteCombat(Combat.FightType.Rock, t, uiManager);
+                    break;
+            }
+            //play attack animation for all characters and monster on the tile
+            //make a copy of the characters and monsters that are originally in the tile. So that if a character or monster moves elsewhere, we can still find it
+            List<NetworkCharacter> copiedCharacters = new List<NetworkCharacter>(t.charaList);
+            List<NetworkMonster> copiedEnemies = new List<NetworkMonster>(t.enemyList);
+            foreach (NetworkCharacter c in copiedCharacters)
+            {
+                c.State = NetworkCharacter.CharacterState.Attacking;
+            }
+            foreach (NetworkMonster mo in copiedEnemies) {
+                mo.State = NetworkMonster.CharacterState.Attacking;
+            }
+                
+            if (win) {
+                // if the character(s) won the battle, destory the enemies
+                Debug.Log("Character won.");
+                switch (t.tileType) {
+                    case NetworkTile.ObstacleType.None:
+                        foreach (NetworkMonster m in t.enemyList) {
+                            m.Kill(excecutionStepTime);
+                            inSceneMonsters.Remove(m);
+                        }
+                        t.enemyList.Clear();
+                        break;
+                    case NetworkTile.ObstacleType.Trap:
+                    case NetworkTile.ObstacleType.Rock:
+                        GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
+                        LocalTile newTile = opentile.GetComponent<LocalTile>();
+                        newTile.row = t.row;
+                        newTile.col = t.col;
+                        MapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
+                        Destroy(t.gameObject);
+                        break;
+                }
+            }
+            else {
+                // If not, reduce health except rock
+                // If character's turn, all remaining steps should be cleared.
+                Debug.Log("Enemy won.");
+
+                List<NetworkCharacter> deadChara = new List<NetworkCharacter>();
+                List<NetworkCharacter> aliveChara = new List<NetworkCharacter>();
+                switch (t.tileType) {
+                    case NetworkTile.ObstacleType.None:
+                        reduceCharacterHealth(t.charaList, deadChara, aliveChara);
+                        if (gameStatus == GameStatus.Player_Moving)
+                        {
+                            clearCharacterMoves(t.charaList);
+                        }
+                        break;
+                    case NetworkTile.ObstacleType.Trap:
+                        reduceCharacterHealth(t.charaList, deadChara, aliveChara);
+                        clearCharacterMoves(t.charaList);
+                        GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
+                        LocalTile newTile = opentile.GetComponent<LocalTile>();
+                        newTile.row = t.row;
+                        newTile.col = t.col;
+                        MapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
+                        Destroy(t.gameObject);
+                        break;
+                    case NetworkTile.ObstacleType.Rock:
+                        foreach (NetworkCharacter c in t.charaList) {
+                            aliveChara.Add(c);
+                        }
+
+                        clearCharacterMoves(t.charaList);
+                        break;
+                }
+
+                foreach (NetworkCharacter c in deadChara) {
+                    t.charaList.Remove(c);
+                }
+                if (gameStatus == GameStatus.Player_Moving)
+                {
+                    foreach (NetworkCharacter c in aliveChara)
+                    {
+                        c.Retreat();
+                    }
+                }
+                else if (gameStatus == GameStatus.Monster_Moving && aliveChara.Count > 0)
+                {
+                    foreach (NetworkMonster m in t.enemyList)
+                    {
+                        m.Retreat();
+                    }
+                }
+            }
+
+            //TODO this should probably be waiting for a button click in the future.
+            yield return new WaitForSeconds(2*excecutionStepTime);
+            foreach (NetworkCharacter c in copiedCharacters)
+            {
+                if (c != null)
+                {
+                    c.State = NetworkCharacter.CharacterState.Idle;
+                }
+            }
+            foreach (NetworkMonster mo in copiedEnemies)
+            {
+                if(mo != null)
+                {
+                    mo.State = NetworkMonster.CharacterState.Idle;
+                }
+            }
+            uiManager.HideCombatUI();
+        }
+        yield break;
+
+        // This should only be called as a sub-coroutine of the main moving one so it
+        // doesn't need to restart them, it should just yield break
+        //if (gameStatus == GameStatus.Player_Moving)
+        //{
+        //    StartCoroutine(CharacterMoveByStep());
+        //}else if (gameStatus == GameStatus.Monster_Moving)
+        //{
+        //    StartCoroutine(MonsterMoveByStep());
+        //}
+    }
+    
+    private void reduceCharacterHealth(List<NetworkCharacter> charaList, List<NetworkCharacter> deadChara, List<NetworkCharacter> aliveChara)
+    {
+        foreach (NetworkCharacter c in charaList)
+        {
+            c.DecrementHealth();
+
+            if (c.dead)
+            {
+                deadChara.Add(c);
+            }
+            else
+            {
+                aliveChara.Add(c);
+            }
+        }
+    }
+    
+    // When chara fail a combat, clear all the remaining moves in queue this round
+    private void clearCharacterMoves(List<NetworkCharacter> charaList ) {
+        foreach (NetworkCharacter c in charaList) {
+            //Debug.LogFormat("Clear plan: {0}", c.name);
+            c.ActionPlan.Clear();
+        }
+    }
+    
+    public void GoalReached(int charaID)
+    {
+        uiManager.UpdateGoalStatus(charaID);
+        goalCount += 1;
     }
     
     public void updateEventQueue(NetworkTile tile) {

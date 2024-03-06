@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,11 +36,32 @@ public class NetworkCharacter : MonoBehaviour
     public List<Direction> ActionPlan = new List<Direction>();
     // how many moves that the character left in this turn
     //private int actionPointsLeft;
+    public bool moving = false;
+
 
     //This is only used for AI characters
     public Vector2Int pingCursor;
     private int pinsPlaced = 0;
     
+
+    private void Start()
+    {
+        movePoint = transform.position;
+        prevMovePointPos = movePoint;
+        characterMask = transform.Find("CharacterMask");
+        visibilityMask = transform.Find("VisibleMask");
+        health = 3;
+        
+        model = transform.Find("Model");
+        if(model == null) {
+            Debug.LogErrorFormat("Character {0} has no Model child object", gameObject.name);
+        }
+        
+        animator = GetComponentInChildren<Animator>();
+        animator.SetBool("Idle", true);
+        State = CharacterState.Idle;
+    }
+
     private Vector3 RoundPosition(Vector3 position, float precision)
     {
         float x = Mathf.Round(position.x / precision) * precision;
@@ -114,8 +136,6 @@ public class NetworkCharacter : MonoBehaviour
         }
     }
 
-
-    public bool moving = false;
     
     public void setStartPos(Vector3 newPosition)
     {
@@ -146,6 +166,17 @@ public class NetworkCharacter : MonoBehaviour
     public void EndPingPhase() {
         pingCursor = Vector2Int.zero;
     }
+    
+    public void ResetPlan() {
+        ActionPlan.Clear();
+    }
+
+    public void StartPlanningPhase()
+    {
+        ResetPlan();
+        NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, 
+            ActionPointsRemaining == 0 || dead);
+    }
 
     public void PlacePin()
     {
@@ -154,6 +185,203 @@ public class NetworkCharacter : MonoBehaviour
         if (ActionPointsRemaining == 0) {
             NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, true);
         }
+    }
+    
+    public bool CheckMove(Direction direction) {
+        if (direction == Direction.Wait) return true;
+
+        Vector3 moveVec = direction switch {
+            Direction.Up => Vector3.forward,
+            Direction.Down => Vector3.back,
+            Direction.Left => Vector3.left,
+            Direction.Right => Vector3.right,
+            _ => Vector3.forward
+        };
+
+        return !Physics.Raycast(indicator.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible"));
+    }
+    
+    public void AddActionToPlan(Direction direction)
+    {
+        if (ActionPointsRemaining <= 0) return;
+
+        Vector3 moveVec = direction switch {
+            Direction.Up => Vector3.forward,
+            Direction.Down => Vector3.back,
+            Direction.Left => Vector3.left,
+            Direction.Right => Vector3.right,
+            _ => Vector3.zero,
+        };
+        if (direction != Direction.Wait)
+        {
+
+            Vector3 old_indicator_position = indicator.transform.position;
+            indicator.transform.position += moveVec * stepLength;
+            Vector3 midpoint = (old_indicator_position + indicator.transform.position) / 2;
+            Vector3 path_indicator_direction = (indicator.transform.position - old_indicator_position).normalized;
+            midpoint = RoundPosition(midpoint, 0.001f);
+            midpoint -= (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) * 0.4f*path_indicator_offset;
+            //midpoint += (Vector3.Cross(path_indicator_direction, Vector3.back).normalized)  * path_indicator_offset;
+            while (path_indicator_positions.Contains(midpoint))
+            {
+                midpoint -= (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) *path_indicator_offset;
+            }
+
+            RaycastHit hit;
+            // Raycast downwards from the indicator's position
+            if (Physics.Raycast(indicator.transform.position, -Vector3.up, out hit))
+            {
+                if (hit.collider.gameObject.tag == "Monster") {
+                    Vector3 combat_indicator_position = indicator.transform.position + indicator_offset;
+                    GameObject new_combat_indicator = Instantiate(combat_indicator, combat_indicator_position, Quaternion.identity);
+                    combat_indicator_list.Push(new_combat_indicator);
+                }
+            }
+
+            path_indicator_positions.Add(midpoint);
+            GameObject new_path_indicator = Instantiate(path_indicator, midpoint, Quaternion.LookRotation(path_indicator_direction));
+
+            new_path_indicator.transform.Rotate(0, -180, 0);
+            new_path_indicator.transform.position = midpoint;
+            path_indicator_list.Push(new_path_indicator);
+        }
+
+        ActionPlan.Add(direction);
+    }
+    
+    public void UndoPlanStep() {
+        if (ReadyForNextPhase) {
+            return;
+        }
+        
+        Direction lastMove = ActionPlan[ActionPlan.Count - 1];
+        ActionPlan.RemoveAt(ActionPlan.Count - 1);
+        Vector3 moveVec = lastMove switch {
+            Direction.Up => Vector3.forward,
+            Direction.Down => Vector3.back,
+            Direction.Left => Vector3.left,
+            Direction.Right => Vector3.right,
+            _ => Vector3.zero
+        };
+        
+        if (lastMove != NetworkCharacter.Direction.Wait)
+        {
+            GameObject one_path_indicator = path_indicator_list.Pop();
+            //Vector3 one_path_indicator_position = RoundPosition(one_path_indicator.transform.position, 0.001f);
+            path_indicator_positions.Remove(one_path_indicator.transform.position);
+            Destroy(one_path_indicator);
+            RaycastHit hit;
+            if (Physics.Raycast(indicator.transform.position, -Vector3.up, out hit))
+            {
+                if (hit.collider.gameObject.tag == "Monster")
+                {
+                    GameObject one_combat_indicator = combat_indicator_list.Pop();
+                    Destroy(one_combat_indicator);
+                }
+            }
+        }
+        indicator.transform.position += -moveVec * stepLength;
+    }
+    
+    public void EndPlanning() {
+        indicator.transform.position = transform.position;
+        indicator.transform.position += indicator_offset;
+        indicator.SetActive(false);
+        while (path_indicator_list.Count > 0)
+        {
+            GameObject one_path_indicator = path_indicator_list.Pop(); 
+            Destroy(one_path_indicator); 
+        }
+        while (combat_indicator_list.Count > 0)
+        {
+            GameObject one_combat_indicator = combat_indicator_list.Pop();
+            Destroy(one_combat_indicator);
+        }
+        path_indicator_positions.Clear();
+    }
+    
+    public IEnumerator TakeNextMove(float stepTime) {
+        if(ActionPlan.Count == 0) {
+            yield break;
+        }
+        moving = true;
+        float timeStart = Time.time;
+        Direction nextMove = ActionPlan[0];
+        ActionPlan.RemoveAt(0);
+        Vector3 moveVec = nextMove switch {
+            Direction.Up => Vector3.forward,
+            Direction.Down => Vector3.back,
+            Direction.Left => Vector3.left,
+            Direction.Right => Vector3.right,
+            _ => Vector3.zero
+        };
+        if (moveVec != Vector3.zero) {
+            State = CharacterState.Walking;
+
+            Vector3 origin = transform.position;
+            Vector3 target = transform.position + moveVec * stepLength;
+            Quaternion targetRotation = Quaternion.LookRotation(moveVec, Vector3.up);
+            while (Time.time - timeStart < stepTime) {
+                float t = (Time.time - timeStart) / stepTime;
+                transform.position = Vector3.Lerp(origin, target, t);
+                model.rotation = Quaternion.Slerp(model.rotation, targetRotation, t);
+                yield return null;
+            }
+            transform.position = target;
+            model.rotation = targetRotation;
+        }
+        State = CharacterState.Idle;
+        moving = false;
+    }
+    
+    private void OnTriggerEnter(Collider col)
+    {
+        if (col.gameObject.tag == "Goal")
+        {
+            NetworkShrine shrine = col.gameObject.GetComponent<NetworkShrine>();
+            if (shrine != null && shrine.CheckShrineType(this))
+            {
+                NetworkGameManager.S.GoalReached(CharacterId);
+            }
+        }
+    }
+    
+    public void DecrementHealth()
+    {
+        health -= 1;
+        Debug.Log(string.Format("Character {0} health: {1}", config.characterName, health));
+
+        if (health == 0)
+        {
+            Debug.Log(string.Format("Character {0} Died!", config.characterName));
+            StartCoroutine(characterDeath());
+        }
+    }
+
+
+    public IEnumerator characterDeath() {
+        State = CharacterState.Die;
+        float animationLength = 0f;
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        animationLength = stateInfo.length;
+
+        // Wait for the duration of the animation
+        yield return new WaitForSeconds(animationLength);
+        State = CharacterState.Idle;
+
+        dead = true;
+        respawnCountdown = 2;
+        this.gameObject.SetActive(false);
+        this.transform.position = startPos;
+
+        movePoint = startPos;
+        prevMovePointPos = movePoint;
+    }
+    
+    public void Retreat()
+    {
+        transform.position = prevMovePointPos;
+        movePoint = prevMovePointPos;
     }
     
     private void MaskControl(bool mask)

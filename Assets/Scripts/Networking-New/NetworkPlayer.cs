@@ -12,6 +12,7 @@ public class NetworkPlayer : MonoBehaviour
 
     public Button pinFinishBtn;
 
+    public GameObject planParent;
     public Button upBtn;
     public Button downBtn;
     public Button leftBtn;
@@ -27,17 +28,13 @@ public class NetworkPlayer : MonoBehaviour
 
         pinFinishBtn.onClick.AddListener(delegate { SubmitPings(); });
 
-        // dwarfBtn.onClick.AddListener(delegate { SwitchCharacter(0); });
-        // gaintBtn.onClick.AddListener(delegate { SwitchCharacter(1); });
-        // humanBtn.onClick.AddListener(delegate { SwitchCharacter(2); });
-
-        // upBtn.onClick.AddListener(delegate { AddMoveToFocusedCharacter(LocalCharacter.Direction.Up); });
-        // downBtn.onClick.AddListener(delegate { AddMoveToFocusedCharacter(LocalCharacter.Direction.Down); });
-        // leftBtn.onClick.AddListener(delegate { AddMoveToFocusedCharacter(LocalCharacter.Direction.Left); });
-        // rightBtn.onClick.AddListener(delegate { AddMoveToFocusedCharacter(LocalCharacter.Direction.Right); });
-        // waitBtn.onClick.AddListener(delegate { AddMoveToFocusedCharacter(LocalCharacter.Direction.Wait); });
-        //
-        // backBtn.onClick.AddListener(delegate { UndoPlanStep(); });
+        upBtn.onClick.AddListener(delegate { AddMoveToCharacter(NetworkCharacter.Direction.Up); });
+        downBtn.onClick.AddListener(delegate { AddMoveToCharacter(NetworkCharacter.Direction.Down); });
+        leftBtn.onClick.AddListener(delegate { AddMoveToCharacter(NetworkCharacter.Direction.Left); });
+        rightBtn.onClick.AddListener(delegate { AddMoveToCharacter(NetworkCharacter.Direction.Right); });
+        waitBtn.onClick.AddListener(delegate { AddMoveToCharacter(NetworkCharacter.Direction.Wait); });
+        
+        backBtn.onClick.AddListener(delegate { UndoPlanStep(); });
         submitBtn.onClick.AddListener(delegate { SubmitPlan(); });
     }
 
@@ -67,26 +64,30 @@ public class NetworkPlayer : MonoBehaviour
         UpdatePinBtnStatus(myCharacter.ReadyForNextPhase);
     }
 
-    // public void AddMoveToFocusedCharacter(LocalCharacter.Direction move) {
-    //     if (myCharacter.CheckMove(move)) {
-    //         LocalGameManager.Instance.UpdateFocusPlayPlan(charaID, move);
-    //     }
-    // }
-    //
-    // public void UndoPlanStep() {
-    //     //LocalGameManager.Instance.undoMove(charaID);
-    //     myCharacter.UndoPlanStep();
-    //     UpdatePlanUI(false, myCharacter.ActionPlan.Count == 0, false);
-    // }
+    public void AddMoveToCharacter(NetworkCharacter.Direction direction)
+    {
+        if (myCharacter.ActionPointsRemaining > 0 && myCharacter.CheckMove(direction))
+        {
+            NetworkMiddleware.S.AddMoveToCharacterLocal(direction, myCharacter.CharacterId);
+        }
+    }
+    
+    public void UndoPlanStep() 
+    {
+        NetworkMiddleware.S.UndoPlanStepLocal(myCharacter.CharacterId);
+        UpdatePlanUI(false, myCharacter.ActionPlan.Count == 0, false);
+    }
 
     public void SubmitPlan() {
-        myCharacter.ReadyForNextPhase = true;
-        LocalGameManager.Instance.CheckPlanPhaseEnd();
-        UpdatePlanUI(true, false, true);
+        NetworkMiddleware.S.ReadyForNextPhaseLocal(myCharacter.CharacterId, true);
+        UpdatePlanUI(true, false, false);
+        
     }
 
     public void UpdatePlanUI(bool submitted, bool isEmpty, bool isFull)
     {
+        planParent.SetActive(true);
+        
         if (submitted)
         {
             shutDownPlanButtons();

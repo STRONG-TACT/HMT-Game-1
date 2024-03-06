@@ -54,6 +54,7 @@ public class NetworkUIManager : MonoBehaviour
                 break;
             case GameStatus.Player_Planning:
                 text.text = "Player Planning Phase";
+                PinFinishBtn.SetActive(false);
                 break;
             case GameStatus.Player_Moving:
                 text.text = "Players Moving";
@@ -150,4 +151,100 @@ public class NetworkUIManager : MonoBehaviour
         UpdateActionPanel(movePoints);
     }
     
+    public void HideCharacterPlanUI()
+    {
+        PlanUI.SetActive(false);
+        CharacterInfo.SetActive(false);
+        HealthPanel.SetActive(false);
+        ActionPanel.SetActive(false);
+    }
+    
+    public void ShowCombatUI(Combat.FightType type, List<int> charaIDs, List<int> charaDice, List<int> enemyDice,
+                             int playerScore, int enemyScore, bool win)
+    {
+        for (int i = 0; i < charaIDs.Count; i++)
+        {
+            switch (charaIDs[i])
+            {
+                case 0:
+                    PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.dwarfIcon;
+                    PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    PlayerCombatSlots[i].SetActive(true);
+                    break;
+                case 1:
+                    PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.giantIcon;
+                    PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    PlayerCombatSlots[i].SetActive(true);
+                    break;
+                case 2:
+                    PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.humanIcon;
+                    PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    PlayerCombatSlots[i].SetActive(true);
+                    break;
+                default:
+                    Debug.Log("Character ID out of scope in ShowCombatUI");
+                    break;
+            }
+        }
+
+        if (type == Combat.FightType.Monster)
+        {
+            // TODO: differenciate monster types
+            for (int i = 0; i < enemyDice.Count; i++)
+            {
+                EnemyCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.monsterIcon;
+                EnemyCombatSlots[i].GetComponentInChildren<TMP_Text>().text = enemyDice[0].ToString();
+                EnemyCombatSlots[i].SetActive(true);
+            }
+        }
+        else if (type == Combat.FightType.Trap)
+        {
+            EnemyCombatSlots[0].GetComponentInChildren<Image>().sprite = gameAssets.trapIcon;
+            EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>().text = enemyDice[0].ToString();
+            EnemyCombatSlots[0].SetActive(true);
+        }
+        else if (type == Combat.FightType.Rock)
+        {
+            EnemyCombatSlots[0].GetComponentInChildren<Image>().sprite = gameAssets.rockIcon;
+            EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>().text = enemyDice[0].ToString();
+            EnemyCombatSlots[0].SetActive(true);
+        }
+
+        PlayerFinalScore.text = playerScore.ToString();
+        EnemyFinalScore.text = enemyScore.ToString();
+
+        if (win)
+        {
+            WinBG.SetActive(true);
+            LoseBG.SetActive(false);
+            ResultMessage.text = "You defeated the enemy!";
+        }
+        else
+        {
+            WinBG.SetActive(false);
+            LoseBG.SetActive(true);
+            ResultMessage.text = "Oops...";
+        }
+
+        CombatUI.SetActive(true);
+    }
+    
+    public void HideCombatUI()
+    {
+        foreach (GameObject slot in PlayerCombatSlots)
+        {
+            slot.SetActive(false);
+        }
+        foreach (GameObject slot in EnemyCombatSlots)
+        {
+            slot.SetActive(false);
+        }
+
+        CombatUI.SetActive(false);
+    }
+    
+    public void UpdateGoalStatus(int CharaID)
+    {
+        GoalStatus[CharaID].GetComponent<Image>().sprite = gameAssets.GetGoalFilled(CharaID);
+    }
 }

@@ -90,4 +90,25 @@ public class NetworkMonster : MonoBehaviour
 
         stepLength = data.tileSize + data.tileGapLength;
     }
+    
+    public void Kill(float stepTime) {
+        State = CharacterState.Die;
+        StartCoroutine(KillCoroutine(stepTime));
+    }
+
+    IEnumerator KillCoroutine(float stepTime) {
+        //This code existed in the old MonsterDie function and might be relevant to bring back.
+        //AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        //float animationLength = stateInfo.length;
+        //yield return new WaitForSeconds(animationLength - 2f);
+        yield return new WaitForSeconds(stepTime);
+        Destroy(this.gameObject);
+        yield break;
+    }
+    
+    public void Retreat()
+    {
+        transform.position = prevMovePointPos;
+        movePoint = prevMovePointPos;
+    }
 }
