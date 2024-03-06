@@ -148,7 +148,7 @@ public class LocalCharacter : MonoBehaviour
         stepLength = gameData.tileSize + gameData.tileGapLength;
         
         indicator_offset = new Vector3(0.1f, 0.5f, -0.1f) * gameData.tileSize;
-        Debug.Log(indicator_offset);
+        //Debug.Log(indicator_offset);
         indicator.transform.position += indicator_offset;
         characterMask = transform.Find("CharacterMask");
         visibilityMask = transform.Find("VisibleMask");
@@ -185,7 +185,7 @@ public class LocalCharacter : MonoBehaviour
     }
 
     public void FocusCharacter() {
-        MaskControl(true);
+        //MaskControl(true);
         MapGenerator.Instance.updateFogOfWar_map(CharacterId);
         if (LocalGameManager.Instance.gameStatus == LocalGameManager.GameStatus.Player_Planning) {
             indicator.SetActive(true);
@@ -201,7 +201,7 @@ public class LocalCharacter : MonoBehaviour
     }
 
     public void UnFocusCharacter() {
-        MaskControl(false);
+        //MaskControl(false);
         indicator.SetActive(false);
         foreach (GameObject one_path_indicator in path_indicator_list)
         {
@@ -238,10 +238,10 @@ public class LocalCharacter : MonoBehaviour
 
             Vector3 old_indicator_position = indicator.transform.position;
             indicator.transform.position += moveVec * stepLength;
-            Vector3 midpoint = (old_indicator_position + indicator.transform.position) / 2;
+            Vector3 midpoint = (old_indicator_position + indicator.transform.position) / 2 - indicator_offset;
             Vector3 path_indicator_direction = (indicator.transform.position - old_indicator_position).normalized;
             midpoint = RoundPosition(midpoint, 0.001f);
-            midpoint -= (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) * 0.4f*path_indicator_offset;
+            //midpoint -= (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) * 0.4f*path_indicator_offset;
             //midpoint += (Vector3.Cross(path_indicator_direction, Vector3.back).normalized)  * path_indicator_offset;
             while (path_indicator_positions.Contains(midpoint))
             {
@@ -253,16 +253,20 @@ public class LocalCharacter : MonoBehaviour
             if (Physics.Raycast(indicator.transform.position, -Vector3.up, out hit))
             {
                 if (hit.collider.gameObject.tag == "Monster") {
-                    Vector3 combat_indicator_position = indicator.transform.position + indicator_offset;
-                    GameObject new_combat_indicator = Instantiate(combat_indicator, combat_indicator_position, Quaternion.identity);
-                    combat_indicator_list.Push(new_combat_indicator);
+                    //if the tile is visible to player, drop a combat indicator
+                    if (hit.collider.gameObject.GetComponent< LocalMonster>().currentTile.fogOfWarDictionary[CharacterId] == LocalTile.FogOfWarState.Visible) {
+                        Vector3 combat_indicator_position = indicator.transform.position + indicator_offset;
+                        GameObject new_combat_indicator = Instantiate(combat_indicator, combat_indicator_position, Quaternion.identity);
+                        combat_indicator_list.Push(new_combat_indicator);
+                    }
+
                 }
             }
 
             path_indicator_positions.Add(midpoint);
             GameObject new_path_indicator = Instantiate(path_indicator, midpoint, Quaternion.LookRotation(path_indicator_direction));
 
-            new_path_indicator.transform.Rotate(0, -180, 0);
+            //new_path_indicator.transform.Rotate(0, -180, 0);
             new_path_indicator.transform.position = midpoint;
             path_indicator_list.Push(new_path_indicator);
         }
@@ -336,8 +340,11 @@ public class LocalCharacter : MonoBehaviour
             {
                 if (hit.collider.gameObject.tag == "Monster")
                 {
-                    GameObject one_combat_indicator = combat_indicator_list.Pop();
-                    Destroy(one_combat_indicator);
+                    if (hit.collider.gameObject.GetComponent<LocalMonster>().currentTile.fogOfWarDictionary[CharacterId] == LocalTile.FogOfWarState.Visible)
+                    {
+                        GameObject one_combat_indicator = combat_indicator_list.Pop();
+                        Destroy(one_combat_indicator);
+                    }
                 }
             }
         }
@@ -377,6 +384,7 @@ public class LocalCharacter : MonoBehaviour
             transform.position = target;
             model.rotation = targetRotation;
         }
+        MapGenerator.Instance.updateFogOfWar_map(CharacterId);
         State = CharacterState.Idle;
         moving = false;
     }
@@ -384,6 +392,7 @@ public class LocalCharacter : MonoBehaviour
     public void Retreat()
     {
         this.transform.position = prevMovePointPos;
+        MapGenerator.Instance.updateFogOfWar_map(CharacterId);
         movePoint = prevMovePointPos;
     }
 
@@ -413,7 +422,7 @@ public class LocalCharacter : MonoBehaviour
     {
         if (col.gameObject.tag == "Door")
         {
-            if (LocalGameManager.Instance.goalCount >= 3)
+            if (LocalGameManager.Instance.goalCount == 3)
             { //take th econditional logic out of the character and move it to the Manager
                 LocalGameManager.Instance.NextLevel();
             }
