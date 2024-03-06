@@ -79,9 +79,8 @@ public class NetworkPlayer : MonoBehaviour
     }
 
     public void SubmitPlan() {
-        NetworkMiddleware.S.ReadyForNextPhaseLocal(myCharacter.CharacterId, true);
         UpdatePlanUI(true, false, false);
-        
+        NetworkMiddleware.S.ReadyForNextPhaseLocal(myCharacter.CharacterId, true);
     }
 
     public void UpdatePlanUI(bool submitted, bool isEmpty, bool isFull)

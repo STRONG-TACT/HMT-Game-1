@@ -22,6 +22,7 @@ public class NetworkGameManager : MonoBehaviour
     private int planSubmittedCount = 0;
     private Queue<NetworkTile> eventQueue = new Queue<NetworkTile>();
     private Coroutine currentCoroutine = null;
+    public int currentLevel = 1;
     
     // ======== Pointer to In Game Prefabs ========
     [Header("In Game Prefabs")]
@@ -68,13 +69,21 @@ public class NetworkGameManager : MonoBehaviour
         // TODO: should use this time to do some setup
         gameStatus = GameStatus.GetReady;
         uiManager.InitGameUI();
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(0.1f);
         StartPlayerTurn();
     }
 
     private void StartPlayerTurn()
     {
-        localChar.ResetActionPoints();
+        remainingCharacterCount = 3;
+
+        foreach (NetworkCharacter chara in inSceneCharacters)
+        {
+            chara.ResetActionPoints();
+            if (chara.ActionPointsRemaining == 0) {
+                remainingCharacterCount -= 1;
+            }
+        }
         PreparePlayerPinningPhase();
     }
 
@@ -226,6 +235,7 @@ public class NetworkGameManager : MonoBehaviour
         Debug.Log("Moving phase ended.");
         pinningSystem.ClearCurrentTurnPins();
         //  StartMonsterTurn();
+        StartPlayerTurn();
     }
     
     private IEnumerator ExecuteCombatOneByOne()
@@ -409,6 +419,43 @@ public class NetworkGameManager : MonoBehaviour
         Debug.LogFormat("Event generated at {0}, {1}, of type {2}", tile.row, tile.col, tile.tileType);
         if (!eventQueue.Contains(tile)) {
             eventQueue.Enqueue(tile);
+        }
+    }
+    
+    // Called by LocalCharacter.OnTriggerEnter(), when all three goals fetched and one character collide with the door after that
+    // "Move" to next level by reset all relevant constants, delete monsters and tiles (tiles done by map generator) this level, and reset chara status
+    public void NextLevel()
+    {
+        Debug.Log("Moving to next level.");
+        currentLevel += 1;
+
+        if (currentLevel <= gameData.levelTextFiles.Length) {
+            goalCount = 0;
+            remainingCharacterCount = 3;
+            eventQueue.Clear();
+            StopAllCoroutines();
+
+            foreach (NetworkCharacter c in inSceneCharacters) {
+                c.StopAllCoroutines();
+                c.QuickRespawn();
+            }
+
+            while (inSceneMonsters.Count != 0)
+            {
+                NetworkMonster m = inSceneMonsters[0];
+                inSceneMonsters.Remove(m);
+                Destroy(m.gameObject);
+            }
+
+            uiManager.ResetGoalStatus();
+            NetworkMapGenerator.Instance.LoadLevel(gameData.levelTextFiles[currentLevel - 1]);
+
+            StartLevel();
+        }
+        else
+        {
+            Debug.Log("Game ends.");
+            gameStatus = GameStatus.GameEnd;
         }
     }
 }

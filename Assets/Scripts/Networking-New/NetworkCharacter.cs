@@ -346,6 +346,17 @@ public class NetworkCharacter : MonoBehaviour
         }
     }
     
+    private void OnTriggerStay(Collider col)
+    {
+        if (col.gameObject.tag == "Door")
+        {
+            if (NetworkGameManager.S.goalCount == 3)
+            { //TODO: take th conditional logic out of the character and move it to the Manager
+                NetworkGameManager.S.NextLevel();
+            }
+        }
+    }
+    
     public void DecrementHealth()
     {
         health -= 1;
@@ -371,11 +382,21 @@ public class NetworkCharacter : MonoBehaviour
 
         dead = true;
         respawnCountdown = 2;
-        this.gameObject.SetActive(false);
-        this.transform.position = startPos;
+        gameObject.SetActive(false);
+        transform.position = startPos;
 
         movePoint = startPos;
         prevMovePointPos = movePoint;
+    }
+    
+    public void QuickRespawn()
+    {
+        ActionPlan.Clear();
+        State = CharacterState.Idle;
+        respawnCountdown = 0;
+        dead = false;
+        gameObject.SetActive(true);
+        health = 3;
     }
     
     public void Retreat()

@@ -247,4 +247,12 @@ public class NetworkUIManager : MonoBehaviour
     {
         GoalStatus[CharaID].GetComponent<Image>().sprite = gameAssets.GetGoalFilled(CharaID);
     }
+    
+    public void ResetGoalStatus()
+    {
+        GoalPanel.SetActive(false);
+        GoalStatus[0].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(0);
+        GoalStatus[1].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(1);
+        GoalStatus[2].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(2);
+    }
 }
