@@ -342,7 +342,8 @@ public class NetworkCharacter : MonoBehaviour
             transform.position = target;
             model.rotation = targetRotation;
         }
-        NetworkMapGenerator.Instance.updateFogOfWar_map(CharacterId);
+        if (CharacterId == NetworkMiddleware.S.myCharacterID)
+            NetworkMapGenerator.Instance.updateFogOfWar_map(CharacterId);
         State = CharacterState.Idle;
         moving = false;
     }
@@ -427,7 +428,8 @@ public class NetworkCharacter : MonoBehaviour
     public void Retreat()
     {
         transform.position = prevMovePointPos;
-        NetworkMapGenerator.Instance.updateFogOfWar_map(CharacterId);
+        if (CharacterId == NetworkMiddleware.S.myCharacterID)
+            NetworkMapGenerator.Instance.updateFogOfWar_map(CharacterId);
         movePoint = prevMovePointPos;
     }
     
@@ -469,13 +471,9 @@ public class NetworkCharacter : MonoBehaviour
         visibilityMask = transform.Find("VisibleMask");
         ResetActionPoints();
         
-        Vector3 cellScale = new Vector3(gameData.tileSize + 2 * gameData.tileGapLength,
-            0,
-            gameData.tileSize + 2 * gameData.tileGapLength);
-        Vector3 globalCellScale = new Vector3(cellScale.x / transform.lossyScale.x, cellScale.y / transform.lossyScale.y, cellScale.z / transform.lossyScale.z);
-
-        characterMask.localScale = globalCellScale;
-        visibilityMask.localScale = globalCellScale*(config.sightRange*2f+1f-0.1f);
+        float maskScale = gameData.tileSize * (config.sightRange * 2f + 1f) + gameData.tileGapLength * (config.sightRange * 2f);
+        characterMask.localScale = new Vector3(gameData.tileSize, 0, gameData.tileSize);
+        visibilityMask.localScale = new Vector3(maskScale,0,maskScale);
         //characterMask.localScale = cellScale;
         //visibilityMask.localScale = cellScale * config.sightRange;
     }
