@@ -409,7 +409,7 @@ public class LocalCharacter : MonoBehaviour
     {
         if (col.gameObject.tag == "Door")
         {
-            if (LocalGameManager.Instance.goalCount == 3)
+            if (LocalGameManager.Instance.goalCount >= 3)
             { //take th econditional logic out of the character and move it to the Manager
                 LocalGameManager.Instance.NextLevel();
             }
