@@ -7579,7 +7579,7 @@ MonoBehaviour:
   config: {fileID: 0}
   CharacterId: 0
   currentTile: {fileID: 0}
-  path_indicator: {fileID: 8582931409851137678, guid: cfe0aa5ad899e1d4bbd267a46c5fb75e, type: 3}
+  path_indicator: {fileID: 8989618856613533639, guid: 8ed031e9d11189d4c996eca60573b7ca, type: 3}
   indicator: {fileID: 251929613}
   combat_indicator: {fileID: 3893728144243371889, guid: d6a5ac4d0d570c24da178c243013580c, type: 3}
   ActionPlan: 
@@ -8104,7 +8104,7 @@ MonoBehaviour:
   config: {fileID: 0}
   CharacterId: 0
   currentTile: {fileID: 0}
-  path_indicator: {fileID: 8582931409851137678, guid: cfe0aa5ad899e1d4bbd267a46c5fb75e, type: 3}
+  path_indicator: {fileID: 8989618856613533639, guid: 8ed031e9d11189d4c996eca60573b7ca, type: 3}
   indicator: {fileID: 480317383}
   combat_indicator: {fileID: 3893728144243371889, guid: d6a5ac4d0d570c24da178c243013580c, type: 3}
   ActionPlan: 
@@ -9338,7 +9338,7 @@ MonoBehaviour:
   config: {fileID: 0}
   CharacterId: 0
   currentTile: {fileID: 0}
-  path_indicator: {fileID: 8582931409851137678, guid: cfe0aa5ad899e1d4bbd267a46c5fb75e, type: 3}
+  path_indicator: {fileID: 8989618856613533639, guid: 8ed031e9d11189d4c996eca60573b7ca, type: 3}
   indicator: {fileID: 1886817385}
   combat_indicator: {fileID: 3893728144243371889, guid: d6a5ac4d0d570c24da178c243013580c, type: 3}
   ActionPlan: 

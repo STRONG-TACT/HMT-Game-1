@@ -43,6 +43,14 @@ public class NetworkMapGenerator : MonoBehaviour
         Instance = this;
     }
 
+    public void updateFogOfWar_map(int characterID)
+    {
+        foreach (NetworkTile tile in Map)
+        {
+            tile.updateFogOfWar_tile(characterID);
+        }
+    }
+
     private void Start()
     {
         LoadLevel(gameData.levelTextFiles[0]);

@@ -219,31 +219,37 @@ public class NetworkCharacter : MonoBehaviour
 
             Vector3 old_indicator_position = indicator.transform.position;
             indicator.transform.position += moveVec * stepLength;
-            Vector3 midpoint = (old_indicator_position + indicator.transform.position) / 2;
+            Vector3 midpoint = (old_indicator_position + indicator.transform.position) / 2 - indicator_offset;
             Vector3 path_indicator_direction = (indicator.transform.position - old_indicator_position).normalized;
             midpoint = RoundPosition(midpoint, 0.001f);
-            midpoint -= (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) * 0.4f*path_indicator_offset;
+            //midpoint -= (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) * 0.4f*path_indicator_offset;
             //midpoint += (Vector3.Cross(path_indicator_direction, Vector3.back).normalized)  * path_indicator_offset;
             while (path_indicator_positions.Contains(midpoint))
             {
-                midpoint -= (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) *path_indicator_offset;
+                midpoint -= (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) * path_indicator_offset;
             }
 
             RaycastHit hit;
             // Raycast downwards from the indicator's position
             if (Physics.Raycast(indicator.transform.position, -Vector3.up, out hit))
             {
-                if (hit.collider.gameObject.tag == "Monster") {
-                    Vector3 combat_indicator_position = indicator.transform.position + indicator_offset;
-                    GameObject new_combat_indicator = Instantiate(combat_indicator, combat_indicator_position, Quaternion.identity);
-                    combat_indicator_list.Push(new_combat_indicator);
+                if (hit.collider.gameObject.tag == "Monster")
+                {
+                    //if the tile is visible to player, drop a combat indicator
+                    if (hit.collider.gameObject.GetComponent<NetworkMonster>().currentTile.fogOfWarDictionary[CharacterId] == NetworkTile.FogOfWarState.Visible)
+                    {
+                        Vector3 combat_indicator_position = indicator.transform.position + indicator_offset;
+                        GameObject new_combat_indicator = Instantiate(combat_indicator, combat_indicator_position, Quaternion.identity);
+                        combat_indicator_list.Push(new_combat_indicator);
+                    }
+
                 }
             }
 
             path_indicator_positions.Add(midpoint);
             GameObject new_path_indicator = Instantiate(path_indicator, midpoint, Quaternion.LookRotation(path_indicator_direction));
 
-            new_path_indicator.transform.Rotate(0, -180, 0);
+            //new_path_indicator.transform.Rotate(0, -180, 0);
             new_path_indicator.transform.position = midpoint;
             path_indicator_list.Push(new_path_indicator);
         }
@@ -277,8 +283,11 @@ public class NetworkCharacter : MonoBehaviour
             {
                 if (hit.collider.gameObject.tag == "Monster")
                 {
-                    GameObject one_combat_indicator = combat_indicator_list.Pop();
-                    Destroy(one_combat_indicator);
+                    if (hit.collider.gameObject.GetComponent<NetworkMonster>().currentTile.fogOfWarDictionary[CharacterId] == NetworkTile.FogOfWarState.Visible)
+                    {
+                        GameObject one_combat_indicator = combat_indicator_list.Pop();
+                        Destroy(one_combat_indicator);
+                    }
                 }
             }
         }
@@ -333,6 +342,7 @@ public class NetworkCharacter : MonoBehaviour
             transform.position = target;
             model.rotation = targetRotation;
         }
+        NetworkMapGenerator.Instance.updateFogOfWar_map(CharacterId);
         State = CharacterState.Idle;
         moving = false;
     }
@@ -353,7 +363,7 @@ public class NetworkCharacter : MonoBehaviour
     {
         if (col.gameObject.tag == "Door")
         {
-            if (NetworkGameManager.S.goalCount == 3)
+            if (NetworkGameManager.S.goalCount >= 3)
             { //TODO: take th conditional logic out of the character and move it to the Manager
                 NetworkGameManager.S.NextLevel();
             }
@@ -417,6 +427,7 @@ public class NetworkCharacter : MonoBehaviour
     public void Retreat()
     {
         transform.position = prevMovePointPos;
+        NetworkMapGenerator.Instance.updateFogOfWar_map(CharacterId);
         movePoint = prevMovePointPos;
     }
     
@@ -429,7 +440,7 @@ public class NetworkCharacter : MonoBehaviour
     }
     
     public void FocusCharacter() {
-        MaskControl(true);
+        //MaskControl(true);
         if(NetworkGameManager.S.gameStatus == GameStatus.Player_Planning) {
             indicator.SetActive(true);
             foreach (GameObject one_path_indicator in path_indicator_list)

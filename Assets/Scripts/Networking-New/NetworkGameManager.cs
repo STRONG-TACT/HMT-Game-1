@@ -69,7 +69,8 @@ public class NetworkGameManager : MonoBehaviour
         // TODO: should use this time to do some setup
         gameStatus = GameStatus.GetReady;
         uiManager.InitGameUI();
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(2f);
+        NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
         StartPlayerTurn();
     }
 
@@ -417,8 +418,14 @@ public class NetworkGameManager : MonoBehaviour
                     case NetworkTile.ObstacleType.Trap:
                         reduceCharacterHealth(t.charaList, deadChara, aliveChara);
                         clearCharacterMoves(t.charaList);
+                        Dictionary<int, NetworkTile.FogOfWarState> fogOfWarDictionary = new Dictionary<int, NetworkTile.FogOfWarState>();
+                        foreach (KeyValuePair<int, NetworkTile.FogOfWarState> entry in t.fogOfWarDictionary)
+                        {
+                            fogOfWarDictionary.Add(entry.Key, entry.Value);
+                        }
                         GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
                         NetworkTile newTile = opentile.GetComponent<NetworkTile>();
+                        newTile.fogOfWarDictionary = fogOfWarDictionary;
                         newTile.row = t.row;
                         newTile.col = t.col;
                         NetworkMapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
