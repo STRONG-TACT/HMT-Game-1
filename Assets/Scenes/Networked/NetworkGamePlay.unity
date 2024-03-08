@@ -2130,6 +2130,61 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 407090554}
   m_CullTransparentMesh: 1
+--- !u!1 &415934545
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 415934547}
+  - component: {fileID: 415934546}
+  m_Layer: 0
+  m_Name: n_HMTInterface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &415934546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 415934545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 348d08a966e59734b88c1b8bc71ad903, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartServerOnStart: 1
+  url: ws://localhost
+  socketPort: 4649
+  serviceName: hmt
+  serviceTargets:
+  - dwarf
+  - giant
+  - human
+  IgnoreScenes: []
+  dwarfID: 0
+  giantID: 1
+  humanID: 2
+--- !u!4 &415934547
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 415934545}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 543.6514, y: 163.85205, z: -46.82383}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 18
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &428104893
 GameObject:
   m_ObjectHideFlags: 0
@@ -10550,7 +10605,7 @@ Transform:
   - {fileID: 1005648489}
   - {fileID: 1230570750}
   m_Father: {fileID: 0}
-  m_RootOrder: 18
+  m_RootOrder: 19
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1976123621
 GameObject:
