@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using GameConstant;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 public class NetworkCharacter : MonoBehaviour
 {
@@ -178,6 +180,40 @@ public class NetworkCharacter : MonoBehaviour
         ResetPlan();
         NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, 
             ActionPointsRemaining == 0 || dead);
+    }
+
+    public bool MovePingCursor(NetworkCharacter.Direction direction) {
+        if (ActionPointsRemaining <= 0) { 
+            return false;
+        }
+        else {
+            switch (direction) {
+                case NetworkCharacter.Direction.Up:
+                    if (pingCursor.y < NetworkMapGenerator.Instance.Map.GetLength(0)) {
+                        pingCursor += Vector2Int.up;
+                    }
+                    break;
+                case NetworkCharacter.Direction.Down:
+                    if (pingCursor.y > 0) {
+                        pingCursor += Vector2Int.down;
+                    }
+                    break;
+                case NetworkCharacter.Direction.Left:
+                    if(pingCursor.x > 0) { 
+                        pingCursor+= Vector2Int.left;
+                    }
+                    break;
+                case NetworkCharacter.Direction.Right:
+                    if (pingCursor.x < NetworkMapGenerator.Instance.Map.GetLength(1)) {
+                        pingCursor += Vector2Int.right;
+                    }
+                    break;
+                case NetworkCharacter.Direction.Wait:
+                    return false;
+            }
+            return true;
+        }
+
     }
 
     public void PlacePin()
@@ -476,6 +512,22 @@ public class NetworkCharacter : MonoBehaviour
         visibilityMask.localScale = new Vector3(maskScale,0,maskScale);
         //characterMask.localScale = cellScale;
         //visibilityMask.localScale = cellScale * config.sightRange;
+    }
+
+    public JObject HMTStateRep() {
+        return new JObject {
+            {"name", config.characterName},
+            {"characterId", CharacterId },
+            {"type", config.type.ToString()},
+            {"sightRange", config.sightRange },
+            {"monsterDice", config.monsterDice.ToString()},
+            {"trapDice", config.trapDice.ToString() },
+            {"stoneDice", config.stoneDice.ToString() },
+            {"health", health},
+            {"dead", dead},
+            {"actionPoints", ActionPointsRemaining},
+            {"actionPlan", new JArray(ActionPlan.Select(d => d.ToString())) }
+        };
     }
     
 }

@@ -113,51 +113,73 @@ public class NetworkPinningSystem : MonoBehaviourPunCallbacks
         isPinned = false;
     }
     
-    /*TODO: to allow for HMT interface, we also need [pin]At version of
-            these functions, refer to LocalPiningSystem,cs line 102*/
-    public void Danger()
-    {
+
+    /*
+     * These DropPin and DropPinAt functions generalize all of the specific functions below.
+     * It also allows for openning up the set of pins in the future.
+     * We shouldn't need the specific functions anymore.
+     */ 
+    public void DropPin(int pinTypeIdx) {
+        DropPinAt(pinTypeIdx, focusedTile.row, focusedTile.col, NetworkMiddleware.S.myCharacterID);
+    }
+
+    public void DropPinAt(int pinTypeIdx, int row, int col, int charId) {
         photonView.RPC(
             "AddPin", 
-            RpcTarget.All, 
-            pinPrefab2Idx[dangerPinPrefab], 
-            focusedTile.row, focusedTile.col, 
-            NetworkMiddleware.S.myCharacterID);
+            RpcTarget.All,
+            pinTypeIdx, 
+            row, col, 
+            charId);
         NetworkGameManager.S.NewPlayerPin();
     }
+
+
+    //public void Danger() {
+    //    DangerAt(focusedTile.row, focusedTile.col, NetworkMiddleware.S.myCharacterID);
+    //}
+
+    //public void DangerAt(int row, int col, int charId) {
+    //    photonView.RPC(
+    //        "AddPin",
+    //        RpcTarget.All,
+    //        pinPrefab2Idx[dangerPinPrefab],
+    //        row, col, charId);
+    //    NetworkGameManager.S.NewPlayerPin();
+    //}
     
-    public void Assist()
-    {
-        photonView.RPC(
-            "AddPin", 
-            RpcTarget.All, 
-            pinPrefab2Idx[assistPinPrefab], 
-            focusedTile.row, focusedTile.col, 
-            NetworkMiddleware.S.myCharacterID);
-        NetworkGameManager.S.NewPlayerPin();
-    }
+    //public void Assist()
+    //{
+    //    photonView.RPC(
+    //        "AddPin", 
+    //        RpcTarget.All, 
+    //        pinPrefab2Idx[assistPinPrefab], 
+    //        focusedTile.row, focusedTile.col, 
+    //        NetworkMiddleware.S.myCharacterID);
+    //    NetworkGameManager.S.NewPlayerPin();
+    //}
+
     
-    public void Unknown()
-    {
-        photonView.RPC(
-            "AddPin", 
-            RpcTarget.All, 
-            pinPrefab2Idx[unknownPinPrefab], 
-            focusedTile.row, focusedTile.col, 
-            NetworkMiddleware.S.myCharacterID);
-        NetworkGameManager.S.NewPlayerPin();
-    }
+    //public void Unknown()
+    //{
+    //    photonView.RPC(
+    //        "AddPin", 
+    //        RpcTarget.All, 
+    //        pinPrefab2Idx[unknownPinPrefab], 
+    //        focusedTile.row, focusedTile.col, 
+    //        NetworkMiddleware.S.myCharacterID);
+    //    NetworkGameManager.S.NewPlayerPin();
+    //}
     
-    public void OMW()
-    {
-        photonView.RPC(
-            "AddPin", 
-            RpcTarget.All, 
-            pinPrefab2Idx[omwPinPrefab], 
-            focusedTile.row, focusedTile.col, 
-            NetworkMiddleware.S.myCharacterID);
-        NetworkGameManager.S.NewPlayerPin();
-    }
+    //public void OMW()
+    //{
+    //    photonView.RPC(
+    //        "AddPin", 
+    //        RpcTarget.All, 
+    //        pinPrefab2Idx[omwPinPrefab], 
+    //        focusedTile.row, focusedTile.col, 
+    //        NetworkMiddleware.S.myCharacterID);
+    //    NetworkGameManager.S.NewPlayerPin();
+    //}
 
     [PunRPC]
     private void AddPin(int pinIdx, int tileRow, int tileCol, int charID)

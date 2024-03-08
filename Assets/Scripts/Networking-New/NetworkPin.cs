@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -40,5 +41,12 @@ public class NetworkPin : MonoBehaviour
         if (locationTile != null) {
             locationTile.pinList.Remove(this);
         }
+    }
+
+    public JObject HMTStateRep() {
+        return new JObject {
+            { "type", pinType.ToString()},
+            {"placedBy", placingCharacter.CharacterId }
+        };
     }
 }

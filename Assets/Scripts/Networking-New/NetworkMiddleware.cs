@@ -70,6 +70,18 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         }
     }
 
+    public void MovePingCursorOnCharacterLocal(NetworkCharacter.Direction direction, int charID) {
+        photonView.RPC("MovePingCursorOnCharacterRPC", RpcTarget.All, direction, charID);
+    }
+
+    [PunRPC]
+    private void MovePingCursorOnCharacterRPC(NetworkCharacter.Direction direction, int charID) {
+        if (charID != myCharacterID) {
+            NetworkGameManager.S.inSceneCharacters[charID].MovePingCursor(direction);
+        }
+    }
+
+
     public void AddMoveToCharacterLocal(NetworkCharacter.Direction direction, int charID)
     {
         photonView.RPC("AddMoveToCharacterRPC", RpcTarget.All, direction, charID);
