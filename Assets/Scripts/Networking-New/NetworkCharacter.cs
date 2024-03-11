@@ -227,7 +227,7 @@ public class NetworkCharacter : MonoBehaviour
     
     public bool CheckMove(Direction direction) {
         if (direction == Direction.Wait) return true;
-
+        
         Vector3 moveVec = direction switch {
             Direction.Up => Vector3.forward,
             Direction.Down => Vector3.back,
@@ -235,8 +235,19 @@ public class NetworkCharacter : MonoBehaviour
             Direction.Right => Vector3.right,
             _ => Vector3.forward
         };
-
-        return !Physics.Raycast(indicator.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible"));
+        RaycastHit hit;
+        if (Physics.Raycast(indicator.transform.position, moveVec, out hit, stepLength, LayerMask.GetMask("Impassible"))) {
+            if (hit.collider.gameObject.GetComponent<NetworkTile>().fogOfWarDictionary[CharacterId] == NetworkTile.FogOfWarState.Unseen)
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+        }
+        return true;
+        //return !Physics.Raycast(indicator.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible"));
     }
     
     public void AddActionToPlan(Direction direction)
@@ -350,8 +361,7 @@ public class NetworkCharacter : MonoBehaviour
     public IEnumerator TakeNextMove(float stepTime) {
         if(ActionPlan.Count == 0) {
             yield break;
-        }
-        moving = true;
+        } 
         prevMovePointPos = transform.position;
         float timeStart = Time.time;
         Direction nextMove = ActionPlan[0];
@@ -363,6 +373,17 @@ public class NetworkCharacter : MonoBehaviour
             Direction.Right => Vector3.right,
             _ => Vector3.zero
         };
+        //if next step is an impassible terrain, cancel all action
+        RaycastHit hit;
+        if (Physics.Raycast(indicator.transform.position, moveVec, out hit, stepLength, LayerMask.GetMask("Impassible"))) 
+        {
+            ActionPlan.Clear();
+            //Debug.Log("Impassible!");
+
+            //State = CharacterState.Idle;
+            yield break;
+        }
+        moving = true;
         if (moveVec != Vector3.zero) {
             State = CharacterState.Walking;
 
