@@ -153,7 +153,9 @@ public class NetworkGameManager : MonoBehaviour
         foreach (NetworkCharacter chara in inSceneCharacters) {
             chara.StartPlanningPhase();
         }
-        
+        localChar.indicator.SetActive(true);
+
+
         if (remainingCharacterCount > 0) {
             CheckPlanPhaseEnd();
             player.UpdateCharacterUI();
@@ -478,7 +480,7 @@ public class NetworkGameManager : MonoBehaviour
             uiManager.HideCombatUI();
         }
         yield break;
-
+        NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
         // This should only be called as a sub-coroutine of the main moving one so it
         // doesn't need to restart them, it should just yield break
         //if (gameStatus == GameStatus.Player_Moving)
