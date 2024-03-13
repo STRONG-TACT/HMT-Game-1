@@ -62,13 +62,15 @@ MonoBehaviour:
   tileType: 2
   dice:
     type: 0
-    bonus: 6
+    bonus: 5
   row: 0
   col: 0
   enemyList: []
   charaList: []
   pinList: []
   shrine: {fileID: 0}
+  seen_material: {fileID: 0}
+  unseen_material: {fileID: 0}
 --- !u!1001 &6257837337522262172
 PrefabInstance:
   m_ObjectHideFlags: 0
