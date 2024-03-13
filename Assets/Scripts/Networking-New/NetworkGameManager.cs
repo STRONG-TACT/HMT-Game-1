@@ -314,7 +314,8 @@ public class NetworkGameManager : MonoBehaviour
                                     if (NetworkMapGenerator.Instance.InMap(targetRow, targetCol))
                                     {
                                         NetworkTile targetTile = NetworkMapGenerator.Instance.GetTileAt(targetRow, targetCol);
-                                        if (targetTile.tileType == NetworkTile.ObstacleType.None && targetTile.enemyList.Count == 0 && targetTile.charaList.Count == 0)
+                                        if (targetTile.tileType == NetworkTile.ObstacleType.None && targetTile.enemyList.Count == 0 
+                                            && targetTile.charaList.Count == 0 && targetTile.gameObject.tag != "Rock" && targetTile.gameObject.tag != "Trap" && targetTile.gameObject.layer != LayerMask.NameToLayer("Impassible")) 
                                         {
                                             availablePos.Add(targetTile);
                                         }
