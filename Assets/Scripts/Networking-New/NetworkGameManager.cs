@@ -82,6 +82,7 @@ public class NetworkGameManager : MonoBehaviour
 
     private void StartPlayerTurn()
     {
+
         NetworkMapGenerator.Instance.updateFogOfWar_map(NetworkGameManager.S.localChar.CharacterId);
         remainingCharacterCount = 3;
 
@@ -626,6 +627,7 @@ public class NetworkGameManager : MonoBehaviour
         else
         {
             Debug.Log("Game ends.");
+            uiManager.DisplayVictoryScreen();
             gameStatus = GameStatus.GameEnd;
         }
     }
