@@ -97,7 +97,7 @@ public class NetworkCharacter : MonoBehaviour
 
     public enum CharacterState
     {
-        Idle, Walking, Attacking, Die
+        Idle, Walking, Attacking, Die, Cheering
     }
 
 
@@ -115,21 +115,35 @@ public class NetworkCharacter : MonoBehaviour
                             animator.SetBool("Idle", true);
                             animator.SetBool("Attack", false);
                             animator.SetBool("Walk", false);
+                            animator.SetBool("Cheer", false);
+                            animator.SetBool("Die", false);
                             break;
                         case CharacterState.Walking:
                             animator.SetBool("Idle", false);
                             animator.SetBool("Attack", false);
                             animator.SetBool("Walk", true);
+                            animator.SetBool("Cheer", false);
+                            animator.SetBool("Die", false);
                             break;
                         case CharacterState.Attacking:
                             animator.SetBool("Idle", false);
                             animator.SetBool("Attack", true);
                             animator.SetBool("Walk", false);
+                            animator.SetBool("Cheer", false);
+                            animator.SetBool("Die", false);
+                            break;
+                        case CharacterState.Cheering:
+                            animator.SetBool("Idle", false);
+                            animator.SetBool("Attack", false);
+                            animator.SetBool("Walk", false);
+                            animator.SetBool("Cheer", true);
+                            animator.SetBool("Die", false);
                             break;
                         case CharacterState.Die:
                             animator.SetBool("Idle", false);
                             animator.SetBool("Attack", false);
                             animator.SetBool("Walk", false);
+                            animator.SetBool("Cheer", false);
                             animator.SetBool("Die", true);
                             break;
                     }

@@ -70,6 +70,9 @@ public class NetworkUIManager : MonoBehaviour
                 break;
         }
     }
+    public void LoadLevelEndUI() {
+        text.text = "Level Conquered!";
+    }
     
     private void UpdateHealthPanel(int health)
     {

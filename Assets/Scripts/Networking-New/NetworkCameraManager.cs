@@ -40,19 +40,19 @@ public class NetworkCameraManager : MonoBehaviour
     private void Update()
     {
 
-        if (Input.GetKey(KeyCode.I))
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
             cameraPivot.transform.position += new Vector3(0f, 1 * cameraMoveSpeed, 0f);
         }
-        if (Input.GetKey(KeyCode.K))
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
             cameraPivot.transform.position += new Vector3(0f, -1 * cameraMoveSpeed, 0f);
         }
-        if (Input.GetKey(KeyCode.J))
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
             cameraPivot.transform.position += new Vector3(-1 * cameraMoveSpeed / 2, 0f, -1 * cameraMoveSpeed / 2);
         }
-        if (Input.GetKey(KeyCode.L))
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
             cameraPivot.transform.position += new Vector3(1 * cameraMoveSpeed / 2, 0f, 1 * cameraMoveSpeed / 2);
         }
@@ -69,7 +69,7 @@ public class NetworkCameraManager : MonoBehaviour
     {
 
         //if (GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber && cameraCentered)
-        if (Input.GetKey(KeyCode.T))
+        if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.Home) || Input.GetKey(KeyCode.F))
         {
             cameraPivot.transform.position = targetCharacter.transform.position; //+ cameraOffset;
         }

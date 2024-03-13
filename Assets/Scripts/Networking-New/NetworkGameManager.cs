@@ -465,6 +465,7 @@ public class NetworkGameManager : MonoBehaviour
                         m.Retreat();
                     }
                 }
+                NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
             }
 
             //TODO this should probably be waiting for a button click in the future.
@@ -545,16 +546,43 @@ public class NetworkGameManager : MonoBehaviour
     // "Move" to next level by reset all relevant constants, delete monsters and tiles (tiles done by map generator) this level, and reset chara status
     public void NextLevel()
     {
+        StartCoroutine(PrepareForNextLevel());
+    }
+
+    private IEnumerator PrepareForNextLevel() {
+
+        while (inSceneMonsters.Count != 0)
+        {
+            NetworkMonster m = inSceneMonsters[0];
+            inSceneMonsters.Remove(m);
+            Destroy(m.gameObject);
+        }
+
+        uiManager.LoadLevelEndUI();
+        foreach (NetworkCharacter c in inSceneCharacters) 
+        {
+            c.State = NetworkCharacter.CharacterState.Cheering;
+        }
+
+        yield return new WaitForSeconds(5f);
+        foreach (NetworkCharacter c in inSceneCharacters)
+        {
+            c.State = NetworkCharacter.CharacterState.Idle;
+        }
+
+
         Debug.Log("Moving to next level.");
         currentLevel += 1;
 
-        if (currentLevel <= gameData.levelTextFiles.Length) {
+        if (currentLevel <= gameData.levelTextFiles.Length)
+        {
             goalCount = 0;
             remainingCharacterCount = 3;
             eventQueue.Clear();
             StopAllCoroutines();
 
-            foreach (NetworkCharacter c in inSceneCharacters) {
+            foreach (NetworkCharacter c in inSceneCharacters)
+            {
                 c.StopAllCoroutines();
                 c.QuickRespawn();
             }
@@ -577,4 +605,6 @@ public class NetworkGameManager : MonoBehaviour
             gameStatus = GameStatus.GameEnd;
         }
     }
+
+
 }

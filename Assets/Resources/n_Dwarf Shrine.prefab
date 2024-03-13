@@ -196,6 +196,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ShrineStone
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: c55f20224110d477f98b284dae7db91b, type: 3}
+      propertyPath: m_TagString
+      value: ShrineStone
+      objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: c55f20224110d477f98b284dae7db91b, type: 3}
       propertyPath: m_Controller
       value: 
