@@ -62,7 +62,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileType: 1
   dice:
-    type: 0
+    type: 4
     bonus: 0
   row: 0
   col: 0

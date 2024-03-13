@@ -62,14 +62,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileType: 1
   dice:
-    type: 0
-    bonus: 0
+    type: 4
+    bonus: 2
   row: 0
   col: 0
   enemyList: []
   charaList: []
   pinList: []
   shrine: {fileID: 0}
+  seen_material: {fileID: 0}
+  unseen_material: {fileID: 0}
 --- !u!1001 &5914118010534028535
 PrefabInstance:
   m_ObjectHideFlags: 0
