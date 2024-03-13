@@ -164,11 +164,13 @@ public class NetworkCharacter : MonoBehaviour
     
     public void StartPingPhase() {
         pingCursor = Vector2Int.zero;
-        NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, dead);
+        if (CharacterId == NetworkMiddleware.S.myCharacterID)
+            NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, dead);
     }
     
     public void EndPingPhase() {
         pingCursor = Vector2Int.zero;
+        ReadyForNextPhase = false;
     }
     
     public void ResetPlan() {
@@ -178,8 +180,12 @@ public class NetworkCharacter : MonoBehaviour
     public void StartPlanningPhase()
     {
         ResetPlan();
-        NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, 
-            ActionPointsRemaining == 0 || dead);
+        if (CharacterId == NetworkMiddleware.S.myCharacterID)
+        {
+            NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, 
+                ActionPointsRemaining == 0 || dead);
+        }
+        Debug.Log($"ActionPointsRemaining: {ActionPointsRemaining}");
     }
 
     public bool MovePingCursor(NetworkCharacter.Direction direction) {
