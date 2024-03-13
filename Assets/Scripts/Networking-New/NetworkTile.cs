@@ -140,6 +140,7 @@ public class NetworkTile : MonoBehaviour
         {
             NetworkGameManager.S.updateEventQueue(this);
         }
+        
     }
 
     private void OnTriggerExit(Collider col)

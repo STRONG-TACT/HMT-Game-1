@@ -246,11 +246,26 @@ public class NetworkMonster : MonoBehaviour
             NetworkCharacter.Direction.Right => Vector3.right,
             _ => Vector3.forward
         };
-        bool passible = true;
-        if (Physics.Raycast(this.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible")) ) 
+        //bool passible = true;
+        bool passible = false;
+        RaycastHit hit;
+        if (Physics.Raycast(this.transform.position, moveVec, out hit, stepLength))
+        //if (Physics.Raycast(this.transform.position, moveVec, out hit, stepLength, LayerMask.GetMask("Impassible")))
         {
-            passible = false;
+            if (hit.collider.gameObject.tag == "Rock" || hit.collider.gameObject.tag == "Trap")
+            {
+                passible = false;
+            }
+            else if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Impassible"))
+            {
+                passible = false;
+            }
+            else {
+                passible = true;
+            }
+
         }
+
         //return !Physics.Raycast(this.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible"));
         return passible;
     }

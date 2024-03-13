@@ -73,7 +73,7 @@ public class NetworkGameManager : MonoBehaviour
         NetworkCameraManager.S.RecenterCamera();
         // this call will mark every tile as unseen
         NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
-        yield return new WaitForSeconds(2.0f); // wait for physic system to kick off
+        yield return new WaitForFixedUpdate(); // wait for physic system to kick off
         // this call actually setup the correct FOW
         // the delay is needed because internal state of FOW needs physics trigger to work
         NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
@@ -82,6 +82,8 @@ public class NetworkGameManager : MonoBehaviour
 
     private void StartPlayerTurn()
     {
+
+        NetworkMapGenerator.Instance.updateFogOfWar_map(NetworkGameManager.S.localChar.CharacterId);
         remainingCharacterCount = 3;
 
         foreach (NetworkCharacter chara in inSceneCharacters)
@@ -313,7 +315,8 @@ public class NetworkGameManager : MonoBehaviour
                                     if (NetworkMapGenerator.Instance.InMap(targetRow, targetCol))
                                     {
                                         NetworkTile targetTile = NetworkMapGenerator.Instance.GetTileAt(targetRow, targetCol);
-                                        if (targetTile.tileType == NetworkTile.ObstacleType.None && targetTile.enemyList.Count == 0 && targetTile.charaList.Count == 0)
+                                        if (targetTile.tileType == NetworkTile.ObstacleType.None && targetTile.enemyList.Count == 0 
+                                            && targetTile.charaList.Count == 0 && targetTile.gameObject.tag != "Rock" && targetTile.gameObject.tag != "Trap" && targetTile.gameObject.layer != LayerMask.NameToLayer("Impassible")) 
                                         {
                                             availablePos.Add(targetTile);
                                         }
@@ -407,6 +410,7 @@ public class NetworkGameManager : MonoBehaviour
                         Destroy(t.gameObject);
                         break;
                 }
+                NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
             }
             else {
                 // If not, reduce health except rock
@@ -623,6 +627,7 @@ public class NetworkGameManager : MonoBehaviour
         else
         {
             Debug.Log("Game ends.");
+            uiManager.DisplayVictoryScreen();
             gameStatus = GameStatus.GameEnd;
         }
     }
