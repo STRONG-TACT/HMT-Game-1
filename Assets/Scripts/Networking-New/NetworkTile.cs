@@ -50,15 +50,17 @@ public class NetworkTile : MonoBehaviour
         fogOfWarDictionary.Add(0, NetworkTile.FogOfWarState.Unseen);
         fogOfWarDictionary.Add(1, NetworkTile.FogOfWarState.Unseen);
         fogOfWarDictionary.Add(2, NetworkTile.FogOfWarState.Unseen);
-    }
-    private void Start()
-    {
+        
         Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
         foreach (Renderer renderer in renderers)
         {
             // Store the original materials
             originalMaterials[renderer] = renderer.materials;
         }
+    }
+    private void Start()
+    {
+        
     }
 
     private void OnTriggerStay(Collider col)

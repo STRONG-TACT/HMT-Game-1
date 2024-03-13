@@ -66,10 +66,16 @@ public class NetworkGameManager : MonoBehaviour
 
     IEnumerator StartLevel()
     {
-        // TODO: should use this time to do some setup
         gameStatus = GameStatus.GetReady;
         uiManager.InitGameUI();
-        yield return new WaitForSeconds(2f);
+        // center camera to player
+        NetworkCameraManager.S.ChangeTargetCharacter(localChar.CharacterId);
+        NetworkCameraManager.S.RecenterCamera();
+        // this call will mark every tile as unseen
+        NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
+        yield return new WaitForSeconds(2.0f); // wait for physic system to kick off
+        // this call actually setup the correct FOW
+        // the delay is needed because internal state of FOW needs physics trigger to work
         NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
         StartPlayerTurn();
     }

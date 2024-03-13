@@ -70,6 +70,8 @@ MonoBehaviour:
   charaList: []
   pinList: []
   shrine: {fileID: 0}
+  seen_material: {fileID: 0}
+  unseen_material: {fileID: 0}
 --- !u!1001 &7221710844581792528
 PrefabInstance:
   m_ObjectHideFlags: 0

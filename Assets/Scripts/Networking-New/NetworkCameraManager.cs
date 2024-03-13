@@ -19,7 +19,7 @@ public class NetworkCameraManager : MonoBehaviour
     public bool cameraCentered;
 
 
-    float lerpDuration = 3f;
+    float lerpDuration = 1.0f;
     float timer;
 
     private void Awake()
