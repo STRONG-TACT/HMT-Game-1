@@ -73,7 +73,7 @@ public class NetworkGameManager : MonoBehaviour
         NetworkCameraManager.S.RecenterCamera();
         // this call will mark every tile as unseen
         NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
-        yield return new WaitForSeconds(2.0f); // wait for physic system to kick off
+        yield return new WaitForFixedUpdate(); // wait for physic system to kick off
         // this call actually setup the correct FOW
         // the delay is needed because internal state of FOW needs physics trigger to work
         NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
