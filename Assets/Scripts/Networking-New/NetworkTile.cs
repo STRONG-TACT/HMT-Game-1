@@ -115,6 +115,8 @@ public class NetworkTile : MonoBehaviour
         {
             NetworkGameManager.S.updateEventQueue(this);
         }
+        
+        NetworkMapGenerator.Instance.updateFogOfWar_map(NetworkGameManager.S.localChar.CharacterId);
     }
 
     private void OnTriggerExit(Collider col)
