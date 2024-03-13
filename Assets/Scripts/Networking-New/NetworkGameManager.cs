@@ -76,7 +76,7 @@ public class NetworkGameManager : MonoBehaviour
         yield return new WaitForSeconds(2.0f); // wait for physic system to kick off
         // this call actually setup the correct FOW
         // the delay is needed because internal state of FOW needs physics trigger to work
-        //NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
+        NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
         StartPlayerTurn();
     }
 
