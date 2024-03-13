@@ -459,6 +459,7 @@ public class NetworkGameManager : MonoBehaviour
                         m.Retreat();
                     }
                 }
+                NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
             }
 
             //TODO this should probably be waiting for a button click in the future.

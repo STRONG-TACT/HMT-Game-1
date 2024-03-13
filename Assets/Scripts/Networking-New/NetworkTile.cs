@@ -80,9 +80,6 @@ public class NetworkTile : MonoBehaviour
                 //Debug.Log("Tile collide with mask-----------------------");
                 NetworkCharacter mask_character = col.gameObject.transform.parent.GetComponent<NetworkCharacter>();
                 //Debug.Log(fogOfWarDictionary[mask_character.CharacterId]);
-                //Debug.Log("CharacterID: -------------------------");
-                //Debug.Log(mask_character.CharacterId);
-                Debug.Log(mask_character.CharacterId);
                 fogOfWarDictionary[mask_character.CharacterId] = FogOfWarState.Visible;
                 //setRenderer(true);
                 break;
@@ -205,9 +202,12 @@ public class NetworkTile : MonoBehaviour
         Animator[] animators = GetComponentsInChildren<Animator>(true);
         foreach (Animator animator in animators)
         {
-            if (animator != null)
+            if (animator.gameObject.tag == "ShrineStone")
             {
-
+                animator.enabled = agent_active;
+            }
+            else if (animator != null)
+            {
                 animator.enabled = object_active;
             }
         }
@@ -241,7 +241,11 @@ public class NetworkTile : MonoBehaviour
                 //if state is seen, turn on renderers for all stationary objects and apply seen shader
                 else if (state == FogOfWarState.Seen)
                 {
-                    if (renderer.gameObject.tag != "Ping")
+                    if (renderer.gameObject.tag == "ShrineStone")
+                    {
+                        renderer.enabled = agent_active;
+                    }
+                    else if (renderer.gameObject.tag != "Ping")
                     {
                         renderer.enabled = object_active;
                         Material[] overideMaterials = new Material[renderer.materials.Length];
