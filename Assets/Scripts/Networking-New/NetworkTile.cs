@@ -1,9 +1,34 @@
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class NetworkTile : MonoBehaviour
 {
+    private static Dictionary<string, int> TILE_IDS_BY_OBJ_KEY = new Dictionary<string, int>();
+    private static string GetObjID(string objKey) {
+        if (!TILE_IDS_BY_OBJ_KEY.ContainsKey(objKey)) {
+            TILE_IDS_BY_OBJ_KEY[objKey] = 0;
+        }
+        TILE_IDS_BY_OBJ_KEY[objKey]++;
+        return objKey + TILE_IDS_BY_OBJ_KEY[objKey];
+    }
+
+    public string ObjKey {
+        get {
+            return _objKey;
+        }
+        set {
+            if (_objKey == null) {
+                _objKey = value;
+                HMTObjID = GetObjID(_objKey);
+            }
+        }
+    }
+
+    private string _objKey = null;
+    private string HMTObjID = null;
+
     public enum ObstacleType {
         None, Trap, Rock, Wall
     }
@@ -325,5 +350,27 @@ public class NetworkTile : MonoBehaviour
         enemyList.Clear();
         charaList.Clear();
         pinList.Clear();
+    }
+
+    public JObject HMTStateRep() {
+        JObject ret = new JObject();
+
+        ret["entityType"] = tileType switch {
+            ObstacleType.None => "Open",
+            ObstacleType.Wall => "Wall",
+            ObstacleType.Trap => "Trap",
+            ObstacleType.Rock => "Rock",
+            _ => "Open"
+        };
+        ret["objKey"] = _objKey;
+        if(_objKey == "**") {
+            ret["entityType"] = "Goal";
+        }
+        ret["id"] = HMTObjID;
+        if (tileType == ObstacleType.Rock || tileType == ObstacleType.Trap) {
+            ret["challenge"] = dice.ToString();
+        }
+
+        return ret;
     }
 }

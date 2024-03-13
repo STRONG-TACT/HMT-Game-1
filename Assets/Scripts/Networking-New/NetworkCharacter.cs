@@ -555,20 +555,56 @@ public class NetworkCharacter : MonoBehaviour
         //visibilityMask.localScale = cellScale * config.sightRange;
     }
 
-    public JObject HMTStateRep() {
-        return new JObject {
-            {"name", config.characterName},
-            {"characterId", CharacterId },
-            {"type", config.type.ToString()},
-            {"sightRange", config.sightRange },
-            {"monsterDice", config.monsterDice.ToString()},
-            {"trapDice", config.trapDice.ToString() },
-            {"stoneDice", config.stoneDice.ToString() },
-            {"health", health},
-            {"dead", dead},
-            {"actionPoints", ActionPointsRemaining},
-            {"actionPlan", new JArray(ActionPlan.Select(d => d.ToString())) }
-        };
+    public enum StateRepLevel {
+        Full = 0,
+        TeamVisible = 1,
+        TeamUnseen = 2
+    }
+
+    public JObject HMTStateRep(StateRepLevel level = StateRepLevel.Full) {
+        switch (level) {
+            case StateRepLevel.Full:
+                return new JObject {
+                    {"name", config.characterName},
+                    {"characterId", CharacterId },
+                    {"type", config.type.ToString()},
+                    {"sightRange", config.sightRange },
+                    {"monsterDice", config.monsterDice.ToString()},
+                    {"trapDice", config.trapDice.ToString() },
+                    {"stoneDice", config.stoneDice.ToString() },
+                    {"health", health},
+                    {"dead", dead},
+                    {"actionPoints", ActionPointsRemaining},
+                    {"actionPlan", new JArray(ActionPlan.Select(d => d.ToString())) }
+                };
+            case StateRepLevel.TeamVisible:
+                return new JObject {
+                    {"name", config.characterName},
+                    {"characterId", CharacterId },
+                    {"type", config.type.ToString()},
+                    {"sightRange", config.sightRange },
+                    {"monsterDice", config.monsterDice.ToString()},
+                    {"trapDice", config.trapDice.ToString() },
+                    {"stoneDice", config.stoneDice.ToString() },
+                    {"health", health},
+                    {"dead", dead},
+                };
+            case StateRepLevel.TeamUnseen:
+                return new JObject {
+                    {"name", config.characterName},
+                    {"characterId", CharacterId },
+                    {"type", config.type.ToString()},
+                    {"sightRange", config.sightRange },
+                    {"monsterDice", config.monsterDice.ToString()},
+                    {"trapDice", config.trapDice.ToString() },
+                    {"stoneDice", config.stoneDice.ToString() },
+                    {"health", health},
+                    {"dead", dead},
+                };
+            default:
+                Debug.LogWarningFormat("Unknown StateRepLevel: {0}", level);
+                goto case StateRepLevel.Full;
+        }
     }
     
 }

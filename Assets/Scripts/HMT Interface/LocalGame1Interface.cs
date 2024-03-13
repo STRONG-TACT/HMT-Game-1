@@ -57,7 +57,7 @@ public class LocalGame1Interface : HMTInterface {
      * 
      */ 
 
-    public override string GetState(bool formated) {
+    public override string GetState(Command command) {
         MapGenerator map = MapGenerator.Instance;
         LocalGameManager gameManager = LocalGameManager.Instance;
 
@@ -232,7 +232,7 @@ public class LocalGame1Interface : HMTInterface {
         //}
 
         ret["scene"] = scene;
-        if (formated) {
+        if (command.json["formated"].ToString().ToLower() == "true") {
             return JsonConvert.SerializeObject(ret, Formatting.Indented);
         }
         else {

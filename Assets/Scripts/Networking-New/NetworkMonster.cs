@@ -5,6 +5,31 @@ using UnityEngine;
 
 public class NetworkMonster : MonoBehaviour
 {
+    private static Dictionary<string, int> MONSTER_IDS_BY_OBJ_KEY = new Dictionary<string, int>();
+    private static string GetObjID(string objKey) {
+        if (!MONSTER_IDS_BY_OBJ_KEY.ContainsKey(objKey)) {
+            MONSTER_IDS_BY_OBJ_KEY[objKey] = 0;
+        }
+        MONSTER_IDS_BY_OBJ_KEY[objKey]++;
+        return objKey + MONSTER_IDS_BY_OBJ_KEY[objKey];
+    }
+
+
+    public string ObjKey {
+        get {
+            return _objKey;
+        }
+        set {
+            if (_objKey == null) { 
+                _objKey = value;
+                HMTObjID = GetObjID(_objKey);
+            }
+        }
+    }
+
+    private string _objKey = null;
+    private string HMTObjID = null;
+
     public MonsterConfig config;
     public int monsterId;
     public NetworkGameData gameData;
@@ -82,7 +107,7 @@ public class NetworkMonster : MonoBehaviour
         animator.speed = Random.Range(0.8f, 1.2f); // Randomize speed within a range
     }
     
-    public void SetUpConfig(MonsterConfig config, int MonsterId, NetworkGameData data)
+    public void SetUpConfig(MonsterConfig config, int MonsterId, NetworkGameData data, string code)
     {
         this.config = config;
         monsterId = MonsterId;
@@ -90,6 +115,7 @@ public class NetworkMonster : MonoBehaviour
         gameData = data;
 
         stepLength = data.tileSize + data.tileGapLength;
+        ObjKey = code;
     }
     
     public void MonsterTurnStart()
@@ -231,11 +257,12 @@ public class NetworkMonster : MonoBehaviour
 
     public JObject HMTStateRep() {
         return new JObject {
-            {"name", "monster" + monsterId },
+            {"entityType","monster" },
+            {"objKey", ObjKey },
+            {"id", HMTObjID },
             {"type", config.type.ToString() },
             {"actionPoints", config.movement },
             {"combatDice", config.combatDice.ToString() }
-
         };
     }
 }

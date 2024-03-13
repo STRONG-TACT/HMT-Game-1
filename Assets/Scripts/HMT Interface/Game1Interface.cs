@@ -107,7 +107,7 @@ public class Game1Interface : HMTInterface {
      * 
      */ 
 
-    public override string GetState(bool formated) {
+    public override string GetState(Command command) {
 
         if (door == null) {
             return "No Door Found, probably not in a scene or currently transitioning";
@@ -249,7 +249,7 @@ public class Game1Interface : HMTInterface {
 
 
         ret["scene"] = scene;
-        if (formated) {
+        if (command.json["formated"].ToString().ToLower() == "true") {
             return JsonConvert.SerializeObject(ret, Formatting.Indented);
         }
         else {

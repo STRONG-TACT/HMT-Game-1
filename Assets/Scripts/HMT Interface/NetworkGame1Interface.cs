@@ -1,3 +1,4 @@
+using ExitGames.Client.Photon.StructWrapping;
 using HMT;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -31,16 +32,65 @@ public class NetworkGame1Interface : HMTInterface {
         }
     }
 
+    public override IEnumerator ProcessCommand(Command command) {
+
+        switch (NetworkGameManager.S.gameStatus) {
+            case GameConstant.GameStatus.GetReady:
+                command.SendErrorResponse("Game is not started yet.", 1002);
+                break;
+            case GameConstant.GameStatus.GameEnd:
+                command.SendGameOverResponse("Game Over"); // may want to send more interesting information than this
+                yield break;
+            case GameConstant.GameStatus.Animation_Pause:
+                command.SendErrorResponse("Game in Deprecated Phase. This shouldn't be possible please report it.", 9001);
+                yield break;
 
 
+            case GameConstant.GameStatus.Player_Moving:
+            case GameConstant.GameStatus.Monster_Moving:
+                if(command.command == "execute_action") {
+                    command.SendIllegalActionResponse("Attempted Action in Movement Phase, actions are not allowed.", 2000);
+                    yield break;
+                }
+                break;
+            case GameConstant.GameStatus.Player_Pinning:
+            case GameConstant.GameStatus.Player_Planning:
+                break;
+            default:
+                Debug.LogWarningFormat("Execute Action called in Unknown Game State {0}", NetworkGameManager.S.gameStatus);
+                command.SendErrorResponse(string.Format("Game in Unknown Phase: {0}", NetworkGameManager.S.gameStatus), 9000);
+                yield break;
+        }
 
-    public override string GetState(bool formated = false) {
+
+        switch (command.command) {
+            case "get_full_state":
+                string state = GetFullState(command);
+                command.SendOKResponse("Full State", state);
+                yield break;
+            case "get_fow_state":
+                state = GetFOWState(command);
+                command.SendOKResponse("FOW State", state);
+                yield break;
+            default:
+                yield return base.ProcessCommand(command);
+                break;
+        }
+    }
+
+    public override string GetState(Command command) {
         NetworkMapGenerator map = NetworkMapGenerator.Instance;
         NetworkGameManager gameManager = NetworkGameManager.S;
 
+        NetworkCharacter target = GetTargetCharacter(command.target);
+        if (target == null) {
+            command.SendErrorResponse(string.Format("Unknown HMT Target {0}. Make sure the targets are configured correctly in the Inspector", command.target), 9002);
+            return null;
+        }
+
         JObject ret = new JObject();
         ret["gameData"] = new JObject {
-             {"boardWidth", map.Map.GetLength(0)},
+            {"boardWidth", map.Map.GetLength(0)},
             {"boardHeight", map.Map.GetLength(1)},
             {"level", gameManager.currentLevel },
             {"currentPhase", gameManager.gameStatus.ToString() }
@@ -55,27 +105,123 @@ public class NetworkGame1Interface : HMTInterface {
                     continue;
                 }
                 NetworkTile tile = map.Map[x, y];
+                JObject rep;
+                switch (tile.fogOfWarDictionary[target.CharacterId]) {
+                    case NetworkTile.FogOfWarState.Visible:
+                        switch (tile.gameObject.tag) {
+                            case "Walls":
+                            case "Trap":
+                            case "Rock":
+                                rep = tile.HMTStateRep();
+                                rep["x"] = x;
+                                rep["y"] = y;
+                                scene.Add(rep);
+                                break;
+                            case "Door":
+                            case "Goal":
+                                rep = tile.HMTStateRep();
+                                rep["x"] = x;
+                                rep["y"] = y;
+                                rep["subGoalCount"] = gameManager.goalCount;
+                                scene.Add(rep);
+                                break;
+                        }
+                        foreach (NetworkCharacter character in tile.charaList) {
+                            if (character == target) {
+                                rep = character.HMTStateRep(NetworkCharacter.StateRepLevel.Full);
+                                rep["x"] = x;
+                                rep["y"] = y;
+                                rep["pinCursorX"] = character.pingCursor.x + x;
+                                rep["pinCursorY"] = character.pingCursor.y + x;
+                            }
+                            else {
+                                rep = character.HMTStateRep(NetworkCharacter.StateRepLevel.TeamVisible);
+                                rep["x"] = x;
+                                rep["y"] = y;
+                            }
+                            scene.Add(rep);
+                        }
+                        foreach (NetworkMonster monster in tile.enemyList) {
+                            rep = monster.HMTStateRep();
+                            rep["x"] = x;
+                            rep["y"] = y;
+                            scene.Add(rep);
+                        }
+                        if (tile.shrine != null) {
+                            rep = tile.shrine.HMTStateRep();
+                            rep["x"] = x;
+                            rep["y"] = y;
+                            scene.Add(rep);
+                        }
+                        break;
+                    case NetworkTile.FogOfWarState.Seen:
+                    case NetworkTile.FogOfWarState.Unseen:
+                        if (tile.shrine != null) {
+                            rep = tile.shrine.HMTStateRep();
+                            scene.Add(rep);
+                        }
+                        break;
+                }
+                foreach (NetworkPin pin in tile.pinList) { //this one moves out
+                    rep = pin.HMTStateRep();
+                    rep["x"] = x;
+                    rep["y"] = y;
+                    scene.Add(rep);
+                }
+            }
+        }
+
+        ret["scene"] = scene;
+        if (command.json["formated"].ToString().ToLower() == "true") {
+            return JsonConvert.SerializeObject(ret, Formatting.Indented);
+        }
+        else {
+            return JsonConvert.SerializeObject(ret, Formatting.None);
+        }
+    }
+
+    public string GetFullState(Command command) {
+        NetworkMapGenerator map = NetworkMapGenerator.Instance;
+        NetworkGameManager gameManager = NetworkGameManager.S;
+
+        JObject ret = new JObject();
+        ret["gameData"] = new JObject {
+            {"boardWidth", map.Map.GetLength(0)},
+            {"boardHeight", map.Map.GetLength(1)},
+            {"level", gameManager.currentLevel },
+            {"currentPhase", gameManager.gameStatus.ToString() }
+        };
+
+        JArray scene = new JArray();
+
+        for (int x = 0; x < map.Map.GetLength(0); x++) {
+            for (int y = 0; y < map.Map.GetLength(1); y++) {
+                if (map.Map[x, y] == null) {
+                    Debug.LogErrorFormat("Map contains a null at {0},{1}", x, y);
+                    continue;
+                }
+                NetworkTile tile = map.Map[x, y];
+                JObject rep;
                 switch (tile.gameObject.tag) {
                     case "Walls":
-                        scene.Add(new JObject { { "type", "wall" }, { "x", x }, { "y", y } });
-                        break;
                     case "Trap":
-                        scene.Add(new JObject { { "type", "trap" }, { "x", x }, { "y", y },
-                            {"challenge", tile.dice.ToString() }
-                        });
-                        break;
                     case "Rock":
-                        scene.Add(new JObject { { "type", "rock" }, { "x", x }, { "y", y },
-                            {"challenge", tile.dice.ToString() }
-                        });
+                        rep = tile.HMTStateRep();
+                        rep["x"] = x;
+                        rep["y"] = y;
+                        scene.Add(rep);
                         break;
                     case "Door":
-                        scene.Add(new JObject { { "type", "goal" }, { "x", x }, { "y", y },
-                            {"subgoalCount", gameManager.goalCount } });
+                    case "Goal":
+                        rep = tile.HMTStateRep();
+                        rep["x"] = x;
+                        rep["y"] = y;
+                        rep["subGoalCount"] = gameManager.goalCount;
+                        scene.Add(rep);
                         break;
                 }
                 foreach (NetworkCharacter character in tile.charaList) {
-                    JObject rep = character.HMTStateRep();
+                    rep = character.HMTStateRep();
                     rep["x"] = x;
                     rep["y"] = y;
                     rep["pinCursorX"] = character.pingCursor.x + x;
@@ -83,28 +229,149 @@ public class NetworkGame1Interface : HMTInterface {
                     scene.Add(rep);
                 }
                 foreach (NetworkMonster monster in tile.enemyList) {
-                    JObject rep = monster.HMTStateRep();
+                    rep = monster.HMTStateRep();
                     rep["x"] = x;
                     rep["y"] = y;
                     scene.Add(rep);
                 }
                 foreach (NetworkPin pin in tile.pinList) {
-                    JObject rep = pin.HMTStateRep();
+                    rep = pin.HMTStateRep();
                     rep["x"] = x;
                     rep["y"] = y;
                     scene.Add(rep);
                 }
                 if (tile.shrine != null) {
-                    JObject rep = tile.shrine.HMTStateRep();
+                    rep = tile.shrine.HMTStateRep();
                     rep["x"] = x;
                     rep["y"] = y;
                     scene.Add(rep);
                 }
             }
         }
-        
+
         ret["scene"] = scene;
-        if (formated) {
+        if (command.json["formated"].ToString().ToLower() == "true") {
+            return JsonConvert.SerializeObject(ret, Formatting.Indented);
+        }
+        else {
+            return JsonConvert.SerializeObject(ret, Formatting.None);
+        }
+    }
+
+    public string GetFOWState(Command command) {
+        NetworkMapGenerator map = NetworkMapGenerator.Instance;
+        NetworkGameManager gameManager = NetworkGameManager.S;
+
+        NetworkCharacter target = GetTargetCharacter(command.target);
+        if (target == null) {
+            command.SendErrorResponse(string.Format("Unknown HMT Target {0}. Make sure the targets are configured correctly in the Inspector", command.target), 9002);
+            return null;
+        }
+
+        JObject ret = new JObject();
+        ret["gameData"] = new JObject {
+            {"boardWidth", map.Map.GetLength(0)},
+            {"boardHeight", map.Map.GetLength(1)},
+            {"level", gameManager.currentLevel },
+            {"currentPhase", gameManager.gameStatus.ToString() }
+        };
+
+        JArray scene = new JArray();
+
+        for (int x = 0; x < map.Map.GetLength(0); x++) {
+            for (int y = 0; y < map.Map.GetLength(1); y++) {
+                if (map.Map[x, y] == null) {
+                    Debug.LogErrorFormat("Map contains a null at {0},{1}", x, y);
+                    continue;
+                }
+                NetworkTile tile = map.Map[x, y];
+                JObject rep;
+                switch (tile.fogOfWarDictionary[target.CharacterId]) {
+                    case NetworkTile.FogOfWarState.Visible:
+                        switch (tile.gameObject.tag) {
+                            case "Walls":
+                            case "Trap":
+                            case "Rock":
+                                rep = tile.HMTStateRep();
+                                rep["x"] = x;
+                                rep["y"] = y;
+                                scene.Add(rep);
+                                break;
+                            case "Door":
+                            case "Goal":
+                                rep = tile.HMTStateRep();
+                                rep["x"] = x;
+                                rep["y"] = y;
+                                rep["subGoalCount"] = gameManager.goalCount;
+                                scene.Add(rep);
+                                break;
+                        }
+                        foreach (NetworkCharacter character in tile.charaList) {
+                            if (character == target) {
+                                rep = character.HMTStateRep(NetworkCharacter.StateRepLevel.Full);
+                                rep["x"] = x;
+                                rep["y"] = y;
+                                rep["pinCursorX"] = character.pingCursor.x + x;
+                                rep["pinCursorY"] = character.pingCursor.y + x;
+                            }
+                            else {
+                                rep = character.HMTStateRep(NetworkCharacter.StateRepLevel.TeamVisible);
+                                rep["x"] = x;
+                                rep["y"] = y;
+                            }
+                            scene.Add(rep);
+                        }
+                        foreach (NetworkMonster monster in tile.enemyList) {
+                            rep = monster.HMTStateRep();
+                            rep["x"] = x;
+                            rep["y"] = y;
+                            scene.Add(rep);
+                        }
+                        if (tile.shrine != null) {
+                            rep = tile.shrine.HMTStateRep();
+                            rep["x"] = x;
+                            rep["y"] = y;
+                            scene.Add(rep);
+                        }
+                        break;
+                    case NetworkTile.FogOfWarState.Seen:
+                        switch (tile.gameObject.tag) {
+                            case "Walls":
+                            case "Trap":
+                            case "Rock":
+                                rep = tile.HMTStateRep();
+                                rep["x"] = x;
+                                rep["y"] = y;
+                                scene.Add(rep);
+                                break;
+                            case "Door":
+                            case "Goal":
+                                rep = tile.HMTStateRep();
+                                rep["x"] = x;
+                                rep["y"] = y;
+                                rep["subGoalCount"] = gameManager.goalCount;
+                                scene.Add(rep);
+                                break;
+                        }
+                        goto case NetworkTile.FogOfWarState.Unseen;
+                    case NetworkTile.FogOfWarState.Unseen:
+                        if (tile.shrine != null) {
+                            rep = tile.shrine.HMTStateRep();
+                            scene.Add(rep);
+                        }
+                        break;
+                }
+                foreach (NetworkPin pin in tile.pinList) { //this one moves out
+                    rep = pin.HMTStateRep();
+                    rep["x"] = x;
+                    rep["y"] = y;
+                    scene.Add(rep);
+                }
+            }
+        }
+
+        ret["scene"] = scene;
+        if (command.json["formated"].ToString().ToLower() == "true") {
             return JsonConvert.SerializeObject(ret, Formatting.Indented);
         }
         else {
@@ -114,32 +381,13 @@ public class NetworkGame1Interface : HMTInterface {
 
     public override IEnumerator ExecuteAction(Command command) {
         NetworkGameManager manager = NetworkGameManager.S;
-        switch (manager.gameStatus) {
-            case GameConstant.GameStatus.GetReady:
-                command.SendErrorResponse("Game not started yet");
-                yield break;
+        switch (manager.gameStatus) {  
             case GameConstant.GameStatus.Player_Pinning:
                 yield return ExecuteActionInPinning(command);
                 break;
             case GameConstant.GameStatus.Player_Planning:
                 yield return ExecuteActionInPlanning(command);
                 break;
-            case GameConstant.GameStatus.Player_Moving:
-                command.SendErrorResponse("Actions not accepted during Moving Phase");
-                break;
-            case GameConstant.GameStatus.Monster_Moving:
-                command.SendErrorResponse("Actions not accepted during Monster Turn");
-                break;
-            case GameConstant.GameStatus.Animation_Pause:
-                command.SendErrorResponse("Animation Pause Phase SHOULD be unreachable, report this.");
-                yield break;
-            case GameConstant.GameStatus.GameEnd:
-                command.SendErrorResponse("Game is Over");
-                yield break;
-            default:
-                Debug.LogWarningFormat("Execute Action called in Unknown Game State {0}", manager.gameStatus);
-                command.SendErrorResponse("Unknown Game State");
-                yield break;
         }
     }
 
@@ -188,6 +436,8 @@ public class NetworkGame1Interface : HMTInterface {
                 return NetworkCharacter.Direction.Left;
             case "right":
                 return NetworkCharacter.Direction.Right;
+            case "wait":
+                return NetworkCharacter.Direction.Wait;
             default:
                 Debug.LogErrorFormat("Unknown Direction {0}", direct);
                 return NetworkCharacter.Direction.Wait;
@@ -198,7 +448,7 @@ public class NetworkGame1Interface : HMTInterface {
         string action = command.json["action"].ToString();
         NetworkCharacter target = GetTargetCharacter(command.target);
         if(target == null) {
-            command.SendErrorResponse(string.Format("Unknown target {0} in pinning phase. This shouldn't be possible please report it.", command.target));
+            command.SendErrorResponse(string.Format("Unknown HMT Target {0}. Make sure the targets are configured correctly in the Inspector", command.target),9002);
             yield break;
         }
 
@@ -225,7 +475,7 @@ public class NetworkGame1Interface : HMTInterface {
                     inputs = null;
                 }
                 if (inputs == null) {
-                    command.SendErrorResponse("Error parsing pin parameters");
+                    command.SendErrorResponse("Error parsing pin parameters", 9003);
                     yield break;
                 }
 
@@ -238,7 +488,7 @@ public class NetworkGame1Interface : HMTInterface {
                 }
 
                 if (!NetworkMapGenerator.Instance.InMap(pos)) {
-                    command.SendErrorResponse(string.Format("Attempting to Ping outside of map {0}, {1}", pos.x, pos.y));
+                    command.SendIllegalActionResponse(string.Format("Attempting to pin outside of map {0}, {1}", pos.x, pos.y),2001);
                     yield break;
                 }
 
@@ -257,7 +507,7 @@ public class NetworkGame1Interface : HMTInterface {
             case "left":
             case "right":
                 if (target.ActionPointsRemaining == 0) {
-                    command.SendErrorResponse("No Action Points remaining so not moving ping cursor");
+                    command.SendIllegalActionResponse("No Action Points Remaining on Pin Move",2002);
                 }
                 else {
                     NetworkMiddleware.S.MovePingCursorOnCharacterLocal(DirectionFromString(action), target.CharacterId);
@@ -266,13 +516,20 @@ public class NetworkGame1Interface : HMTInterface {
                 }
                 yield break;
             case "undo":
-                command.SendErrorResponse(string.Format("Received {0} action in pinning phase", action));
+                command.SendIllegalActionResponse("Cannot Undo in Pinning Phase",2003);
                 yield break;
             default:
-                command.SendErrorResponse(string.Format("Unknown action {0} in pinning phase", action));
+                command.SendErrorResponse("Unknown Action in Pinning Phase", UnknownActionContent(action.ToLower(), 1003));
                 yield break;
         }
         yield break;
+    }
+
+    private static string UnknownActionContent(string action, int errorCode) {
+        return @"{
+            ""errorCode"":erroCode,
+            ""attemptedAction"":action,
+            ""validActions"":[""pinga"",""pingb"",""pingc"",""pingd"",""ping"",""submit"",""up"",""down"",""left"",""right"",""undo""]}";
     }
 
     private IEnumerator ExecuteActionInPlanning(Command command) {
@@ -280,7 +537,7 @@ public class NetworkGame1Interface : HMTInterface {
         NetworkGameManager manager = NetworkGameManager.S;
         NetworkCharacter target = GetTargetCharacter(command.target);
         if (target == null) {
-            command.SendErrorResponse(string.Format("Unknown target {0} in pinning phase. This shouldn't be possible...", command.target));
+            command.SendErrorResponse(string.Format("Unknown HMT Target {0}. Make sure the targets are configured correctly in the Inspector", command.target), 9002);
             yield break;
         }
         switch (action.ToLower()) {
@@ -289,7 +546,7 @@ public class NetworkGame1Interface : HMTInterface {
             case "pingc":
             case "pingd":
             case "ping":
-                command.SendErrorResponse("Received ping action in planning phase");
+                command.SendIllegalActionResponse("Pin Command Sent in Planning Phase",2004);
                 yield break;
             case "submit":
                 NetworkMiddleware.S.ReadyForNextPhaseLocal(target.CharacterId, true);
@@ -315,7 +572,7 @@ public class NetworkGame1Interface : HMTInterface {
             case "undo":
                 if (!target.ReadyForNextPhase) {
                     if (target.ActionPlan.Count == 0) {
-                        command.SendErrorResponse("Cannot undo action, no actions to undo");
+                        command.SendIllegalActionResponse("Cannot undo action, no actions to undo",2005);
                     }
                     else {
                         target.UndoPlanStep();
@@ -324,11 +581,11 @@ public class NetworkGame1Interface : HMTInterface {
                     yield break;
                 }
                 else {
-                    command.SendErrorResponse("Cannot undo action after submitting");
+                    command.SendIllegalActionResponse("Cannot undo action after submitting",2006);
                     yield break;
                 }
             default:
-                command.SendErrorResponse(string.Format("Unknown action {0} in pinning phase", action));
+                command.SendErrorResponse("Unknown Action in Planning Phase", UnknownActionContent(action.ToLower(), 1003));
                 yield break;
         }
         yield break;
@@ -342,11 +599,11 @@ public class NetworkGame1Interface : HMTInterface {
                 command.SendOKResponse("Action Added");
             }
             else {
-                command.SendErrorResponse("Illegal Move, Target is Impassible");
+                command.SendIllegalActionResponse("Target is Impassible", 2007);
             }
         }
         else {
-            command.SendErrorResponse("Illegal Move, Out of Action Points");
+            command.SendIllegalActionResponse("Out of Action Points", 2008);
         }
     }
 }

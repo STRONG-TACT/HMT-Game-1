@@ -151,6 +151,7 @@ public class NetworkMapGenerator : MonoBehaviour
         string name = SearchSchema(code);
 
         GameObject tileObj = null;
+        bool spawnEntity = false;
 
         switch (name)
         {
@@ -196,8 +197,9 @@ public class NetworkMapGenerator : MonoBehaviour
                 break;
 
             default:
+                spawnEntity = true;
                 tileObj = Instantiate(gameAssets.OpenTile, new Vector3(x, 0, z), Quaternion.identity, tileParent);
-                SpawnEntity(name, x, z, tileObj.GetComponent<NetworkTile>());
+                SpawnEntity(name, x, z, tileObj.GetComponent<NetworkTile>(), code);
                 break;
         }
 
@@ -205,6 +207,12 @@ public class NetworkMapGenerator : MonoBehaviour
             NetworkTile tile = tileObj.GetComponent<NetworkTile>();
             tile.row = row;
             tile.col = col;
+            if (spawnEntity) {
+                tile.ObjKey = "..";
+            }
+            else { 
+                tile.ObjKey = code;
+            }
             return tile;
         }
         else {
@@ -224,7 +232,7 @@ public class NetworkMapGenerator : MonoBehaviour
         }
     }
 
-    private void SpawnEntity(string tileName, float x, float z, NetworkTile tileObj)
+    private void SpawnEntity(string tileName, float x, float z, NetworkTile tileObj, string code)
     {
         switch (tileName)
         {
@@ -243,37 +251,40 @@ public class NetworkMapGenerator : MonoBehaviour
             case "1Goal":
                 GameObject goal1 = Instantiate(gameAssets.Goals[0], new Vector3(x, 0f, z), Quaternion.identity);
                 tileObj.shrine = goal1.GetComponent<NetworkShrine>();
+                tileObj.shrine.ObjKey = code;
                 goal1.transform.parent = tileObj.transform;
                 break;
 
             case "2Goal":
                 GameObject goal2 = Instantiate(gameAssets.Goals[1], new Vector3(x, 0f, z), Quaternion.identity);
                 tileObj.shrine = goal2.GetComponent<NetworkShrine>();
+                tileObj.shrine.ObjKey = code;
                 goal2.transform.parent = tileObj.transform;
                 break;
 
             case "3Goal":
                 GameObject goal3 = Instantiate(gameAssets.Goals[2], new Vector3(x, 0f, z), Quaternion.identity);
                 tileObj.shrine = goal3.GetComponent<NetworkShrine>();
+                tileObj.shrine.ObjKey = code;
                 goal3.transform.parent = tileObj.transform;
                 break;
 
             case "Monster1":
                 GameObject monster1 = Instantiate(gameAssets.Monsters[0], new Vector3(x, 0f, z), Quaternion.identity);
                 NetworkGameManager.S.inSceneMonsters.Add(monster1.GetComponent<NetworkMonster>());
-                monster1.GetComponent<NetworkMonster>().SetUpConfig(gameData.monsterConfigs[0], NetworkGameManager.S.inSceneMonsters.Count - 1, gameData);
+                monster1.GetComponent<NetworkMonster>().SetUpConfig(gameData.monsterConfigs[0], NetworkGameManager.S.inSceneMonsters.Count - 1, gameData, code);
                 break;
 
             case "Monster2":
                 GameObject monster2 = Instantiate(gameAssets.Monsters[1], new Vector3(x, 0f, z), Quaternion.identity);
                 NetworkGameManager.S.inSceneMonsters.Add(monster2.GetComponent<NetworkMonster>());
-                monster2.GetComponent<NetworkMonster>().SetUpConfig(gameData.monsterConfigs[1], NetworkGameManager.S.inSceneMonsters.Count - 1, gameData);
+                monster2.GetComponent<NetworkMonster>().SetUpConfig(gameData.monsterConfigs[1], NetworkGameManager.S.inSceneMonsters.Count - 1, gameData, code);
                 break;
 
             case "Monster3":
                 GameObject monster3 = Instantiate(gameAssets.Monsters[2], new Vector3(x, 0f, z), Quaternion.identity);
                 NetworkGameManager.S.inSceneMonsters.Add(monster3.GetComponent<NetworkMonster>());
-                monster3.GetComponent<NetworkMonster>().SetUpConfig(gameData.monsterConfigs[2], NetworkGameManager.S.inSceneMonsters.Count - 1, gameData);
+                monster3.GetComponent<NetworkMonster>().SetUpConfig(gameData.monsterConfigs[2], NetworkGameManager.S.inSceneMonsters.Count - 1, gameData, code);
                 break;
 
             default:

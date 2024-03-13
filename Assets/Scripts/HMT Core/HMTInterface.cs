@@ -122,7 +122,7 @@ namespace HMT {
         /// </summary>
         /// <param name="formated">Whether to "pretty print" format the JSON or not.</param>
         /// <returns></returns>
-        public abstract string GetState(bool formated = false);
+        public abstract string GetState(Command command);
 
         /// <summary>
         /// Exectutes a character action on behalf of the agent.
@@ -150,17 +150,20 @@ namespace HMT {
         public virtual IEnumerator ProcessCommand(Command command) {
             switch (command.command) {
                 case "get_state":
-                    string response = GetState();
-                    command.SendOKResponse("Full State", response);
+                    string response = GetState(command);
+                    command.SendOKResponse("Local State", response);
                     yield break;
                 case "execute_action":
                     //TODO this is just a stub API for now. Actions' will likely be much more complex.
                     yield return ExecuteAction(command);
                     break;
+                case "JSON_PARSE_ERROR":
+                    command.SendErrorResponse("JSON Parse Error", string.Format("{{\"errorCode\":0,\"errorMessage\":{0}   }}", command.json["errorMessage"]));
+                    break;
                 default:
                     if (!command.supressDefault) {
                         Debug.LogErrorFormat("[{0}] Unrecognized Command: {1}", "HMTInterface", command);
-                        command.SendErrorResponse(string.Format("Unrecognized Command: {0}", command));
+                        command.SendErrorResponse(string.Format("Unrecognized Command: {0}", command), 1);
                     }
                     break;
             }
@@ -191,7 +194,8 @@ namespace HMT {
                 Debug.LogErrorFormat("[HMTInterface] Error parsing JSON: {0}", ex.Message);
                 json = new JObject{
                     {"command","JSON_PARSE_ERROR" },
-                    { "supressDefault", true}
+                    { "supressDefault", true},
+                    {"errorMessage",ex.Message}
                 };
             }
             Command newCommand = new Command();
@@ -235,13 +239,33 @@ namespace HMT {
         public JObject json;
         public WebSocketBehavior originService;
 
-        public void SendOKResponse(string message, string content = "") {
+        public void SendOKResponse(string message, string content = null) {
             string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"OK\", \"message\":\"{1}\", \"content\":{2} }}", command, message, content);
             originService.Context.WebSocket.Send(mess);
         }
 
-        public void SendErrorResponse(string message, string content = "") {
+        public void SendErrorResponse(string message, string content = null) {
             string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"ERROR\", \"message\":\"{1}\", \"content\":{2}}}", command, message, content);
+            originService.Context.WebSocket.Send(mess);
+        }
+
+        public void SendErrorResponse(string message, int content) {
+            string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"ERROR\", \"message\":\"{1}\", \"content\":{{\"errorCode:\"{2} }} }}", command, message, content);
+            originService.Context.WebSocket.Send(mess);
+        }
+
+        public void SendGameOverResponse(string message, string content = null) {
+            string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"GAME_OVER\", \"message\":\"{1}\", \"content\":{2} }}", command, message, content);
+            originService.Context.WebSocket.Send(mess);
+        }
+
+        public void SendIllegalActionResponse(string message, string content = null) {
+            string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"ILLEGAL_ACTION\", \"message\":\"{1}\", \"content\":{2}}}", command, message, content);
+            originService.Context.WebSocket.Send(mess);
+        }
+
+        public void SendIllegalActionResponse(string message, int content) {
+            string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"ILLEGAL_ACTION\", \"message\":\"{1}\", \"content\":{{\"errorCode:\"{2} }} }}", command, message, content);
             originService.Context.WebSocket.Send(mess);
         }
     }

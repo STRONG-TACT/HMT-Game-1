@@ -1,6 +1,7 @@
 using HMT;
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 
@@ -18,6 +19,8 @@ namespace HMT {
         private bool isOpen = false;
         private Vector2 scrollPos = Vector2.zero;
 
+        //private Command STUB_COMMAND = new Command(command = "get_state",json = new JObject { { "stub", true } });
+
         private void Awake() {
             apiInterface = GetComponent<HMTInterface>();
         }
@@ -29,7 +32,10 @@ namespace HMT {
                 isOpen = !isOpen;
             }
             if (CheckHotKey(PrintCurrentStateHotKey)) {
-                Debug.LogFormat("[HMTInterface] State Hotkey: {0}", apiInterface.GetState(false));
+                Command newCommand = new Command();
+                newCommand.command = "get_state";
+                newCommand.json = new JObject { { "fortmated", false } };
+                Debug.LogFormat("[HMTInterface] State Hotkey: {0}", newCommand);
             }
         }
 
@@ -81,7 +87,7 @@ namespace HMT {
 
                 GUILayout.Label("STATE:");
                 if (GUILayout.Button("Snap State")) {
-                    lastState = apiInterface.GetState(true);
+                    //lastState = apiInterface.GetState(true);
                 }
                 if (lastState != string.Empty) {
                     if (GUILayout.Button("Copy State")) {
