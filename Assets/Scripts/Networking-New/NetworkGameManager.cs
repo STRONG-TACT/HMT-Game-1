@@ -422,6 +422,21 @@ public class NetworkGameManager : MonoBehaviour
                         {
                             clearCharacterMoves(t.charaList);
                         }
+                        
+                        // if player got defeated by monster on a shrine tile
+                        // and the player correspond to that shrine tile
+                        // then we should "unreach" the shrine
+                        if (t.gameObject.CompareTag("Goal"))
+                        {
+                            NetworkShrine shrine = t.gameObject.GetComponent<NetworkShrine>();
+                            foreach (var character in t.charaList)
+                            {
+                                if (shrine.CheckShrineType(character))
+                                {
+                                    GoalUnReached(character.CharacterId);
+                                }
+                            }
+                        }
                         break;
                     case NetworkTile.ObstacleType.Trap:
                         reduceCharacterHealth(t.charaList, deadChara, aliveChara);
@@ -528,6 +543,12 @@ public class NetworkGameManager : MonoBehaviour
     {
         uiManager.UpdateGoalStatus(charaID);
         goalCount += 1;
+    }
+
+    public void GoalUnReached(int charaID)
+    {
+        uiManager.UpdateGoalStatus(charaID, false);
+        goalCount -= 1;
     }
     
     public void updateEventQueue(NetworkTile tile) {

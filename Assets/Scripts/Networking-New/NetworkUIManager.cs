@@ -246,9 +246,12 @@ public class NetworkUIManager : MonoBehaviour
         CombatUI.SetActive(false);
     }
     
-    public void UpdateGoalStatus(int CharaID)
+    public void UpdateGoalStatus(int CharaID, bool reached = true)
     {
-        GoalStatus[CharaID].GetComponent<Image>().sprite = gameAssets.GetGoalFilled(CharaID);
+        if (reached)
+            GoalStatus[CharaID].GetComponent<Image>().sprite = gameAssets.GetGoalFilled(CharaID);
+        else 
+            GoalStatus[CharaID].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(CharaID);
     }
     
     public void ResetGoalStatus()
