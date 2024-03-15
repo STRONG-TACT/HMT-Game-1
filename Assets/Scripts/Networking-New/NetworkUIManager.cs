@@ -32,6 +32,7 @@ public class NetworkUIManager : MonoBehaviour
     public GameObject WinBG;
     public GameObject LoseBG;
     public GameObject VictoryScreen;
+    public GameObject LossScreen;
 
     public GameObject GoalPanel; 
     public GameObject[] GoalStatus = new GameObject[3];
@@ -44,6 +45,7 @@ public class NetworkUIManager : MonoBehaviour
         GoalPanel.SetActive(true);
         CharacterInfo.SetActive(true);
         VictoryScreen.SetActive(false);
+        LossScreen.SetActive(false);
 
     }
 
@@ -51,6 +53,10 @@ public class NetworkUIManager : MonoBehaviour
         VictoryScreen.SetActive(true);
     }
 
+    public void DisplayLossScreen()
+    {
+        LossScreen.SetActive(true);
+    }
 
     public void UpdateGamePhaseInfo()
     {
