@@ -481,6 +481,8 @@ public class NetworkCharacter : MonoBehaviour
 
         movePoint = startPos;
         prevMovePointPos = movePoint;
+        
+        NetworkGameManager.S.CheckLoseCondition();
     }
     
     public void RespawnCountdown()

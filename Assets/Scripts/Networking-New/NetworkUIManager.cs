@@ -37,6 +37,7 @@ public class NetworkUIManager : MonoBehaviour
     public GameObject GoalPanel; 
     public GameObject[] GoalStatus = new GameObject[3];
 
+
     public void InitGameUI()
     {
         text.text = "Level Starting";
@@ -47,6 +48,8 @@ public class NetworkUIManager : MonoBehaviour
         VictoryScreen.SetActive(false);
         LossScreen.SetActive(false);
 
+        VictoryScreen.SetActive(false);
+        LossScreen.SetActive(false);
     }
 
     public void DisplayVictoryScreen() {
@@ -279,5 +282,10 @@ public class NetworkUIManager : MonoBehaviour
         GoalStatus[0].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(0);
         GoalStatus[1].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(1);
         GoalStatus[2].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(2);
+    }
+
+    public void ShowDefeatedScreen()
+    {
+        LossScreen.SetActive(true);
     }
 }

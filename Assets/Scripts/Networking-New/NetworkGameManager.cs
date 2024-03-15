@@ -93,6 +93,7 @@ public class NetworkGameManager : MonoBehaviour
                 remainingCharacterCount -= 1;
             }
         }
+
         PreparePlayerPinningPhase();
     }
 
@@ -591,6 +592,7 @@ public class NetworkGameManager : MonoBehaviour
             c.State = NetworkCharacter.CharacterState.Cheering;
         }
 
+        eventQueue.Clear();
         yield return new WaitForSeconds(5f);
         foreach (NetworkCharacter c in inSceneCharacters)
         {
@@ -634,5 +636,22 @@ public class NetworkGameManager : MonoBehaviour
         }
     }
 
+    public void CheckLoseCondition()
+    {
+        int deadPlayerCount = 0;
+        foreach (var character in inSceneCharacters)
+        {
+            if (character.dead) deadPlayerCount++;
+        }
 
+        if (deadPlayerCount >= 3)
+        {
+            Lose();
+        }
+    }
+
+    private void Lose()
+    {
+        uiManager.ShowDefeatedScreen();
+    }
 }

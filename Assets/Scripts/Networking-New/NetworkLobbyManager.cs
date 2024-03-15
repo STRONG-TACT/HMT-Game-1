@@ -36,7 +36,8 @@ public class NetworkLobbyManager : MonoBehaviour
     public void OnConnectToServer()
     {
         onBoardingState = OnBoardingState.ChooseJoinRoomMode;
-        LobbyUI.S.ShowJoinRoomModeUI();
+        // LobbyUI.S.ShowJoinRoomModeUI();
+        CreateOrJoinRoomSelected();
     }
 
     public void OnDisconnectSucceed()
@@ -110,18 +111,18 @@ public class NetworkLobbyManager : MonoBehaviour
 
     // ============ Back Button Logic ============
 
-    public void BackButtonClicked()
-    {
-        switch (onBoardingState)
-        {
-            case OnBoardingState.ChooseJoinRoomMode:
-                onBoardingState = OnBoardingState.Loading;
-                LobbyUI.S.ShowLoadingUI();
-                LobbyNetwork.S.TryDisconnectFromServer();
-                break;
-            default:
-                Debug.LogWarning("Back Btn is presented where it shouldn't be");
-                break;
-        }
-    }
+    // public void BackButtonClicked()
+    // {
+    //     switch (onBoardingState)
+    //     {
+    //         case OnBoardingState.ChooseJoinRoomMode:
+    //             onBoardingState = OnBoardingState.Loading;
+    //             LobbyUI.S.ShowLoadingUI();
+    //             LobbyNetwork.S.TryDisconnectFromServer();
+    //             break;
+    //         default:
+    //             Debug.LogWarning("Back Btn is presented where it shouldn't be");
+    //             break;
+    //     }
+    // }
 }
