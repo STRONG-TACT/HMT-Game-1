@@ -279,10 +279,27 @@ namespace HMT {
         public string target;
         public JObject json;
         public bool supressDefault;
-        public void SendOKResponse(string message, string content ="") {
-            return;    
+        public void SendOKResponse(string message, string content = null) {
+            return;
         }
-        public void SendErrorResponse(string message, string content = "") {
+
+        public void SendErrorResponse(string message, string content = null) {
+            return;
+        }
+
+        public void SendErrorResponse(string message, int content) {
+            return;
+        }
+
+        public void SendGameOverResponse(string message, string content = null) {
+            return;
+        }
+
+        public void SendIllegalActionResponse(string message, string content = null) {
+            return;
+        }
+
+        public void SendIllegalActionResponse(string message, int content) {
             return;
         }
     }
