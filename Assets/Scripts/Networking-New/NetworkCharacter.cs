@@ -179,7 +179,10 @@ public class NetworkCharacter : MonoBehaviour
     public void StartPingPhase() {
         pingCursor = Vector2Int.zero;
         if (CharacterId == NetworkMiddleware.S.myCharacterID)
+        {
             NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, dead);
+            Debug.Log($"Dead: {dead}");
+        }
     }
     
     public void EndPingPhase() {
@@ -489,6 +492,7 @@ public class NetworkCharacter : MonoBehaviour
             dead = false;
             gameObject.SetActive(true);
             health = 3;
+            NetworkMapGenerator.Instance.updateFogOfWar_map(CharacterId);
         }
     }
     

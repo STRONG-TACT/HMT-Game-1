@@ -60,6 +60,12 @@ public class NetworkUIManager : MonoBehaviour
 
     public void UpdateGamePhaseInfo()
     {
+        if (NetworkGameManager.S.localChar.dead)
+        {
+            text.text = "Waiting Respawn";
+            return;
+        }
+        
         switch (NetworkGameManager.S.gameStatus)
         {
             case GameStatus.Player_Pinning:

@@ -129,7 +129,13 @@ public class NetworkTile : MonoBehaviour
 
         if (charaList.Count != 0 && enemyList.Count != 0)
         {
-            NetworkGameManager.S.updateEventQueue(this);
+            foreach (var character in charaList)
+            {
+                if (character.dead)
+                    charaList.Remove(character);
+            }
+            if (charaList.Count != 0)
+                NetworkGameManager.S.updateEventQueue(this);
         }
 
         if (tileType == ObstacleType.Trap && charaList.Count != 0)
