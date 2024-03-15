@@ -432,12 +432,13 @@ public class NetworkGameManager : MonoBehaviour
                         // then we should "unreach" the shrine
                         if (t.gameObject.CompareTag("Goal"))
                         {
-                            NetworkShrine shrine = t.gameObject.GetComponent<NetworkShrine>();
+                            NetworkShrine shrine = t.gameObject.GetComponentInChildren<NetworkShrine>();
                             foreach (var character in t.charaList)
                             {
                                 if (shrine.CheckShrineType(character))
                                 {
                                     GoalUnReached(character.CharacterId);
+                                    shrine.ReturnOrb();
                                 }
                             }
                         }
@@ -553,6 +554,7 @@ public class NetworkGameManager : MonoBehaviour
     {
         uiManager.UpdateGoalStatus(charaID, false);
         goalCount -= 1;
+        Debug.Log("refunded");
     }
     
     public void updateEventQueue(NetworkTile tile) {

@@ -48,6 +48,11 @@ public class NetworkShrine : MonoBehaviour
         return false;
     }
 
+    public void ReturnOrb()
+    {
+        shrineStone.gameObject.SetActive(true);
+    }
+
     public JObject HMTStateRep() {
         return new JObject {
             {"entityType", "Shrine" },

@@ -16,5 +16,5 @@ MonoBehaviour:
   movement: 1
   combatDice:
     type: 6
-    bonus: 0
+    bonus: 20
   MonsterIcon: {fileID: 0}
