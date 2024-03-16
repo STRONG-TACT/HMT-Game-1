@@ -366,7 +366,7 @@ public class NetworkGameManager : MonoBehaviour
 
             Debug.LogFormat("Processing Event at {0}, {1}", t.row, t.col);
 
-            NetworkCameraManager.S.ChangeTargetCharacter(t.charaList[0].CharacterId);
+            // NetworkCameraManager.S.ChangeTargetCharacter(t.charaList[0].CharacterId);
             switch (t.tileType) {
                 case NetworkTile.ObstacleType.None:
                     win = Combat.ExecuteCombat(Combat.FightType.Monster, t, uiManager);
