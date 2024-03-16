@@ -43,5 +43,8 @@ public class CharacterConfig : ScriptableObject {
 
     [Tooltip("The icon used for the YouAre UI.")]
     public Sprite youAreIcon;
+
+    [Tooltip("The color used to identify the character.")]
+    public Color color;
 }
 

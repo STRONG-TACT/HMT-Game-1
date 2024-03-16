@@ -25,6 +25,8 @@ public class NetworkPinningSystem : MonoBehaviourPunCallbacks
     // stores a list of 
     public List<NetworkPin> pinList = new List<NetworkPin>();
 
+    public float pinOffsetSide = .3f;
+
     // 3D pin
     public GameObject unknownPinPrefab;
     public GameObject dangerPinPrefab;
@@ -187,13 +189,13 @@ public class NetworkPinningSystem : MonoBehaviourPunCallbacks
         GameObject pinObj;
         NetworkTile targetTile = NetworkMapGenerator.Instance.GetTileAt(tileRow, tileCol);
 
-        pinObj = Instantiate(idx2PinPrefab[pinIdx], targetTile.transform.position + pin_icon_offset, Quaternion.Euler(0, 180, 0));
+        pinObj = Instantiate(idx2PinPrefab[pinIdx], targetTile.GetNextPingLocation() + pin_icon_offset, Quaternion.Euler(0, 180, 0));
         pinObj.transform.SetParent(targetTile.transform);
         NetworkPin pin = pinObj.GetComponent<NetworkPin>();
         pinList.Add(pin);
         targetTile.pinList.Add(pin);
         pin.locationTile = targetTile;
-        pin.placingCharacter = NetworkGameManager.S.inSceneCharacters[charID];
+        pin.SetPlacingCharacter(NetworkGameManager.S.inSceneCharacters[charID]);
         pinObj.transform.localScale = new Vector3(4f, 4f, 4f);
         
         Cancel();

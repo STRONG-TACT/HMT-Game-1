@@ -29,6 +29,8 @@ public class NetworkPin : MonoBehaviour
     private string _objKey = null;
     private string HMTObjID = null;
 
+    public Transform playerIndicator;
+
 
     public enum PinType {
         Danger,
@@ -83,6 +85,11 @@ public class NetworkPin : MonoBehaviour
         if (locationTile != null) {
             locationTile.pinList.Remove(this);
         }
+    }
+
+    public void SetPlacingCharacter(NetworkCharacter character) {
+        placingCharacter = character;
+        playerIndicator.GetComponent<MeshRenderer>().material.color = character.config.color;
     }
 
     public JObject HMTStateRep() {

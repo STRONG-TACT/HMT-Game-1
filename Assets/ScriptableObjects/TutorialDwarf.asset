@@ -29,3 +29,4 @@ MonoBehaviour:
   dieFaces: 010000000100000002000000020000000300000003000000
   characterIcon: {fileID: 21300000, guid: d0d76f0bcf97e5645bb0a8ae52e5192d, type: 3}
   youAreIcon: {fileID: 21300000, guid: afc45c96e5f372a4daf928d7d0f581f1, type: 3}
+  color: {r: 1, g: 1, b: 0, a: 1}

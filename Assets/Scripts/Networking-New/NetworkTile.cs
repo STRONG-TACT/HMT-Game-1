@@ -176,6 +176,33 @@ public class NetworkTile : MonoBehaviour
         }
     }
 
+    
+
+    public Vector3 GetNextPingLocation() {
+        float pinOffsetSize = .3f;
+
+        switch(pinList.Count) {
+            case 0:
+                return transform.position + pinOffsetSize * Vector3.back + pinOffsetSize * Vector3.right;
+            case 1:
+                return transform.position + pinOffsetSize * Vector3.right;
+            case 2:
+                return transform.position + pinOffsetSize * Vector3.back;
+            case 3:
+                return transform.position + pinOffsetSize *Vector3.forward + pinOffsetSize * Vector3.right;
+            case 4:
+                return transform.position + pinOffsetSize * Vector3.back + pinOffsetSize * Vector3.left;
+            case 5:
+                return transform.position + pinOffsetSize * Vector3.forward;
+            case 6:
+                return transform.position + pinOffsetSize * Vector3.left;
+            case 7:
+                return transform.position + pinOffsetSize * Vector3.forward + pinOffsetSize * Vector3.left;
+            default:
+                return transform.position;
+        }
+    }
+
 
     private void setRenderer(FogOfWarState state)
     {
