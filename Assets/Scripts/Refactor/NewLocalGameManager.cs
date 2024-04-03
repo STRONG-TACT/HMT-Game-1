@@ -23,7 +23,7 @@ public class NewLocalGameManager : IntegratedGameManager
 
     // When awake, find all the managers and data.
     // Future update: Set isFirstLevel (currentLevel should by default be 1, may delete this step in future if we stick in the same scene)
-    private override void Awake()
+    protected override void Awake()
     {
 
 
@@ -48,7 +48,7 @@ public class NewLocalGameManager : IntegratedGameManager
     // Prepare for player pinning phase
     // Reset all the player pinning parameters
     // If there are characters dead, update relevant params so they will skip pinning
-    private override void PreparePlayerPinningPhase()
+    protected override void PreparePlayerPinningPhase()
     {
         base.PreparePlayerPinningPhase();
 
@@ -59,7 +59,7 @@ public class NewLocalGameManager : IntegratedGameManager
     }
 
 
-    private override void StartPlayerPinningPhase()
+    protected override void StartPlayerPinningPhase()
     {
         // Local version of player planning stage
         if (remainingCharacterCount > 0) {
@@ -84,7 +84,7 @@ public class NewLocalGameManager : IntegratedGameManager
     // Prepare for player planning phase
     // Reset all the player planning parameters
     // If there are characters dead, update relevant params so they will skip planning
-    private override void PreparePlayerPlanningPhase()
+    protected override void PreparePlayerPlanningPhase()
     {
         base.PreparePlayerPlanningPhase();
         if (remainingCharacterCount > 0) {

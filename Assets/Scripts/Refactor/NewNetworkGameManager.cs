@@ -14,7 +14,7 @@ public class NewNetworkGameManager : IntegratedGameManager
     
     public float excecutionStepTime = 1;
 
-    private override void Awake()
+    protected override void Awake()
     {
         base.Awake();
         if (S) Destroy(this);
@@ -38,7 +38,7 @@ public class NewNetworkGameManager : IntegratedGameManager
     }
 
 
-    private override void PreparePlayerPinningPhase()
+    protected override void PreparePlayerPinningPhase()
     {
         base.PreparePlayerPinningPhase();
 
@@ -46,7 +46,7 @@ public class NewNetworkGameManager : IntegratedGameManager
         StartPlayerPinningPhase();
     }
 
-    private override void StartPlayerPinningPhase()
+    protected override void StartPlayerPinningPhase()
     {
         if (remainingCharacterCount > 0)
         {
@@ -71,7 +71,7 @@ public class NewNetworkGameManager : IntegratedGameManager
     // Prepare for player planning phase
     // Reset all the player planning parameters
     // If there are characters dead, update relevant params so they will skip planning
-    private override void PreparePlayerPlanningPhase()
+    protected override void PreparePlayerPlanningPhase()
     {
         base.PreparePlayerPlanningPhase();
         localChar.indicator.SetActive(true);

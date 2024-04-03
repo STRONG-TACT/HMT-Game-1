@@ -65,7 +65,7 @@ public class IntegratedGameManager : MonoBehaviour
         StartCoroutine(StartLevel());
     }
 
-    protected virtual IEnumerator StartLevel() {
+    public virtual IEnumerator StartLevel() {
         gameStatus = GameStatus.GetReady;
         uiManager.InitGameUI();
         yield return new WaitForFixedUpdate();
@@ -128,7 +128,7 @@ public class IntegratedGameManager : MonoBehaviour
         }
     }
 
-    private virtual void EndPlayerPinningPhase()
+    protected virtual void EndPlayerPinningPhase()
     {
         Debug.Log("Pinning phase ended.");
 
@@ -172,7 +172,7 @@ public class IntegratedGameManager : MonoBehaviour
         }
     }
 
-    private virtual void EndPlayerPlanningPhase()
+    protected virtual void EndPlayerPlanningPhase()
     {
         Debug.Log("Planning phase ended.");
         uiManager.HideCharacterPlanUI();
