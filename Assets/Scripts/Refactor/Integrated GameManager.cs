@@ -682,7 +682,7 @@ public class IntegratedGameManager : MonoBehaviour
             Lose();
         }
     }
-    private virtual void Lose()
+    protected virtual void Lose()
     {
         uiManager.ShowDefeatedScreen();
     }
