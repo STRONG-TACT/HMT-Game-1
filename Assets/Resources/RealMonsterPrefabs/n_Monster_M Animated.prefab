@@ -123,11 +123,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 6422928321250116657}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c11cc767f57ca4ada96993d27fdf59fd, type: 3}
+  m_Script: {fileID: 11500000, guid: 50f4a731b646be840a4212772a59ee16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   config: {fileID: 0}
-  monsterId: 1
+  monsterId: 0
   gameData: {fileID: 0}
   turnFinished: 0
   moving: 0

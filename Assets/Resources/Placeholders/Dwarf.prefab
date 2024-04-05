@@ -107,14 +107,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 2284675785199134838}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f0faeaaa69a04c2988d07b6fc33aa90, type: 3}
+  m_Script: {fileID: 11500000, guid: 01f555dc6e266394098165af812c835d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1
   playerId: 0
   config: {fileID: 0}
   CharacterId: 0
-  indicator: {fileID: 2284675785434449998}
+  currentTile: {fileID: 0}
+  path_indicator: {fileID: 0}
+  indicator: {fileID: 0}
+  combat_indicator: {fileID: 0}
+  ActionPlan: 
+  moving: 0
+  pingCursor: {x: 0, y: 0}
+  ReadyForNextPhase: 0
+  dead: 0
+  respawnCountdown: 0
 --- !u!54 &2284675785199134844
 Rigidbody:
   m_ObjectHideFlags: 0
