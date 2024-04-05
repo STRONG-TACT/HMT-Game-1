@@ -8,7 +8,7 @@ public class IntegratedNetworkGameManager : IntegratedGameManager
 {
     
 
-    public static NetworkGameManager S =null;
+    public static IntegratedGameManager S;
     
     public float excecutionStepTime = 1;
 

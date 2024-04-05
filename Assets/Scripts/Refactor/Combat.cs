@@ -60,7 +60,7 @@ public class Combat : MonoBehaviour
         }
     }
 
-    public static bool ExecuteCombat(FightType type, LocalTile tile, LocalUIManager uiManager)
+    public static bool ExecuteCombat(FightType type, Tile tile, UIManager uiManager)
     {
         bool result = false;
         List<int> charaIDs = new List<int>();
@@ -69,7 +69,7 @@ public class Combat : MonoBehaviour
         int enemyScore = 0;
         int charaScore = 0;
 
-        foreach (LocalCharacter c in tile.charaList)
+        foreach (Character c in tile.charaList)
         {
             charaIDs.Add(c.CharacterId);
             int outcome = c.config.monsterDice.Roll();
@@ -79,7 +79,7 @@ public class Combat : MonoBehaviour
 
         if (type == FightType.Monster)
         {
-            foreach (LocalMonster m in tile.enemyList)
+            foreach (Monster m in tile.enemyList)
             {
                 int outcome = m.config.combatDice.Roll();
                 enemyScores.Add(outcome);

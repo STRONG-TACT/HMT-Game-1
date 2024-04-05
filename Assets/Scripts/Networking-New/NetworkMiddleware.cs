@@ -55,17 +55,17 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     [PunRPC]
     private void ReadyForNextPhaseRPC(int CharID, bool ready)
     {
-        NetworkGameManager.S.inSceneCharacters[CharID].ReadyForNextPhase = ready;
+        IntegratedGameManager.S.inSceneCharacters[CharID].ReadyForNextPhase = ready;
         if (ready)
         {
-            if (NetworkGameManager.S.gameStatus == GameStatus.Player_Pinning)
+            if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning)
             {
-                NetworkGameManager.S.CheckPingPhaseEnd();
+                IntegratedGameManager.S.CheckPingPhaseEnd();
             }
 
-            if (NetworkGameManager.S.gameStatus == GameStatus.Player_Planning)
+            if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning)
             {
-                NetworkGameManager.S.CheckPlanPhaseEnd();
+                IntegratedGameManager.S.CheckPlanPhaseEnd();
             }
         }
     }
@@ -75,30 +75,30 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    private void MovePingCursorOnCharacterRPC(NetworkCharacter.Direction direction, int charID) {
+    private void MovePingCursorOnCharacterRPC(Character.Direction direction, int charID) {
         if (charID != myCharacterID) {
-            NetworkGameManager.S.inSceneCharacters[charID].MovePingCursor(direction);
+            IntegratedGameManager.S.inSceneCharacters[charID].MovePingCursor(direction);
         }
     }
 
 
-    public void AddMoveToCharacterLocal(NetworkCharacter.Direction direction, int charID)
+    public void AddMoveToCharacterLocal(Character.Direction direction, int charID)
     {
         photonView.RPC("AddMoveToCharacterRPC", RpcTarget.All, direction, charID);
     }
 
     [PunRPC]
-    private void AddMoveToCharacterRPC(NetworkCharacter.Direction direction, int charID)
+    private void AddMoveToCharacterRPC(Character.Direction direction, int charID)
     {
         if (charID != myCharacterID)
         {
-            NetworkGameManager.S.inSceneCharacters[charID].ActionPlan.Add(direction);
+            IntegratedGameManager.S.inSceneCharacters[charID].ActionPlan.Add(direction);
         }
         else
         {
-            NetworkGameManager.S.localChar.AddActionToPlan(direction);
-            NetworkGameManager.S.player.UpdateCharacterUI();
-            NetworkGameManager.S.uiManager.UpdateActionPointsRemaining(NetworkGameManager.S.localChar.ActionPointsRemaining);
+            IntegratedGameManager.S.localChar.AddActionToPlan(direction);
+            IntegratedGameManager.S.player.UpdateCharacterUI();
+            IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining);
         }
     }
 
@@ -112,12 +112,12 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     {
         if (charID != myCharacterID)
         {
-            NetworkGameManager.S.inSceneCharacters[charID].ActionPlan.RemoveAt(NetworkGameManager.S.inSceneCharacters[charID].ActionPlan.Count-1);
+            IntegratedGameManager.S.inSceneCharacters[charID].ActionPlan.RemoveAt(IntegratedGameManager.S.inSceneCharacters[charID].ActionPlan.Count-1);
         }
         else
         {
-            NetworkGameManager.S.localChar.UndoPlanStep();
-            NetworkGameManager.S.uiManager.UpdateActionPointsRemaining(NetworkGameManager.S.localChar.ActionPointsRemaining);
+            IntegratedGameManager.S.localChar.UndoPlanStep();
+            IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining);
         }
     }
 
@@ -129,7 +129,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
             pinTypeIdx, 
             row, col, 
             charId);
-        NetworkGameManager.S.NewPlayerPin();
+        IntegratedGameManager.S.NewPlayerPin();
     }
 
     [PunRPC]

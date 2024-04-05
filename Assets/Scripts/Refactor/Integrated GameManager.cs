@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using GameConstant;
 
 public class IntegratedGameManager : MonoBehaviour
 {
@@ -29,7 +31,6 @@ public class IntegratedGameManager : MonoBehaviour
 
     public List<Character> inSceneCharacters = new List<Character>();
     public List<Monster> inSceneMonsters = new List<Monster>();
-    protected Queue<Tile> eventQueue;
 
     public static IntegratedGameManager S = null;
     public float excecutionStepTime = 1;
@@ -310,7 +311,7 @@ public class IntegratedGameManager : MonoBehaviour
                     int startCol = currentTile.col;
                     bool foundSpot = false;
                     //move monster to nearest avaiable tile where there is no character and no other monster on it
-                    for (int distance = 1; distance < Math.Max(MapGenerator.Instance.Map.GetLength(0), MapGenerator.Instance.Map.GetLength(1)); distance++)
+                    for (int distance = 1; distance < Math.Max(IntegratedMapGenerator.Instance.Map.GetLength(0), IntegratedMapGenerator.Instance.Map.GetLength(1)); distance++)
                     {
                         if (!foundSpot)
                         {
@@ -321,9 +322,9 @@ public class IntegratedGameManager : MonoBehaviour
                                 {
                                     int targetRow = startRow + rowOffset;
                                     int targetCol = startCol + colOffset;
-                                    if (MapGenerator.Instance.InMap(targetRow, targetCol))
+                                    if (IntegratedMapGenerator.Instance.InMap(targetRow, targetCol))
                                     {
-                                        Tile targetTile = MapGenerator.Instance.GetTileAt(targetRow, targetCol);
+                                        Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(targetRow, targetCol);
                                         if (targetTile.tileType == Tile.ObstacleType.None && targetTile.enemyList.Count == 0
                                             && targetTile.charaList.Count == 0 && targetTile.gameObject.tag != "Rock" && targetTile.gameObject.tag != "Trap" && targetTile.gameObject.layer != LayerMask.NameToLayer("Impassible"))
                                         {
@@ -337,7 +338,7 @@ public class IntegratedGameManager : MonoBehaviour
                                 foundSpot = true;
                                 //select a random tile in the avaiable positions to move
                                 int randomIndex = UnityEngine.Random.Range(0, availablePos.Count);
-                                NetworkTile selectedTile = availablePos[randomIndex];
+                                Tile selectedTile = availablePos[randomIndex];
                                 yield return StartCoroutine(mon.moveToTargetLocation(selectedTile.transform.position, excecutionStepTime));
                             }
                         }
@@ -376,7 +377,7 @@ public class IntegratedGameManager : MonoBehaviour
         while (eventQueue.Count != 0)
         {
             bool win = false;
-            NetworkTile t = eventQueue.Dequeue();
+            Tile t = eventQueue.Dequeue();
 
             Debug.LogFormat("Processing Event at {0}, {1}", t.row, t.col);
 
@@ -412,7 +413,7 @@ public class IntegratedGameManager : MonoBehaviour
                 switch (t.tileType)
                 {
                     case Tile.ObstacleType.None:
-                        foreach (NetworkMonster m in t.enemyList)
+                        foreach (Monster m in t.enemyList)
                         {
                             m.Kill(excecutionStepTime);
                             inSceneMonsters.Remove(m);
@@ -425,7 +426,7 @@ public class IntegratedGameManager : MonoBehaviour
                         Tile newTile = opentile.GetComponent<Tile>();
                         newTile.row = t.row;
                         newTile.col = t.col;
-                        MapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
+                        IntegratedMapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
                         Destroy(t.gameObject);
                         break;
                 }
@@ -455,7 +456,7 @@ public class IntegratedGameManager : MonoBehaviour
                         // then we should "unreach" the shrine
                         if (t.gameObject.CompareTag("Goal"))
                         {
-                            Shrine shrine = t.gameObject.GetComponentInChildren<NetworkShrine>();
+                            Shrine shrine = t.gameObject.GetComponentInChildren<Shrine>();
                             foreach (var character in t.charaList)
                             {
                                 if (shrine.CheckShrineType(character))
@@ -479,7 +480,7 @@ public class IntegratedGameManager : MonoBehaviour
                         newTile.fogOfWarDictionary = fogOfWarDictionary;
                         newTile.row = t.row;
                         newTile.col = t.col;
-                        MapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
+                        IntegratedMapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
                         Destroy(t.gameObject);
                         break;
                     case Tile.ObstacleType.Rock:
@@ -510,7 +511,7 @@ public class IntegratedGameManager : MonoBehaviour
                         m.Retreat();
                     }
                 }
-                MapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
+                IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
             }
 
             //TODO this should probably be waiting for a button click in the future.
@@ -519,20 +520,20 @@ public class IntegratedGameManager : MonoBehaviour
             {
                 if (c != null)
                 {
-                    c.State = NetworkCharacter.CharacterState.Idle;
+                    c.State = Character.CharacterState.Idle;
                 }
             }
             foreach (Monster mo in copiedEnemies)
             {
                 if (mo != null)
                 {
-                    mo.State = NetworkMonster.CharacterState.Idle;
+                    mo.State = Monster.CharacterState.Idle;
                 }
             }
             uiManager.HideCombatUI();
         }
         yield break;
-        NetworkMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
+        IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
         // This should only be called as a sub-coroutine of the main moving one so it
         // doesn't need to restart them, it should just yield break
         //if (gameStatus == GameStatus.Player_Moving)
@@ -566,7 +567,7 @@ public class IntegratedGameManager : MonoBehaviour
     // When chara fail a combat, clear all the remaining moves in queue this round
     protected virtual void clearCharacterMoves(List<Character> charaList)
     {
-        foreach (NetworkCharacter c in charaList)
+        foreach (Character c in charaList)
         {
             //Debug.LogFormat("Clear plan: {0}", c.name);
             c.ActionPlan.Clear();
@@ -631,7 +632,7 @@ public class IntegratedGameManager : MonoBehaviour
         yield return new WaitForSeconds(5f);
         foreach (Character c in inSceneCharacters)
         {
-            c.State = NetworkCharacter.CharacterState.Idle;
+            c.State = Character.CharacterState.Idle;
         }
 
 
@@ -659,7 +660,7 @@ public class IntegratedGameManager : MonoBehaviour
             }
 
             uiManager.ResetGoalStatus();
-            MapGenerator.Instance.LoadLevel(gameData.levelTextFiles[currentLevel - 1]);
+            IntegratedMapGenerator.Instance.LoadLevel(gameData.levelTextFiles[currentLevel - 1]);
 
             StartCoroutine(StartLevel());
         }
