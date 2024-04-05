@@ -1654,7 +1654,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c97f30c2b94a4c79b6c49a9ba93e138, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainCamera: {fileID: 0}
+  focusedTile: {fileID: 0}
+  tile: {fileID: 0}
   pinWheel: {fileID: 1640361128}
+  pinPosition: {x: 0, y: 0, z: 0}
+  isPinned: 0
   ui_offset: {x: 0, y: 0.3, z: 0}
   pin_icon_offset: {x: 0, y: 0.3, z: 0}
   pinList: []
@@ -2231,21 +2236,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 415934545}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 348d08a966e59734b88c1b8bc71ad903, type: 3}
+  m_Script: {fileID: 11500000, guid: 85df20c9e3e8e4a4ebd93974889195b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartServerOnStart: 1
-  url: ws://localhost
-  socketPort: 4649
-  serviceName: hmt
-  serviceTargets:
-  - dwarf
-  - giant
-  - human
-  IgnoreScenes: []
-  dwarfID: 0
-  giantID: 1
-  humanID: 2
 --- !u!4 &415934547
 Transform:
   m_ObjectHideFlags: 0
@@ -2436,7 +2429,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 477472143}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c0c264318e644899b58b467a6a9939c, type: 3}
+  m_Script: {fileID: 11500000, guid: a09332250f8444ab9ba9bdf459bcda52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gameAssets: {fileID: 1090566748}
@@ -3501,7 +3494,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 601247817}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0f20ef14b7014731b9cd6e65373a085, type: 3}
+  m_Script: {fileID: 11500000, guid: eca6df18715234cb6969001418e3a52e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   levelTextFiles:
@@ -3949,7 +3942,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 641018627}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2015c35b2535d406cae722c42144f197, type: 3}
+  m_Script: {fileID: 11500000, guid: c95269275f87778418e40469f00b3bd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cameraPivot: {fileID: 1597887105}
@@ -5415,7 +5408,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 962620381}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 276ea6befc96d4c789a0384f6b11cb65, type: 3}
+  m_Script: {fileID: 11500000, guid: c06317470502f51439a18ffb120f0634, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gameAssets: {fileID: 1090566748}
@@ -5693,6 +5686,7 @@ MonoBehaviour:
   dwarfID: 1
   giantID: 0
   humanID: 2
+  gameData: {fileID: 0}
 --- !u!4 &1005648489
 Transform:
   m_ObjectHideFlags: 0
@@ -6817,22 +6811,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1148622264}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 455bd1f277f9e4fa8938b6556717c051, type: 3}
+  m_Script: {fileID: 11500000, guid: 96baf1b91c7163b4eb73014744334b96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   uiManager: {fileID: 477472144}
   gameData: {fileID: 601247818}
   player: {fileID: 1700429515}
   pinningSystem: {fileID: 1726500803}
+  localChar: {fileID: 0}
   gameStatus: 0
   goalCount: 0
   currentLevel: 1
+  isNetworkGame: 0
   inSceneCharacters:
   - {fileID: 1441866728}
   - {fileID: 1464507125}
   - {fileID: 1636441392}
   inSceneMonsters: []
-  localChar: {fileID: 0}
+  excecutionStepTime: 1
   excecutionStepTime: 1
 --- !u!1 &1154773739
 GameObject:
@@ -7318,8 +7314,11 @@ MonoBehaviour:
   gameData: {fileID: 1618205929}
   cameraMoveSpeed: 0.01
   zoomSensitivity: 0.8
+  targetCharacter: {fileID: 0}
   cameraOffset: {x: 0, y: 0, z: 0}
   cameraCentered: 0
+  lerpDuration: 3
+  timer: 0
 --- !u!4 &1230570750
 Transform:
   m_ObjectHideFlags: 0
@@ -7968,19 +7967,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36c89c25825204329983b43e6c5af7a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movePoint: {x: 0, y: 0, z: 0}
+  prevMovePointPos: {x: 0, y: 0, z: 0}
+  startPos: {x: 0, y: 0, z: 0}
+  stepLength: 0
   playerId: 0
   config: {fileID: 0}
   CharacterId: 0
+  maskOn: 0
   currentTile: {fileID: 0}
+  indicator_offset: {x: 0, y: 0, z: 0}
+  path_indicator_offset: 0
   path_indicator: {fileID: 8989618856613533639, guid: 8ed031e9d11189d4c996eca60573b7ca, type: 3}
   indicator: {fileID: 251929613}
   combat_indicator: {fileID: 3893728144243371889, guid: d6a5ac4d0d570c24da178c243013580c, type: 3}
+  path_indicator_positions: []
   ActionPlan: 
   moving: 0
   pingCursor: {x: 0, y: 0}
+  pinsPlaced: 0
   ReadyForNextPhase: 0
+  <characterMask>k__BackingField: {fileID: 0}
+  <visibilityMask>k__BackingField: {fileID: 0}
+  health: 3
   dead: 0
   respawnCountdown: 0
+  model: {fileID: 0}
+  animator: {fileID: 0}
+  characterState: 0
 --- !u!1 &1444188639
 GameObject:
   m_ObjectHideFlags: 0
@@ -8493,19 +8507,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36c89c25825204329983b43e6c5af7a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movePoint: {x: 0, y: 0, z: 0}
+  prevMovePointPos: {x: 0, y: 0, z: 0}
+  startPos: {x: 0, y: 0, z: 0}
+  stepLength: 0
   playerId: 1
   config: {fileID: 0}
   CharacterId: 0
+  maskOn: 0
   currentTile: {fileID: 0}
+  indicator_offset: {x: 0, y: 0, z: 0}
+  path_indicator_offset: 0
   path_indicator: {fileID: 8989618856613533639, guid: 8ed031e9d11189d4c996eca60573b7ca, type: 3}
   indicator: {fileID: 480317383}
   combat_indicator: {fileID: 3893728144243371889, guid: d6a5ac4d0d570c24da178c243013580c, type: 3}
+  path_indicator_positions: []
   ActionPlan: 
   moving: 0
   pingCursor: {x: 0, y: 0}
+  pinsPlaced: 0
   ReadyForNextPhase: 0
+  <characterMask>k__BackingField: {fileID: 0}
+  <visibilityMask>k__BackingField: {fileID: 0}
+  health: 3
   dead: 0
   respawnCountdown: 0
+  model: {fileID: 0}
+  animator: {fileID: 0}
+  characterState: 0
 --- !u!1 &1480097745
 GameObject:
   m_ObjectHideFlags: 0
@@ -9543,6 +9572,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3027d89920ed4c4484cb31a0c583d2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Initialized>k__BackingField: 0
   levelTextFiles:
   - {fileID: 4900000, guid: 4dd78d57817c6444eb09fe4c816f645e, type: 3}
   - {fileID: 4900000, guid: 639404744e3da4b3997394218ee948a6, type: 3}
@@ -9576,6 +9606,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d2413007b52147cea91a2e7494e8f9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <gameData>k__BackingField: {fileID: 0}
+  uiManager: {fileID: 0}
   player: {fileID: 1764717557}
   pinningSystem: {fileID: 0}
   debugRPCReceipts: 0
@@ -9589,7 +9621,10 @@ MonoBehaviour:
   inSceneMonsters: []
   mainCharacter: {fileID: 0}
   goalCount: 0
+  remainingCharacterCount: 3
   gameStatus: 0
+  pinningSubmittedCount: 0
+  planSubmittedCount: 0
 --- !u!4 &1618205931
 Transform:
   m_ObjectHideFlags: 0
@@ -9827,19 +9862,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36c89c25825204329983b43e6c5af7a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movePoint: {x: 0, y: 0, z: 0}
+  prevMovePointPos: {x: 0, y: 0, z: 0}
+  startPos: {x: 0, y: 0, z: 0}
+  stepLength: 0
   playerId: 2
   config: {fileID: 0}
   CharacterId: 0
+  maskOn: 0
   currentTile: {fileID: 0}
+  indicator_offset: {x: 0, y: 0, z: 0}
+  path_indicator_offset: 0
   path_indicator: {fileID: 8989618856613533639, guid: 8ed031e9d11189d4c996eca60573b7ca, type: 3}
   indicator: {fileID: 1886817385}
   combat_indicator: {fileID: 3893728144243371889, guid: d6a5ac4d0d570c24da178c243013580c, type: 3}
+  path_indicator_positions: []
   ActionPlan: 
   moving: 0
   pingCursor: {x: 0, y: 0}
+  pinsPlaced: 0
   ReadyForNextPhase: 0
+  <characterMask>k__BackingField: {fileID: 0}
+  <visibilityMask>k__BackingField: {fileID: 0}
+  health: 3
   dead: 0
   respawnCountdown: 0
+  model: {fileID: 0}
+  animator: {fileID: 0}
+  characterState: 0
 --- !u!1 &1637726528
 GameObject:
   m_ObjectHideFlags: 0
@@ -10012,7 +10062,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1700429514}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1845bac2a2f9e482bbeb83b1f6b47315, type: 3}
+  m_Script: {fileID: 11500000, guid: ad0051c65dc524fda84d7fcf65a7d78f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   pinFinishBtn: {fileID: 674937929}
@@ -10250,13 +10300,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1726500801}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 363c86a3959cd4521ad760fb204c58eb, type: 3}
+  m_Script: {fileID: 11500000, guid: 27a7207cb0ccf4d7bb0fb0ccae80b768, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   pinWheel: {fileID: 1120016807}
   ui_offset: {x: 0, y: 0.3, z: 0}
   pin_icon_offset: {x: 0, y: 0.3, z: 0}
   pinList: []
+  pinOffsetSide: 0.3
   unknownPinPrefab: {fileID: 6099151916383471026, guid: cdec057ce5f534b469fb29525f33f163, type: 3}
   dangerPinPrefab: {fileID: 9008908807479991329, guid: f6f7555638fe14f07be533f3092ea3a5, type: 3}
   assistPinPrefab: {fileID: 3856196415462018541, guid: 309e60385c932406d9dc198c363e66c5, type: 3}
@@ -10312,6 +10363,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77711f75afd8f43f3b9aac9d8ffbff72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <myCharacter>k__BackingField: {fileID: 0}
   pinFinishBtn: {fileID: 674937929}
   dwarfBtn: {fileID: 0}
   gaintBtn: {fileID: 0}
