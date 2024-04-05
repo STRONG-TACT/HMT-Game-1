@@ -2618,47 +2618,48 @@ MonoBehaviour:
   m_GameObject: {fileID: 496902473}
   m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0f5a3ae1679644c5a9e9cc0bf127b82, type: 3}
+  m_Script: {fileID: 11500000, guid: a09332250f8444ab9ba9bdf459bcda52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gameAssets: {fileID: 1090566748}
-  text: {fileID: 822792993}
+  text: {fileID: 0}
   TutorialTime: 1
-  PlanUI: {fileID: 898724893}
-  PinFinishBtn: {fileID: 674937927}
-  SwitchCharaButton: {fileID: 0}
-  CharacterInfo: {fileID: 1108842492}
-  YouAreInfo: {fileID: 2102953641}
+  PlanUI: {fileID: 0}
+  PinFinishBtn: {fileID: 0}
+  CharacterInfo: {fileID: 0}
+  YouAreInfo: {fileID: 0}
   DiceStats:
-  - {fileID: 463302105}
-  - {fileID: 118006771}
-  - {fileID: 182759403}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   BonusStats:
-  - {fileID: 1058443878}
-  - {fileID: 1414804071}
-  - {fileID: 1480097745}
-  HealthPanel: {fileID: 674452509}
-  ActionPanel: {fileID: 702401516}
-  CombatUI: {fileID: 846543553}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  HealthPanel: {fileID: 0}
+  ActionPanel: {fileID: 0}
+  CombatUI: {fileID: 0}
   PlayerCombatSlots:
-  - {fileID: 1725206468}
-  - {fileID: 1268968048}
-  - {fileID: 227369489}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   EnemyCombatSlots:
-  - {fileID: 1458500266}
-  - {fileID: 898297173}
-  - {fileID: 265300625}
-  - {fileID: 1566708458}
-  PlayerFinalScore: {fileID: 551870408}
-  EnemyFinalScore: {fileID: 873280535}
-  ResultMessage: {fileID: 1444188641}
-  WinBG: {fileID: 205855061}
-  LoseBG: {fileID: 506356024}
-  GoalPanel: {fileID: 1614209711}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  PlayerFinalScore: {fileID: 0}
+  EnemyFinalScore: {fileID: 0}
+  ResultMessage: {fileID: 0}
+  WinBG: {fileID: 0}
+  LoseBG: {fileID: 0}
+  VictoryScreen: {fileID: 0}
+  LossScreen: {fileID: 0}
+  GoalPanel: {fileID: 0}
   GoalStatus:
-  - {fileID: 428104893}
-  - {fileID: 1637726528}
-  - {fileID: 1534434522}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &496902476
 MonoBehaviour:
   m_ObjectHideFlags: 0

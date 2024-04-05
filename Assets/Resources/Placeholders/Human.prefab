@@ -114,7 +114,7 @@ MonoBehaviour:
   config: {fileID: 0}
   CharacterId: 0
   currentTile: {fileID: 0}
-  path_indicator: {fileID: 0}
+  path_indicator: {fileID: 8989618856613533639, guid: 8ed031e9d11189d4c996eca60573b7ca, type: 3}
   indicator: {fileID: 0}
   combat_indicator: {fileID: 0}
   ActionPlan: 

@@ -96,7 +96,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   config: {fileID: 0}
-  monsterId: 0
+  monsterId: 2
   gameData: {fileID: 0}
   turnFinished: 0
   moving: 0
