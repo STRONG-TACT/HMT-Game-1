@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: -3908676543630665713}
   - component: {fileID: 7509556887802056433}
   m_Layer: 8
-  m_Name: n_MountainTile3 1
+  m_Name: n_MountainTile3
   m_TagString: Walls
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -55,7 +55,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 9153439007067548606}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58bb163745bf34af8a4a70895e47da4a, type: 3}
+  m_Script: {fileID: 11500000, guid: d07d4500c59886246976477d325e165b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   tileType: 3
@@ -68,6 +68,8 @@ MonoBehaviour:
   charaList: []
   pinList: []
   shrine: {fileID: 0}
+  seen_material: {fileID: 0}
+  unseen_material: {fileID: 0}
 --- !u!1001 &9153439007669233273
 PrefabInstance:
   m_ObjectHideFlags: 0

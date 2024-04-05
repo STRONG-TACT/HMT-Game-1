@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6890866774265503466}
   - component: {fileID: -1792198541226104587}
   m_Layer: 6
-  m_Name: n_RockTile3 1
+  m_Name: n_RockTile3
   m_TagString: Rock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -56,7 +56,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4459639482418607303}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58bb163745bf34af8a4a70895e47da4a, type: 3}
+  m_Script: {fileID: 11500000, guid: d07d4500c59886246976477d325e165b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   tileType: 2
