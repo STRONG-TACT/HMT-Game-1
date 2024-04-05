@@ -46,7 +46,7 @@ public class IntegratedGameManager : MonoBehaviour
 
         //Depend on whether we want to assign them in editor of find in run time
         uiManager = FindObjectOfType<UIManager>();
-        gameData = FindObjectOfType<lGameData>();
+        gameData = FindObjectOfType<GameData>();
         player = FindObjectOfType<Player>();
         pinningSystem = FindObjectOfType<PinningSystem>();
     }

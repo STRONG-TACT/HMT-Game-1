@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using GameConstant;
-using Photon.Pun;
 
-public class NetworkPinningSystem : MonoBehaviourPunCallbacks
+public class PinningSystem : MonoBehaviour
 {
-    public static NetworkPinningSystem S { get; private set; }
+    public static PinningSystem S { get; private set; }
     private Camera mainCamera;
     private Ray ray;
     private RaycastHit hit;
@@ -53,7 +52,7 @@ public class NetworkPinningSystem : MonoBehaviourPunCallbacks
             {omwPinPrefab, 3}
         };
     }
-
+    
     private void Start()
     {
         if (S) Destroy(this);
@@ -100,7 +99,6 @@ public class NetworkPinningSystem : MonoBehaviourPunCallbacks
         }
     }
     
-    //TODO: GameManager should call this when chars start to move
     public void ClearCurrentTurnPins() {
         foreach (NetworkPin pin in pinList) {
             if (pin != null) Destroy(pin.gameObject);
@@ -114,28 +112,24 @@ public class NetworkPinningSystem : MonoBehaviourPunCallbacks
         pinWheel.SetActive(false);
         isPinned = false;
     }
-
-    /*
-     * These DropPin and DropPinAt functions generalize all of the specific functions below.
-     * It also allows for openning up the set of pins in the future.
-     * We shouldn't need the specific functions anymore.
-     */ 
+    
     public void DropPin(int pinTypeIdx) {
-        DropPinAt(pinTypeIdx, focusedTile.row, focusedTile.col, NetworkMiddleware.S.myCharacterID);
+        DropPinAt(pinTypeIdx, focusedTile.row, focusedTile.col, IntegratedGameManager.S.localChar.playerId);
     }
 
     public void DropPinAt(int pinTypeIdx, int row, int col, int charId) {
-        photonView.RPC(
-            "AddPin", 
-            RpcTarget.All,
-            pinTypeIdx, 
-            row, col, 
-            charId);
-        NetworkGameManager.S.NewPlayerPin();
-    }
+        if (IntegratedGameManager.S.isNetworkGame)
+        {
+            NetworkMiddleware.S.DropPinAtLocal(pinTypeIdx, row, col, charId);
+        }
 
-    [PunRPC]
-    private void AddPin(int pinIdx, int tileRow, int tileCol, int charID)
+        else
+        {
+            AddPin(pinTypeIdx, row, col, charId);
+        }
+    }
+    
+    public void AddPin(int pinIdx, int tileRow, int tileCol, int charID)
     {
         GameObject pinObj;
         NetworkTile targetTile = NetworkMapGenerator.Instance.GetTileAt(tileRow, tileCol);

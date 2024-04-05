@@ -444,11 +444,11 @@ public class Character : MonoBehaviour {
         if (IntegratedGameManager.S.isNetworkGame)
         {
             if (CharacterId == NetworkMiddleware.S.myCharacterID)
-                IntegratedMapGenerator.Instance.updateFogOfWar_map();
+                IntegratedMapGenerator.Instance.updateFogOfWar_map(CharacterId);
         }
         else
         {
-            IntegratedMapGenerator.Instance.updateFogOfWar_map();
+            IntegratedMapGenerator.Instance.updateFogOfWar_map(CharacterId);
         }
 
 

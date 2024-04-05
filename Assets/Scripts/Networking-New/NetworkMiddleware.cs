@@ -120,4 +120,21 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
             NetworkGameManager.S.uiManager.UpdateActionPointsRemaining(NetworkGameManager.S.localChar.ActionPointsRemaining);
         }
     }
+
+    public void DropPinAtLocal(int pinTypeIdx, int row, int col, int charId)
+    {
+        photonView.RPC(
+            "DropPinAtRpc", 
+            RpcTarget.All,
+            pinTypeIdx, 
+            row, col, 
+            charId);
+        NetworkGameManager.S.NewPlayerPin();
+    }
+
+    [PunRPC]
+    private void DropPinAtRpc(int pinTypeIdx, int row, int col, int charId)
+    {
+        PinningSystem.S.AddPin(pinTypeIdx, row, col, charId);
+    }
 }
