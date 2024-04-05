@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using GameConstant;
 
-public class NewNetworkGameManager : IntegratedGameManager
+public class IntegratedNetworkGameManager : IntegratedGameManager
 {
 
     // Pointer to the character that local client controls
@@ -30,10 +30,10 @@ public class NewNetworkGameManager : IntegratedGameManager
         CameraManager.S.ChangeTargetCharacter(localChar.CharacterId);
         CameraManager.S.RecenterCamera();
         // this call will mark every tile as unseen
-        MapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
+        IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
         // this call actually setup the correct FOW
         // the delay is needed because internal state of FOW needs physics trigger to work
-        MapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
+        IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
         yield return StartCoroutine(base.StartLevel());
     }
 

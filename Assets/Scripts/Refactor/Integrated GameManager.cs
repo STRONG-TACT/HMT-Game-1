@@ -76,7 +76,7 @@ public class IntegratedGameManager : MonoBehaviour
     protected virtual void StartPlayerTurn()
     {
         //check this later
-        MapGenerator.Instance.updateFogOfWar_map(NetworkGameManager.S.localChar.CharacterId);
+        IntegratedMapGenerator.Instance.updateFogOfWar_map(IntegratedGameManager.S.localChar.CharacterId);
         remainingCharacterCount = 3;
 
         foreach (Character chara in inSceneCharacters)
@@ -429,7 +429,7 @@ public class IntegratedGameManager : MonoBehaviour
                 }
 
                 //problem -> need to fix
-                MapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
+                IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
             }
             else
             {

@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 using Photon.Pun.Demo.PunBasics;
 using UnityEditor;
 
-public class NewLocalGameManager : IntegratedGameManager
+public class IntegratedLocalGameManager : IntegratedGameManager
 {
     public enum GameStatus { GetReady, Player_Pinning, Player_Planning, Player_Moving, Monster_Moving, Animation_Pause, GameEnd }
 
