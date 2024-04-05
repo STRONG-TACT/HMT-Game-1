@@ -25,7 +25,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
     // Future update: Set isFirstLevel (currentLevel should by default be 1, may delete this step in future if we stick in the same scene)
     protected override void Awake()
     {
-
+        isNetworkGame = false;
 
         base.Awake();
 

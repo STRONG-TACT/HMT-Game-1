@@ -16,6 +16,7 @@ public class IntegratedGameManager : MonoBehaviour
 
     // ======== Game States ======== 
     [Header("Game States")]
+    [HideInInspector] public Character localChar;
     public GameStatus gameStatus = GameStatus.GetReady;
     public int goalCount = 0;
     protected int remainingCharacterCount = 3;
@@ -24,6 +25,7 @@ public class IntegratedGameManager : MonoBehaviour
     private Queue<Tile> eventQueue = new Queue<Tile>();
     protected Coroutine currentCoroutine = null;
     public int currentLevel = 1;
+    public bool isNetworkGame;
 
     public List<Character> inSceneCharacters = new List<Character>();
     public List<Monster> inSceneMonsters = new List<Monster>();

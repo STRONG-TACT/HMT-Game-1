@@ -1,331 +1,650 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Pun.Demo.PunBasics;
+using GameConstant;
+using Newtonsoft.Json.Linq;
 
 /// <summary>
-/// A goal is that this script knows nothing about dwarves, giants, or humans.
+/// 4/5/24 refactor change this older version of character to a integrated version
+/// used by both local and network version of the game
 /// </summary>
 public class Character : MonoBehaviour {
-    public enum Direction {
-        Left, Right, Up, Down
+    public enum Direction
+    {
+        Up = 1, Down = 2, Left = 3, Right = 4, Wait = 0
+    }
+    
+    public enum CharacterState
+    {
+        Idle, Walking, Attacking, Die, Cheering
     }
 
-    public enum CharacterState {
-        Idle, Walking, Attacking
-    }
-
-    PhotonView photonView;
-
-    public float speed;
     private Vector3 movePoint;
     private Vector3 prevMovePointPos;
+    private Vector3 startPos;
+
+    private float stepLength;
 
     public int playerId;
 
-    private CharacterState characterState;
-
-    public CharacterState State {
-        get { return characterState; }
-        set {
-            if (value != characterState) {
-                characterState = value;
-                switch (value) {
-                    case CharacterState.Idle:
-                        animator.SetBool("Idle", true);
-                        animator.SetBool("Attack", false);
-                        animator.SetBool("Walk", false);
-                        break;
-                    case CharacterState.Walking:
-                        animator.SetBool("Idle", false);
-                        animator.SetBool("Attack", false);
-                        animator.SetBool("Walk", true);
-                        break;
-                    case CharacterState.Attacking:
-                        animator.SetBool("Idle", false);
-                        animator.SetBool("Attack", true);
-                        animator.SetBool("Walk", false);
-                        break;
-                }
-            }
-        }
-    }
-    //public bool[] movable; // detecting walls. index 0: left, 1: right, 2: front, 3: back 
-
-    public int moveCount;
-
     public CharacterConfig config;
     public int CharacterId;
+    private bool maskOn;
 
-    private Transform characterRig;
+    public Tile currentTile;
+
+    private Vector3 indicator_offset;
+    private float path_indicator_offset;
+    public GameObject path_indicator;
+    public GameObject indicator;
+    public GameObject combat_indicator;
+    private Stack<GameObject> combat_indicator_list = new Stack<GameObject>();
+    private Stack<GameObject> path_indicator_list = new Stack<GameObject>();
+    private List<Vector3> path_indicator_positions = new List<Vector3>();
+    public List<Direction> ActionPlan = new List<Direction>();
+    // how many moves that the character left in this turn
+    //private int actionPointsLeft;
+    public bool moving = false;
+    
+    //This is only used for AI characters
+    public Vector2Int pingCursor;
+    private int pinsPlaced = 0;
+    
+    public bool ReadyForNextPhase = false;
+
     public Transform characterMask { get; private set; }
     public Transform visibilityMask { get; private set; }
 
     //Health
     public int Health { get { return health; } }
-    private int health;
+    private int health = 3;
 
-    
+    //Death and death round count down
+    public bool dead = false;
+    public int respawnCountdown = 0;
 
+    private Transform model;
     private Animator animator;
-
-    public CameraManager cameraManager;
-    private UIManager uiManager;
-    public GameData gameData;
-
-    void Awake() {
-        photonView = GetComponent<PhotonView>();
-        characterRig = transform.GetChild(0);
-
+    private CharacterState characterState;
+    
+    public CharacterState State
+    {
+        get { return characterState; }
+        set
+        {
+            if (value != characterState)
+            {
+                characterState = value;
+                if (animator != null) {
+                    switch (value) {
+                        case CharacterState.Idle:
+                            animator.SetBool("Idle", true);
+                            animator.SetBool("Attack", false);
+                            animator.SetBool("Walk", false);
+                            animator.SetBool("Cheer", false);
+                            animator.SetBool("Die", false);
+                            break;
+                        case CharacterState.Walking:
+                            animator.SetBool("Idle", false);
+                            animator.SetBool("Attack", false);
+                            animator.SetBool("Walk", true);
+                            animator.SetBool("Cheer", false);
+                            animator.SetBool("Die", false);
+                            break;
+                        case CharacterState.Attacking:
+                            animator.SetBool("Idle", false);
+                            animator.SetBool("Attack", true);
+                            animator.SetBool("Walk", false);
+                            animator.SetBool("Cheer", false);
+                            animator.SetBool("Die", false);
+                            break;
+                        case CharacterState.Cheering:
+                            animator.SetBool("Idle", false);
+                            animator.SetBool("Attack", false);
+                            animator.SetBool("Walk", false);
+                            animator.SetBool("Cheer", true);
+                            animator.SetBool("Die", false);
+                            break;
+                        case CharacterState.Die:
+                            animator.SetBool("Idle", false);
+                            animator.SetBool("Attack", false);
+                            animator.SetBool("Walk", false);
+                            animator.SetBool("Cheer", false);
+                            animator.SetBool("Die", true);
+                            break;
+                    }
+                }
+            }
+        }
     }
-    private void Start() {
+    
+    private Vector3 RoundPosition(Vector3 position, float precision)
+    {
+        float x = Mathf.Round(position.x / precision) * precision;
+        float y = Mathf.Round(position.y / precision) * precision;
+        float z = Mathf.Round(position.z / precision) * precision;
+        return new Vector3(x, y, z);
+    }
 
-        speed = 3.0f;
-        cameraManager = FindObjectOfType<CameraManager>();
-        gameData = FindObjectOfType<GameData>();
-        uiManager = FindObjectOfType<UIManager>();
-
+    public int ActionPointsRemaining {
+        get {
+            return config.movement - ActionPlan.Count - pinsPlaced;
+        }
+    }
+    
+    private void Start()
+    {
         movePoint = transform.position;
         prevMovePointPos = movePoint;
-
-        moveCount = 0;
-
+        characterMask = transform.Find("CharacterMask");
+        visibilityMask = transform.Find("VisibleMask");
+        health = 3;
+        
+        model = transform.Find("Model");
+        if(model == null) {
+            Debug.LogErrorFormat("Character {0} has no Model child object", gameObject.name);
+        }
+        
         animator = GetComponentInChildren<Animator>();
         animator.SetBool("Idle", true);
         State = CharacterState.Idle;
-
-        health = 3;
     }
-
-    void Update() {
-        //if its our turn the camera is centered then move
-        //if (GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber) {
-        //    if (gameData.differentCameraView) {
-        //        if (cameraManager.cameraCentered) {
-        //            PlayerMovement();
-        //        }
-        //    }
-        //    else {
-        //        PlayerMovement();
-        //    }
-        //}
-        //else {
-        //    PlayerMovement();
-        //}
-
-        ////if its not out turn then just move?
-        //if (GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber && 
-        //    !CombatSystem.Instance.isInFight && 
-        //    GameManager.Instance.isFirstLevel) {
-        //    if (!gameData.differentCameraView) {
-        //        PlayerMovement();
-        //    }
-        //    else if (cameraManager.cameraCentered) {
-        //        PlayerMovement();
-        //    }
-        //}
-
-        switch (State) {
-            case CharacterState.Walking:
-                transform.position = Vector3.MoveTowards(transform.position, movePoint, speed * Time.deltaTime);
-                if (Vector3.Distance(transform.position, movePoint) == 0f) {
-                    GameManager.Instance.CallUpdateActionPoints(config.movement - moveCount);
-
-                    prevMovePointPos = movePoint;
-                    if (moveCount == config.movement) {
-                        moveCount = 0;
-                        GameManager.Instance.EndTurn();
-                    }
-                    State = CharacterState.Idle;
-                }
-                break;
-            case CharacterState.Idle:
-            case CharacterState.Attacking:
-            default: break;
+    
+    public void setStartPos(Vector3 newPosition)
+    {
+        transform.position = newPosition;
+        startPos = newPosition;
+        movePoint = transform.position;
+        prevMovePointPos = movePoint;
+    }
+    
+    public void ResetActionPoints() {
+        if (dead) {
+            ActionPlan.Clear();
+            for(int i = 0; i <config.movement; i++) {
+                ActionPlan.Add(Direction.Wait);
+            }
         }
+        else {
+            pinsPlaced = 0;
+            ActionPlan.Clear();
+        }
+
+        moving = false;
     }
-
-    public void SetUpConfig(CharacterConfig config, int characterId, GameData gameData) {
-        this.config = config;
-        CharacterId = characterId;
-
-        characterMask = transform.Find("CharacterMask");
-        visibilityMask = transform.Find("VisibleMask");
-       
-        Vector3 cellScale = new Vector3( gameData.tileSize + 2 * gameData.tileGapLength, 
-                                         0, 
-                                         gameData.tileSize + 2 * gameData.tileGapLength);
-        characterMask.localScale = cellScale;
-        visibilityMask.localScale = cellScale * config.sightRange;
+    
+    public void StartPingPhase() {
+        pingCursor = Vector2Int.zero;
+        if (IntegratedGameManager.S.isNetworkGame)
+        {
+            if (CharacterId == NetworkMiddleware.S.myCharacterID)
+            {
+                NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, dead);
+            }
+        }
+        else
+        {
+            pingCursor = Vector2Int.zero;
+            ReadyForNextPhase = dead;
+        }
         
     }
-
-    public void CallDoMove(Vector3 targetPos, Quaternion orientation) {
-        photonView.RPC("DoMove", RpcTarget.All, targetPos, orientation);
+    
+    public void EndPingPhase() {
+        pingCursor = Vector2Int.zero;
+        ReadyForNextPhase = false;
     }
-
-    [PunRPC]
-    public void DoMove(Vector3 targetPos, Quaternion orientation) {
-        movePoint = targetPos;
-        if (characterRig.rotation != orientation) {
-            characterRig.rotation = orientation;
+    
+    public void ResetPlan() {
+        ActionPlan.Clear();
+    }
+    
+    public void StartPlanningPhase()
+    {
+        ResetPlan();
+        if (IntegratedGameManager.S.isNetworkGame)
+        {
+            if (CharacterId == NetworkMiddleware.S.myCharacterID)
+            {
+                NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, 
+                    ActionPointsRemaining == 0 || dead);
+            }
         }
-        moveCount++;
-        State = CharacterState.Walking;
+        else
+        {
+            ReadyForNextPhase = ActionPointsRemaining == 0 || dead;
+        }
     }
 
+    public bool MovePingCursor(Character.Direction direction) {
+        if (ActionPointsRemaining <= 0) { 
+            return false;
+        }
+        else {
+            switch (direction) {
+                case Character.Direction.Up:
+                    if (pingCursor.y < NetworkMapGenerator.Instance.Map.GetLength(0)) {
+                        pingCursor += Vector2Int.up;
+                    }
+                    break;
+                case Character.Direction.Down:
+                    if (pingCursor.y > 0) {
+                        pingCursor += Vector2Int.down;
+                    }
+                    break;
+                case Character.Direction.Left:
+                    if(pingCursor.x > 0) { 
+                        pingCursor+= Vector2Int.left;
+                    }
+                    break;
+                case Character.Direction.Right:
+                    if (pingCursor.x < NetworkMapGenerator.Instance.Map.GetLength(1)) {
+                        pingCursor += Vector2Int.right;
+                    }
+                    break;
+                case Character.Direction.Wait:
+                    return false;
+            }
+            return true;
+        }
+    }
+    
+    public void PlacePin()
+    {
+        pinsPlaced += 1;
+        pingCursor = Vector2Int.zero;
+        if (ActionPointsRemaining == 0)
+        {
+            if (IntegratedGameManager.S.isNetworkGame)
+                NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, true);
+            else
+                ReadyForNextPhase = true;
+        }
+    }
+    
     public bool CheckMove(Direction direction) {
+        if (direction == Direction.Wait) return true;
+        
         Vector3 moveVec = direction switch {
             Direction.Up => Vector3.forward,
             Direction.Down => Vector3.back,
             Direction.Left => Vector3.left,
             Direction.Right => Vector3.right,
             _ => Vector3.forward
-        } ;
-
-        return !Physics.Raycast(transform.position, moveVec, gameData.tileSize + gameData.tileGapLength, LayerMask.GetMask("Impassible"));
-    }
-
-    public bool Move(Direction direction) {
-        //Debug.LogFormat("Calling Move on: {0} direction: {1}", name, direction.ToString());
-        Vector3 moveVec = Vector3.zero;
-        Quaternion rot = Quaternion.identity;
-
-
-        switch(direction) {
-            case Direction.Up:
-                moveVec = Vector3.forward;
-                rot = Quaternion.Euler(0, 0, 0);
-                break;
-
-            case Direction.Down:
-                moveVec = Vector3.back;
-                rot = Quaternion.Euler(0, 180, 0);
-                break;
-
-            case Direction.Left:
-                moveVec = Vector3.left;
-                rot = Quaternion.Euler(0, 270, 0);
-                break;
-                
-            case Direction.Right:
-                moveVec = Vector3.right;
-                rot = Quaternion.Euler(0, 90, 0);
-                break;
-
-            default:
-                goto case Direction.Up;
-        }
-
-        Debug.DrawLine(transform.position, transform.position + moveVec * (gameData.tileSize + gameData.tileGapLength), Color.red, 1f, false);
-
-        if (Physics.Raycast(transform.position, moveVec, out RaycastHit hit, gameData.tileSize + gameData.tileGapLength, LayerMask.GetMask("Impassible"))) {
-            Debug.LogErrorFormat("{0} attempted {1} move but hit {2}", name, direction.ToString(), hit.collider.gameObject.name);
-            return false;
-        }
-        else {
-            movePoint += moveVec * (gameData.tileSize + gameData.tileGapLength);
-
-            if (characterRig.rotation != rot) {
-                characterRig.rotation = rot;
+        };
+        RaycastHit hit;
+        if (Physics.Raycast(indicator.transform.position, moveVec, out hit, stepLength, LayerMask.GetMask("Impassible"))) {
+            if (hit.collider.gameObject.GetComponent<Tile>().fogOfWarDictionary[CharacterId] == Tile.FogOfWarState.Unseen)
+            {
+                return true;
             }
-            moveCount++;
-            State = CharacterState.Walking;
-            return true;
+            else 
+            {
+                return false;
+            }
         }
+        return true;
+        //return !Physics.Raycast(indicator.transform.position, moveVec, stepLength, LayerMask.GetMask("Impassible"));
     }
+    
+    public void AddActionToPlan(Direction direction)
+    {
+        if (ActionPointsRemaining <= 0) return;
 
-    public void CompleteMove() {
-        State = CharacterState.Walking;
+        Vector3 moveVec = direction switch {
+            Direction.Up => Vector3.forward,
+            Direction.Down => Vector3.back,
+            Direction.Left => Vector3.left,
+            Direction.Right => Vector3.right,
+            _ => Vector3.zero,
+        };
+        if (direction != Direction.Wait)
+        {
+
+            Vector3 old_indicator_position = indicator.transform.position;
+            indicator.transform.position += moveVec * stepLength;
+            Vector3 midpoint = (old_indicator_position + indicator.transform.position) / 2 - indicator_offset;
+            Vector3 path_indicator_direction = (indicator.transform.position - old_indicator_position).normalized;
+            midpoint = RoundPosition(midpoint, 0.001f);
+            //midpoint -= (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) * 0.4f*path_indicator_offset;
+            //midpoint += (Vector3.Cross(path_indicator_direction, Vector3.back).normalized)  * path_indicator_offset;
+            while (path_indicator_positions.Contains(midpoint))
+            {
+                midpoint -= (Vector3.Cross(path_indicator_direction, Vector3.up).normalized) * path_indicator_offset;
+            }
+
+            RaycastHit hit;
+            // Raycast downwards from the indicator's position
+            if (Physics.Raycast(indicator.transform.position, -Vector3.up, out hit))
+            {
+                if (hit.collider.gameObject.tag == "Monster")
+                {
+                    //if the tile is visible to player, drop a combat indicator
+                    if (hit.collider.gameObject.GetComponent<Monster>().currentTile.fogOfWarDictionary[CharacterId] == Tile.FogOfWarState.Visible)
+                    {
+                        Vector3 combat_indicator_position = indicator.transform.position + indicator_offset;
+                        GameObject new_combat_indicator = Instantiate(combat_indicator, combat_indicator_position, Quaternion.identity);
+                        combat_indicator_list.Push(new_combat_indicator);
+                    }
+
+                }
+            }
+
+            path_indicator_positions.Add(midpoint);
+            GameObject new_path_indicator = Instantiate(path_indicator, midpoint, Quaternion.LookRotation(path_indicator_direction));
+
+            //new_path_indicator.transform.Rotate(0, -180, 0);
+            new_path_indicator.transform.position = midpoint;
+            path_indicator_list.Push(new_path_indicator);
+        }
+
+        ActionPlan.Add(direction);
     }
-
-    public void ResetPosition() {
-        movePoint = prevMovePointPos;
-        State = CharacterState.Walking;
-    }
-
-    private void OnTriggerEnter(Collider col) {
-        //Debug.LogFormat("Character Hit Trigger: {0}", col.gameObject.tag);
-        switch (col.gameObject.tag) {
-            case "Goal":
-                //Debug.Log("Triggered Goal");
-                if (CheckRightGoal(col.gameObject)) {
-                    if (PhotonNetwork.IsMasterClient) {
-                        GameManager.Instance.CallGoalReached(config.type.ToString());
-                        PhotonNetwork.Destroy(col.gameObject);
+    
+    public void UndoPlanStep() {
+        if (ReadyForNextPhase) {
+            return;
+        }
+        
+        Direction lastMove = ActionPlan[ActionPlan.Count - 1];
+        ActionPlan.RemoveAt(ActionPlan.Count - 1);
+        Vector3 moveVec = lastMove switch {
+            Direction.Up => Vector3.forward,
+            Direction.Down => Vector3.back,
+            Direction.Left => Vector3.left,
+            Direction.Right => Vector3.right,
+            _ => Vector3.zero
+        };
+        
+        if (lastMove != Character.Direction.Wait)
+        {
+            GameObject one_path_indicator = path_indicator_list.Pop();
+            //Vector3 one_path_indicator_position = RoundPosition(one_path_indicator.transform.position, 0.001f);
+            path_indicator_positions.Remove(one_path_indicator.transform.position);
+            Destroy(one_path_indicator);
+            RaycastHit hit;
+            if (Physics.Raycast(indicator.transform.position, -Vector3.up, out hit))
+            {
+                if (hit.collider.gameObject.tag == "Monster")
+                {
+                    if (hit.collider.gameObject.GetComponent<Monster>().currentTile.fogOfWarDictionary[CharacterId] == Tile.FogOfWarState.Visible)
+                    {
+                        GameObject one_combat_indicator = combat_indicator_list.Pop();
+                        Destroy(one_combat_indicator);
                     }
                 }
-                break;
+            }
+        }
+        indicator.transform.position += -moveVec * stepLength;
+    }
+    
+    public void EndPlanning() {
+        indicator.transform.position = transform.position;
+        indicator.transform.position += indicator_offset;
+        indicator.SetActive(false);
+        while (path_indicator_list.Count > 0)
+        {
+            GameObject one_path_indicator = path_indicator_list.Pop(); 
+            Destroy(one_path_indicator); 
+        }
+        while (combat_indicator_list.Count > 0)
+        {
+            GameObject one_combat_indicator = combat_indicator_list.Pop();
+            Destroy(one_combat_indicator);
+        }
+        path_indicator_positions.Clear();
+    }
+    
+    public IEnumerator TakeNextMove(float stepTime) {
+        if(ActionPlan.Count == 0) {
+            yield break;
+        } 
+        prevMovePointPos = transform.position;
+        float timeStart = Time.time;
+        Direction nextMove = ActionPlan[0];
+        ActionPlan.RemoveAt(0);
+        Vector3 moveVec = nextMove switch {
+            Direction.Up => Vector3.forward,
+            Direction.Down => Vector3.back,
+            Direction.Left => Vector3.left,
+            Direction.Right => Vector3.right,
+            _ => Vector3.zero
+        };
+        //if next step is an impassible terrain, cancel all action
+        RaycastHit hit;
+        if (Physics.Raycast(indicator.transform.position, moveVec, out hit, stepLength, LayerMask.GetMask("Impassible"))) 
+        {
+            ActionPlan.Clear();
+            //Debug.Log("Impassible!");
 
-            case "Door":
-                //Debug.Log("Triggered Door");
-                //After collect all the goal, the door can be stepped and end game
-                if (PhotonNetwork.IsMasterClient && GameManager.Instance.goalCount == 3) { //take th econditional logic out of the character and move it to the Manager
-                    GameManager.Instance.CallNextLevel();
-                }
-                break;
+            //State = CharacterState.Idle;
+            yield break;
+        }
+        moving = true;
+        if (moveVec != Vector3.zero) {
+            State = CharacterState.Walking;
 
-            case "Rock":
-            case "Trap":
-            case "Monster":
-                if (GameManager.Instance.CurrentTurnPlayerNum == PhotonNetwork.LocalPlayer.ActorNumber) {
-                    GameManager.Instance.CallStartFight(photonView.ViewID, col.gameObject.GetComponent<PhotonView>().ViewID);
-                }
-                //CombatSystem.Instance.StartFight(col.gameObject, CombatSystem.FightType.Rock, this);
-                break;
+            Vector3 origin = transform.position;
+            Vector3 target = transform.position + moveVec * stepLength;
+            Quaternion targetRotation = Quaternion.LookRotation(moveVec, Vector3.up);
+            while (Time.time - timeStart < stepTime) {
+                float t = (Time.time - timeStart) / stepTime;
+                transform.position = Vector3.Lerp(origin, target, t);
+                model.rotation = Quaternion.Slerp(model.rotation, targetRotation, t);
+                yield return null;
+            }
+            transform.position = target;
+            model.rotation = targetRotation;
+        }
 
-            case "VisableArea":
-            case "VisibleArea":
-                break;
+        if (IntegratedGameManager.S.isNetworkGame)
+        {
+            if (CharacterId == NetworkMiddleware.S.myCharacterID)
+                IntegratedMapGenerator.Instance.updateFogOfWar_map();
+        }
+        else
+        {
+            IntegratedMapGenerator.Instance.updateFogOfWar_map();
+        }
 
+
+        State = CharacterState.Idle;
+        moving = false;
+    }
+    
+    private void OnTriggerEnter(Collider col)
+    {
+        if (col.gameObject.tag == "Goal")
+        {
+            Shrine shrine = col.gameObject.GetComponent<Shrine>();
+            if (shrine != null && shrine.CheckShrineType(this))
+            {
+                IntegratedGameManager.S.GoalReached(CharacterId);
+            }
+        }
+    }
+    
+    private void OnTriggerStay(Collider col)
+    {
+        if (col.gameObject.tag == "Door")
+        {
+            if (IntegratedGameManager.S.goalCount >= 3)
+            { //TODO: take th conditional logic out of the character and move it to the Manager
+                IntegratedGameManager.S.NextLevel();
+            }
+        }
+    }
+    
+    public void DecrementHealth()
+    {
+        health -= 1;
+        Debug.Log(string.Format("Character {0} health: {1}", config.characterName, health));
+
+        if (health == 0)
+        {
+            Debug.Log(string.Format("Character {0} Died!", config.characterName));
+            StartCoroutine(characterDeath());
+        }
+    }
+    
+    public IEnumerator characterDeath() {
+        State = CharacterState.Die;
+        float animationLength = 0f;
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        animationLength = stateInfo.length;
+
+        // Wait for the duration of the animation
+        yield return new WaitForSeconds(animationLength);
+        State = CharacterState.Idle;
+
+        dead = true;
+        respawnCountdown = 2;
+        gameObject.SetActive(false);
+        transform.position = startPos;
+
+        movePoint = startPos;
+        prevMovePointPos = movePoint;
+        
+        IntegratedGameManager.S.CheckLoseCondition();
+    }
+    
+    public void RespawnCountdown()
+    {
+        respawnCountdown -= 1;
+
+        if (respawnCountdown == 0)
+        {
+            dead = false;
+            gameObject.SetActive(true);
+            health = 3;
+            IntegratedMapGenerator.Instance.updateFogOfWar_map(CharacterId);
+        }
+    }
+    
+    public void QuickRespawn()
+    {
+        ActionPlan.Clear();
+        State = CharacterState.Idle;
+        respawnCountdown = 0;
+        dead = false;
+        gameObject.SetActive(true);
+        health = 3;
+    }
+    
+    public void Retreat()
+    {
+        transform.position = prevMovePointPos;
+        if (IntegratedGameManager.S.isNetworkGame)
+        {
+            if (CharacterId == NetworkMiddleware.S.myCharacterID)
+                IntegratedMapGenerator.Instance.updateFogOfWar_map(CharacterId);
+        }
+        else
+        {
+            IntegratedMapGenerator.Instance.updateFogOfWar_map(CharacterId);
+        }
+        movePoint = prevMovePointPos;
+    }
+    
+    private void MaskControl(bool mask)
+    {
+        if (maskOn == true)
+        {
+            visibilityMask.gameObject.SetActive(mask);
+        }
+    }
+    
+    public void FocusCharacter() {
+        //MaskControl(true);
+        if(IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
+            indicator.SetActive(true);
+            foreach (GameObject one_path_indicator in path_indicator_list)
+            {
+                one_path_indicator.SetActive(true); 
+            }
+            foreach (GameObject one_combat_indicator in combat_indicator_list)
+            {
+                one_combat_indicator.SetActive(true);
+            }
+        }
+    }
+    
+    public void SetUpConfig(CharacterConfig config, int characterId, GameData gameData)
+    {
+        this.config = config;
+        this.maskOn = gameData.maskOn;
+        CharacterId = characterId;
+        path_indicator_offset = gameData.tileSize * 0.15f;
+        stepLength = gameData.tileSize + gameData.tileGapLength;
+        
+        indicator_offset = new Vector3(0.1f, 0.5f, -0.1f) * gameData.tileSize;
+        Debug.Log(indicator_offset);
+        indicator.transform.position += indicator_offset;
+        characterMask = transform.Find("CharacterMask");
+        visibilityMask = transform.Find("VisibleMask");
+        ResetActionPoints();
+        
+        float maskScale = gameData.tileSize * (config.sightRange * 2f + 1f) + gameData.tileGapLength * (config.sightRange * 2f);
+        characterMask.localScale = new Vector3(gameData.tileSize, 0, gameData.tileSize);
+        visibilityMask.localScale = new Vector3(maskScale,0,maskScale);
+        //characterMask.localScale = cellScale;
+        //visibilityMask.localScale = cellScale * config.sightRange;
+    }
+
+    public enum StateRepLevel {
+        Full = 0,
+        TeamVisible = 1,
+        TeamUnseen = 2
+    }
+    
+    public JObject HMTStateRep(StateRepLevel level = StateRepLevel.Full) {
+        switch (level) {
+            case StateRepLevel.Full:
+                return new JObject {
+                    {"name", config.characterName},
+                    {"characterId", CharacterId },
+                    {"type", config.type.ToString()},
+                    {"sightRange", config.sightRange },
+                    {"monsterDice", config.monsterDice.ToString()},
+                    {"trapDice", config.trapDice.ToString() },
+                    {"stoneDice", config.stoneDice.ToString() },
+                    {"health", health},
+                    {"dead", dead},
+                    {"actionPoints", ActionPointsRemaining},
+                    {"actionPlan", new JArray(ActionPlan.Select(d => d.ToString())) }
+                };
+            case StateRepLevel.TeamVisible:
+                return new JObject {
+                    {"name", config.characterName},
+                    {"characterId", CharacterId },
+                    {"type", config.type.ToString()},
+                    {"sightRange", config.sightRange },
+                    {"monsterDice", config.monsterDice.ToString()},
+                    {"trapDice", config.trapDice.ToString() },
+                    {"stoneDice", config.stoneDice.ToString() },
+                    {"health", health},
+                    {"dead", dead},
+                };
+            case StateRepLevel.TeamUnseen:
+                return new JObject {
+                    {"name", config.characterName},
+                    {"characterId", CharacterId },
+                    {"type", config.type.ToString()},
+                    {"sightRange", config.sightRange },
+                    {"monsterDice", config.monsterDice.ToString()},
+                    {"trapDice", config.trapDice.ToString() },
+                    {"stoneDice", config.stoneDice.ToString() },
+                    {"health", health},
+                    {"dead", dead},
+                };
             default:
-                Debug.LogFormat("Character Hit Trigger: {0}", col.gameObject.tag);
-                break;
-        }
-    }
-
-    private bool CheckRightGoal(GameObject goal) {
-        if (config.type == CharacterConfig.CharacterType.Dwarf  && goal.name == "DwarfGoal") {
-            return true;
-        }
-        else if (config.type == CharacterConfig.CharacterType.Giant && goal.name == "GiantGoal") {
-            return true;
-        }
-        else if (config.type == CharacterConfig.CharacterType.Human && goal.name == "HumanGoal") {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    //private void PlayAttackAnimation() {
-    //    animator.SetBool("Idle", false);
-    //    animator.SetBool("Walk", false);
-    //    animator.SetBool("Attack", true);
-    //}
-
-   /* private bool CheckMoveCount() {
-        if (PhotonNetwork.LocalPlayer.ActorNumber == 1 && moveCount == gameData.dwarfMovecount) {
-            return true;
-        }
-        else if (PhotonNetwork.LocalPlayer.ActorNumber == 2 && moveCount == gameData.giantMovecount) {
-            return true;
-        }
-        else if (PhotonNetwork.LocalPlayer.ActorNumber == 3 && moveCount == gameData.humanMovecount) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }*/
-
-    public void Damage(int amount) {
-        health -= amount;
-        if (CharacterId == GameManager.Instance.CurrentTurnCharacterId) {
-            uiManager.UpdateHealthUI(health);
+                Debug.LogWarningFormat("Unknown StateRepLevel: {0}", level);
+                goto case StateRepLevel.Full;
         }
     }
 }
+

@@ -6,9 +6,7 @@ using GameConstant;
 
 public class IntegratedNetworkGameManager : IntegratedGameManager
 {
-
-    // Pointer to the character that local client controls
-    [HideInInspector] public NetworkCharacter localChar;
+    
 
     public static NetworkGameManager S =null;
     
@@ -17,6 +15,7 @@ public class IntegratedNetworkGameManager : IntegratedGameManager
     protected override void Awake()
     {
         base.Awake();
+        isNetworkGame = true;
         if (S) Destroy(this);
         else S = this;
         localChar.FocusCharacter();
