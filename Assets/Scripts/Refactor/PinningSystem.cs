@@ -11,7 +11,7 @@ public class PinningSystem : MonoBehaviour
     private Camera mainCamera;
     private Ray ray;
     private RaycastHit hit;
-    private NetworkTile focusedTile;
+    private Tile focusedTile;
     private GameObject tile;
 
     public GameObject pinWheel;
@@ -22,7 +22,7 @@ public class PinningSystem : MonoBehaviour
     public Vector3 ui_offset = new Vector3(0,0.3f,0);
     public Vector3 pin_icon_offset = new Vector3(0.3f, 0.3f, 0.3f);
     // stores a list of 
-    public List<NetworkPin> pinList = new List<NetworkPin>();
+    public List<Pin> pinList = new List<Pin>();
 
     public float pinOffsetSide = .3f;
 
@@ -64,7 +64,7 @@ public class PinningSystem : MonoBehaviour
 
     private void Update()
     {
-        if (NetworkGameManager.S.localChar.ReadyForNextPhase) return;
+        if (IntegratedGameManager.S.localChar.ReadyForNextPhase) return;
         
         if (isPinned)
         {
@@ -72,7 +72,7 @@ public class PinningSystem : MonoBehaviour
             pinWheel.transform.position = pinPosition;
         }
         
-        if (Input.GetMouseButtonDown(0) && NetworkGameManager.S.gameStatus == GameStatus.Player_Pinning)
+        if (Input.GetMouseButtonDown(0) && IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning)
         {
             if (EventSystem.current.IsPointerOverGameObject()) {
                 Debug.Log("mouse clicked on UI");
@@ -87,7 +87,7 @@ public class PinningSystem : MonoBehaviour
                 if (Physics.Raycast(ray, out hit, 1000f, LayerMask.GetMask("Ground")))  // if raycast on ground
                 {
                     tile = hit.transform.gameObject;
-                    focusedTile = tile.GetComponent<NetworkTile>();
+                    focusedTile = tile.GetComponent<Tile>();
                     Debug.LogFormat("tile location: {0}, {1}", focusedTile.row, focusedTile.col);
                     Debug.Log(focusedTile.row);
                     Debug.Log(focusedTile.col);
@@ -100,10 +100,10 @@ public class PinningSystem : MonoBehaviour
     }
     
     public void ClearCurrentTurnPins() {
-        foreach (NetworkPin pin in pinList) {
+        foreach (Pin pin in pinList) {
             if (pin != null) Destroy(pin.gameObject);
         }       
-        pinList = new List<NetworkPin>();
+        pinList = new List<Pin>();
     }
     
     // ========== Pin Wheel Buttons ==========
@@ -132,15 +132,15 @@ public class PinningSystem : MonoBehaviour
     public void AddPin(int pinIdx, int tileRow, int tileCol, int charID)
     {
         GameObject pinObj;
-        NetworkTile targetTile = NetworkMapGenerator.Instance.GetTileAt(tileRow, tileCol);
+        Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(tileRow, tileCol);
 
         pinObj = Instantiate(idx2PinPrefab[pinIdx], targetTile.GetNextPingLocation() + pin_icon_offset, Quaternion.Euler(0, 180, 0));
         pinObj.transform.SetParent(targetTile.transform);
-        NetworkPin pin = pinObj.GetComponent<NetworkPin>();
+        Pin pin = pinObj.GetComponent<Pin>();
         pinList.Add(pin);
         targetTile.pinList.Add(pin);
         pin.locationTile = targetTile;
-        pin.SetPlacingCharacter(NetworkGameManager.S.inSceneCharacters[charID]);
+        pin.SetPlacingCharacter(IntegratedGameManager.S.inSceneCharacters[charID]);
         pinObj.transform.localScale = new Vector3(4f, 4f, 4f);
         
         Cancel();

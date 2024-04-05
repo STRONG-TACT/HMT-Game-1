@@ -12,7 +12,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
 {
     public enum GameStatus { GetReady, Player_Pinning, Player_Planning, Player_Moving, Monster_Moving, Animation_Pause, GameEnd }
 
-    public static LocalGameManager S = null;
+    public static IntegratedGameManager S = null;
 
     public bool debugRPCReceipts = false;
 
@@ -65,8 +65,8 @@ public class IntegratedLocalGameManager : IntegratedGameManager
         if (remainingCharacterCount > 0) {
             player.myCharacter = inSceneCharacters[0];
             player.myCharacter.FocusCharacter();
-            player.UpdateCharacterUI(0, player.myCharacter);
-            uiManager.ShowCharacterPinUI(player.myCharacter);
+            // player.UpdateCharacterUI(0, player.myCharacter);
+            // uiManager.ShowCharacterPinUI(player.myCharacter);
             //MapGenerator.Instance.updateFogOfWar_map(player.myCharacter.CharacterId);
         }
         else {
@@ -98,9 +98,9 @@ public class IntegratedLocalGameManager : IntegratedGameManager
 
     // Called by LocalPlayer.AddMoveToFocusedCharacter(), when player press direction buttons.
     // Add the move to corresponding queue, and confirm with current LocalCharacter.
-    public void UpdateFocusPlayPlan(int index, LocalCharacter.Direction move) {
-        player.myCharacter.AddActionToPlan(move);
-        player.UpdateCharacterUI(index, player.myCharacter);
+    public void UpdateFocusPlayPlan(int index, Character.Direction move) {
+        // player.myCharacter.AddActionToPlan(move);
+        // player.UpdateCharacterUI(index, player.myCharacter);
         uiManager.UpdateActionPointsRemaining(player.myCharacter.ActionPointsRemaining);
     }
 
@@ -109,24 +109,24 @@ public class IntegratedLocalGameManager : IntegratedGameManager
     // Update changes with camera control.
     public void SwitchCharacter(int index)
     {
-        if (gameStatus == GameStatus.Player_Pinning)
-        {
-            player.myCharacter.UnFocusCharacter();
-            player.myCharacter = inSceneCharacters[index];
-            player.myCharacter.FocusCharacter();
-            uiManager.ShowCharacterPinUI(player.myCharacter);
-            player.UpdateCharacterUI(index, player.myCharacter);
-        }
-        else if (gameStatus == GameStatus.Player_Planning)
-        {
-            player.myCharacter.UnFocusCharacter();
-            player.myCharacter = inSceneCharacters[index];
-            player.myCharacter.FocusCharacter();
-            uiManager.ShowCharacterPlanUI(player.myCharacter);
-            player.UpdateCharacterUI(index, player.myCharacter);
-        }
-
-       CameraManager.Instance.ChangeTargetCharacter(index);
+       //  if (gameStatus == GameStatus.Player_Pinning)
+       //  {
+       //      player.myCharacter.UnFocusCharacter();
+       //      player.myCharacter = inSceneCharacters[index];
+       //      player.myCharacter.FocusCharacter();
+       //      uiManager.ShowCharacterPinUI(player.myCharacter);
+       //      player.UpdateCharacterUI(index, player.myCharacter);
+       //  }
+       //  else if (gameStatus == GameStatus.Player_Planning)
+       //  {
+       //      player.myCharacter.UnFocusCharacter();
+       //      player.myCharacter = inSceneCharacters[index];
+       //      player.myCharacter.FocusCharacter();
+       //      uiManager.ShowCharacterPlanUI(player.myCharacter);
+       //      player.UpdateCharacterUI(index, player.myCharacter);
+       //  }
+       //
+       // CameraManager.S.ChangeTargetCharacter(index);
     }
 
 }

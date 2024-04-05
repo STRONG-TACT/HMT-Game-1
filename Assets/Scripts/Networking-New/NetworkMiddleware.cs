@@ -70,7 +70,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         }
     }
 
-    public void MovePingCursorOnCharacterLocal(NetworkCharacter.Direction direction, int charID) {
+    public void MovePingCursorOnCharacterLocal(Character.Direction direction, int charID) {
         photonView.RPC("MovePingCursorOnCharacterRPC", RpcTarget.All, direction, charID);
     }
 

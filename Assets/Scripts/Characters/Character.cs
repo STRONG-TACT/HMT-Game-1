@@ -227,7 +227,7 @@ public class Character : MonoBehaviour {
         else {
             switch (direction) {
                 case Character.Direction.Up:
-                    if (pingCursor.y < NetworkMapGenerator.Instance.Map.GetLength(0)) {
+                    if (pingCursor.y < IntegratedMapGenerator.Instance.Map.GetLength(0)) {
                         pingCursor += Vector2Int.up;
                     }
                     break;
@@ -242,7 +242,7 @@ public class Character : MonoBehaviour {
                     }
                     break;
                 case Character.Direction.Right:
-                    if (pingCursor.x < NetworkMapGenerator.Instance.Map.GetLength(1)) {
+                    if (pingCursor.x < IntegratedMapGenerator.Instance.Map.GetLength(1)) {
                         pingCursor += Vector2Int.right;
                     }
                     break;

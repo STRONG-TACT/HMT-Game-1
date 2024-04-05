@@ -36,10 +36,10 @@ public class Player : MonoBehaviour
     }
     
     public void UpdateCharacterUI() {
-        if (NetworkGameManager.S.gameStatus == GameStatus.Player_Pinning) {
+        if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning) {
             UpdatePinBtnStatus(myCharacter.ReadyForNextPhase);
         }
-        else if (NetworkGameManager.S.gameStatus == GameStatus.Player_Planning) {
+        else if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
             UpdatePlanUI(myCharacter.ReadyForNextPhase, 
                 myCharacter.ActionPlan.Count == 0, 
                 myCharacter.ActionPointsRemaining == 0);
