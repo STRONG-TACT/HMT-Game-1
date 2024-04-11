@@ -246,8 +246,8 @@ public class IntegratedGameManager : MonoBehaviour
             }
             Debug.Log("Moving phase ended.");
             pinningSystem.ClearCurrentTurnPins();
-            StartMonsterTurn();
         }
+        StartMonsterTurn();
     }
 
     // Start monster moving phase
