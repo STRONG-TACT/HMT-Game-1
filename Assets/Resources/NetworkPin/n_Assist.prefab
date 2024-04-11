@@ -191,7 +191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fce328f0a525e794896d902ca5470168, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerIndicator: {fileID: 0}
+  playerIndicator: {fileID: 137249534719827236}
   pinType: 1
   animate: 0
   locationTile: {fileID: 0}
