@@ -576,7 +576,7 @@ public class Character : MonoBehaviour {
     public void SetUpConfig(CharacterConfig config, int characterId, GameData gameData)
     {
         this.config = config;
-        this.maskOn = gameData.maskOn;
+        maskOn = gameData.maskOn;
         CharacterId = characterId;
         path_indicator_offset = gameData.tileSize * 0.15f;
         stepLength = gameData.tileSize + gameData.tileGapLength;

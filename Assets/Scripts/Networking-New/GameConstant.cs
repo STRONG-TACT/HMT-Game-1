@@ -7,8 +7,8 @@ namespace GameConstant
     public class GlobalConstant
     {
         public const int LOCAL_TEST_LEVEL = 1;
-        public const int ROOM_LEVEL = 2;
-        public const int GAME_LEVEL = 3;
+        public const int ROOM_LEVEL = 0;
+        public const int GAME_LEVEL = 1;
         public const int START_HEALTH = 3;
     }
     

@@ -92,12 +92,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6099151916383471026}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1106b2d15d194590a3e703444d140b5, type: 3}
+  m_Script: {fileID: 11500000, guid: fce328f0a525e794896d902ca5470168, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerIndicator: {fileID: 6113539276235401332}
+  playerIndicator: {fileID: 0}
   pinType: 3
-  animate: 1
+  animate: 0
   locationTile: {fileID: 0}
   placingCharacter: {fileID: 0}
 --- !u!1 &8697249417876827627

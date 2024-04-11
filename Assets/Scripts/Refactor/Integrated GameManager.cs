@@ -32,7 +32,7 @@ public class IntegratedGameManager : MonoBehaviour
     public List<Character> inSceneCharacters = new List<Character>();
     public List<Monster> inSceneMonsters = new List<Monster>();
 
-    public static IntegratedGameManager S = null;
+    public static IntegratedGameManager S;
     public float excecutionStepTime = 1;
 
     protected virtual void Awake()

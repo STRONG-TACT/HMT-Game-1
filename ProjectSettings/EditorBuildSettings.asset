@@ -38,10 +38,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/EndGame.unity
     guid: ef4a9b25b8337904fab862bc8fe3682c
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/LocalGame/Local_Level_WithMapGeneration.unity
     guid: e7909662e8e844214a7268797925404b
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/LocalGame/Local_Animated.unity
     guid: 528f45a96ee793547b710d072bd61fb9
   - enabled: 1
@@ -50,4 +50,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Networked/NetworkGamePlay.unity
     guid: c75ce17acfd8d4f71aa5d2848dafb58c
+  - enabled: 1
+    path: Assets/Scenes/Networked/Lobby_n.unity
+    guid: 04e438f7d0ca140828ed4c5568a36b9b
   m_configObjects: {}

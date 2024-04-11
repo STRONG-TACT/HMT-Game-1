@@ -10,8 +10,6 @@ public class IntegratedNetworkGameManager : IntegratedGameManager
 
     public static IntegratedGameManager S;
     
-    public float excecutionStepTime = 1;
-
     protected override void Awake()
     {
         base.Awake();
@@ -29,9 +27,10 @@ public class IntegratedNetworkGameManager : IntegratedGameManager
         CameraManager.S.ChangeTargetCharacter(localChar.CharacterId);
         CameraManager.S.RecenterCamera();
         // this call will mark every tile as unseen
-        IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
+        // IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
         // this call actually setup the correct FOW
         // the delay is needed because internal state of FOW needs physics trigger to work
+        yield return new WaitForFixedUpdate();
         IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
         yield return StartCoroutine(base.StartLevel());
     }
