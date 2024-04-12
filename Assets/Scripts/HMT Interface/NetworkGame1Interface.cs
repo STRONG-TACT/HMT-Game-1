@@ -172,12 +172,12 @@ public class NetworkGame1Interface : HMTInterface {
         }
 
         ret["scene"] = scene;
-        if (command.json["formated"].ToString().ToLower() == "true") {
-            return JsonConvert.SerializeObject(ret, Formatting.Indented);
-        }
-        else {
+        //if (command.json["formated"].ToString().ToLower() == "true") {
+        //    return JsonConvert.SerializeObject(ret, Formatting.Indented);
+        //}
+        //else {
             return JsonConvert.SerializeObject(ret, Formatting.None);
-        }
+        //}
     }
 
     public string GetFullState(Command command) {
@@ -250,12 +250,12 @@ public class NetworkGame1Interface : HMTInterface {
         }
 
         ret["scene"] = scene;
-        if (command.json["formated"].ToString().ToLower() == "true") {
-            return JsonConvert.SerializeObject(ret, Formatting.Indented);
-        }
-        else {
+        //if (command.json["formated"].ToString().ToLower() == "true") {
+        //    return JsonConvert.SerializeObject(ret, Formatting.Indented);
+        //}
+        //else {
             return JsonConvert.SerializeObject(ret, Formatting.None);
-        }
+        //}
     }
 
     public string GetFOWState(Command command) {
@@ -371,12 +371,7 @@ public class NetworkGame1Interface : HMTInterface {
         }
 
         ret["scene"] = scene;
-        if (command.json["formated"].ToString().ToLower() == "true") {
-            return JsonConvert.SerializeObject(ret, Formatting.Indented);
-        }
-        else {
-            return JsonConvert.SerializeObject(ret, Formatting.None);
-        }
+        return JsonConvert.SerializeObject(ret, Formatting.None);
     }
 
     public override IEnumerator ExecuteAction(Command command) {
