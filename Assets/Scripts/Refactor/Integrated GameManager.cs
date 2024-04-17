@@ -134,12 +134,12 @@ public class IntegratedGameManager : MonoBehaviour
     protected virtual void EndPlayerPinningPhase()
     {
         Debug.Log("Pinning phase ended.");
-
+        
         foreach (Character chara in inSceneCharacters)
         {
             chara.EndPingPhase();
         }
-
+        PinningSystem.S.Cancel();
         Debug.Log("Should start planning phase here.");
         PreparePlayerPlanningPhase();
     }
@@ -422,8 +422,14 @@ public class IntegratedGameManager : MonoBehaviour
                         break;
                     case Tile.ObstacleType.Trap:
                     case Tile.ObstacleType.Rock:
+                        var copy = new Dictionary<int, Tile.FogOfWarState>();
+                        foreach (KeyValuePair<int, Tile.FogOfWarState> entry in t.fogOfWarDictionary)
+                        {
+                           copy.Add(entry.Key, entry.Value);
+                        }
                         GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
                         Tile newTile = opentile.GetComponent<Tile>();
+                        newTile.fogOfWarDictionary = copy;
                         newTile.row = t.row;
                         newTile.col = t.col;
                         IntegratedMapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);

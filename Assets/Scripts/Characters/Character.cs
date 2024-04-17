@@ -321,7 +321,7 @@ public class Character : MonoBehaviour {
             // Raycast downwards from the indicator's position
             if (Physics.Raycast(indicator.transform.position, -Vector3.up, out hit))
             {
-                if (hit.collider.gameObject.tag == "Monster")
+                if (hit.collider.gameObject.tag == "Monster" )
                 {
                     //if the tile is visible to player, drop a combat indicator
                     if (hit.collider.gameObject.GetComponent<Monster>().currentTile.fogOfWarDictionary[CharacterId] == Tile.FogOfWarState.Visible)
@@ -332,6 +332,15 @@ public class Character : MonoBehaviour {
                     }
 
                 }
+                if (hit.collider.gameObject.tag == "Trap" || hit.collider.gameObject.tag == "Rock") {
+                    Debug.Log("Trap or Rock");
+                    if (hit.collider.gameObject.GetComponent<Tile>().fogOfWarDictionary[CharacterId] == Tile.FogOfWarState.Visible) {
+                        Vector3 combat_indicator_position = indicator.transform.position + indicator_offset;
+                        GameObject new_combat_indicator = Instantiate(combat_indicator, combat_indicator_position, Quaternion.identity);
+                        combat_indicator_list.Push(new_combat_indicator);
+                    }
+                }
+
             }
 
             path_indicator_positions.Add(midpoint);
@@ -372,6 +381,14 @@ public class Character : MonoBehaviour {
                 if (hit.collider.gameObject.tag == "Monster")
                 {
                     if (hit.collider.gameObject.GetComponent<Monster>().currentTile.fogOfWarDictionary[CharacterId] == Tile.FogOfWarState.Visible)
+                    {
+                        GameObject one_combat_indicator = combat_indicator_list.Pop();
+                        Destroy(one_combat_indicator);
+                    }
+                }
+                if (hit.collider.gameObject.tag == "Trap" || hit.collider.gameObject.tag == "Rock")
+                {
+                    if (hit.collider.gameObject.GetComponent<Tile>().fogOfWarDictionary[CharacterId] == Tile.FogOfWarState.Visible)
                     {
                         GameObject one_combat_indicator = combat_indicator_list.Pop();
                         Destroy(one_combat_indicator);
