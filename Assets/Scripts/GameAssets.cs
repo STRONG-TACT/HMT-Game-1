@@ -30,6 +30,11 @@ public class GameAssets : MonoBehaviour
     public Sprite youAreGiant;
     public Sprite youAreHuman;
 
+
+    [Header("Player Live Status Icon")]
+    public Sprite deadIcon;
+    public Sprite aliveIcon;
+
     public Sprite GetCharacterIcon(CharacterConfig.CharacterType character) {
         return character switch {
             CharacterConfig.CharacterType.Dwarf => dwarfIcon,

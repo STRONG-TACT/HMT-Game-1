@@ -17,7 +17,7 @@ public class UIManager : MonoBehaviour
     public GameObject PinFinishBtn;
 
     public GameObject CharacterInfo;
-    public Image YouAreInfo;
+    //public Image YouAreInfo;
     public GameObject[] DiceStats = new GameObject[3];
     public GameObject[] BonusStats = new GameObject[3];
     public GameObject HealthPanel;
@@ -34,7 +34,7 @@ public class UIManager : MonoBehaviour
     public GameObject VictoryScreen;
     public GameObject LossScreen;
 
-    public GameObject GoalPanel; 
+    //public GameObject GoalPanel; 
     public GameObject[] GoalStatus = new GameObject[3];
     
     public void InitGameUI()
@@ -42,7 +42,7 @@ public class UIManager : MonoBehaviour
         text.text = "Level Starting";
         CombatUI.SetActive(false);
         
-        GoalPanel.SetActive(true);
+        //GoalPanel.SetActive(true);
         CharacterInfo.SetActive(true);
         VictoryScreen.SetActive(false);
         LossScreen.SetActive(false);
@@ -147,6 +147,7 @@ public class UIManager : MonoBehaviour
     public void ShowCharacterPinUI()
     {
         Character currentCharacter = IntegratedGameManager.S.localChar;
+        /*
         switch (currentCharacter.CharacterId)
         {
             case 0:
@@ -159,6 +160,7 @@ public class UIManager : MonoBehaviour
                 YouAreInfo.sprite = gameAssets.youAreHuman;
                 break;
         }
+        */
 
         PinFinishBtn.SetActive(true);
 
@@ -277,7 +279,7 @@ public class UIManager : MonoBehaviour
     
     public void ResetGoalStatus()
     {
-        GoalPanel.SetActive(false);
+        //GoalPanel.SetActive(false);
         GoalStatus[0].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(0);
         GoalStatus[1].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(1);
         GoalStatus[2].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(2);
