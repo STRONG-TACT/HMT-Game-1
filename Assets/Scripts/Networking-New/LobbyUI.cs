@@ -10,6 +10,7 @@ public class LobbyUI : MonoBehaviour
     public static LobbyUI S;
 
     [Header("UI Block Parent")]
+    [SerializeField] private GameObject startSceneUI;
     [SerializeField] private GameObject gameModeUI;
     [SerializeField] private GameObject loadingUI;
     [SerializeField] private GameObject joinRoomModeUI;
@@ -29,8 +30,12 @@ public class LobbyUI : MonoBehaviour
     private void Start()
     {
         DisableAllUI();
-        gameModeUI.SetActive(true);
+        startSceneUI.SetActive(true);
+        //gameModeUI.SetActive(true);
     }
+
+
+
 
     public void ShowGameModeUI()
     {
@@ -65,6 +70,7 @@ public class LobbyUI : MonoBehaviour
 
     private void DisableAllUI()
     {
+        startSceneUI.SetActive(false);
         gameModeUI.SetActive(false);
         loadingUI.SetActive(false);
         joinRoomModeUI.SetActive(false);

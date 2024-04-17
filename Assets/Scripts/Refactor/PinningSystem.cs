@@ -96,6 +96,9 @@ public class PinningSystem : MonoBehaviour
                     isPinned = true;
                 }
             }
+            else {
+                PinningSystem.S.Cancel();
+            }
         }
     }
     

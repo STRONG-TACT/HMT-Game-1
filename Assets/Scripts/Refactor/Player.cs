@@ -47,6 +47,7 @@ public class Player : MonoBehaviour
     }
     
     private void SubmitPings() {
+        PinningSystem.S.Cancel();
         if (IntegratedGameManager.S.isNetworkGame)
             NetworkMiddleware.S.ReadyForNextPhaseLocal(myCharacter.CharacterId, true);
         else 
