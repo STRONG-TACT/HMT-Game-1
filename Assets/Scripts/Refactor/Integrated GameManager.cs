@@ -71,6 +71,7 @@ public class IntegratedGameManager : MonoBehaviour
     public virtual IEnumerator StartLevel() {
         gameStatus = GameStatus.GetReady;
         uiManager.InitGameUI();
+        uiManager.ResetActionStatus();
         yield return new WaitForFixedUpdate();
         StartPlayerTurn();
     }
@@ -363,6 +364,10 @@ public class IntegratedGameManager : MonoBehaviour
             if (chara.dead)
             {
                 chara.RespawnCountdown();
+                //update life status ui if character respawns
+                if (!chara.dead) {
+                    uiManager.UpdateCharacterLifeStatus(chara.CharacterId, true);
+                }
             }
         }
         StartPlayerTurn();
@@ -560,6 +565,7 @@ public class IntegratedGameManager : MonoBehaviour
 
             if (c.dead)
             {
+                uiManager.UpdateCharacterLifeStatus(c.CharacterId, false);
                 deadChara.Add(c);
             }
             else
@@ -656,6 +662,7 @@ public class IntegratedGameManager : MonoBehaviour
             {
                 c.StopAllCoroutines();
                 c.QuickRespawn();
+                uiManager.UpdateCharacterLifeStatus(c.CharacterId, true);
             }
 
             while (inSceneMonsters.Count != 0)
@@ -666,6 +673,7 @@ public class IntegratedGameManager : MonoBehaviour
             }
 
             uiManager.ResetGoalStatus();
+            uiManager.ResetActionStatus();
             IntegratedMapGenerator.Instance.LoadLevel(gameData.levelTextFiles[currentLevel - 1]);
 
             StartCoroutine(StartLevel());

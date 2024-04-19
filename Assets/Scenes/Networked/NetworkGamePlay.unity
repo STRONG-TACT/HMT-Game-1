@@ -1060,7 +1060,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &182612324
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1683,7 +1683,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 09ec05c9b17791a48baf827b6221906a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1e5f218c7a345ec4a95bb5c292ad3825, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2044,7 +2044,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 09ec05c9b17791a48baf827b6221906a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1e5f218c7a345ec4a95bb5c292ad3825, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2625,6 +2625,14 @@ MonoBehaviour:
   - {fileID: 428104893}
   - {fileID: 1637726528}
   - {fileID: 1534434522}
+  LifeStatus:
+  - {fileID: 269678185}
+  - {fileID: 859715981}
+  - {fileID: 352148483}
+  ActionStatus:
+  - {fileID: 1560233769}
+  - {fileID: 759570866}
+  - {fileID: 597516094}
 --- !u!4 &477472145
 Transform:
   m_ObjectHideFlags: 0
@@ -2735,6 +2743,14 @@ MonoBehaviour:
   VictoryScreen: {fileID: 0}
   LossScreen: {fileID: 0}
   GoalStatus:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  LifeStatus:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  ActionStatus:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -4203,7 +4219,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &650914369
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5501,7 +5517,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 09ec05c9b17791a48baf827b6221906a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1e5f218c7a345ec4a95bb5c292ad3825, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7065,7 +7081,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1058697521
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7203,6 +7219,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 820993973835651314, guid: 3d0527164067f4572910217fb570fbe8, type: 3}
     - target: {fileID: 8586804875866554797, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: deadIcon
+      value: 
+      objectReference: {fileID: 21300000, guid: 09ec05c9b17791a48baf827b6221906a, type: 3}
+    - target: {fileID: 8586804875866554797, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
       propertyPath: rockIcon
       value: 
       objectReference: {fileID: 21300000, guid: 26f0939df052a40ea8c4f2eb879fe54e, type: 3}
@@ -7210,6 +7230,10 @@ PrefabInstance:
       propertyPath: trapIcon
       value: 
       objectReference: {fileID: 21300000, guid: e50942f747f464df69128aa8b8729d9c, type: 3}
+    - target: {fileID: 8586804875866554797, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
+      propertyPath: aliveIcon
+      value: 
+      objectReference: {fileID: 21300000, guid: 1e5f218c7a345ec4a95bb5c292ad3825, type: 3}
     - target: {fileID: 8586804875866554797, guid: da6995981fc987f4aab30a6ac20e1e08, type: 3}
       propertyPath: D0_Outline
       value: 
@@ -10957,7 +10981,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1727178210
 RectTransform:
   m_ObjectHideFlags: 0

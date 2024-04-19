@@ -13,6 +13,8 @@ using Newtonsoft.Json.Linq;
 /// used by both local and network version of the game
 /// </summary>
 public class Character : MonoBehaviour {
+
+
     public enum Direction
     {
         Up = 1, Down = 2, Left = 3, Right = 4, Wait = 0

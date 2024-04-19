@@ -36,7 +36,11 @@ public class UIManager : MonoBehaviour
 
     //public GameObject GoalPanel; 
     public GameObject[] GoalStatus = new GameObject[3];
-    
+    public GameObject[] LifeStatus = new GameObject[3];
+    public GameObject[] ActionStatus = new GameObject[3];
+
+    private Coroutine dotsCoroutine;
+
     public void InitGameUI()
     {
         text.text = "Level Starting";
@@ -284,9 +288,66 @@ public class UIManager : MonoBehaviour
         GoalStatus[1].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(1);
         GoalStatus[2].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(2);
     }
+
+    public void UpdateCharacterLifeStatus(int CharaID, bool alive = true)
+    {
+        if (alive)
+            LifeStatus[CharaID].GetComponent<Image>().sprite = gameAssets.aliveIcon;
+        else
+            LifeStatus[CharaID].GetComponent<Image>().sprite = gameAssets.deadIcon;
+
+    }
+
+    public void ResetActionStatus()
+    {
+        UpdateCharacterActionStatus(0, false);
+        UpdateCharacterActionStatus(1, false);
+        UpdateCharacterActionStatus(2, false);
+    }
+
+    public void UpdateCharacterActionStatus(int CharaID, bool ready = true) {
+        if (ready)
+        //action status ui set to ready
+        {
+            ActionStatus[CharaID].transform.Find("Complete").gameObject.SetActive(true);
+            if (dotsCoroutine != null) 
+            {
+                StopCoroutine(dotsCoroutine);
+                dotsCoroutine = null;
+            }
+            ActionStatus[CharaID].transform.Find("Planning").gameObject.SetActive(false);
+        }
+        //action status ui set to plannning
+        else
+        {
+            ActionStatus[CharaID].transform.Find("Complete").gameObject.SetActive(false);
+            GameObject planning = ActionStatus[CharaID].transform.Find("Planning").gameObject;
+            planning.SetActive(true);
+            TextMeshProUGUI dotsText = planning.GetComponent<TextMeshProUGUI>();
+            dotsCoroutine =  StartCoroutine(DotsAnimation(dotsText));
+        }
+
+
+    }
+
     
     public void ShowDefeatedScreen()
     {
         LossScreen.SetActive(true);
     }
+
+    public IEnumerator DotsAnimation(TextMeshProUGUI dotsText)
+    {
+        string[] dotsStates = new string[] { ".", "..", "..." };
+        int currentState = 0;
+        while (true) 
+        {
+            dotsText.text = dotsStates[currentState]; // Update the text to the current state
+            currentState = (currentState + 1) % dotsStates.Length; 
+            yield return new WaitForSeconds(0.5f); 
+        }
+    }
+
+
+
 }
