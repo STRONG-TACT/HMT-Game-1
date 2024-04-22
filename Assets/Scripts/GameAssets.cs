@@ -14,6 +14,8 @@ public class GameAssets : MonoBehaviour
     public Sprite rockCombatUI;
     public Sprite monsterCombatUI;
     public Sprite[] diceImg;
+    public Sprite Scoreboard_visible;
+    public Sprite Scoreboard_hidden;
 
     [Header("CharacterIcon UI Assets")]
     public Sprite dwarfIcon;

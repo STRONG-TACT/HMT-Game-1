@@ -193,25 +193,55 @@ public class UIManager : MonoBehaviour
     }
     
     public void ShowCombatUI(Combat.FightType type, List<int> charaIDs, List<int> charaDice, List<int> enemyDice,
-                             int playerScore, int enemyScore, bool win)
+                             int playerScore, int enemyScore, bool win, bool visible=true)
     {
+        GameObject scoreBoard = CombatUI.transform.Find("Scoreboard").gameObject;
+        GameObject vsText = CombatUI.transform.Find("VSText").gameObject;
+        GameObject inProgressText = CombatUI.transform.Find("InProgressText").gameObject;
+        GameObject UnknownOpponentSlot = CombatUI.transform.Find("UnknownOpponent").gameObject;
+
+        if (visible == true)
+        {
+            scoreBoard.GetComponentInChildren<Image>().sprite = gameAssets.Scoreboard_visible;
+            vsText.SetActive(true);
+            inProgressText.SetActive(false);
+            UnknownOpponentSlot.SetActive(false);
+        }
+        //if the combat happens outside of vision range
+        else
+        {
+            scoreBoard.GetComponentInChildren<Image>().sprite = gameAssets.Scoreboard_hidden;
+            vsText.SetActive(false);
+            inProgressText.SetActive(true);
+            UnknownOpponentSlot.SetActive(true);
+        }
+
         for (int i = 0; i < charaIDs.Count; i++)
         {
             switch (charaIDs[i])
             {
                 case 0:
                     PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.dwarfIcon;
-                    PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    if(visible == true)
+                        PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    else
+                        PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = "";
                     PlayerCombatSlots[i].SetActive(true);
                     break;
                 case 1:
                     PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.giantIcon;
-                    PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    if (visible == true)
+                        PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    else
+                        PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = "";
                     PlayerCombatSlots[i].SetActive(true);
                     break;
                 case 2:
                     PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.humanIcon;
-                    PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    if (visible == true)
+                        PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    else
+                        PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = "";
                     PlayerCombatSlots[i].SetActive(true);
                     break;
                 default:
@@ -220,7 +250,11 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        if (type == Combat.FightType.Monster)
+        if (visible == false) 
+        {
+            
+        }
+        else if (type == Combat.FightType.Monster)
         {
             // TODO: differenciate monster types
             for (int i = 0; i < enemyDice.Count; i++)
@@ -243,20 +277,29 @@ public class UIManager : MonoBehaviour
             EnemyCombatSlots[0].SetActive(true);
         }
 
-        PlayerFinalScore.text = playerScore.ToString();
-        EnemyFinalScore.text = enemyScore.ToString();
+        if(visible == true) 
+        {
+            PlayerFinalScore.text = playerScore.ToString();
+            EnemyFinalScore.text = enemyScore.ToString();
+        }
+        else
+        {
+            PlayerFinalScore.text = "";
+            EnemyFinalScore.text = "";
+        }
+
 
         if (win)
         {
             WinBG.SetActive(true);
             LoseBG.SetActive(false);
-            ResultMessage.text = "You defeated the enemy!";
+            ResultMessage.text = "The opponent is defeated!";
         }
         else
         {
             WinBG.SetActive(false);
             LoseBG.SetActive(true);
-            ResultMessage.text = "Oops...";
+            ResultMessage.text = "Failed to defeat the opponent!";
         }
 
         CombatUI.SetActive(true);
