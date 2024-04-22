@@ -46,6 +46,7 @@ public class IntegratedNetworkGameManager : IntegratedGameManager
 
     protected override void StartPlayerPinningPhase()
     {
+        uiManager.UpdateTimer(95);
         if (remainingCharacterCount > 0)
         {
             localChar.FocusCharacter();

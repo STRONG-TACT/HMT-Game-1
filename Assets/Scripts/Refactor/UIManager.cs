@@ -4,6 +4,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using GameConstant;
+using System;
+
 
 public class UIManager : MonoBehaviour
 {
@@ -33,6 +35,7 @@ public class UIManager : MonoBehaviour
     public GameObject LoseBG;
     public GameObject VictoryScreen;
     public GameObject LossScreen;
+    public GameObject Timer;
 
     //public GameObject GoalPanel; 
     public GameObject[] GoalStatus = new GameObject[3];
@@ -346,6 +349,16 @@ public class UIManager : MonoBehaviour
             currentState = (currentState + 1) % dotsStates.Length; 
             yield return new WaitForSeconds(0.5f); 
         }
+    }
+
+    public void UpdateTimer(int secondsLeft)
+    {
+        TimeSpan timeSpan = TimeSpan.FromSeconds(secondsLeft);
+        string text_to_display = string.Format("{0}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
+
+        TextMeshProUGUI timer_text = Timer.transform.Find("Timer_text").gameObject.GetComponent<TextMeshProUGUI>();
+        timer_text.text = text_to_display;
+
     }
 
 
