@@ -44,6 +44,19 @@ public class UIManager : MonoBehaviour
 
     private Coroutine dotsCoroutine;
 
+    //Combat Skill Display
+    public Vector3 ui_offset = new Vector3(0, 0.3f, 0);
+    public GameObject CombatSkillDisplay;
+    public GameObject opponent_icon;
+    public GameObject opponent_dice;
+    public GameObject[] self_icons = new GameObject[4];
+    public GameObject[] partner1_icons = new GameObject[2];
+    public GameObject[] partner2_icons = new GameObject[2];
+    public GameObject[] self_dices = new GameObject[4];
+    public GameObject[] partner1_dices = new GameObject[2];
+    public GameObject[] partner2_dices = new GameObject[2];
+
+
     public void InitGameUI()
     {
         text.text = "Level Starting";
@@ -405,5 +418,96 @@ public class UIManager : MonoBehaviour
     }
 
 
+    public void DisplayCombatSkills(GameObject opponent, String opponent_type) {
+        Character currentCharacter = IntegratedGameManager.S.localChar;
+        Character partner1 = null;
+        Character partner2 = null;
+
+        Camera mainCamera = Camera.main;
+        Vector3 displayPosition = mainCamera.WorldToScreenPoint(opponent.transform.position + ui_offset);
+        CombatSkillDisplay.transform.position = displayPosition;
+        Sprite self_icon_sprite = null;
+        Sprite partner1_icon_sprite = null;
+        Sprite partner2_icon_sprite = null;
+
+        switch (currentCharacter.config.type){
+            case CharacterConfig.CharacterType.Dwarf:
+                partner1 = gameAssets.Characters[1].GetComponent<Character>(); // Giant
+                partner2 = gameAssets.Characters[2].GetComponent<Character>(); // Human
+                self_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Dwarf);
+                partner1_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Giant);
+                partner2_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Human);
+                break;
+            case CharacterConfig.CharacterType.Human:
+                partner1 = gameAssets.Characters[0].GetComponent<Character>(); // Dwarf
+                partner2 = gameAssets.Characters[1].GetComponent<Character>(); // Giant
+                self_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Human);
+                partner1_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Dwarf);
+                partner2_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Giant);
+                break;
+            case CharacterConfig.CharacterType.Giant:
+                partner1 = gameAssets.Characters[0].GetComponent<Character>(); // Dwarf
+                partner2 = gameAssets.Characters[2].GetComponent<Character>(); // human
+                self_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Giant);
+                partner1_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Dwarf);
+                partner2_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Human);
+                break;
+        }
+
+        //Display character icons
+        foreach (GameObject self_icon in self_icons)
+            self_icon.GetComponent<Image>().sprite = self_icon_sprite;
+        foreach (GameObject partner1_icon in partner1_icons)
+            partner1_icon.GetComponent<Image>().sprite = partner1_icon_sprite;
+        foreach (GameObject partner2_icon in partner2_icons)
+            partner2_icon.GetComponent<Image>().sprite = partner2_icon_sprite;
+
+        //Display Character dice, opponent dice, and opponent icon
+        switch (opponent_type) {
+            case "Monster":
+                //Character dice
+                foreach (GameObject self_dice in self_dices)
+                    self_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(currentCharacter.config.monsterDice.type);
+                foreach (GameObject partner1_dice in partner1_dices)
+                    partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner1.config.monsterDice.type);
+                foreach (GameObject partner1_dice in partner2_dices)
+                    partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner2.config.monsterDice.type);
+                //opponent dice
+                opponent_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(opponent.GetComponent<Monster>().config.combatDice.type);
+                //opponent icon
+
+                break;
+            case "Rock":
+                //Character dice
+                foreach (GameObject self_dice in self_dices)
+                    self_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(currentCharacter.config.stoneDice.type);
+                foreach (GameObject partner1_dice in partner1_dices)
+                    partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner1.config.stoneDice.type);
+                foreach (GameObject partner1_dice in partner2_dices)
+                    partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner2.config.stoneDice.type);
+                //opponent dice
+                opponent_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(opponent.GetComponent<Tile>().dice.type);
+                //opponent icon
+
+                break;
+            case "Trap":
+                //Character dice
+                foreach (GameObject self_dice in self_dices)
+                    self_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(currentCharacter.config.trapDice.type);
+                foreach (GameObject partner1_dice in partner1_dices)
+                    partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner1.config.trapDice.type);
+                foreach (GameObject partner1_dice in partner2_dices)
+                    partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner2.config.trapDice.type);
+                //opponent dice
+                opponent_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(opponent.GetComponent<Tile>().dice.type);
+                //opponent icon
+
+                break;
+        }
+
+
+
+
+    }
 
 }
