@@ -42,7 +42,7 @@ public class UIManager : MonoBehaviour
     public GameObject[] LifeStatus = new GameObject[3];
     public GameObject[] ActionStatus = new GameObject[3];
 
-    private Coroutine dotsCoroutine;
+    private Coroutine[] dotsCoroutine = new Coroutine[3];
 
     //Combat Skill Display
     public Vector3 ui_offset = new Vector3(0, 0.3f, 0);
@@ -369,10 +369,10 @@ public class UIManager : MonoBehaviour
         //action status ui set to ready
         {
             ActionStatus[CharaID].transform.Find("Complete").gameObject.SetActive(true);
-            if (dotsCoroutine != null) 
+            if (dotsCoroutine[CharaID] != null) 
             {
-                StopCoroutine(dotsCoroutine);
-                dotsCoroutine = null;
+                StopCoroutine(dotsCoroutine[CharaID]);
+                dotsCoroutine[CharaID] = null;
             }
             ActionStatus[CharaID].transform.Find("Planning").gameObject.SetActive(false);
         }
@@ -382,10 +382,13 @@ public class UIManager : MonoBehaviour
             ActionStatus[CharaID].transform.Find("Complete").gameObject.SetActive(false);
             GameObject planning = ActionStatus[CharaID].transform.Find("Planning").gameObject;
             planning.SetActive(true);
-            TextMeshProUGUI dotsText = planning.GetComponent<TextMeshProUGUI>();
-            dotsCoroutine =  StartCoroutine(DotsAnimation(dotsText));
-        }
+            if(dotsCoroutine[CharaID] == null)
+            {
+                TextMeshProUGUI dotsText = planning.GetComponent<TextMeshProUGUI>();
+                dotsCoroutine[CharaID] = StartCoroutine(DotsAnimation(dotsText));
+            }
 
+        }
 
     }
 
@@ -504,10 +507,6 @@ public class UIManager : MonoBehaviour
 
                 break;
         }
-
-
-
-
     }
 
 }

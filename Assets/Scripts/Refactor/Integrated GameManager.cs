@@ -385,17 +385,26 @@ public class IntegratedGameManager : MonoBehaviour
             Tile t = eventQueue.Dequeue();
 
             Debug.LogFormat("Processing Event at {0}, {1}", t.row, t.col);
-
+            Tile.FogOfWarState fow_state = t.fogOfWarDictionary[localChar.CharacterId];
+            bool visibility;
+            if (fow_state == Tile.FogOfWarState.Visible)
+            {
+                visibility = true;
+            }
+            else
+            {
+                visibility = false;
+            }
             switch (t.tileType)
             {
                 case Tile.ObstacleType.None:
-                    win = Combat.ExecuteCombat(Combat.FightType.Monster, t, uiManager);
+                    win = Combat.ExecuteCombat(Combat.FightType.Monster, t, uiManager, visibility);
                     break;
                 case Tile.ObstacleType.Trap:
-                    win = Combat.ExecuteCombat(Combat.FightType.Trap, t, uiManager);
+                    win = Combat.ExecuteCombat(Combat.FightType.Trap, t, uiManager, visibility);
                     break;
                 case Tile.ObstacleType.Rock:
-                    win = Combat.ExecuteCombat(Combat.FightType.Rock, t, uiManager);
+                    win = Combat.ExecuteCombat(Combat.FightType.Rock, t, uiManager, visibility);
                     break;
             }
             //play attack animation for all characters and monster on the tile

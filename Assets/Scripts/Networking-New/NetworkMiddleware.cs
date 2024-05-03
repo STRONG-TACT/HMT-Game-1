@@ -19,9 +19,11 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     
     // referenced by game manager
     public int myCharacterID = -1;
-    
+
+    public UIManager uiManager;
+
     // ======== Used During Gameplay ========
-    
+
     public static NetworkMiddleware S;
 
     private void Awake()
@@ -56,6 +58,8 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     private void ReadyForNextPhaseRPC(int CharID, bool ready)
     {
         IntegratedGameManager.S.inSceneCharacters[CharID].ReadyForNextPhase = ready;
+        uiManager = FindObjectOfType<UIManager>();
+        uiManager.UpdateCharacterActionStatus(CharID, ready = ready);
         if (ready)
         {
             if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning)
