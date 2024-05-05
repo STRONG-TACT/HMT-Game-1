@@ -45,7 +45,7 @@ public class UIManager : MonoBehaviour
     private Coroutine[] dotsCoroutine = new Coroutine[3];
 
     //Combat Skill Display
-    public Vector3 ui_offset = new Vector3(0, 0.3f, 0);
+    public Vector3 combat_skill_display_offset = new Vector3(0, 2f, 0);
     public GameObject CombatSkillDisplay;
     public GameObject opponent_icon;
     public GameObject opponent_dice;
@@ -55,6 +55,8 @@ public class UIManager : MonoBehaviour
     public GameObject[] self_dices = new GameObject[4];
     public GameObject[] partner1_dices = new GameObject[2];
     public GameObject[] partner2_dices = new GameObject[2];
+    bool combatSkillDisplayActive;
+
 
 
     public void InitGameUI()
@@ -426,37 +428,39 @@ public class UIManager : MonoBehaviour
         Character partner1 = null;
         Character partner2 = null;
 
+        
         Camera mainCamera = Camera.main;
-        Vector3 displayPosition = mainCamera.WorldToScreenPoint(opponent.transform.position + ui_offset);
+        Vector3 corrected_offset = combat_skill_display_offset * mainCamera.orthographicSize / 3; //correct display offset according to current zoom in value of the camera
+        Vector3 displayPosition = mainCamera.WorldToScreenPoint(opponent.transform.position + corrected_offset);
         CombatSkillDisplay.transform.position = displayPosition;
         Sprite self_icon_sprite = null;
         Sprite partner1_icon_sprite = null;
         Sprite partner2_icon_sprite = null;
+        CombatSkillDisplay.SetActive(true);
 
         switch (currentCharacter.config.type){
             case CharacterConfig.CharacterType.Dwarf:
-                partner1 = gameAssets.Characters[1].GetComponent<Character>(); // Giant
-                partner2 = gameAssets.Characters[2].GetComponent<Character>(); // Human
+                partner1 = GameObject.Find("n_Giant").GetComponent<Character>(); // Giant
+                partner2 = GameObject.Find("n_Human").GetComponent<Character>(); // Human
                 self_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Dwarf);
                 partner1_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Giant);
                 partner2_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Human);
                 break;
             case CharacterConfig.CharacterType.Human:
-                partner1 = gameAssets.Characters[0].GetComponent<Character>(); // Dwarf
-                partner2 = gameAssets.Characters[1].GetComponent<Character>(); // Giant
+                partner1 = GameObject.Find("n_Dwarf").GetComponent<Character>(); // Dwarf
+                partner2 = GameObject.Find("n_Giant").GetComponent<Character>(); // Giant
                 self_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Human);
                 partner1_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Dwarf);
                 partner2_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Giant);
                 break;
             case CharacterConfig.CharacterType.Giant:
-                partner1 = gameAssets.Characters[0].GetComponent<Character>(); // Dwarf
-                partner2 = gameAssets.Characters[2].GetComponent<Character>(); // human
+                partner1 = GameObject.Find("n_Dwarf").GetComponent<Character>(); // Dwarf
+                partner2 = GameObject.Find("n_Human").GetComponent<Character>(); // human
                 self_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Giant);
                 partner1_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Dwarf);
                 partner2_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Human);
                 break;
         }
-
         //Display character icons
         foreach (GameObject self_icon in self_icons)
             self_icon.GetComponent<Image>().sprite = self_icon_sprite;
@@ -504,9 +508,43 @@ public class UIManager : MonoBehaviour
                 //opponent dice
                 opponent_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(opponent.GetComponent<Tile>().dice.type);
                 //opponent icon
-
                 break;
         }
     }
+
+    private void Update()
+    {
+        //display combat skills when mouse hover on objects
+        Ray ray;
+        RaycastHit[] hits;
+        bool monsterHit = false;
+        Camera mainCamera = Camera.main;
+        ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        //Debug.Log(mainCamera.orthographicSize);
+        hits = Physics.RaycastAll(ray, 1000f);
+        combatSkillDisplayActive = false;
+        foreach (RaycastHit hit in hits)
+        {
+            GameObject hitObject = hit.collider.gameObject;
+            if (hitObject.tag == "Monster")
+            {
+               
+                Debug.Log("Monster hit!");
+                monsterHit = true;
+                if (!combatSkillDisplayActive)
+                {
+                    combatSkillDisplayActive = true;
+                    DisplayCombatSkills(hitObject, "Monster");
+                }
+            }
+            else
+            {
+            }
+        }
+        if(!combatSkillDisplayActive) CombatSkillDisplay.SetActive(false);
+    }
+
+
+
 
 }
