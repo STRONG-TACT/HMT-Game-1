@@ -57,9 +57,11 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     [PunRPC]
     private void ReadyForNextPhaseRPC(int CharID, bool ready)
     {
+        
         IntegratedGameManager.S.inSceneCharacters[CharID].ReadyForNextPhase = ready;
         uiManager = FindObjectOfType<UIManager>();
         uiManager.UpdateCharacterActionStatus(CharID, ready = ready);
+        
         if (ready)
         {
             if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning)

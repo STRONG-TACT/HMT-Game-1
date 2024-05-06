@@ -33,6 +33,7 @@ public class Monster : MonoBehaviour
     public MonsterConfig config;
     public int monsterId;
     public GameData gameData;
+    public Sprite icon;
 
     private Vector3 movePoint;
     private Vector3 prevMovePointPos;

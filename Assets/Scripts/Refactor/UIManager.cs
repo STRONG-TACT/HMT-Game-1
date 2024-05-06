@@ -49,6 +49,7 @@ public class UIManager : MonoBehaviour
     public GameObject CombatSkillDisplay;
     public GameObject opponent_icon;
     public GameObject opponent_dice;
+    public GameObject opponent_bonus;
     public GameObject[] self_icons = new GameObject[4];
     public GameObject[] partner1_icons = new GameObject[2];
     public GameObject[] partner2_icons = new GameObject[2];
@@ -436,6 +437,7 @@ public class UIManager : MonoBehaviour
         Sprite self_icon_sprite = null;
         Sprite partner1_icon_sprite = null;
         Sprite partner2_icon_sprite = null;
+        TextMeshProUGUI opponent_bonus_text = opponent_bonus.GetComponent<TextMeshProUGUI>();
         CombatSkillDisplay.SetActive(true);
 
         switch (currentCharacter.config.type){
@@ -481,8 +483,9 @@ public class UIManager : MonoBehaviour
                     partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner2.config.monsterDice.type);
                 //opponent dice
                 opponent_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(opponent.GetComponent<Monster>().config.combatDice.type);
+                opponent_bonus_text.text = opponent.GetComponent<Monster>().config.combatDice.bonus.ToString();
                 //opponent icon
-
+                opponent_icon.GetComponent<Image>().sprite = opponent.GetComponent<Monster>().icon;
                 break;
             case "Rock":
                 //Character dice
@@ -494,8 +497,9 @@ public class UIManager : MonoBehaviour
                     partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner2.config.stoneDice.type);
                 //opponent dice
                 opponent_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(opponent.GetComponent<Tile>().dice.type);
+                opponent_bonus_text.text = opponent.GetComponent<Tile>().dice.bonus.ToString();
                 //opponent icon
-
+                opponent_icon.GetComponent<Image>().sprite = gameAssets.rockIcon;
                 break;
             case "Trap":
                 //Character dice
@@ -507,7 +511,9 @@ public class UIManager : MonoBehaviour
                     partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner2.config.trapDice.type);
                 //opponent dice
                 opponent_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(opponent.GetComponent<Tile>().dice.type);
+                opponent_bonus_text.text = opponent.GetComponent<Tile>().dice.bonus.ToString();
                 //opponent icon
+                opponent_icon.GetComponent<Image>().sprite = gameAssets.trapIcon;
                 break;
         }
     }
@@ -517,7 +523,6 @@ public class UIManager : MonoBehaviour
         //display combat skills when mouse hover on objects
         Ray ray;
         RaycastHit[] hits;
-        bool monsterHit = false;
         Camera mainCamera = Camera.main;
         ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         //Debug.Log(mainCamera.orthographicSize);
@@ -526,19 +531,22 @@ public class UIManager : MonoBehaviour
         foreach (RaycastHit hit in hits)
         {
             GameObject hitObject = hit.collider.gameObject;
-            if (hitObject.tag == "Monster")
+            if (hitObject.tag == "Monster" || hitObject.tag == "Rock" || hitObject.tag == "Trap")
             {
-               
-                Debug.Log("Monster hit!");
-                monsterHit = true;
-                if (!combatSkillDisplayActive)
+                Tile.FogOfWarState visibility;
+                if (hitObject.tag == "Monster")
+                {
+                    visibility = hitObject.GetComponent<Monster>().currentTile.fogOfWarDictionary[IntegratedGameManager.S.localChar.CharacterId];
+                }
+                else
+                {
+                    visibility = hitObject.GetComponent<Tile>().fogOfWarDictionary[IntegratedGameManager.S.localChar.CharacterId];
+                }
+                if (!combatSkillDisplayActive && visibility == Tile.FogOfWarState.Visible)
                 {
                     combatSkillDisplayActive = true;
-                    DisplayCombatSkills(hitObject, "Monster");
+                    DisplayCombatSkills(hitObject, hitObject.tag);
                 }
-            }
-            else
-            {
             }
         }
         if(!combatSkillDisplayActive) CombatSkillDisplay.SetActive(false);
