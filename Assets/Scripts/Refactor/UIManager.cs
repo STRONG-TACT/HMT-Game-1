@@ -59,6 +59,13 @@ public class UIManager : MonoBehaviour
     public GameObject[] partner2_dices = new GameObject[2];
     bool combatSkillDisplayActive;
 
+    public static UIManager S;
+
+    private void Awake()
+    {
+        if (S) Destroy(this);
+        else S = this;
+    }
 
 
     public void InitGameUI()
@@ -192,19 +199,6 @@ public class UIManager : MonoBehaviour
     public void ShowCharacterPlanUI()
     {
         Character currentCharacter = IntegratedGameManager.S.localChar;
-        
-        switch (currentCharacter.CharacterId)
-        {
-            case 0:
-                YouAreInfo.sprite = gameAssets.youAreDwarf;
-                break;
-            case 1:
-                YouAreInfo.sprite = gameAssets.youAreGiant;
-                break;
-            case 2:
-                YouAreInfo.sprite = gameAssets.youAreHuman;
-                break;
-        }
 
         PlanUI.SetActive(true);
 

@@ -261,10 +261,7 @@ public class Character : MonoBehaviour {
         pingCursor = Vector2Int.zero;
         if (ActionPointsRemaining == 0)
         {
-            if (IntegratedGameManager.S.isNetworkGame)
-                NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, true);
-            else
-                ReadyForNextPhase = true;
+            NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, true);
         }
     }
     
@@ -279,8 +276,10 @@ public class Character : MonoBehaviour {
             _ => Vector3.forward
         };
         RaycastHit hit;
-        if (Physics.Raycast(indicator.transform.position, moveVec, out hit, stepLength, LayerMask.GetMask("Impassible"))) {
-            if (hit.collider.gameObject.GetComponent<Tile>().fogOfWarDictionary[CharacterId] == Tile.FogOfWarState.Unseen)
+        if (Physics.Raycast(indicator.transform.position, moveVec, out hit, stepLength, LayerMask.GetMask("Impassible")))
+        {
+            Tile getTile = hit.collider.gameObject.GetComponent<Tile>();
+            if (getTile != null && getTile.fogOfWarDictionary[CharacterId] == Tile.FogOfWarState.Unseen)
             {
                 return true;
             }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,6 +28,13 @@ public class GameData : MonoBehaviour
     public int maxCombatAttempts = 3; //The maximum number of combat attempts a player can make
 
     public Vector3[] cameraViews; // <-- next on the chopping block
+
+    public static GameData S;
+
+    private void Awake()
+    {
+        S = this;
+    }
 
     void Start()
     {

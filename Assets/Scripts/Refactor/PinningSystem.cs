@@ -51,13 +51,13 @@ public class PinningSystem : MonoBehaviour
             {assistPinPrefab, 2},
             {omwPinPrefab, 3}
         };
+        
+        if (S) Destroy(this);
+        else S = this;
     }
     
     private void Start()
     {
-        if (S) Destroy(this);
-        else S = this;
-        
         mainCamera = Camera.main;
         pinWheel.SetActive(false);
     }
@@ -120,18 +120,11 @@ public class PinningSystem : MonoBehaviour
         DropPinAt(pinTypeIdx, focusedTile.row, focusedTile.col, IntegratedGameManager.S.localChar.playerId);
     }
 
-    public void DropPinAt(int pinTypeIdx, int row, int col, int charId) {
-        if (IntegratedGameManager.S.isNetworkGame)
-        {
-            NetworkMiddleware.S.DropPinAtLocal(pinTypeIdx, row, col, charId);
-        }
-
-        else
-        {
-            AddPin(pinTypeIdx, row, col, charId);
-        }
+    public void DropPinAt(int pinTypeIdx, int row, int col, int charId)
+    {
+        NetworkMiddleware.S.DropPinAtLocal(pinTypeIdx, row, col, charId);
     }
-    
+
     public void AddPin(int pinIdx, int tileRow, int tileCol, int charID)
     {
         GameObject pinObj;

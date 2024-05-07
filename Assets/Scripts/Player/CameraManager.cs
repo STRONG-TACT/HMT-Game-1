@@ -28,14 +28,14 @@ public class CameraManager : MonoBehaviour
         S = this;
     }
 
-    void Start()
+    IEnumerator Start()
     {
         MainCamera = Camera.main;
         cameraCentered = true;
 
+        yield return new WaitForEndOfFrame();
         targetCharacter = IntegratedGameManager.S.localChar.transform;
         cameraOffset = MainCamera.transform.position - targetCharacter.transform.position;
-
     }
 
     private void Update()

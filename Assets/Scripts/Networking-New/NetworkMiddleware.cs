@@ -36,6 +36,11 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         }
     }
 
+    private void Start()
+    {
+        uiManager = UIManager.S;
+    }
+
     public void SetupMiddleware(int randomSeed_, int characterID_)
     {
         randomSeed = randomSeed_;
@@ -51,7 +56,14 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     public void ReadyForNextPhaseLocal(int CharID, bool ready)
     {
-        photonView.RPC("ReadyForNextPhaseRPC", RpcTarget.All, CharID, ready);
+        if (IntegratedGameManager.S.isNetworkGame)
+        {
+            photonView.RPC("ReadyForNextPhaseRPC", RpcTarget.All, CharID, ready);
+        }
+        else
+        {
+            ReadyForNextPhaseRPC(CharID, ready);
+        }
     }
 
     [PunRPC]
@@ -59,7 +71,6 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     {
         
         IntegratedGameManager.S.inSceneCharacters[CharID].ReadyForNextPhase = ready;
-        uiManager = FindObjectOfType<UIManager>();
         uiManager.UpdateCharacterActionStatus(CharID, ready = ready);
         
         if (ready)
@@ -129,13 +140,20 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     public void DropPinAtLocal(int pinTypeIdx, int row, int col, int charId)
     {
-        photonView.RPC(
-            "DropPinAtRpc", 
-            RpcTarget.All,
-            pinTypeIdx, 
-            row, col, 
-            charId);
-        IntegratedGameManager.S.NewPlayerPin();
+        if (IntegratedGameManager.S.isNetworkGame)
+        {
+            photonView.RPC(
+                "DropPinAtRpc", 
+                RpcTarget.All,
+                pinTypeIdx, 
+                row, col, 
+                charId);
+        }
+        else
+        {
+            DropPinAtRpc(pinTypeIdx, row, col, charId);
+        }
+        IntegratedGameManager.S.UpdateOnPinDrop(charId);
     }
 
     [PunRPC]

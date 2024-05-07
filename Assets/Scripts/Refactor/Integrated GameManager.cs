@@ -18,7 +18,7 @@ public class IntegratedGameManager : MonoBehaviour
 
     // ======== Game States ======== 
     [Header("Game States")]
-    [HideInInspector] public Character localChar;
+    public Character localChar;
     public GameStatus gameStatus = GameStatus.GetReady;
     public int goalCount = 0;
     protected int remainingCharacterCount = 3;
@@ -39,17 +39,6 @@ public class IntegratedGameManager : MonoBehaviour
     {
         if (S) Destroy(this);
         else S = this;
-
-        goalCount = 0;
-        localChar = inSceneCharacters[NetworkMiddleware.S.myCharacterID];
-        player.myCharacter = localChar;
-
-
-        //Depend on whether we want to assign them in editor of find in run time
-        uiManager = FindObjectOfType<UIManager>();
-        gameData = FindObjectOfType<GameData>();
-        player = FindObjectOfType<Player>();
-        pinningSystem = FindObjectOfType<PinningSystem>();
     }
 
     // Called by map generator to update characters' position at the beginning of the level.
@@ -65,6 +54,14 @@ public class IntegratedGameManager : MonoBehaviour
 
     protected virtual void Start()
     {
+        uiManager = UIManager.S;
+        gameData = GameData.S;
+        player = FindObjectOfType<Player>();
+        pinningSystem = PinningSystem.S;
+        
+        goalCount = 0;
+        localChar = inSceneCharacters[(isNetworkGame) ? NetworkMiddleware.S.myCharacterID : 0];
+
         StartCoroutine(StartLevel());
     }
 
@@ -109,10 +106,12 @@ public class IntegratedGameManager : MonoBehaviour
     {
     }
 
-    public virtual void NewPlayerPin()
+    public virtual void UpdateOnPinDrop(int charIdx)
     {
-        player.PlacePinByFocusedCharacter();
+        inSceneCharacters[charIdx].PlacePin();
+        player.UpdatePinBtnStatus(inSceneCharacters[charIdx].ReadyForNextPhase);
         CheckPingPhaseEnd();
+        uiManager.UpdateActionPointsRemaining(player.myCharacter.ActionPointsRemaining, player.myCharacter.config.movement);
     }
 
     // Update params, if all end their pinning, move to planning phase
@@ -155,7 +154,15 @@ public class IntegratedGameManager : MonoBehaviour
         {
             chara.StartPlanningPhase();
         }
-
+        
+        localChar.indicator.SetActive(true);
+        if (remainingCharacterCount > 0) {
+            CheckPlanPhaseEnd();
+            player.UpdateCharacterUI();
+        }
+        else {
+            StartCharacterMovingPhase();
+        }
     }
 
     // Called by LocalPlayer.SubmitPlan(), when player press submit button.
@@ -713,4 +720,7 @@ public class IntegratedGameManager : MonoBehaviour
         uiManager.ShowDefeatedScreen();
     }
 
+    public virtual void SwitchCharacter(int index)
+    {
+    }
 }

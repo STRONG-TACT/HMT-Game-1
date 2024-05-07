@@ -16,23 +16,27 @@ public class IntegratedNetworkGameManager : IntegratedGameManager
         isNetworkGame = true;
         if (S) Destroy(this);
         else S = this;
+    }
+
+    protected override void Start()
+    {
+        base.Start();
         localChar.FocusCharacter();
     }
     
-
-
     public override IEnumerator StartLevel()
     {
         // center camera to player
         CameraManager.S.ChangeTargetCharacter(localChar.CharacterId);
         CameraManager.S.RecenterCamera();
+        
+        yield return base.StartLevel();
         // this call will mark every tile as unseen
         // IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
         // this call actually setup the correct FOW
         // the delay is needed because internal state of FOW needs physics trigger to work
         yield return new WaitForFixedUpdate();
         IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
-        yield return StartCoroutine(base.StartLevel());
     }
 
 
@@ -58,32 +62,6 @@ public class IntegratedNetworkGameManager : IntegratedGameManager
             PreparePlayerPlanningPhase();
         }
     }
-
-    public override void NewPlayerPin()
-    {
-        base.NewPlayerPin();
-        uiManager.UpdateActionPointsRemaining(localChar.ActionPointsRemaining, localChar.config.movement);
-    }
-    
-    
-
-    // Prepare for player planning phase
-    // Reset all the player planning parameters
-    // If there are characters dead, update relevant params so they will skip planning
-    protected override void PreparePlayerPlanningPhase()
-    {
-        base.PreparePlayerPlanningPhase();
-        localChar.indicator.SetActive(true);
-
-        if (remainingCharacterCount > 0) {
-            CheckPlanPhaseEnd();
-            player.UpdateCharacterUI();
-        }
-        else {
-            StartCharacterMovingPhase();
-        }
-    }
-
 
 
     public void CheckLoseCondition()

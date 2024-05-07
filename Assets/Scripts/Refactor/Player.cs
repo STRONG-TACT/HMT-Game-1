@@ -4,7 +4,10 @@ using GameConstant;
 
 public class Player : MonoBehaviour
 {
-    public Character myCharacter { set; get; }
+    public Character myCharacter
+    {
+        get { return IntegratedGameManager.S.localChar; }
+    }
 
     public int charaID { get { return myCharacter.CharacterId; } }
 
@@ -56,21 +59,30 @@ public class Player : MonoBehaviour
         IntegratedGameManager.S.CheckPingPhaseEnd();
     }
 
-    private void UpdatePinBtnStatus(bool submitted) {
+    public void UpdatePinBtnStatus(bool submitted) {
         pinFinishBtn.interactable = !submitted;
     }
 
-    public void PlacePinByFocusedCharacter() {
-        myCharacter.PlacePin();
-        UpdatePinBtnStatus(myCharacter.ReadyForNextPhase);
+    public void AddMoveToCharacter(Character character, Character.Direction direction)
+    {
+        if (character.ActionPointsRemaining > 0 && character.CheckMove(direction))
+        {
+            if (IntegratedGameManager.S.isNetworkGame)
+            {
+                NetworkMiddleware.S.AddMoveToCharacterLocal(direction, character.CharacterId);
+            }
+            else
+            {
+                character.AddActionToPlan(direction);
+                IntegratedGameManager.S.player.UpdateCharacterUI();
+                IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
+            }
+        }
     }
     
     public void AddMoveToCharacter(Character.Direction direction)
     {
-        if (myCharacter.ActionPointsRemaining > 0 && myCharacter.CheckMove(direction))
-        {
-            NetworkMiddleware.S.AddMoveToCharacterLocal(direction, myCharacter.CharacterId);
-        }
+        AddMoveToCharacter(IntegratedGameManager.S.localChar, direction);
     }
     
     public void UndoPlanStep() 
