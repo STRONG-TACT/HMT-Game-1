@@ -76,7 +76,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
 
     public override void NewPlayerPin()
     {
-        uiManager.UpdateActionPointsRemaining(player.myCharacter.ActionPointsRemaining);
+        uiManager.UpdateActionPointsRemaining(player.myCharacter.ActionPointsRemaining, player.myCharacter.config.movement);
         base.NewPlayerPin();
     }
 
@@ -101,7 +101,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
     public void UpdateFocusPlayPlan(int index, Character.Direction move) {
         // player.myCharacter.AddActionToPlan(move);
         // player.UpdateCharacterUI(index, player.myCharacter);
-        uiManager.UpdateActionPointsRemaining(player.myCharacter.ActionPointsRemaining);
+        uiManager.UpdateActionPointsRemaining(player.myCharacter.ActionPointsRemaining, player.myCharacter.config.movement);
     }
 
     // Called by LocalPlayer.SwitchCharacter(), when player press chara buttons.

@@ -33,7 +33,9 @@ public class GameAssets : MonoBehaviour
     public Sprite youAreHuman;
 
 
-    [Header("Player Live Status Icon")]
+    [Header("Player Status Icon")]
+    public Sprite actionpoint;
+    public Sprite actionpoint_grey;
     public Sprite deadIcon;
     public Sprite aliveIcon;
 

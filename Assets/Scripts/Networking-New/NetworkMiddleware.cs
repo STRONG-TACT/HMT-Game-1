@@ -104,7 +104,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         {
             IntegratedGameManager.S.localChar.AddActionToPlan(direction);
             IntegratedGameManager.S.player.UpdateCharacterUI();
-            IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining);
+            IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
         }
     }
 
@@ -123,7 +123,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         else
         {
             IntegratedGameManager.S.localChar.UndoPlanStep();
-            IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining);
+            IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
         }
     }
 

@@ -139,16 +139,23 @@ public class UIManager : MonoBehaviour
         HealthPanel.gameObject.SetActive(true);
     }
     
-    private void UpdateActionPanel(int actionPointCount)
+    private void UpdateActionPanel(int current_actionPointCount, int total_actionPointCount)
     {
         foreach (Transform child in ActionPanel.transform.GetComponentsInChildren<Transform>())
         {
             child.gameObject.SetActive(false);
         }
 
-        for (int i = 0; i < actionPointCount; i++)
+        for (int i = 0; i < total_actionPointCount; i++)
         {
             ActionPanel.transform.GetChild(i).gameObject.SetActive(true);
+            ActionPanel.transform.GetChild(i).gameObject.GetComponent<Image>().sprite = gameAssets.actionpoint_grey;
+        }
+
+        for (int i = 0; i < current_actionPointCount; i++)
+        {
+            ActionPanel.transform.GetChild(i).gameObject.SetActive(true);
+            ActionPanel.transform.GetChild(i).gameObject.GetComponent<Image>().sprite = gameAssets.actionpoint;
         }
 
         ActionPanel.gameObject.SetActive(true);
@@ -190,14 +197,14 @@ public class UIManager : MonoBehaviour
         // TODO check the case when health == 0
         UpdateHealthPanel(currentCharacter.Health);
         Debug.Log($"Health: {currentCharacter.Health}");
-        UpdateActionPanel(currentCharacter.ActionPointsRemaining);
+        UpdateActionPanel(currentCharacter.ActionPointsRemaining, currentCharacter.config.movement);
         UpdateCharacterStats();
         CharacterInfo.SetActive(true);
     }
     
-    public void UpdateActionPointsRemaining(int movePoints)
+    public void UpdateActionPointsRemaining(int current_movePoints, int total_movepoints)
     {
-        UpdateActionPanel(movePoints);
+        UpdateActionPanel(current_movePoints, total_movepoints);
     }
     
     public void HideCharacterPlanUI()

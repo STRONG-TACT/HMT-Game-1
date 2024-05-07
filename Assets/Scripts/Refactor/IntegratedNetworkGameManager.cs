@@ -62,7 +62,7 @@ public class IntegratedNetworkGameManager : IntegratedGameManager
     public override void NewPlayerPin()
     {
         base.NewPlayerPin();
-        uiManager.UpdateActionPointsRemaining(localChar.ActionPointsRemaining);
+        uiManager.UpdateActionPointsRemaining(localChar.ActionPointsRemaining, localChar.config.movement);
     }
     
     
