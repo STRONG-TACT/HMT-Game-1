@@ -41,10 +41,6 @@ public class IntegratedLocalGameManager : IntegratedGameManager
         }
     }
 
-
-
-
-
     // Prepare for player pinning phase
     // Reset all the player pinning parameters
     // If there are characters dead, update relevant params so they will skip pinning

@@ -19,6 +19,7 @@ public class UIManager : MonoBehaviour
     public GameObject PinFinishBtn;
 
     public GameObject CharacterInfo;
+    public Image YouAreInfo;
     //public Image YouAreInfo;
     public GameObject[] DiceStats = new GameObject[3];
     public GameObject[] BonusStats = new GameObject[3];
@@ -177,7 +178,21 @@ public class UIManager : MonoBehaviour
     public void ShowCharacterPinUI()
     {
         Character currentCharacter = IntegratedGameManager.S.localChar;
-        /*
+
+        PinFinishBtn.SetActive(true);
+
+        // TODO check the case when health == 0
+        UpdateHealthPanel(currentCharacter.Health);
+        Debug.Log($"Health: {currentCharacter.Health}");
+        UpdateActionPanel(currentCharacter.ActionPointsRemaining, currentCharacter.config.movement);
+        UpdateCharacterStats();
+        CharacterInfo.SetActive(true);
+    }
+    
+    public void ShowCharacterPlanUI()
+    {
+        Character currentCharacter = IntegratedGameManager.S.localChar;
+        
         switch (currentCharacter.CharacterId)
         {
             case 0:
@@ -190,14 +205,17 @@ public class UIManager : MonoBehaviour
                 YouAreInfo.sprite = gameAssets.youAreHuman;
                 break;
         }
-        */
 
-        PinFinishBtn.SetActive(true);
+        PlanUI.SetActive(true);
 
         // TODO check the case when health == 0
+
         UpdateHealthPanel(currentCharacter.Health);
         Debug.Log($"Health: {currentCharacter.Health}");
         UpdateActionPanel(currentCharacter.ActionPointsRemaining, currentCharacter.config.movement);
+
+        UpdateActionPanel(currentCharacter.ActionPointsRemaining, currentCharacter.config.movement);
+        
         UpdateCharacterStats();
         CharacterInfo.SetActive(true);
     }

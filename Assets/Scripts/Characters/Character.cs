@@ -579,6 +579,7 @@ public class Character : MonoBehaviour {
     
     public void FocusCharacter() {
         //MaskControl(true);
+        IntegratedMapGenerator.Instance.updateFogOfWar_map(playerId);
         if(IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
             indicator.SetActive(true);
             foreach (GameObject one_path_indicator in path_indicator_list)
@@ -663,6 +664,20 @@ public class Character : MonoBehaviour {
             default:
                 Debug.LogWarningFormat("Unknown StateRepLevel: {0}", level);
                 goto case StateRepLevel.Full;
+        }
+    }
+    
+    // functions referenced only in local scene
+    public void UnFocusCharacter() {
+        //MaskControl(false);
+        indicator.SetActive(false);
+        foreach (GameObject one_path_indicator in path_indicator_list)
+        {
+            one_path_indicator.SetActive(false);
+        }
+        foreach (GameObject one_combat_indicator in combat_indicator_list)
+        {
+            one_combat_indicator.SetActive(false);
         }
     }
 }
