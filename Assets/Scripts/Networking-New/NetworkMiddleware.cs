@@ -121,7 +121,14 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     public void UndoPlanStepLocal(int charID)
     {
-        photonView.RPC("UndoPlanStepRpc", RpcTarget.All, charID);
+        if (IntegratedGameManager.S.isNetworkGame)
+        {
+            photonView.RPC("UndoPlanStepRpc", RpcTarget.All, charID);
+        }
+        else
+        {
+            IntegratedGameManager.S.localChar.UndoPlanStep();
+        }
     }
 
     [PunRPC]
