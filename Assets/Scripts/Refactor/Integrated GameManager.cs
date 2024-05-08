@@ -160,6 +160,7 @@ public class IntegratedGameManager : MonoBehaviour
         if (remainingCharacterCount > 0) {
             CheckPlanPhaseEnd();
             player.UpdateCharacterUI();
+            uiManager.ResetActionStatus();
         }
         else {
             StartCharacterMovingPhase();
