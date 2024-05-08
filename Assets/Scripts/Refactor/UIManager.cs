@@ -104,22 +104,28 @@ public class UIManager : MonoBehaviour
         {
             case GameStatus.Player_Pinning:
                 text.text = "Player Pinning Phase";
+                Timer.SetActive(true);
                 break;
             case GameStatus.Player_Planning:
                 text.text = "Player Planning Phase";
                 PinFinishBtn.SetActive(false);
+                Timer.SetActive(true);
                 break;
             case GameStatus.Player_Moving:
                 text.text = "Players Moving";
+                Timer.SetActive(false);
                 break;
             case GameStatus.Monster_Moving:
                 text.text = "Monsters Moving";
+                Timer.SetActive(false);
                 break;
             case GameStatus.Animation_Pause:
                 text.text = "An Event Happening";
+                Timer.SetActive(false);
                 break;
             default:
                 text.text = "Game Loading";
+                Timer.SetActive(false);
                 break;
         }
     }
