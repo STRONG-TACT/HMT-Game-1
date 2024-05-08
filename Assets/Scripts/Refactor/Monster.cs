@@ -221,7 +221,6 @@ public class Monster : MonoBehaviour
     }
 
     public void Kill(float stepTime) {
-        currentTile.enemyList.Remove(this);
         State = CharacterState.Die;
         StartCoroutine(KillCoroutine(stepTime));
     }

@@ -45,6 +45,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
     {
         if (gameStatus == GameStatus.Player_Pinning)
         {
+            uiManager.HideCharacterPlanUI();
             localChar.UnFocusCharacter();
             localChar = inSceneCharacters[index];
             localChar.FocusCharacter();
