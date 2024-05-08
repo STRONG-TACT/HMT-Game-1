@@ -71,7 +71,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     {
         
         IntegratedGameManager.S.inSceneCharacters[CharID].ReadyForNextPhase = ready;
-        uiManager.UpdateCharacterActionStatus(CharID, ready = ready);
+        UIManager.S.UpdateCharacterActionStatus(CharID, ready = ready);
         
         if (ready)
         {

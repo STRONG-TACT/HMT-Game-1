@@ -4,11 +4,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SwitchCharacter : MonoBehaviour
+public class CharacterSwitcher : MonoBehaviour
 {
     public Button dwarfBtn;
     public Button gaintBtn;
     public Button humanBtn;
+
+    public static CharacterSwitcher S;
+
+    private void Awake()
+    {
+        if (S) Destroy(this);
+        else S = this;
+    }
 
     private void Start()
     {
@@ -17,7 +25,7 @@ public class SwitchCharacter : MonoBehaviour
         humanBtn.onClick.AddListener(delegate { CharacterSwitch(2); });
     }
     
-    private void CharacterSwitch(int index)
+    public void CharacterSwitch(int index)
     {
         IntegratedGameManager.S.SwitchCharacter(index);
 

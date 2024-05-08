@@ -58,7 +58,6 @@ public class IntegratedGameManager : MonoBehaviour
         gameData = GameData.S;
         player = FindObjectOfType<Player>();
         pinningSystem = PinningSystem.S;
-        
         goalCount = 0;
         localChar = inSceneCharacters[(isNetworkGame) ? NetworkMiddleware.S.myCharacterID : 0];
 
@@ -76,7 +75,10 @@ public class IntegratedGameManager : MonoBehaviour
 
     protected virtual void StartPlayerTurn()
     {
-        //check this later
+        if (!isNetworkGame)
+        {
+            CharacterSwitcher.S.CharacterSwitch(localChar.CharacterId);
+        }
         IntegratedMapGenerator.Instance.updateFogOfWar_map(IntegratedGameManager.S.localChar.CharacterId);
         remainingCharacterCount = 3;
 
@@ -663,6 +665,7 @@ public class IntegratedGameManager : MonoBehaviour
         }
 
         eventQueue.Clear();
+        uiManager.HideCharacterPinUI();
         yield return new WaitForSeconds(5f);
         foreach (Character c in inSceneCharacters)
         {
