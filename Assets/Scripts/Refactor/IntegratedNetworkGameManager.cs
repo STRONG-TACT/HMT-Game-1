@@ -50,6 +50,7 @@ public class IntegratedNetworkGameManager : IntegratedGameManager
 
     protected override void StartPlayerPinningPhase()
     {
+        base.StartPlayerPinningPhase();
         uiManager.UpdateTimer(95);
         if (remainingCharacterCount > 0)
         {
