@@ -215,8 +215,13 @@ public class Monster : MonoBehaviour
         State = CharacterState.Idle;
         moving = false;
     }
-    
+
+    private void OnDestroy() {
+        currentTile.enemyList.Remove(this);
+    }
+
     public void Kill(float stepTime) {
+        currentTile.enemyList.Remove(this);
         State = CharacterState.Die;
         StartCoroutine(KillCoroutine(stepTime));
     }
