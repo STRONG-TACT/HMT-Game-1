@@ -16,10 +16,14 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private GameObject joinRoomModeUI;
     [SerializeField] private GameObject disconnectedUI;
     [SerializeField] private GameObject createJoinUI;
+    [SerializeField] private GameObject competitionIDUI;
 
-    [Header("Text Input Fields")] [SerializeField]
+    [Header("Text Input Fields")] 
+    [SerializeField]
     // TODO: This is not TMP_Text, we want TMP_Text
     private Text roomSelectText;
+    [SerializeField]
+    private Text competitionIdText;
 
     private void Awake()
     {
@@ -68,6 +72,12 @@ public class LobbyUI : MonoBehaviour
         disconnectedUI.SetActive(true);
     }
 
+    public void ShowCompetitionIDUI() {
+        DisableAllUI();
+        competitionIDUI.SetActive(true);
+    }
+
+
     private void DisableAllUI()
     {
         startSceneUI.SetActive(false);
@@ -76,10 +86,26 @@ public class LobbyUI : MonoBehaviour
         joinRoomModeUI.SetActive(false);
         disconnectedUI.SetActive(false);
         createJoinUI.SetActive(false);
+        //competitionIDUI.SetActive(false);
     }
 
     public string GetRoomNameEntered()
     {
         return roomSelectText.text;
+    }
+
+    public void SetCompetitionID() {
+        if(competitionIdText.text == "") {
+            return;
+        }
+
+        CompetitionMiddleware.Instance.SetUserID(competitionIdText.text);
+        competitionIDUI.SetActive(false);
+    }
+
+    public void StartAnoymousGame() {
+        
+        CompetitionMiddleware.Instance.SetUserID( System.Guid.NewGuid().ToString());
+        competitionIDUI.SetActive(false);
     }
 }

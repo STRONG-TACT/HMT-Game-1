@@ -74,6 +74,7 @@ MonoBehaviour:
   - UndoPlanStepRpc
   - MovePingCursorOnCharacterRPC
   - DropPinAtRpc
+  - HandshakeSessionIds
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
