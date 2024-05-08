@@ -377,6 +377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad0051c65dc524fda84d7fcf65a7d78f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  turnTimeLimit: 120
   pinFinishBtn: {fileID: 674937929}
   planParent: {fileID: 898724893}
   upBtn: {fileID: 1057764385}
@@ -538,9 +539,24 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6070971950263813834, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: TimerText
+      value: 
+      objectReference: {fileID: 6070971950461641563}
     - target: {fileID: 6070971950651353378, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: sceneViewId
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+--- !u!114 &6070971950461641563 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6070971949734665476, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+  m_PrefabInstance: {fileID: 6070971950461641562}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
