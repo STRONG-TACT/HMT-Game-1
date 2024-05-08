@@ -97,6 +97,8 @@ public class IntegratedGameManager : MonoBehaviour
         //just common operations, each derived class extend this
         gameStatus = GameStatus.Player_Pinning;
         uiManager.UpdateGamePhaseInfo();
+        player.ResetTurnTimer();
+
         pinningSubmittedCount = 3 - remainingCharacterCount;
     }
 
@@ -104,6 +106,7 @@ public class IntegratedGameManager : MonoBehaviour
 
     protected virtual void StartPlayerPinningPhase()
     {
+        
         UIManager.S.ResetActionStatus();
     }
 
@@ -149,6 +152,7 @@ public class IntegratedGameManager : MonoBehaviour
     {
         //common operations only, derived classes extend this
         gameStatus = GameStatus.Player_Planning;
+        player.ResetTurnTimer();
         uiManager.UpdateGamePhaseInfo();
 
         foreach (Character chara in inSceneCharacters)

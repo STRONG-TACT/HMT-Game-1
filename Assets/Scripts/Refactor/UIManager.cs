@@ -37,6 +37,7 @@ public class UIManager : MonoBehaviour
     public GameObject VictoryScreen;
     public GameObject LossScreen;
     public GameObject Timer;
+    public TextMeshProUGUI TimerText;
 
     //public GameObject GoalPanel; 
     public GameObject[] GoalStatus = new GameObject[3];
@@ -437,8 +438,10 @@ public class UIManager : MonoBehaviour
         TimeSpan timeSpan = TimeSpan.FromSeconds(secondsLeft);
         string text_to_display = string.Format("{0}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
 
-        TextMeshProUGUI timer_text = Timer.transform.Find("Timer_text").gameObject.GetComponent<TextMeshProUGUI>();
-        timer_text.text = text_to_display;
+        TimerText.text = text_to_display;
+
+        //TextMeshProUGUI timer_text = Timer.transform.Find("Timer_text").gameObject.GetComponent<TextMeshProUGUI>();
+        //timer_text.text = text_to_display;
 
     }
 

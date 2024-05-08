@@ -11,6 +11,9 @@ public class Player : MonoBehaviour
 
     public int charaID { get { return myCharacter.CharacterId; } }
 
+    public int turnTimeLimit = 120;
+    private float turnStartTime;
+
     public Button pinFinishBtn;
 
     public GameObject planParent;
@@ -36,8 +39,31 @@ public class Player : MonoBehaviour
         
         backBtn.onClick.AddListener(delegate { UndoPlanStep(); });
         submitBtn.onClick.AddListener(delegate { SubmitPlan(); });
+        turnStartTime = Time.time;
     }
-    
+
+    private void Update() {
+        switch (IntegratedGameManager.S.gameStatus) {
+            case GameStatus.Player_Planning:
+                if (Time.time - turnStartTime < turnTimeLimit) {
+                    UIManager.S.UpdateTimer(turnTimeLimit - Mathf.RoundToInt(Time.time - turnStartTime));
+                }
+                else {
+                    SubmitPlan();
+                }
+                break;
+            case GameStatus.Player_Pinning:
+                if (Time.time - turnStartTime < turnTimeLimit) {
+                    UIManager.S.UpdateTimer(turnTimeLimit - Mathf.RoundToInt(Time.time - turnStartTime));
+                }
+                else {
+                    SubmitPings();
+                }
+
+                break;
+        }
+    }
+
     public void UpdateCharacterUI() {
         if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning) {
             UpdatePinBtnStatus(myCharacter.ReadyForNextPhase);
@@ -47,6 +73,10 @@ public class Player : MonoBehaviour
                 myCharacter.ActionPlan.Count == 0, 
                 myCharacter.ActionPointsRemaining == 0);
         }
+    }
+
+    public void ResetTurnTimer() {
+        turnStartTime = Time.time;
     }
     
     private void SubmitPings() {
