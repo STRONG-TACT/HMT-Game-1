@@ -219,6 +219,15 @@ public class UIManager : MonoBehaviour
         UpdateActionPanel(current_movePoints, total_movepoints);
     }
     
+    public void HideCharacterPinUI()
+    {
+        PinFinishBtn.SetActive(false);
+        CharacterInfo.SetActive(false);
+        HealthPanel.SetActive(false);
+        ActionPanel.SetActive(false);
+    }
+
+
     public void HideCharacterPlanUI()
     {
         //Debug.Log("Hide Planning UI in manager");

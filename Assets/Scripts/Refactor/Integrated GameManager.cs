@@ -661,6 +661,7 @@ public class IntegratedGameManager : MonoBehaviour
         }
 
         eventQueue.Clear();
+        uiManager.HideCharacterPinUI();
         yield return new WaitForSeconds(5f);
         foreach (Character c in inSceneCharacters)
         {
