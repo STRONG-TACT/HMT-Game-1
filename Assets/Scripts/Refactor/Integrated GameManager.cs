@@ -104,6 +104,7 @@ public class IntegratedGameManager : MonoBehaviour
 
     protected virtual void StartPlayerPinningPhase()
     {
+        UIManager.S.ResetActionStatus();
     }
 
     public virtual void UpdateOnPinDrop(int charIdx)
