@@ -86,11 +86,12 @@ public class Player : MonoBehaviour
     {
         NetworkMiddleware.S.UndoPlanStepLocal(myCharacter.CharacterId);
         UpdatePlanUI(false, myCharacter.ActionPlan.Count == 0, false);
+        IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
     }
 
     public void SubmitPlan() {
-        UpdatePlanUI(true, false, false);
         NetworkMiddleware.S.ReadyForNextPhaseLocal(myCharacter.CharacterId, true);
+        UpdatePlanUI(true, false, false);
     }
 
     public void UpdatePlanUI(bool submitted, bool isEmpty, bool isFull)

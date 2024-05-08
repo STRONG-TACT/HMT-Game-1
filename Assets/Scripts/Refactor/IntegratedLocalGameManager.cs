@@ -34,6 +34,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
         else {
             PreparePlayerPlanningPhase();
         }
+        base.StartPlayerPinningPhase();
     }
     
     
