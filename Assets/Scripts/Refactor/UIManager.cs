@@ -199,7 +199,7 @@ public class UIManager : MonoBehaviour
     public void ShowCharacterPlanUI()
     {
         Character currentCharacter = IntegratedGameManager.S.localChar;
-
+        //Debug.Log("Enable Plan UI in UI manager");
         PlanUI.SetActive(true);
 
         // TODO check the case when health == 0
@@ -221,6 +221,7 @@ public class UIManager : MonoBehaviour
     
     public void HideCharacterPlanUI()
     {
+        //Debug.Log("Hide Planning UI in manager");
         PlanUI.SetActive(false);
         CharacterInfo.SetActive(false);
         HealthPanel.SetActive(false);

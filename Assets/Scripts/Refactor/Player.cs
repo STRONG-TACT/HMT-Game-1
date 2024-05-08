@@ -40,6 +40,7 @@ public class Player : MonoBehaviour
     
     public void UpdateCharacterUI() {
         if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning) {
+            planParent.SetActive(false);
             UpdatePinBtnStatus(myCharacter.ReadyForNextPhase);
         }
         else if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
@@ -96,6 +97,7 @@ public class Player : MonoBehaviour
 
     public void UpdatePlanUI(bool submitted, bool isEmpty, bool isFull)
     {
+        Debug.Log("Show Plan UI in player script");
         planParent.SetActive(true);
         
         if (submitted)

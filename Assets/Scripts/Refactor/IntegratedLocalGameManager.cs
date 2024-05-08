@@ -1,7 +1,12 @@
 using GameConstant;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class IntegratedLocalGameManager : IntegratedGameManager
 {
+
     // When awake, find all the managers and data.
     // Future update: Set isFirstLevel (currentLevel should by default be 1, may delete this step in future if we stick in the same scene)
     protected override void Awake()
@@ -10,6 +15,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
 
         base.Awake();
     }
+
 
     // Prepare for player pinning phase
     // Reset all the player pinning parameters
@@ -30,6 +36,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
         // Local version of player planning stage
         if (remainingCharacterCount > 0) {
             SwitchCharacter(0);
+            CharacterSwitcher.S.CharacterSwitch(localChar.CharacterId);
         }
         else {
             PreparePlayerPlanningPhase();
