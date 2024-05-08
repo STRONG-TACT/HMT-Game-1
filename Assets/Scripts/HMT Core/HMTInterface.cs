@@ -100,7 +100,7 @@ namespace HMT {
             }
         }
 
-#else 
+#else
         virtual protected void Start() {
             Debug.LogWarning("HMT_BUILD flag not set. Destroying HMTInterface");
             Destroy(this.gameObject);
@@ -112,6 +112,16 @@ namespace HMT {
 
 
 #endif
+
+        /// <summary>
+        /// Used as an intiial handshake with the agent.
+        /// 
+        /// Mainly used to send the agent's competition id/name so that other systems can know it.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public abstract IEnumerator Register(Command command);
+        
         /// <summary>
         /// Captures a representation of the current game state to send to an agent.
         /// 
@@ -149,6 +159,9 @@ namespace HMT {
         /// <returns></returns>
         public virtual IEnumerator ProcessCommand(Command command) {
             switch (command.command) {
+                case "register":
+                    yield return Register(command);
+                    break;
                 case "get_state":
                     string response = GetState(command);
                     command.SendOKResponse("Local State", response);

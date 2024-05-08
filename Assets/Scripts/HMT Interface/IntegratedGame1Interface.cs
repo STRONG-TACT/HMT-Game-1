@@ -78,6 +78,23 @@ public class IntegratedGame1Interface : HMTInterface {
         }
     }
 
+    public override IEnumerator Register(Command command) {
+        string target = command.target;
+        string agent_id = command.json["agent_id"].ToString();
+        CompetitionMiddleware.Instance.AddAIAgent(target, agent_id);
+
+
+        while(IntegratedGameManager.S == null) {
+            yield return null;
+        }
+        while(IntegratedGameManager.S.gameStatus == GameConstant.GameStatus.GetReady) {
+            yield return null;
+        }
+
+        command.SendOKResponse("Ready for Actions");
+        yield break;
+    }
+
     public override string GetState(Command command) {
         IntegratedMapGenerator map = IntegratedMapGenerator.Instance;
         IntegratedGameManager gameManager = IntegratedGameManager.S;

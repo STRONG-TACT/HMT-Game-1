@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using GameConstant;
+using HMT;
 
 public class NetworkLobbyManager : MonoBehaviour
 {
@@ -18,6 +19,39 @@ public class NetworkLobbyManager : MonoBehaviour
         if (S) Destroy(this);
         else S = this;
     }
+
+
+#if HMT_BUILD
+
+    private ArgParser Args = new ArgParser();
+    private IEnumerator Start() {
+        Args.AddArg("photonroom", ArgParser.ArgType.One);
+        Args.AddArg("localmode", ArgParser.ArgType.Flag);
+        Args.ParseArgs();
+
+        if (CompetitionMiddleware.Instance.overrideAIMode) {
+            yield break;
+        }
+
+        if(Args.GetArgValue("localmode", false)) {
+            LocalTestSelected();
+            yield break;
+        }
+        else {
+            //act like we cliked Online
+            OnlinePlaySelected();
+            //spin until we're connected
+            while(onBoardingState != OnBoardingState.CreateOrJoinRoom) {
+                yield return null;
+            }
+            //attempt to join a room, will need to edit that function to get the name
+            JoinRoomAttempt(Args.GetArgValue("photonroom",""));
+            yield break;
+            //if the connection failes then just bail, AI's don't create rooms
+        }
+    }
+#endif
+
 
     public void LocalTestSelected()
     {
@@ -72,9 +106,13 @@ public class NetworkLobbyManager : MonoBehaviour
        Current hacky solution: join & create is the same button. Will try to join room with name
        first. If failed a room will be created with the same name. This is obviously NOT SAFE
        but it works for testing purposes*/
-    public void JoinRoomAttempt()
+    public void JoinRoomAttempt(string roomName = "")
     {
-        string roomName = LobbyUI.S.GetRoomNameEntered();
+        Debug.LogFormat("Joining room with name: {0}", roomName);
+
+        if (roomName == "") {
+            roomName = LobbyUI.S.GetRoomNameEntered();
+        }
         // TODO: Handle for names that are too long
         if (roomName != "")
         {
@@ -86,8 +124,16 @@ public class NetworkLobbyManager : MonoBehaviour
 
     public void OnJoinRoomAttemptFailed()
     {
-        LobbyUI.S.ShowLoadingUI("Room Does Not Exist, Creating One...");
-        LobbyNetwork.S.TryCreateRoom(LobbyUI.S.GetRoomNameEntered());
+
+        if (CompetitionMiddleware.Instance.IsAI) {
+            //AIs are not allowed to create rooms so if the room doesn't exist we just bail
+            Debug.LogErrorFormat("Provided room name: {0} does not exist. Exiting Application", Args.GetArgValue("photonroom", ""));
+            Application.Quit();
+        }
+        else {
+            LobbyUI.S.ShowLoadingUI("Room Does Not Exist, Creating One...");
+            LobbyNetwork.S.TryCreateRoom(LobbyUI.S.GetRoomNameEntered());
+        }
     }
 
     public void OnCreateRoomFailed()
