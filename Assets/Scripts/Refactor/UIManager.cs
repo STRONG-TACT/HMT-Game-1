@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using GameConstant;
 using System;
+using System.Reflection;
 
 
 public class UIManager : MonoBehaviour
@@ -568,8 +569,30 @@ public class UIManager : MonoBehaviour
         CharacterSwitchPanel.SetActive(true);
     }
 
+    public void SwitchCharacterTo(int charID) {
+        SwitchCharacter(charID);
+    }
+
     private void SwitchCharacter(int charID) {
         IntegratedGameManager.S.SwitchCharacter(charID);
+
+        switch (charID) {
+            case 0:
+                DwarfBtn.interactable = false;
+                GiantBtn.interactable = true;
+                HumanBtn.interactable = true;
+                break;
+            case 1:
+                DwarfBtn.interactable = true;
+                GiantBtn.interactable = false;
+                HumanBtn.interactable = true;
+                break;
+            case 2:
+                DwarfBtn.interactable = true;
+                GiantBtn.interactable = true;
+                HumanBtn.interactable = false;
+                break;
+        }
     }
 
     public void HideCharacterSwitcher() {

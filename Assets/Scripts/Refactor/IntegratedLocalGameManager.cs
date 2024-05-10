@@ -26,8 +26,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
     {
         // Local version of player planning stage
         if (remainingCharacterCount > 0) {
-            SwitchCharacter(0);
-            CharacterSwitcher.S.CharacterSwitch(localChar.CharacterId);
+            UIManager.S.SwitchCharacterTo(0);
         }
         base.StartPlayerPinningPhase();
     }

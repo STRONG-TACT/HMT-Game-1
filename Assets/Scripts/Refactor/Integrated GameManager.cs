@@ -69,10 +69,6 @@ public class IntegratedGameManager : MonoBehaviour
 
     protected virtual void StartPlayerTurn()
     {
-        if (!isNetworkGame)
-        {
-            CharacterSwitcher.S.CharacterSwitch(localChar.CharacterId);
-        }
         IntegratedMapGenerator.Instance.updateFogOfWar_map(IntegratedGameManager.S.localChar.CharacterId);
         remainingCharacterCount = 3;
 
