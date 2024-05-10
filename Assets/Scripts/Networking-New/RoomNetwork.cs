@@ -71,7 +71,7 @@ public class RoomNetwork : MonoBehaviourPunCallbacks
     [PunRPC]
     private void TravelToGameLevel()
     {
-        SceneManager.LoadScene(GameConstant.GlobalConstant.GAME_LEVEL);
+        SceneManager.LoadScene(GameConstant.GlobalConstant.NETWORK_SCENE);
     }
 
     [PunRPC]

@@ -6,9 +6,9 @@ namespace GameConstant
 {
     public class GlobalConstant
     {
-        public const int ROOM_LEVEL = 1;
-        public const int LOCAL_TEST_LEVEL = 2;
-        public const int GAME_LEVEL = 3;
+        public const string ROOM_SCENE = "Room_n";
+        public const string LOCAL_SCENE = "Local_Animated";
+        public const string NETWORK_SCENE = "NetworkGamePlay";
         public const int START_HEALTH = 3;
     }
     

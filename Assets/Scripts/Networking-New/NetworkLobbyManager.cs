@@ -21,7 +21,7 @@ public class NetworkLobbyManager : MonoBehaviour
 
     public void LocalTestSelected()
     {
-        SceneManager.LoadScene(GlobalConstant.LOCAL_TEST_LEVEL);
+        SceneManager.LoadScene(GlobalConstant.LOCAL_SCENE);
     }
     
     // ============ Server Connection & Handle ============
@@ -106,7 +106,7 @@ public class NetworkLobbyManager : MonoBehaviour
     public void OnRoomEntered()
     {
         Debug.Log("Joined a room, initiating travel to room");
-        SceneManager.LoadScene(GlobalConstant.ROOM_LEVEL);
+        SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
     }
 
     // ============ Back Button Logic ============
