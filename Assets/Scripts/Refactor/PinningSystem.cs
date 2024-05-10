@@ -75,10 +75,10 @@ public class PinningSystem : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning)
         {
             if (EventSystem.current.IsPointerOverGameObject()) {
-                Debug.Log("mouse clicked on UI");
+                //Debug.Log("mouse clicked on UI");
                 return;
             }
-            Debug.Log("mouse clicked at " + Input.mousePosition);
+            //Debug.Log("mouse clicked at " + Input.mousePosition);
 
             ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
@@ -88,10 +88,10 @@ public class PinningSystem : MonoBehaviour
                 {
                     tile = hit.transform.gameObject;
                     focusedTile = tile.GetComponent<Tile>();
-                    Debug.LogFormat("tile location: {0}, {1}", focusedTile.row, focusedTile.col);
+                    //Debug.LogFormat("tile location: {0}, {1}", focusedTile.row, focusedTile.col);
                     Debug.Log(focusedTile.row);
                     Debug.Log(focusedTile.col);
-                    Debug.LogFormat("Mouse hit object {0}", hit.transform.gameObject.name);
+                    //Debug.LogFormat("Mouse hit object {0}", hit.transform.gameObject.name);
                     pinWheel.transform.gameObject.SetActive(true);
                     isPinned = true;
                 }

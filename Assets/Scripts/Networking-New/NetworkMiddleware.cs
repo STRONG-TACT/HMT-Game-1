@@ -20,8 +20,6 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     // referenced by game manager
     public int myCharacterID = -1;
 
-    public UIManager uiManager;
-
     // ======== Used During Gameplay ========
 
     public static NetworkMiddleware S;
@@ -38,7 +36,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        uiManager = UIManager.S;
+
     }
 
     public void SetupMiddleware(int randomSeed_, int characterID_)
@@ -71,17 +69,15 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     {
         
         IntegratedGameManager.S.inSceneCharacters[CharID].ReadyForNextPhase = ready;
-        UIManager.S.UpdateCharacterActionStatus(CharID, ready = ready);
+        UIManager.S.UpdateCommonHUD();
+        UIManager.S.UpdateCharacterActionStatus(CharID, ready);
         
-        if (ready)
-        {
-            if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning)
-            {
+        if (ready) {
+            if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning) {
                 IntegratedGameManager.S.CheckPingPhaseEnd();
             }
 
-            if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning)
-            {
+            if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
                 IntegratedGameManager.S.CheckPlanPhaseEnd();
             }
         }
@@ -101,48 +97,65 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     public void AddMoveToCharacterLocal(Character.Direction direction, int charID)
     {
-        photonView.RPC("AddMoveToCharacterRPC", RpcTarget.All, direction, charID);
+        if (IntegratedGameManager.S.isNetworkGame) {
+            photonView.RPC("AddMoveToCharacterRPC", RpcTarget.All, direction, charID);
+        }
+        
+        else {
+            AddMoveToCharacterRPC(direction, charID);
+        }
     }
 
     [PunRPC]
     private void AddMoveToCharacterRPC(Character.Direction direction, int charID)
     {
-        if (charID != myCharacterID)
-        {
-            IntegratedGameManager.S.inSceneCharacters[charID].ActionPlan.Add(direction);
-        }
-        else
-        {
-            IntegratedGameManager.S.localChar.AddActionToPlan(direction);
-            IntegratedGameManager.S.player.UpdateCharacterUI();
-            IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
-        }
+
+        IntegratedGameManager.S.inSceneCharacters[charID].AddActionToPlan(direction);
+        UIManager.S.UpdateCommonHUD();
+        UIManager.S.UpdateCharacterPlanUI();
+
+
+        //IntegratedGameManager.S.player.UpdateCharacterUI();
+        //UIManager.S.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
+
+        //if (charID != myCharacterID)
+        //{
+        //    IntegratedGameManager.S.inSceneCharacters[charID].ActionPlan.Add(direction);
+        //}
+        //else
+        //{
+        //    IntegratedGameManager.S.localChar.AddActionToPlan(direction);
+        //    IntegratedGameManager.S.player.UpdateCharacterUI();
+        //    IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
+        //}
     }
 
-    public void UndoPlanStepLocal(int charID)
-    {
-        if (IntegratedGameManager.S.isNetworkGame)
-        {
+    public void UndoPlanStepLocal(int charID) {
+        if (IntegratedGameManager.S.isNetworkGame) {
             photonView.RPC("UndoPlanStepRpc", RpcTarget.All, charID);
         }
-        else
-        {
-            IntegratedGameManager.S.localChar.UndoPlanStep();
+        else {
+            UndoPlanStepRpc(charID);
         }
     }
 
     [PunRPC]
-    private void UndoPlanStepRpc(int charID)
-    {
-        if (charID != myCharacterID)
-        {
-            IntegratedGameManager.S.inSceneCharacters[charID].ActionPlan.RemoveAt(IntegratedGameManager.S.inSceneCharacters[charID].ActionPlan.Count-1);
-        }
-        else
-        {
-            IntegratedGameManager.S.localChar.UndoPlanStep();
-            IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
-        }
+    private void UndoPlanStepRpc(int charID) {
+        IntegratedGameManager.S.inSceneCharacters[charID].UndoPlanStep();
+        UIManager.S.UpdateCommonHUD();
+        UIManager.S.UpdateCharacterPlanUI();
+        //UIManager.S.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
+
+
+        //if (charID != myCharacterID)
+        //{
+        //    IntegratedGameManager.S.inSceneCharacters[charID].ActionPlan.RemoveAt(IntegratedGameManager.S.inSceneCharacters[charID].ActionPlan.Count-1);
+        //}
+        //else
+        //{
+        //    IntegratedGameManager.S.localChar.UndoPlanStep();
+        //    IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
+        //}
     }
 
     public void DropPinAtLocal(int pinTypeIdx, int row, int col, int charId)
@@ -160,12 +173,13 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         {
             DropPinAtRpc(pinTypeIdx, row, col, charId);
         }
-        IntegratedGameManager.S.UpdateOnPinDrop(charId);
+        
     }
 
     [PunRPC]
     private void DropPinAtRpc(int pinTypeIdx, int row, int col, int charId)
     {
         PinningSystem.S.AddPin(pinTypeIdx, row, col, charId);
+        IntegratedGameManager.S.UpdateOnPinDrop(charId);
     }
 }

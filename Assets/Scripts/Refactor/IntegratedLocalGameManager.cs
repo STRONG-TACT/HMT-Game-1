@@ -17,29 +17,12 @@ public class IntegratedLocalGameManager : IntegratedGameManager
     }
 
 
-    // Prepare for player pinning phase
-    // Reset all the player pinning parameters
-    // If there are characters dead, update relevant params so they will skip pinning
-    protected override void PreparePlayerPinningPhase()
-    {
-        base.PreparePlayerPinningPhase();
-
-        foreach (Character chara in inSceneCharacters) {
-            chara.StartPingPhase();
-        }
-        StartPlayerPinningPhase();
-    }
-
-
     protected override void StartPlayerPinningPhase()
     {
         // Local version of player planning stage
         if (remainingCharacterCount > 0) {
             SwitchCharacter(0);
             CharacterSwitcher.S.CharacterSwitch(localChar.CharacterId);
-        }
-        else {
-            PreparePlayerPlanningPhase();
         }
         base.StartPlayerPinningPhase();
     }
@@ -53,20 +36,24 @@ public class IntegratedLocalGameManager : IntegratedGameManager
     {
         if (gameStatus == GameStatus.Player_Pinning)
         {
-            uiManager.HideCharacterPlanUI();
+            //uiManager.HideCharacterPlanUI();
             localChar.UnFocusCharacter();
             localChar = inSceneCharacters[index];
             localChar.FocusCharacter();
-            uiManager.ShowCharacterPinUI();
-            player.UpdateCharacterUI();
+            UIManager.S.UpdateCommonHUD();
+            UIManager.S.UpdateCharacterPinUI();
+            //uiManager.ShowCharacterPinUI();
+            //player.UpdateCharacterUI();
         }
         else if (gameStatus == GameStatus.Player_Planning)
         {
             localChar.UnFocusCharacter();
             localChar = inSceneCharacters[index];
             localChar.FocusCharacter();
-            uiManager.ShowCharacterPlanUI();
-            player.UpdateCharacterUI();
+            UIManager.S.ShowCharacterPlanUI();
+            UIManager.S.UpdateCommonHUD();
+            UIManager.S.UpdateCharacterPlanUI();
+            //player.UpdateCharacterUI();
         }
        
        CameraManager.S.ChangeTargetCharacter(index);

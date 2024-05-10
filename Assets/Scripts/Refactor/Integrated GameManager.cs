@@ -10,10 +10,10 @@ public class IntegratedGameManager : MonoBehaviour
 
     // ======== Managers ========
     [Header("Managers")]
-    public UIManager uiManager;
-    public GameData gameData;
-    public Player player;
-    public PinningSystem pinningSystem;
+    //protected UIManager uiManager;
+    protected GameData gameData;
+    protected Player player;
+    protected PinningSystem pinningSystem;
 
 
     // ======== Game States ======== 
@@ -22,8 +22,6 @@ public class IntegratedGameManager : MonoBehaviour
     public GameStatus gameStatus = GameStatus.GetReady;
     public int goalCount = 0;
     protected int remainingCharacterCount = 3;
-    private int pinningSubmittedCount = 0;
-    private int planSubmittedCount = 0;
     private Queue<Tile> eventQueue = new Queue<Tile>();
     protected Coroutine currentCoroutine = null;
     public int currentLevel = 1;
@@ -52,9 +50,7 @@ public class IntegratedGameManager : MonoBehaviour
 
 
 
-    protected virtual void Start()
-    {
-        uiManager = UIManager.S;
+    protected virtual void Start() {        
         gameData = GameData.S;
         player = FindObjectOfType<Player>();
         pinningSystem = PinningSystem.S;
@@ -66,8 +62,8 @@ public class IntegratedGameManager : MonoBehaviour
 
     public virtual IEnumerator StartLevel() {
         gameStatus = GameStatus.GetReady;
-        uiManager.InitGameUI();
-        uiManager.ResetActionStatus();
+        UIManager.S.InitGameUI();
+        UIManager.S.ResetTeamActionStatus();
         yield return new WaitForFixedUpdate();
         StartPlayerTurn();
     }
@@ -91,110 +87,112 @@ public class IntegratedGameManager : MonoBehaviour
             }
         }
 
-        PreparePlayerPinningPhase();
+        StartPlayerPinningPhase();
     }
 
-    protected virtual void PreparePlayerPinningPhase() 
-    {
-        //just common operations, each derived class extend this
-        gameStatus = GameStatus.Player_Pinning;
-        uiManager.UpdateGamePhaseInfo();
-        player.ResetTurnTimer();
-
-        pinningSubmittedCount = 3 - remainingCharacterCount;
-    }
-
-
+    //protected virtual void PreparePlayerPinningPhase() 
+    //{
+    //    //just common operations, each derived class extend this
+       
+    //}
 
     protected virtual void StartPlayerPinningPhase()
     {
-        
-        UIManager.S.ResetActionStatus();
+        Debug.Log("Start Pinning Phase.");
+        gameStatus = GameStatus.Player_Pinning;
+        UIManager.S.UpdateGamePhaseInfo();
+        player.ResetTurnTimer();
+
+
+        foreach (Character chara in inSceneCharacters) {
+            chara.StartPingPhase();
+        }
+
+        if (remainingCharacterCount > 0) {
+            localChar.FocusCharacter();
+            UIManager.S.ShowCharacterPinUI();
+            UIManager.S.ShowCommonHUD();
+            UIManager.S.ResetTeamActionStatus();
+        }
+        else {
+            EndPlayerPinningPhase();
+        }
     }
 
     public virtual void UpdateOnPinDrop(int charIdx)
     {
         inSceneCharacters[charIdx].PlacePin();
-        player.UpdatePinBtnStatus(inSceneCharacters[charIdx].ReadyForNextPhase);
+        UIManager.S.UpdateCharacterPinUI();
+        UIManager.S.UpdateCommonHUD();
         CheckPingPhaseEnd();
-        uiManager.UpdateActionPointsRemaining(player.myCharacter.ActionPointsRemaining, player.myCharacter.config.movement);
+
     }
 
-    // Update params, if all end their pinning, move to planning phase
-    public virtual void CheckPingPhaseEnd()
-    {
+    protected virtual bool CheckPhaseEnd() {
         bool phaseEnd = true;
-        foreach (Character character in inSceneCharacters)
-        {
-            if (!character.ReadyForNextPhase)
-            {
+        foreach (Character character in inSceneCharacters) {
+            if (!character.ReadyForNextPhase) {
                 phaseEnd = false;
             }
         }
-        if (phaseEnd)
-        {
+        return phaseEnd;
+    }
+
+    // Update params, if all end their pinning, move to planning phase
+    public virtual void CheckPingPhaseEnd() {
+        if(CheckPhaseEnd()) {
             EndPlayerPinningPhase();
         }
     }
 
     protected virtual void EndPlayerPinningPhase()
     {
-        Debug.Log("Pinning phase ended.");
+        Debug.Log("End Pinning Phase");
         
-        foreach (Character chara in inSceneCharacters)
-        {
+        foreach (Character chara in inSceneCharacters) {
             chara.EndPingPhase();
         }
         PinningSystem.S.Cancel();
-        Debug.Log("Should start planning phase here.");
-        PreparePlayerPlanningPhase();
+        UIManager.S.HideCharacterPinUI();
+        //Debug.Log("Should start planning phase here.");
+        StartPlayerPlanningPhase();
     }
 
-    protected virtual void PreparePlayerPlanningPhase() 
+    protected virtual void StartPlayerPlanningPhase() 
     {
+        Debug.Log("Start Planning Phase.");
         //common operations only, derived classes extend this
         gameStatus = GameStatus.Player_Planning;
         player.ResetTurnTimer();
-        uiManager.UpdateGamePhaseInfo();
+        UIManager.S.UpdateGamePhaseInfo();
 
-        foreach (Character chara in inSceneCharacters)
-        {
+        foreach (Character chara in inSceneCharacters) {
             chara.StartPlanningPhase();
         }
-        
-        localChar.indicator.SetActive(true);
-        if (remainingCharacterCount > 0) {
-            CheckPlanPhaseEnd();
-            player.UpdateCharacterUI();
-            uiManager.ResetActionStatus();
+
+        if (remainingCharacterCount <= 0 || CheckPhaseEnd()) {
+            EndPlayerPlanningPhase();
         }
         else {
-            StartCharacterMovingPhase();
+            UIManager.S.UpdateCommonHUD();
+            UIManager.S.ResetTeamActionStatus();
+            UIManager.S.ShowCharacterPlanUI();
+            localChar.FocusCharacter();
         }
     }
 
     // Called by LocalPlayer.SubmitPlan(), when player press submit button.
     // Update params, if all submitted their plan, move to moving phase
-    public virtual void CheckPlanPhaseEnd()
-    {
-        bool phaseEnd = true;
-        foreach (Character character in inSceneCharacters)
-        {
-            if (!character.ReadyForNextPhase)
-            {
-                phaseEnd = false;
-            }
-        }
-        if (phaseEnd)
-        {
+    public virtual void CheckPlanPhaseEnd() {
+        if (remainingCharacterCount <= 0 || CheckPhaseEnd()) {
             EndPlayerPlanningPhase();
         }
     }
 
     protected virtual void EndPlayerPlanningPhase()
     {
-        Debug.Log("Planning phase ended.");
-        uiManager.HideCharacterPlanUI();
+        Debug.Log("End Planning Phase");
+        UIManager.S.HideCharacterPlanUI();
 
         foreach (Character chara in inSceneCharacters)
         {
@@ -208,8 +206,12 @@ public class IntegratedGameManager : MonoBehaviour
 
     public virtual void StartCharacterMovingPhase() 
     {
+        Debug.Log("Start Moving Phase.");
         gameStatus = GameStatus.Player_Moving;
-        uiManager.UpdateGamePhaseInfo();
+        UIManager.S.UpdateGamePhaseInfo();
+        UIManager.S.HideCommonHUD();
+        UIManager.S.HideCharacterPlanUI();
+        UIManager.S.HideCharacterPinUI();
         //moveFinishedCount = 0;       
         eventQueue = new Queue<Tile>();
 
@@ -269,8 +271,9 @@ public class IntegratedGameManager : MonoBehaviour
     // Start monster moving phase
     protected virtual void StartMonsterTurn()
     {
+        Debug.Log("Start Monster Turn.");
         gameStatus = GameStatus.Monster_Moving;
-        uiManager.UpdateGamePhaseInfo();
+        UIManager.S.UpdateGamePhaseInfo();
         //moveFinishedCount = 0;
 
         foreach (Monster m in inSceneMonsters)
@@ -381,7 +384,7 @@ public class IntegratedGameManager : MonoBehaviour
                 chara.RespawnCountdown();
                 //update life status ui if character respawns
                 if (!chara.dead) {
-                    uiManager.UpdateCharacterLifeStatus(chara.CharacterId, true);
+                    UIManager.S.UpdateCharacterLifeStatus(chara.CharacterId, true);
                 }
             }
         }
@@ -413,13 +416,13 @@ public class IntegratedGameManager : MonoBehaviour
             switch (t.tileType)
             {
                 case Tile.ObstacleType.None:
-                    win = Combat.ExecuteCombat(Combat.FightType.Monster, t, uiManager, visibility);
+                    win = Combat.ExecuteCombat(Combat.FightType.Monster, t, visibility);
                     break;
                 case Tile.ObstacleType.Trap:
-                    win = Combat.ExecuteCombat(Combat.FightType.Trap, t, uiManager, visibility);
+                    win = Combat.ExecuteCombat(Combat.FightType.Trap, t, visibility);
                     break;
                 case Tile.ObstacleType.Rock:
-                    win = Combat.ExecuteCombat(Combat.FightType.Rock, t, uiManager, visibility);
+                    win = Combat.ExecuteCombat(Combat.FightType.Rock, t, visibility);
                     break;
             }
             //play attack animation for all characters and monster on the tile
@@ -565,7 +568,7 @@ public class IntegratedGameManager : MonoBehaviour
                     mo.State = Monster.CharacterState.Idle;
                 }
             }
-            uiManager.HideCombatUI();
+            UIManager.S.HideCombatUI();
         }
         yield break;
         IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
@@ -589,7 +592,7 @@ public class IntegratedGameManager : MonoBehaviour
 
             if (c.dead)
             {
-                uiManager.UpdateCharacterLifeStatus(c.CharacterId, false);
+                UIManager.S.UpdateCharacterLifeStatus(c.CharacterId, false);
                 deadChara.Add(c);
             }
             else
@@ -613,13 +616,13 @@ public class IntegratedGameManager : MonoBehaviour
     // Called by Character.OnTriggerEnter(), when a character collide with its goal
     public virtual void GoalReached(int charaID)
     {
-        uiManager.UpdateGoalStatus(charaID);
+        UIManager.S.UpdateCharacterGoalStatus(charaID);
         goalCount += 1;
     }
 
     public virtual void GoalUnReached(int charaID)
     {
-        uiManager.UpdateGoalStatus(charaID, false);
+        UIManager.S.UpdateCharacterGoalStatus(charaID, false);
         goalCount -= 1;
         Debug.Log("refunded");
     }
@@ -658,14 +661,14 @@ public class IntegratedGameManager : MonoBehaviour
             Destroy(m.gameObject);
         }
 
-        uiManager.LoadLevelEndUI();
+        UIManager.S.LoadLevelEndUI();
         foreach (Character c in inSceneCharacters)
         {
             c.State = Character.CharacterState.Cheering;
         }
 
         eventQueue.Clear();
-        uiManager.HideCharacterPinUI();
+        UIManager.S.HideCharacterPinUI();
         yield return new WaitForSeconds(5f);
         foreach (Character c in inSceneCharacters)
         {
@@ -687,7 +690,7 @@ public class IntegratedGameManager : MonoBehaviour
             {
                 c.StopAllCoroutines();
                 c.QuickRespawn();
-                uiManager.UpdateCharacterLifeStatus(c.CharacterId, true);
+                UIManager.S.UpdateCharacterLifeStatus(c.CharacterId, true);
             }
 
             while (inSceneMonsters.Count != 0)
@@ -697,8 +700,8 @@ public class IntegratedGameManager : MonoBehaviour
                 Destroy(m.gameObject);
             }
 
-            uiManager.ResetGoalStatus();
-            uiManager.ResetActionStatus();
+            UIManager.S.ResetTeamGoalStatus();
+            UIManager.S.ResetTeamActionStatus();
             IntegratedMapGenerator.Instance.LoadLevel(gameData.levelTextFiles[currentLevel - 1]);
 
             StartCoroutine(StartLevel());
@@ -706,7 +709,7 @@ public class IntegratedGameManager : MonoBehaviour
         else
         {
             Debug.Log("Game ends.");
-            uiManager.DisplayVictoryScreen();
+            UIManager.S.DisplayVictoryScreen();
             gameStatus = GameStatus.GameEnd;
         }
     }
@@ -726,7 +729,7 @@ public class IntegratedGameManager : MonoBehaviour
     }
     protected virtual void Lose()
     {
-        uiManager.ShowDefeatedScreen();
+        UIManager.S.ShowDefeatedScreen();
     }
 
     public virtual void SwitchCharacter(int index)

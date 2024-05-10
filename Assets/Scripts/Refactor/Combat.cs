@@ -60,7 +60,7 @@ public class Combat : MonoBehaviour
         }
     }
 
-    public static bool ExecuteCombat(FightType type, Tile tile, UIManager uiManager, bool visibility)
+    public static bool ExecuteCombat(FightType type, Tile tile, bool visibility)
     {
         bool result = false;
         List<int> charaIDs = new List<int>();
@@ -99,7 +99,7 @@ public class Combat : MonoBehaviour
             result = true;
         }
 
-        uiManager.ShowCombatUI(type, charaIDs, charaScores, enemyScores, charaScore, enemyScore, result, visibility);
+        UIManager.S.ShowCombatUI(type, charaIDs, charaScores, enemyScores, charaScore, enemyScore, result, visibility);
             return result;
     }
 }

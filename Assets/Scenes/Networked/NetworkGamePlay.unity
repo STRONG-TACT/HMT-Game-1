@@ -156,17 +156,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &477472144 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6070971950263813834, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
-  m_PrefabInstance: {fileID: 6070971950461641562}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a09332250f8444ab9ba9bdf459bcda52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &586536992 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6070971951027174266, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
@@ -259,7 +248,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96baf1b91c7163b4eb73014744334b96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiManager: {fileID: 477472144}
   gameData: {fileID: 601247818}
   player: {fileID: 1700429515}
   pinningSystem: {fileID: 1726500803}
@@ -487,6 +475,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6070971949094896909, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6070971949126703746, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: m_Name
       value: CommonElements
@@ -535,6 +527,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6070971949167418335, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6070971950130997087, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -545,6 +541,14 @@ PrefabInstance:
       objectReference: {fileID: 6070971950461641563}
     - target: {fileID: 6070971950651353378, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: sceneViewId
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971950709107803, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971951103539348, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

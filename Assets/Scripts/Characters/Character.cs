@@ -181,19 +181,7 @@ public class Character : MonoBehaviour {
     
     public void StartPingPhase() {
         pingCursor = Vector2Int.zero;
-        if (IntegratedGameManager.S.isNetworkGame)
-        {
-            if (CharacterId == NetworkMiddleware.S.myCharacterID)
-            {
-                NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, dead);
-            }
-        }
-        else
-        {
-            pingCursor = Vector2Int.zero;
-            ReadyForNextPhase = dead;
-        }
-        
+        NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, dead);
     }
     
     public void EndPingPhase() {

@@ -18,19 +18,22 @@ public class IntegratedPlayerLocal : IntegratedPlayer
     
     public void SwitchCharacter(int index)
     {
-        myCharacter.UnFocusCharacter();
-        myCharacter = IntegratedGameManager.S.inSceneCharacters[index];
-        myCharacter.FocusCharacter();
-        UpdateCharacterUI();
-        IntegratedGameManager.S.localChar = myCharacter;
-        if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning)
-        {
-            IntegratedGameManager.S.uiManager.ShowCharacterPinUI();
-        } else if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning)
-        {
-            IntegratedGameManager.S.uiManager.ShowCharacterPlanUI();
-        }
 
-        CameraManager.S.ChangeTargetCharacter(index);
+        IntegratedGameManager.S.SwitchCharacter(index);
+
+        //myCharacter.UnFocusCharacter();
+        //myCharacter = IntegratedGameManager.S.inSceneCharacters[index];
+        //myCharacter.FocusCharacter();
+        //UpdateCharacterUI();
+        //IntegratedGameManager.S.localChar = myCharacter;
+        //if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning)
+        //{
+        //    IntegratedGameManager.S.uiManager.ShowCharacterPinUI();
+        //} else if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning)
+        //{
+        //    IntegratedGameManager.S.uiManager.ShowCharacterPlanUI();
+        //}
+
+        //CameraManager.S.ChangeTargetCharacter(index);
     }
 }

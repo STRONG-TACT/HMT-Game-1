@@ -39,48 +39,4 @@ public class IntegratedNetworkGameManager : IntegratedGameManager
         IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
     }
 
-
-    protected override void PreparePlayerPinningPhase()
-    {
-        base.PreparePlayerPinningPhase();
-
-        localChar.StartPingPhase();
-        StartPlayerPinningPhase();
-    }
-
-    protected override void StartPlayerPinningPhase()
-    {
-        base.StartPlayerPinningPhase();
-        uiManager.UpdateTimer(95);
-        if (remainingCharacterCount > 0)
-        {
-            localChar.FocusCharacter();
-            player.UpdateCharacterUI();
-            uiManager.ShowCharacterPinUI();
-        }
-        else
-        {
-            PreparePlayerPlanningPhase();
-        }
-    }
-
-
-    public void CheckLoseCondition()
-    {
-        int deadPlayerCount = 0;
-        foreach (var character in inSceneCharacters)
-        {
-            if (character.dead) deadPlayerCount++;
-        }
-
-        if (deadPlayerCount >= 3)
-        {
-            Lose();
-        }
-    }
-
-    private void Lose()
-    {
-        uiManager.ShowDefeatedScreen();
-    }
 }

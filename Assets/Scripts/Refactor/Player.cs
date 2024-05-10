@@ -16,7 +16,7 @@ public class Player : MonoBehaviour
 
     public Button pinFinishBtn;
 
-    public GameObject planParent;
+    //public GameObject planParent;
     public Button upBtn;
     public Button downBtn;
     public Button leftBtn;
@@ -64,17 +64,17 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void UpdateCharacterUI() {
-        if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning) {
-            planParent.SetActive(false);
-            UpdatePinBtnStatus(myCharacter.ReadyForNextPhase);
-        }
-        else if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
-            UpdatePlanUI(myCharacter.ReadyForNextPhase, 
-                myCharacter.ActionPlan.Count == 0, 
-                myCharacter.ActionPointsRemaining == 0);
-        }
-    }
+    //public void UpdateCharacterUI() {
+    //    if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning) {
+    //        planParent.SetActive(false);
+    //        UpdatePinBtnStatus(myCharacter.ReadyForNextPhase);
+    //    }
+    //    else if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
+    //        UpdatePlanUI(myCharacter.ReadyForNextPhase, 
+    //            myCharacter.ActionPlan.Count == 0, 
+    //            myCharacter.ActionPointsRemaining == 0);
+    //    }
+    //}
 
     public void ResetTurnTimer() {
         turnStartTime = Time.time;
@@ -83,28 +83,28 @@ public class Player : MonoBehaviour
     private void SubmitPings() {
         PinningSystem.S.Cancel();
         NetworkMiddleware.S.ReadyForNextPhaseLocal(myCharacter.CharacterId, true);
-        UpdatePinBtnStatus(myCharacter.ReadyForNextPhase);
+        UIManager.S.UpdateCharacterPinUI();
         IntegratedGameManager.S.CheckPingPhaseEnd();
     }
 
-    public void UpdatePinBtnStatus(bool submitted) {
-        pinFinishBtn.interactable = !submitted;
-    }
+    //public void UpdatePinBtnStatus(bool submitted) {
+    //    pinFinishBtn.interactable = !submitted;
+    //}
 
-    public void AddMoveToCharacter(Character character, Character.Direction direction)
-    {
-        if (character.ActionPointsRemaining > 0 && character.CheckMove(direction))
-        {
-            if (IntegratedGameManager.S.isNetworkGame)
-            {
-                NetworkMiddleware.S.AddMoveToCharacterLocal(direction, character.CharacterId);
-            }
-            else
-            {
-                character.AddActionToPlan(direction);
-                IntegratedGameManager.S.player.UpdateCharacterUI();
-                IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
-            }
+    public void AddMoveToCharacter(Character character, Character.Direction direction) {
+        if (character.ActionPointsRemaining > 0 && character.CheckMove(direction)) {
+            NetworkMiddleware.S.AddMoveToCharacterLocal(direction, character.CharacterId);
+
+            //if (IntegratedGameManager.S.isNetworkGame)
+            //{
+            //    NetworkMiddleware.S.AddMoveToCharacterLocal(direction, character.CharacterId);
+            //}
+            //else
+            //{
+            //    character.AddActionToPlan(direction);
+            //    IntegratedGameManager.S.player.UpdateCharacterUI();
+            //    IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
+            //}
         }
     }
     
@@ -112,87 +112,91 @@ public class Player : MonoBehaviour
     {
         AddMoveToCharacter(IntegratedGameManager.S.localChar, direction);
     }
+
+    public void UndoPlanStep(Character character) {
+        NetworkMiddleware.S.UndoPlanStepLocal(character.CharacterId);
+    }
     
     public void UndoPlanStep() 
     {
         NetworkMiddleware.S.UndoPlanStepLocal(myCharacter.CharacterId);
-        UpdatePlanUI(false, myCharacter.ActionPlan.Count == 0, false);
-        IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
+        //UpdatePlanUI(false, myCharacter.ActionPlan.Count == 0, false);
+        //IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
     }
 
     public void SubmitPlan() {
         NetworkMiddleware.S.ReadyForNextPhaseLocal(myCharacter.CharacterId, true);
-        UpdatePlanUI(true, false, false);
+        //UpdatePlanUI(true, false, false);
     }
 
-    public void UpdatePlanUI(bool submitted, bool isEmpty, bool isFull)
-    {
-        Debug.Log("Show Plan UI in player script");
-        planParent.SetActive(true);
+    //public void UpdatePlanUI(bool submitted, bool isEmpty, bool isFull)
+    //{
+    //    Debug.Log("Show Plan UI in player script");
+    //    planParent.SetActive(true);
         
-        if (submitted)
-        {
-            shutDownPlanButtons();
-        }
-        else if (isFull)
-        {
-            lastMovePlaned();
-        }
-        else if (isEmpty)
-        {
-            noMovePlaned();
-        }
-        else
-        {
-            someMovePlaned();
-        }
-    }
+    //    if (submitted)
+    //    {
+    //        shutDownPlanButtons();
+    //    }
+    //    else if (isFull)
+    //    {
+    //        lastMovePlaned();
+    //    }
+    //    else if (isEmpty)
+    //    {
+    //        noMovePlaned();
+    //    }
+    //    else
+    //    {
+    //        someMovePlaned();
+    //    }
+    //}
 
-    public void lastMovePlaned()
-    {
-        upBtn.interactable = false;
-        downBtn.interactable = false;
-        leftBtn.interactable = false;
-        rightBtn.interactable = false;
-        waitBtn.interactable = false;
+    //public void lastMovePlaned()
+    //{
+    //    upBtn.interactable = false;
+    //    downBtn.interactable = false;
+    //    leftBtn.interactable = false;
+    //    rightBtn.interactable = false;
+    //    waitBtn.interactable = false;
 
-        backBtn.interactable = true;
-        submitBtn.interactable = true;
-    }
+    //    backBtn.interactable = true;
+    //    submitBtn.interactable = true;
+    //}
 
-    public void noMovePlaned()
-    {
-        upBtn.interactable = true;
-        downBtn.interactable = true;
-        leftBtn.interactable = true;
-        rightBtn.interactable = true;
-        waitBtn.interactable = true;
+    //public void noMovePlaned()
+    //{
+    //    upBtn.interactable = true;
+    //    downBtn.interactable = true;
+    //    leftBtn.interactable = true;
+    //    rightBtn.interactable = true;
+    //    waitBtn.interactable = true;
 
-        backBtn.interactable = false;
-        submitBtn.interactable = true;
-    }
+    //    backBtn.interactable = false;
+    //    submitBtn.interactable = true;
+    //}
 
-    public void someMovePlaned()
-    {
-        upBtn.interactable = true;
-        downBtn.interactable = true;
-        leftBtn.interactable = true;
-        rightBtn.interactable = true;
-        waitBtn.interactable = true;
+    //public void someMovePlaned()
+    //{
+    //    upBtn.interactable = true;
+    //    downBtn.interactable = true;
+    //    leftBtn.interactable = true;
+    //    rightBtn.interactable = true;
+    //    waitBtn.interactable = true;
 
-        backBtn.interactable = true;
-        submitBtn.interactable = true;
-    }
+    //    backBtn.interactable = true;
+    //    submitBtn.interactable = true;
+    //}
 
-    public void shutDownPlanButtons()
-    {
-        upBtn.interactable = false;
-        downBtn.interactable = false;
-        leftBtn.interactable = false;
-        rightBtn.interactable = false;
-        waitBtn.interactable = false;
+    //public void shutDownPlanButtons()
+    //{
+    //    upBtn.interactable = false;
+    //    downBtn.interactable = false;
+    //    leftBtn.interactable = false;
+    //    rightBtn.interactable = false;
+    //    waitBtn.interactable = false;
 
-        backBtn.interactable = false;
-        submitBtn.interactable = false;
-    }
+    //    backBtn.interactable = false;
+    //    submitBtn.interactable = false;
+    //}
 }
