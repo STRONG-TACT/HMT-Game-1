@@ -21,7 +21,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI TimerText;
 
     [Header("Team Status Panel")]
-    public GameObject CharacterInfo;
+    public GameObject TeamInfoPanel;
     public GameObject[] GoalStatusIcons = new GameObject[3];
     public GameObject[] LifeStatusIcons = new GameObject[3];
     public GameObject[] ActionStatusIcons = new GameObject[3];
@@ -87,7 +87,7 @@ public class UIManager : MonoBehaviour
         CombatUI.SetActive(false);
         
         //GoalPanel.SetActive(true);
-        CharacterInfo.SetActive(true);
+        TeamInfoPanel.SetActive(true);
         VictoryScreen.SetActive(false);
         LossScreen.SetActive(false);
 
@@ -225,6 +225,7 @@ public class UIManager : MonoBehaviour
     public void ShowCommonHUD() {
         ActionPanel.SetActive(true);
         HealthPanel.SetActive(true);
+        TeamInfoPanel.SetActive(true);
         UpdateCommonHUD();
     }
 
@@ -238,6 +239,7 @@ public class UIManager : MonoBehaviour
     public void HideCommonHUD() {
         ActionPanel.SetActive(false);
         HealthPanel.SetActive(false);
+        TeamInfoPanel.SetActive(false);
     }
 
 
@@ -279,7 +281,7 @@ public class UIManager : MonoBehaviour
         //UpdateActionPanel(currentCharacter.ActionPointsRemaining, currentCharacter.config.movement);
         
         //UpdateCharacterStats();
-        //CharacterInfo.SetActive(true);
+        //TeamInfoPanel.SetActive(true);
     }
 
     public void UpdateCharacterPlanUI() {
@@ -326,7 +328,7 @@ public class UIManager : MonoBehaviour
     public void HideCharacterPlanUI() {
         //Debug.Log("Hide Planning UI in manager");
         PlanUIPanel.SetActive(false);
-        //CharacterInfo.SetActive(false);
+        //TeamInfoPanel.SetActive(false);
         //HealthPanel.SetActive(false);
         //ActionPanel.SetActive(false);
     }

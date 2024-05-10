@@ -7,6 +7,7 @@ using Photon.Pun;
 using Photon.Pun.Demo.PunBasics;
 using GameConstant;
 using Newtonsoft.Json.Linq;
+using System.Runtime.CompilerServices;
 
 /// <summary>
 /// 4/5/24 refactor change this older version of character to a integrated version
@@ -51,7 +52,9 @@ public class Character : MonoBehaviour {
     // how many moves that the character left in this turn
     //private int actionPointsLeft;
     public bool moving = false;
-    
+
+    public bool Focused { get; private set; } = false;
+
     //This is only used for AI characters
     public Vector2Int pingCursor;
     private int pinsPlaced = 0;
@@ -317,6 +320,7 @@ public class Character : MonoBehaviour {
                     {
                         Vector3 combat_indicator_position = indicator.transform.position + indicator_offset;
                         GameObject new_combat_indicator = Instantiate(combat_indicator, combat_indicator_position, Quaternion.identity);
+                        new_combat_indicator.SetActive(Focused);
                         combat_indicator_list.Push(new_combat_indicator);
                     }
 
@@ -326,6 +330,7 @@ public class Character : MonoBehaviour {
                     if (hit.collider.gameObject.GetComponent<Tile>().fogOfWarDictionary[CharacterId] == Tile.FogOfWarState.Visible) {
                         Vector3 combat_indicator_position = indicator.transform.position + indicator_offset;
                         GameObject new_combat_indicator = Instantiate(combat_indicator, combat_indicator_position, Quaternion.identity);
+                        new_combat_indicator.SetActive(Focused);
                         combat_indicator_list.Push(new_combat_indicator);
                     }
                 }
@@ -337,6 +342,7 @@ public class Character : MonoBehaviour {
 
             //new_path_indicator.transform.Rotate(0, -180, 0);
             new_path_indicator.transform.position = midpoint;
+            new_path_indicator.SetActive(Focused);
             path_indicator_list.Push(new_path_indicator);
         }
 
@@ -566,6 +572,7 @@ public class Character : MonoBehaviour {
     
     public void FocusCharacter() {
         //MaskControl(true);
+        Focused = true;
         IntegratedMapGenerator.Instance.updateFogOfWar_map(playerId);
         if(IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
             indicator.SetActive(true);
@@ -657,6 +664,7 @@ public class Character : MonoBehaviour {
     // functions referenced only in local scene
     public void UnFocusCharacter() {
         //MaskControl(false);
+        Focused = false;
         indicator.SetActive(false);
         foreach (GameObject one_path_indicator in path_indicator_list)
         {
