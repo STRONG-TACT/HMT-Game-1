@@ -2,12 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
-using Photon.Pun;
-using Photon.Pun.Demo.PunBasics;
 using GameConstant;
 using Newtonsoft.Json.Linq;
-using System.Runtime.CompilerServices;
 
 /// <summary>
 /// 4/5/24 refactor change this older version of character to a integrated version
@@ -36,8 +32,6 @@ public class Character : MonoBehaviour {
 
     public CharacterConfig config;
     public int CharacterId;
-    private bool maskOn;
-
     public Tile currentTile;
 
     private Vector3 indicator_offset;
@@ -246,12 +240,10 @@ public class Character : MonoBehaviour {
         }
     }
     
-    public void PlacePin()
-    {
+    public void PinPlaced() {
         pinsPlaced += 1;
         pingCursor = Vector2Int.zero;
-        if (ActionPointsRemaining == 0)
-        {
+        if (ActionPointsRemaining == 0) {
             NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, true);
         }
     }
@@ -285,7 +277,8 @@ public class Character : MonoBehaviour {
     
     public void AddActionToPlan(Direction direction)
     {
-        if (ActionPointsRemaining <= 0) return;
+        if (ActionPointsRemaining <= 0 || !CheckMove(direction)) 
+            return;
 
         Vector3 moveVec = direction switch {
             Direction.Up => Vector3.forward,
@@ -350,7 +343,7 @@ public class Character : MonoBehaviour {
     }
     
     public void UndoPlanStep() {
-        if (ReadyForNextPhase) {
+        if (ReadyForNextPhase || ActionPlan.Count == 0) {
             return;
         }
         
@@ -562,14 +555,6 @@ public class Character : MonoBehaviour {
         movePoint = prevMovePointPos;
     }
     
-    private void MaskControl(bool mask)
-    {
-        if (maskOn == true)
-        {
-            visibilityMask.gameObject.SetActive(mask);
-        }
-    }
-    
     public void FocusCharacter() {
         //MaskControl(true);
         Focused = true;
@@ -590,7 +575,6 @@ public class Character : MonoBehaviour {
     public void SetUpConfig(CharacterConfig config, int characterId, GameData gameData)
     {
         this.config = config;
-        maskOn = gameData.maskOn;
         CharacterId = characterId;
         path_indicator_offset = gameData.tileSize * 0.15f;
         stepLength = gameData.tileSize + gameData.tileGapLength;

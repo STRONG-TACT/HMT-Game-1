@@ -495,7 +495,7 @@ public class IntegratedGame1Interface : HMTInterface {
                 }
 
                 PinningSystem.S.DropPinAt(pinType,pos.x, pos.y, target.CharacterId);
-                target.PlacePin();
+                target.PinPlaced();
                 break;
 
             case "submit":

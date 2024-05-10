@@ -17,8 +17,11 @@ public class UIManager : MonoBehaviour
     public GameObject HealthPanel;
     public GameObject ActionPanel;
     public Image YouAreIcon;
+
+    [Header("Timer Panel")]
     public GameObject TimerPanel;
     public TextMeshProUGUI TimerText;
+    private float lastTimeReset;
 
     [Header("Team Status Panel")]
     public GameObject TeamInfoPanel;
@@ -38,6 +41,12 @@ public class UIManager : MonoBehaviour
 
     [Header("Pinning UI")]
     public Button PinFinishBtn;
+
+    [Header("Character Switching UI")]
+    public GameObject CharacterSwitchPanel;
+    public Button DwarfBtn;
+    public Button GiantBtn;
+    public Button HumanBtn;
 
     [Header("Chracter Stats UI (Deprecated)")]
     public GameObject[] DiceStats = new GameObject[3];
@@ -80,6 +89,25 @@ public class UIManager : MonoBehaviour
         else S = this;
     }
 
+    private void Start() {
+        PinFinishBtn.onClick.AddListener(delegate { SubmitPins(); });
+
+        PlanUpBtn.onClick.AddListener(delegate { AddMoveToCharacter(Character.Direction.Up); });
+        PlanDownBtn.onClick.AddListener(delegate { AddMoveToCharacter(Character.Direction.Down); });
+        PlanLeftBtn.onClick.AddListener(delegate { AddMoveToCharacter(Character.Direction.Left); });
+        PlanRightBtn.onClick.AddListener(delegate { AddMoveToCharacter(Character.Direction.Right); });
+        PlanWaitBtn.onClick.AddListener(delegate { AddMoveToCharacter(Character.Direction.Wait); });
+
+        PlanUndoBtn.onClick.AddListener(delegate { UndoPlanStep(); });
+        PlanSubmitBtn.onClick.AddListener(delegate { SubmitPlan(); });
+
+        DwarfBtn.onClick.AddListener(delegate { SwitchCharacter(0); });
+        GiantBtn.onClick.AddListener(delegate { SwitchCharacter(1); });
+        HumanBtn.onClick.AddListener(delegate { SwitchCharacter(2); });
+
+        lastTimeReset = Time.time;
+    }
+
 
     public void InitGameUI()
     {
@@ -103,7 +131,7 @@ public class UIManager : MonoBehaviour
     {
         LossScreen.SetActive(true);
     }
-    
+
     public void UpdateGamePhaseInfo()
     {
         if (IntegratedGameManager.S.localChar.dead)
@@ -158,63 +186,42 @@ public class UIManager : MonoBehaviour
     public void LoadLevelEndUI() {
         CurrentPhaseLabel.text = "Level Conquered!";
     }
-    
-    private void UpdateHealthPanel(int health)
-    {
-        foreach (Transform child in HealthPanel.transform.GetComponentsInChildren<Transform>())
-        {
+
+    #region Common HUD
+
+    private void UpdateHealthPanel(int health) {
+        foreach (Transform child in HealthPanel.transform.GetComponentsInChildren<Transform>()) {
             child.gameObject.SetActive(false);
         }
 
-        for (int i = 0; i < health; i++)
-        {
+        for (int i = 0; i < health; i++) {
             HealthPanel.transform.GetChild(i).gameObject.SetActive(true);
         }
 
-        for (int j = 0; j < GlobalConstant.START_HEALTH - health; j++)
-        {
+        for (int j = 0; j < GlobalConstant.START_HEALTH - health; j++) {
             HealthPanel.transform.GetChild(j + GlobalConstant.START_HEALTH).gameObject.SetActive(true);
         }
 
         HealthPanel.gameObject.SetActive(true);
     }
-    
-    private void UpdateActionPanel(int current_actionPointCount, int total_actionPointCount)
-    {
-        foreach (Transform child in ActionPanel.transform.GetComponentsInChildren<Transform>())
-        {
+
+    private void UpdateActionPanel(int current_actionPointCount, int total_actionPointCount) {
+        foreach (Transform child in ActionPanel.transform.GetComponentsInChildren<Transform>()) {
             child.gameObject.SetActive(false);
         }
 
-        for (int i = 0; i < total_actionPointCount; i++)
-        {
+        for (int i = 0; i < total_actionPointCount; i++) {
             ActionPanel.transform.GetChild(i).gameObject.SetActive(true);
             ActionPanel.transform.GetChild(i).gameObject.GetComponent<Image>().sprite = gameAssets.actionpoint_grey;
         }
 
-        for (int i = 0; i < current_actionPointCount; i++)
-        {
+        for (int i = 0; i < current_actionPointCount; i++) {
             ActionPanel.transform.GetChild(i).gameObject.SetActive(true);
             ActionPanel.transform.GetChild(i).gameObject.GetComponent<Image>().sprite = gameAssets.actionpoint;
         }
 
         ActionPanel.gameObject.SetActive(true);
     }
-    
-    //private void UpdateCharacterStats()
-    //{
-    //    Character currentCharacter = IntegratedGameManager.S.localChar;
-        
-    //    DiceStats[0].GetComponent<Image>().sprite = gameAssets.GetDiceIcon(currentCharacter.config.monsterDice.type);
-    //    DiceStats[1].GetComponent<Image>().sprite = gameAssets.GetDiceIcon(currentCharacter.config.stoneDice.type);
-    //    DiceStats[2].GetComponent<Image>().sprite = gameAssets.GetDiceIcon(currentCharacter.config.trapDice.type);
-
-    //    BonusStats[0].GetComponent<TMP_Text>().text = currentCharacter.config.monsterDice.bonus.ToString();
-    //    BonusStats[1].GetComponent<TMP_Text>().text = currentCharacter.config.stoneDice.bonus.ToString();
-    //    BonusStats[2].GetComponent<TMP_Text>().text = currentCharacter.config.trapDice.bonus.ToString();
-    //}
-
-    #region Common HUD
 
     /// <summary>
     /// The Common HUD consists of the:
@@ -245,8 +252,6 @@ public class UIManager : MonoBehaviour
 
     #endregion
 
-
-
     #region Pin UI
 
     public void ShowCharacterPinUI() {
@@ -263,27 +268,24 @@ public class UIManager : MonoBehaviour
         PinFinishBtn.gameObject.SetActive(false);
     }
 
+    private void SubmitPins() {
+        PinningSystem.S.ClosePinWheel();
+        NetworkMiddleware.S.ReadyForNextPhaseLocal(IntegratedGameManager.S.localChar.CharacterId, true);
+        UpdateCharacterPinUI();
+    }
+
     #endregion
 
     #region Plan UI
 
     public void ShowCharacterPlanUI() {
-        //Character currentCharacter = IntegratedGameManager.S.localChar;
-        //Debug.Log("Enable Plan UI in UI manager");
         PlanUIPanel.SetActive(true);
         UpdateCharacterPlanUI();
-        //// TODO check the case when health == 0
-
-        //UpdateHealthPanel(currentCharacter.Health);
-        //Debug.Log($"Health: {currentCharacter.Health}");
-        //UpdateActionPanel(currentCharacter.ActionPointsRemaining, currentCharacter.config.movement);
-
-        //UpdateActionPanel(currentCharacter.ActionPointsRemaining, currentCharacter.config.movement);
-        
-        //UpdateCharacterStats();
-        //TeamInfoPanel.SetActive(true);
     }
 
+    /// <summary>
+    /// Updates accessiblity of the Plan UI buttons, always in reference to the current character.
+    /// </summary>
     public void UpdateCharacterPlanUI() {
         Character currentCharacter = IntegratedGameManager.S.localChar;
 
@@ -326,21 +328,21 @@ public class UIManager : MonoBehaviour
     }
 
     public void HideCharacterPlanUI() {
-        //Debug.Log("Hide Planning UI in manager");
         PlanUIPanel.SetActive(false);
-        //TeamInfoPanel.SetActive(false);
-        //HealthPanel.SetActive(false);
-        //ActionPanel.SetActive(false);
+    }
+    public void AddMoveToCharacter(Character.Direction direction) {
+        NetworkMiddleware.S.AddMoveToCharacterLocal(direction, IntegratedGameManager.S.localChar.CharacterId);
+    }
+
+    public void UndoPlanStep() {
+        NetworkMiddleware.S.UndoPlanStepLocal(IntegratedGameManager.S.localChar.CharacterId);
+    }
+
+    public void SubmitPlan() {
+        NetworkMiddleware.S.ReadyForNextPhaseLocal(IntegratedGameManager.S.localChar.CharacterId, true);
     }
 
     #endregion
-
-    public void UpdateActionPointsRemaining(int current_movePoints, int total_movepoints)
-    {
-        UpdateActionPanel(current_movePoints, total_movepoints);
-    }
-
-
 
     #region Combat UI
 
@@ -472,7 +474,9 @@ public class UIManager : MonoBehaviour
     }
 
     #endregion
-    
+
+    #region Team Status UI
+
     public void UpdateCharacterGoalStatus(int charID, bool reached = true)
     {
         if (reached)
@@ -533,36 +537,48 @@ public class UIManager : MonoBehaviour
 
     }
 
-    
-    public void ShowDefeatedScreen()
-    {
-        LossScreen.SetActive(true);
-    }
-
-    public IEnumerator DotsAnimation(TextMeshProUGUI dotsText)
-    {
+    public IEnumerator DotsAnimation(TextMeshProUGUI dotsText) {
         string[] dotsStates = new string[] { ".", "..", "..." };
         int currentState = 0;
-        while (true) 
-        {
+        while (true) {
             dotsText.text = dotsStates[currentState]; // Update the CurrentPhaseLabel to the current state
-            currentState = (currentState + 1) % dotsStates.Length; 
-            yield return new WaitForSeconds(0.5f); 
+            currentState = (currentState + 1) % dotsStates.Length;
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
-    public void UpdateTimer(int secondsLeft)
-    {
-        TimeSpan timeSpan = TimeSpan.FromSeconds(secondsLeft);
-        string text_to_display = string.Format("{0}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
+    #endregion
 
-        TimerText.text = text_to_display;
+    #region Timer
 
-        //TextMeshProUGUI timer_text = TimerPanel.transform.Find("Timer_text").gameObject.GetComponent<TextMeshProUGUI>();
-        //timer_text.CurrentPhaseLabel = text_to_display;
-
+    public void ResetTurnTimer() {
+        lastTimeReset = Time.time;
     }
 
+    private void UpdateTimer(int secondsLeft) {
+        TimeSpan timeSpan = TimeSpan.FromSeconds(secondsLeft);
+        TimerText.text = string.Format("{0}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
+    }
+
+    #endregion
+
+    #region CharacterSwitcher
+
+    public void ShowCharacterSwitcher() {
+        CharacterSwitchPanel.SetActive(true);
+    }
+
+    private void SwitchCharacter(int charID) {
+        IntegratedGameManager.S.SwitchCharacter(charID);
+    }
+
+    public void HideCharacterSwitcher() {
+        CharacterSwitchPanel.SetActive(false);
+    }
+
+    #endregion
+
+    #region Combat Skill Tooltip
 
     public void DisplayCombatSkills(GameObject opponent, String opponent_type) {
         Character currentCharacter = IntegratedGameManager.S.localChar;
@@ -658,8 +674,30 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
+    #endregion
+
+    private void Update() {
+
+        switch (IntegratedGameManager.S.gameStatus) {
+            case GameStatus.Player_Planning:
+                if (Time.time - lastTimeReset < GameData.S.TurntimeLimit) {
+                    UpdateTimer(GameData.S.TurntimeLimit - Mathf.RoundToInt(Time.time - lastTimeReset));
+                }
+                else {
+                    SubmitPlan();
+                }
+                break;
+            case GameStatus.Player_Pinning:
+                if (Time.time - lastTimeReset < GameData.S.TurntimeLimit) {
+                    UpdateTimer(GameData.S.TurntimeLimit - Mathf.RoundToInt(Time.time - lastTimeReset));
+                }
+                else {
+                    SubmitPins();
+                }
+
+                break;
+        }
+
         //display combat skills when mouse hover on objects
         Ray ray;
         RaycastHit[] hits;
@@ -668,8 +706,7 @@ public class UIManager : MonoBehaviour
         //Debug.Log(mainCamera.orthographicSize);
         hits = Physics.RaycastAll(ray, 1000f);
         combatSkillDisplayActive = false;
-        foreach (RaycastHit hit in hits)
-        {
+        foreach (RaycastHit hit in hits) {
             GameObject hitObject = hit.collider.gameObject;
             if (hitObject.tag == "Monster" || hitObject.tag == "Rock" || hitObject.tag == "Trap")
             {
@@ -691,7 +728,6 @@ public class UIManager : MonoBehaviour
         }
         if(!combatSkillDisplayActive) CombatSkillDisplay.SetActive(false);
     }
-
 
 
 

@@ -47,7 +47,7 @@ public class CompetitionMiddleware : MonoBehaviour
     private string phase = null;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         if (Instance == null) {
             Instance = this;
@@ -74,8 +74,19 @@ public class CompetitionMiddleware : MonoBehaviour
         }
     }
 
+    void SendPostRequestImmediate(string url, string json) {
+        using(UnityWebRequest www = UnityWebRequest.Post(url, json)) {
+            www.SetRequestHeader("Content-type", "application/json");
+            Debug.LogFormat("Sending {0} request to {1} with data {2}, with", www.method, www.url, json);
+            www.SendWebRequest();
+        }
+    }
+
+
     IEnumerator SendPostRequestFireAndForget(string url, string json) {
         using (UnityWebRequest www = UnityWebRequest.Post(url, json)) {
+            Debug.LogFormat("Sending {0} request to {1} with data {2}, with", www.method, www.url, json);
+            www.SetRequestHeader("Content-type", "application/json");
             yield return www.SendWebRequest();
             if (www.result != UnityWebRequest.Result.Success) {
                 Debug.LogError(www.error);
@@ -85,6 +96,8 @@ public class CompetitionMiddleware : MonoBehaviour
 
     IEnumerator SendPostRequestWithCallback(string url, string json, System.Action<JObject> callback) {
         using (UnityWebRequest www = UnityWebRequest.Post(url, json)) {
+            Debug.LogFormat("Sending {0} request to {1} with data {2}, with", www.method, www.url, json);
+            www.SetRequestHeader("Content-type", "application/json");
             yield return www.SendWebRequest();
             if (www.result != UnityWebRequest.Result.Success) {
                 Debug.LogError(www.error);
@@ -135,19 +148,19 @@ public class CompetitionMiddleware : MonoBehaviour
         //this can be fire and forget
     }
 
-    private void CallLogEvent(string userID, string sessionID, int eventId, string actor, string verb, string label, string value) {
-        CallLogEvent(userID, sessionID, eventId, actor, verb, new JObject { { label, value } }, false);
+    private void CallLogEvent(string userID, string sessionID, int eventId, string actor, string verb, string label, string value, bool immediate=false) {
+        CallLogEvent(userID, sessionID, eventId, actor, verb, new JObject { { label, value } }, false, immediate);
     }
 
-    private void CallLogEvent(int eventId, string actor, string verb, string label, string value) {
-        CallLogEvent(this.currUserID, this.currSessionID, eventId, actor, verb, new JObject { { label, value} }, false);
+    private void CallLogEvent(int eventId, string actor, string verb, string label, string value, bool immediate=false) {
+        CallLogEvent(this.currUserID, this.currSessionID, eventId, actor, verb, new JObject { { label, value} }, false, immediate);
     }
 
-    private void CallLogEvent(int eventId, string actor, string verb, JObject obj, bool includeContext) {
-        CallLogEvent(this.currUserID, this.currSessionID, eventId, actor, verb, obj, includeContext);
+    private void CallLogEvent(int eventId, string actor, string verb, JObject obj, bool includeContext, bool immediate=false) {
+        CallLogEvent(this.currUserID, this.currSessionID, eventId, actor, verb, obj, includeContext, immediate);
     }
 
-    private void CallLogEvent(string userID, string sessionID, int eventID, string actor, string verb, JObject obj, bool includeContext) {
+    private void CallLogEvent(string userID, string sessionID, int eventID, string actor, string verb, JObject obj, bool includeContext, bool immediate=false) {
         if(!enableLogging) { return; }
         JObject job = new JObject {
            {"api_key", serverKey},
@@ -163,7 +176,12 @@ public class CompetitionMiddleware : MonoBehaviour
         if(includeContext) {
             job["context"] = GenerateContext();
         }
-        StartCoroutine(SendPostRequestFireAndForget(flaskURL + "/log_event", JsonConvert.SerializeObject(job)));
+        if(immediate) {
+            SendPostRequestImmediate(flaskURL + "/log_event", JsonConvert.SerializeObject(job));
+        }
+        else {
+            StartCoroutine(SendPostRequestFireAndForget(flaskURL + "/log_event", JsonConvert.SerializeObject(job)));
+        }
     }
 
 
@@ -185,7 +203,7 @@ public class CompetitionMiddleware : MonoBehaviour
     }
 
     private void LogEndSession() {
-        CallLogEvent(1001, "system", "end_session", "session_id", currSessionID);
+        CallLogEvent(1001, "system", "end_session", "session_id", currSessionID, true);
         currSessionID = null;
     }
 

@@ -16,6 +16,11 @@ public class IntegratedLocalGameManager : IntegratedGameManager
         base.Awake();
     }
 
+    protected override void Start() {
+        base.Start();
+        UIManager.S.ShowCharacterSwitcher();
+    }
+
 
     protected override void StartPlayerPinningPhase()
     {
@@ -26,8 +31,12 @@ public class IntegratedLocalGameManager : IntegratedGameManager
         }
         base.StartPlayerPinningPhase();
     }
-    
-    
+
+    protected override void StartPlayerPlanningPhase() {
+        base.StartPlayerPlanningPhase();
+    }
+
+
 
     // Called by LocalPlayer.SwitchCharacter(), when player press chara buttons.
     // Update ui text/icon, pass params about current chara planning status to LocalPlayer.
@@ -57,7 +66,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
         }
        
        CameraManager.S.ChangeTargetCharacter(index);
-       IntegratedMapGenerator.Instance.updateFogOfWar_map(player.myCharacter.CharacterId);
+       IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
     }
 
 }

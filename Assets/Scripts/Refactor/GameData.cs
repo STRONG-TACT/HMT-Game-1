@@ -19,15 +19,8 @@ public class GameData : MonoBehaviour
     public float tileSize;
     public float tileGapLength; // the length between tiles, mainlt used in PlayerMovement.cs
 
-    [Tooltip("Whether this level should use fog of war or not")]
-    public bool maskOn;
-    public bool differentCameraView; // Whether the photonView size of each character is different
-    [Tooltip("Whether a moster turn shold be included in the turn rotation")]
-    public bool inlcudeMonsterTurn = false; //Whether the monsters should be inlcuded in the turn rotation
-    [Tooltip("The maximum number of combat attempts a player can make. Default=3")]
-    public int maxCombatAttempts = 3; //The maximum number of combat attempts a player can make
-
-    public Vector3[] cameraViews; // <-- next on the chopping block
+    [Tooltip("The number of seconds a player has to take their turn in each Phase.")]
+    public int TurntimeLimit = 120;
 
     public static GameData S;
 

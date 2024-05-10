@@ -97,7 +97,7 @@ public class PinningSystem : MonoBehaviour
                 }
             }
             else {
-                PinningSystem.S.Cancel();
+                PinningSystem.S.ClosePinWheel();
             }
         }
     }
@@ -110,7 +110,7 @@ public class PinningSystem : MonoBehaviour
     }
     
     // ========== Pin Wheel Buttons ==========
-    public void Cancel()
+    public void ClosePinWheel()
     {
         pinWheel.SetActive(false);
         isPinned = false;
@@ -139,6 +139,6 @@ public class PinningSystem : MonoBehaviour
         pin.SetPlacingCharacter(IntegratedGameManager.S.inSceneCharacters[charID]);
         pinObj.transform.localScale = new Vector3(4f, 4f, 4f);
         
-        Cancel();
+        ClosePinWheel();
     }
 }

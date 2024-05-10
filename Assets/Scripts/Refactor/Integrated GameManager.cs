@@ -12,7 +12,6 @@ public class IntegratedGameManager : MonoBehaviour
     [Header("Managers")]
     //protected UIManager uiManager;
     protected GameData gameData;
-    protected Player player;
     protected PinningSystem pinningSystem;
 
 
@@ -52,7 +51,6 @@ public class IntegratedGameManager : MonoBehaviour
 
     protected virtual void Start() {        
         gameData = GameData.S;
-        player = FindObjectOfType<Player>();
         pinningSystem = PinningSystem.S;
         goalCount = 0;
         localChar = inSceneCharacters[(isNetworkGame) ? NetworkMiddleware.S.myCharacterID : 0];
@@ -101,7 +99,7 @@ public class IntegratedGameManager : MonoBehaviour
         Debug.Log("Start Pinning Phase.");
         gameStatus = GameStatus.Player_Pinning;
         UIManager.S.UpdateGamePhaseInfo();
-        player.ResetTurnTimer();
+        UIManager.S.ResetTurnTimer();
 
 
         foreach (Character chara in inSceneCharacters) {
@@ -117,15 +115,6 @@ public class IntegratedGameManager : MonoBehaviour
         else {
             EndPlayerPinningPhase();
         }
-    }
-
-    public virtual void UpdateOnPinDrop(int charIdx)
-    {
-        inSceneCharacters[charIdx].PlacePin();
-        UIManager.S.UpdateCharacterPinUI();
-        UIManager.S.UpdateCommonHUD();
-        CheckPingPhaseEnd();
-
     }
 
     protected virtual bool CheckPhaseEnd() {
@@ -152,7 +141,7 @@ public class IntegratedGameManager : MonoBehaviour
         foreach (Character chara in inSceneCharacters) {
             chara.EndPingPhase();
         }
-        PinningSystem.S.Cancel();
+        PinningSystem.S.ClosePinWheel();
         UIManager.S.HideCharacterPinUI();
         //Debug.Log("Should start planning phase here.");
         StartPlayerPlanningPhase();
@@ -163,8 +152,8 @@ public class IntegratedGameManager : MonoBehaviour
         Debug.Log("Start Planning Phase.");
         //common operations only, derived classes extend this
         gameStatus = GameStatus.Player_Planning;
-        player.ResetTurnTimer();
         UIManager.S.UpdateGamePhaseInfo();
+        UIManager.S.ResetTurnTimer();
 
         foreach (Character chara in inSceneCharacters) {
             chara.StartPlanningPhase();
@@ -729,7 +718,7 @@ public class IntegratedGameManager : MonoBehaviour
     }
     protected virtual void Lose()
     {
-        UIManager.S.ShowDefeatedScreen();
+        UIManager.S.DisplayLossScreen();
     }
 
     public virtual void SwitchCharacter(int index)

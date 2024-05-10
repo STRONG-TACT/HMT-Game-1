@@ -22,6 +22,7 @@ public class IntegratedNetworkGameManager : IntegratedGameManager
     {
         base.Start();
         localChar.FocusCharacter();
+        UIManager.S.HideCharacterSwitcher();
     }
     
     public override IEnumerator StartLevel()

@@ -52,14 +52,11 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         return Random.Range(min, max);
     }
 
-    public void ReadyForNextPhaseLocal(int CharID, bool ready)
-    {
-        if (IntegratedGameManager.S.isNetworkGame)
-        {
+    public void ReadyForNextPhaseLocal(int CharID, bool ready) {
+        if (IntegratedGameManager.S.isNetworkGame) {
             photonView.RPC("ReadyForNextPhaseRPC", RpcTarget.All, CharID, ready);
         }
-        else
-        {
+        else {
             ReadyForNextPhaseRPC(CharID, ready);
         }
     }
@@ -84,7 +81,12 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     }
 
     public void MovePingCursorOnCharacterLocal(Character.Direction direction, int charID) {
-        photonView.RPC("MovePingCursorOnCharacterRPC", RpcTarget.All, direction, charID);
+        if (IntegratedGameManager.S.isNetworkGame) {
+            photonView.RPC("MovePingCursorOnCharacterRPC", RpcTarget.All, direction, charID);
+        }
+        else {
+            MovePingCursorOnCharacterRPC(direction, charID);
+        }
     }
 
     [PunRPC]
@@ -107,27 +109,10 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    private void AddMoveToCharacterRPC(Character.Direction direction, int charID)
-    {
-
+    private void AddMoveToCharacterRPC(Character.Direction direction, int charID) {
         IntegratedGameManager.S.inSceneCharacters[charID].AddActionToPlan(direction);
         UIManager.S.UpdateCommonHUD();
         UIManager.S.UpdateCharacterPlanUI();
-
-
-        //IntegratedGameManager.S.player.UpdateCharacterUI();
-        //UIManager.S.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
-
-        //if (charID != myCharacterID)
-        //{
-        //    IntegratedGameManager.S.inSceneCharacters[charID].ActionPlan.Add(direction);
-        //}
-        //else
-        //{
-        //    IntegratedGameManager.S.localChar.AddActionToPlan(direction);
-        //    IntegratedGameManager.S.player.UpdateCharacterUI();
-        //    IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
-        //}
     }
 
     public void UndoPlanStepLocal(int charID) {
@@ -144,24 +129,10 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         IntegratedGameManager.S.inSceneCharacters[charID].UndoPlanStep();
         UIManager.S.UpdateCommonHUD();
         UIManager.S.UpdateCharacterPlanUI();
-        //UIManager.S.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
-
-
-        //if (charID != myCharacterID)
-        //{
-        //    IntegratedGameManager.S.inSceneCharacters[charID].ActionPlan.RemoveAt(IntegratedGameManager.S.inSceneCharacters[charID].ActionPlan.Count-1);
-        //}
-        //else
-        //{
-        //    IntegratedGameManager.S.localChar.UndoPlanStep();
-        //    IntegratedGameManager.S.uiManager.UpdateActionPointsRemaining(IntegratedGameManager.S.localChar.ActionPointsRemaining, IntegratedGameManager.S.localChar.config.movement);
-        //}
     }
 
-    public void DropPinAtLocal(int pinTypeIdx, int row, int col, int charId)
-    {
-        if (IntegratedGameManager.S.isNetworkGame)
-        {
+    public void DropPinAtLocal(int pinTypeIdx, int row, int col, int charId) {
+        if (IntegratedGameManager.S.isNetworkGame) {
             photonView.RPC(
                 "DropPinAtRpc", 
                 RpcTarget.All,
@@ -169,17 +140,17 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
                 row, col, 
                 charId);
         }
-        else
-        {
+        else {
             DropPinAtRpc(pinTypeIdx, row, col, charId);
         }
         
     }
 
     [PunRPC]
-    private void DropPinAtRpc(int pinTypeIdx, int row, int col, int charId)
-    {
+    private void DropPinAtRpc(int pinTypeIdx, int row, int col, int charId) {
         PinningSystem.S.AddPin(pinTypeIdx, row, col, charId);
-        IntegratedGameManager.S.UpdateOnPinDrop(charId);
+        IntegratedGameManager.S.inSceneCharacters[charId].PinPlaced();
+        UIManager.S.UpdateCommonHUD();
+        UIManager.S.UpdateCharacterPinUI();
     }
 }
