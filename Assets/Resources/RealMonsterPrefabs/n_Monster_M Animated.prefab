@@ -129,7 +129,7 @@ MonoBehaviour:
   config: {fileID: 0}
   monsterId: 1
   gameData: {fileID: 0}
-  icon: {fileID: 21300000, guid: 2fc75fd01406c6348b7b6f37489c00c2, type: 3}
+  icon: {fileID: 21300000, guid: d160b3ec78d7f4d45a2f38e605f51a3b, type: 3}
   turnFinished: 0
   moving: 0
   currentTile: {fileID: 0}
