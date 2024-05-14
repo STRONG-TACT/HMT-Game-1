@@ -178,7 +178,7 @@ public class Character : MonoBehaviour {
     
     public void StartPingPhase() {
         pingCursor = Vector2Int.zero;
-        NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, dead);
+        NetworkMiddleware.S.CallReadyForNextPhase(CharacterId, dead);
     }
     
     public void EndPingPhase() {
@@ -197,7 +197,7 @@ public class Character : MonoBehaviour {
         {
             if (CharacterId == NetworkMiddleware.S.myCharacterID)
             {
-                NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, 
+                NetworkMiddleware.S.CallReadyForNextPhase(CharacterId, 
                     ActionPointsRemaining == 0 || dead);
             }
         }
@@ -244,7 +244,7 @@ public class Character : MonoBehaviour {
         pinsPlaced += 1;
         pingCursor = Vector2Int.zero;
         if (ActionPointsRemaining == 0) {
-            NetworkMiddleware.S.ReadyForNextPhaseLocal(CharacterId, true);
+            NetworkMiddleware.S.CallReadyForNextPhase(CharacterId, true);
         }
     }
     

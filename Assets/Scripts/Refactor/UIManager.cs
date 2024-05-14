@@ -271,7 +271,7 @@ public class UIManager : MonoBehaviour
 
     private void SubmitPins() {
         PinningSystem.S.ClosePinWheel();
-        NetworkMiddleware.S.ReadyForNextPhaseLocal(IntegratedGameManager.S.localChar.CharacterId, true);
+        NetworkMiddleware.S.CallReadyForNextPhase(IntegratedGameManager.S.localChar.CharacterId, true);
         UpdateCharacterPinUI();
     }
 
@@ -332,15 +332,15 @@ public class UIManager : MonoBehaviour
         PlanUIPanel.SetActive(false);
     }
     public void AddMoveToCharacter(Character.Direction direction) {
-        NetworkMiddleware.S.AddMoveToCharacterLocal(direction, IntegratedGameManager.S.localChar.CharacterId);
+        NetworkMiddleware.S.CallAddMoveToCharacter(IntegratedGameManager.S.localChar.CharacterId, direction);
     }
 
     public void UndoPlanStep() {
-        NetworkMiddleware.S.UndoPlanStepLocal(IntegratedGameManager.S.localChar.CharacterId);
+        NetworkMiddleware.S.CallUndoPlanStep(IntegratedGameManager.S.localChar.CharacterId);
     }
 
     public void SubmitPlan() {
-        NetworkMiddleware.S.ReadyForNextPhaseLocal(IntegratedGameManager.S.localChar.CharacterId, true);
+        NetworkMiddleware.S.CallReadyForNextPhase(IntegratedGameManager.S.localChar.CharacterId, true);
     }
 
     #endregion

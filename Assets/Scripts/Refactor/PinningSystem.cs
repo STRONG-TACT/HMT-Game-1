@@ -117,16 +117,10 @@ public class PinningSystem : MonoBehaviour
     }
     
     public void DropPin(int pinTypeIdx) {
-        DropPinAt(pinTypeIdx, focusedTile.row, focusedTile.col, IntegratedGameManager.S.localChar.playerId);
+        NetworkMiddleware.S.CallDropPinAt(IntegratedGameManager.S.localChar.playerId, pinTypeIdx, focusedTile.row, focusedTile.col);
     }
 
-    public void DropPinAt(int pinTypeIdx, int row, int col, int charId)
-    {
-        NetworkMiddleware.S.DropPinAtLocal(pinTypeIdx, row, col, charId);
-    }
-
-    public void AddPin(int pinIdx, int tileRow, int tileCol, int charID)
-    {
+    public void InstantiatePin(int charID, int pinIdx, int tileRow, int tileCol) {
         GameObject pinObj;
         Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(tileRow, tileCol);
 

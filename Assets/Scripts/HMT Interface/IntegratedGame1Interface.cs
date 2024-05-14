@@ -494,15 +494,12 @@ public class IntegratedGame1Interface : HMTInterface {
                     yield break;
                 }
 
-                PinningSystem.S.DropPinAt(pinType,pos.x, pos.y, target.CharacterId);
-                target.PinPlaced();
+                NetworkMiddleware.S.CallDropPinAt(target.CharacterId, pinType, pos.x, pos.y);
                 break;
 
             case "submit":
-                NetworkMiddleware.S.ReadyForNextPhaseLocal(target.CharacterId, true);
-                //target.ReadyForNextPhase = true;
+                NetworkMiddleware.S.CallReadyForNextPhase(target.CharacterId, true);
                 command.SendOKResponse("Pings Submited");
-                //manager.CheckPingPhaseEnd();  //Shouldn't need this any more because the RPC does the check.
                 break;
             case "up":
             case "down":
@@ -512,8 +509,7 @@ public class IntegratedGame1Interface : HMTInterface {
                     command.SendIllegalActionResponse("No Action Points Remaining on Pin Move",2002);
                 }
                 else {
-                    NetworkMiddleware.S.MovePingCursorOnCharacterLocal(DirectionFromString(action), target.CharacterId);
-                    //target.MovePingCusor(action);
+                    NetworkMiddleware.S.CallMovePingCursorOnCharacter(target.CharacterId, DirectionFromString(action));
                     command.SendOKResponse("Ping Cursor Moved");
                 }
                 yield break;
@@ -551,10 +547,8 @@ public class IntegratedGame1Interface : HMTInterface {
                 command.SendIllegalActionResponse("Pin Command Sent in Planning Phase",2004);
                 yield break;
             case "submit":
-                NetworkMiddleware.S.ReadyForNextPhaseLocal(target.CharacterId, true);
-                //target.ReadyForNextPhase = true;
+                NetworkMiddleware.S.CallReadyForNextPhase(target.CharacterId, true);
                 command.SendOKResponse("Plan Submited");
-                //manager.CheckPlanPhaseEnd(); //Shouldn't need this any more because the RPC does the check.
                 break;
             case "up":
                 CheckAndAddMove(target, Character.Direction.Up, command);
@@ -577,7 +571,7 @@ public class IntegratedGame1Interface : HMTInterface {
                         command.SendIllegalActionResponse("Cannot undo action, no actions to undo",2005);
                     }
                     else {
-                        target.UndoPlanStep();
+                        NetworkMiddleware.S.CallUndoPlanStep(target.CharacterId);
                         command.SendOKResponse("Action Undone");
                     }
                     yield break;
@@ -596,8 +590,7 @@ public class IntegratedGame1Interface : HMTInterface {
     private void CheckAndAddMove(Character target, Character.Direction move, Command command) {
         if (target.ActionPointsRemaining > 0) {
             if (target.CheckMove(move)) {
-                NetworkMiddleware.S.AddMoveToCharacterLocal(move, target.CharacterId);
-                //target.AddActionToPlan(move);
+                NetworkMiddleware.S.CallAddMoveToCharacter(target.CharacterId, move);
                 command.SendOKResponse("Action Added");
             }
             else {

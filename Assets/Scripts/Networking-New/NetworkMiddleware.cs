@@ -24,11 +24,11 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     public static NetworkMiddleware S;
 
-    private void Awake()
-    {
-        if (S) Destroy(this.gameObject);
-        else
-        {
+    private void Awake() {
+        if (S) {
+            Destroy(this.gameObject);
+        }
+        else {
             S = this;
             DontDestroyOnLoad(this.gameObject);
         }
@@ -39,35 +39,32 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     }
 
-    public void SetupMiddleware(int randomSeed_, int characterID_)
-    {
+    public void SetupMiddleware(int randomSeed_, int characterID_) {
         randomSeed = randomSeed_;
         myCharacterID = characterID_ - 1;
         Random.InitState(randomSeed);
         Debug.Log($"Player {characterID_} middleware setup with random seed {randomSeed}");
     }
 
-    public int NextRandomInt(int min, int max)
-    {
+    public int NextRandomInt(int min, int max) {
         return Random.Range(min, max);
     }
 
-    public void ReadyForNextPhaseLocal(int CharID, bool ready) {
+    public void CallReadyForNextPhase(int charID, bool ready) {
         if (IntegratedGameManager.S.isNetworkGame) {
-            photonView.RPC("ReadyForNextPhaseRPC", RpcTarget.All, CharID, ready);
+            photonView.RPC("ReadyForNextPhaseLocal", RpcTarget.All, charID, ready);
         }
         else {
-            ReadyForNextPhaseRPC(CharID, ready);
+            ReadyForNextPhaseLocal(charID, ready);
         }
     }
 
     [PunRPC]
-    private void ReadyForNextPhaseRPC(int CharID, bool ready)
-    {
+    private void ReadyForNextPhaseLocal(int charID, bool ready) {
         
-        IntegratedGameManager.S.inSceneCharacters[CharID].ReadyForNextPhase = ready;
+        IntegratedGameManager.S.inSceneCharacters[charID].ReadyForNextPhase = ready;
         UIManager.S.UpdateCommonHUD();
-        UIManager.S.UpdateCharacterActionStatus(CharID, ready);
+        UIManager.S.UpdateCharacterActionStatus(charID, ready);
         
         if (ready) {
             if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning) {
@@ -80,75 +77,74 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         }
     }
 
-    public void MovePingCursorOnCharacterLocal(Character.Direction direction, int charID) {
+    public void CallMovePingCursorOnCharacter(int charID, Character.Direction direction) {
         if (IntegratedGameManager.S.isNetworkGame) {
-            photonView.RPC("MovePingCursorOnCharacterRPC", RpcTarget.All, direction, charID);
+            photonView.RPC("MovePingCursorOnCharacterLocal", RpcTarget.All,charID, direction);
         }
         else {
-            MovePingCursorOnCharacterRPC(direction, charID);
+            MovePingCursorOnCharacterLocal(charID, direction);
         }
     }
 
     [PunRPC]
-    private void MovePingCursorOnCharacterRPC(Character.Direction direction, int charID) {
+    private void MovePingCursorOnCharacterLocal(int charID, Character.Direction direction) {
         if (charID != myCharacterID) {
             IntegratedGameManager.S.inSceneCharacters[charID].MovePingCursor(direction);
         }
     }
 
 
-    public void AddMoveToCharacterLocal(Character.Direction direction, int charID)
-    {
+    public void CallAddMoveToCharacter(int charID, Character.Direction direction) {
         if (IntegratedGameManager.S.isNetworkGame) {
-            photonView.RPC("AddMoveToCharacterRPC", RpcTarget.All, direction, charID);
+            photonView.RPC("AddMoveToCharacterLocal", RpcTarget.All, charID, direction);
         }
         
         else {
-            AddMoveToCharacterRPC(direction, charID);
+            AddMoveToCharacterLocal(charID, direction);
         }
     }
 
     [PunRPC]
-    private void AddMoveToCharacterRPC(Character.Direction direction, int charID) {
+    private void AddMoveToCharacterLocal(int charID, Character.Direction direction) {
         IntegratedGameManager.S.inSceneCharacters[charID].AddActionToPlan(direction);
         UIManager.S.UpdateCommonHUD();
         UIManager.S.UpdateCharacterPlanUI();
     }
 
-    public void UndoPlanStepLocal(int charID) {
+    public void CallUndoPlanStep(int charID) {
         if (IntegratedGameManager.S.isNetworkGame) {
-            photonView.RPC("UndoPlanStepRpc", RpcTarget.All, charID);
+            photonView.RPC("UndoPlanStepLocal", RpcTarget.All, charID);
         }
         else {
-            UndoPlanStepRpc(charID);
+            UndoPlanStepLocal(charID);
         }
     }
 
     [PunRPC]
-    private void UndoPlanStepRpc(int charID) {
+    private void UndoPlanStepLocal(int charID) {
         IntegratedGameManager.S.inSceneCharacters[charID].UndoPlanStep();
         UIManager.S.UpdateCommonHUD();
         UIManager.S.UpdateCharacterPlanUI();
     }
 
-    public void DropPinAtLocal(int pinTypeIdx, int row, int col, int charId) {
+    public void CallDropPinAt(int charId, int pinTypeIdx, int row, int col) {
         if (IntegratedGameManager.S.isNetworkGame) {
             photonView.RPC(
-                "DropPinAtRpc", 
+                "DropPinAtLocal", 
                 RpcTarget.All,
                 pinTypeIdx, 
                 row, col, 
                 charId);
         }
         else {
-            DropPinAtRpc(pinTypeIdx, row, col, charId);
+            DropPinAtLocal(charId, pinTypeIdx, row, col);
         }
         
     }
 
     [PunRPC]
-    private void DropPinAtRpc(int pinTypeIdx, int row, int col, int charId) {
-        PinningSystem.S.AddPin(pinTypeIdx, row, col, charId);
+    private void DropPinAtLocal(int charId, int pinTypeIdx, int row, int col) {
+        PinningSystem.S.InstantiatePin(pinTypeIdx, row, col, charId);
         IntegratedGameManager.S.inSceneCharacters[charId].PinPlaced();
         UIManager.S.UpdateCommonHUD();
         UIManager.S.UpdateCharacterPinUI();
