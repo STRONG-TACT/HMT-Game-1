@@ -50,6 +50,22 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         return Random.Range(min, max);
     }
 
+    /// <summary>
+    /// This is similar to the CallReadForNextPhase method but is meant to only be called when a 
+    /// Ready state is set automatically rather than by player action. In this case the RPCs should 
+    /// only come from MasterClient to avoid duplicate messaging.
+    /// </summary>
+    /// <param name="charID"></param>
+    /// <param name="ready"></param>
+    public void CallReadyForNextPhaseAuto(int charID, bool ready) {
+        if (IntegratedGameManager.S.isNetworkGame && PhotonNetwork.IsMasterClient) {
+            photonView.RPC("ReadyForNextPhaseLocal", RpcTarget.All, charID, ready);
+        }
+        else {
+            ReadyForNextPhaseLocal(charID, ready);
+        }
+    }
+
     public void CallReadyForNextPhase(int charID, bool ready) {
         if (IntegratedGameManager.S.isNetworkGame) {
             photonView.RPC("ReadyForNextPhaseLocal", RpcTarget.All, charID, ready);
@@ -88,9 +104,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     [PunRPC]
     private void MovePingCursorOnCharacterLocal(int charID, Character.Direction direction) {
-        if (charID != myCharacterID) {
-            IntegratedGameManager.S.inSceneCharacters[charID].MovePingCursor(direction);
-        }
+        IntegratedGameManager.S.inSceneCharacters[charID].MovePingCursor(direction);
     }
 
 

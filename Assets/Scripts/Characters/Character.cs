@@ -193,18 +193,7 @@ public class Character : MonoBehaviour {
     public void StartPlanningPhase()
     {
         ResetPlan();
-        if (IntegratedGameManager.S.isNetworkGame)
-        {
-            if (CharacterId == NetworkMiddleware.S.myCharacterID)
-            {
-                NetworkMiddleware.S.CallReadyForNextPhase(CharacterId, 
-                    ActionPointsRemaining == 0 || dead);
-            }
-        }
-        else
-        {
-            ReadyForNextPhase = ActionPointsRemaining == 0 || dead;
-        }
+        NetworkMiddleware.S.CallReadyForNextPhaseAuto(CharacterId, ActionPointsRemaining == 0 || dead);
     }
 
     public bool MovePingCursor(Character.Direction direction) {
@@ -446,16 +435,6 @@ public class Character : MonoBehaviour {
             model.rotation = targetRotation;
         }
 
-        if (IntegratedGameManager.S.isNetworkGame)
-        {
-            if (CharacterId == NetworkMiddleware.S.myCharacterID)
-                IntegratedMapGenerator.Instance.updateFogOfWar_map(CharacterId);
-        }
-        else
-        {
-            IntegratedMapGenerator.Instance.updateFogOfWar_map(CharacterId);
-        }
-
         IntegratedMapGenerator.Instance.UpdateFOWVisuals();
 
         State = CharacterState.Idle;
@@ -527,7 +506,6 @@ public class Character : MonoBehaviour {
             dead = false;
             gameObject.SetActive(true);
             health = 3;
-            IntegratedMapGenerator.Instance.updateFogOfWar_map(CharacterId);
             IntegratedMapGenerator.Instance.UpdateFOWVisuals();
         }
     }
@@ -545,22 +523,13 @@ public class Character : MonoBehaviour {
     public void Retreat()
     {
         transform.position = prevMovePointPos;
-        if (IntegratedGameManager.S.isNetworkGame)
-        {
-            if (CharacterId == NetworkMiddleware.S.myCharacterID)
-                IntegratedMapGenerator.Instance.updateFogOfWar_map(CharacterId);
-        }
-        else
-        {
-            IntegratedMapGenerator.Instance.updateFogOfWar_map(CharacterId);
-        }
+        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
         movePoint = prevMovePointPos;
     }
     
     public void FocusCharacter() {
         //MaskControl(true);
         Focused = true;
-        IntegratedMapGenerator.Instance.updateFogOfWar_map(playerId);
         IntegratedMapGenerator.Instance.UpdateFOWVisuals();
         if(IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
             indicator.SetActive(true);

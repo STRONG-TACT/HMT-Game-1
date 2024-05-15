@@ -69,7 +69,7 @@ public class IntegratedGameManager : MonoBehaviour
 
     protected virtual void StartPlayerTurn()
     {
-        IntegratedMapGenerator.Instance.updateFogOfWar_map(IntegratedGameManager.S.localChar.CharacterId);
+        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
         remainingCharacterCount = 3;
 
         foreach (Character chara in inSceneCharacters)
@@ -455,7 +455,6 @@ public class IntegratedGameManager : MonoBehaviour
                 }
 
                 //problem -> need to fix
-                IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
                 IntegratedMapGenerator.Instance.UpdateFOWVisuals();
             }
             else
@@ -535,7 +534,6 @@ public class IntegratedGameManager : MonoBehaviour
                         m.Retreat();
                     }
                 }
-                IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
                 IntegratedMapGenerator.Instance.UpdateFOWVisuals();
             }
 
@@ -558,7 +556,6 @@ public class IntegratedGameManager : MonoBehaviour
             UIManager.S.HideCombatUI();
         }
         yield break;
-        IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
         // This should only be called as a sub-coroutine of the main moving one so it
         // doesn't need to restart them, it should just yield break
         //if (gameStatus == GameStatus.Player_Moving)
