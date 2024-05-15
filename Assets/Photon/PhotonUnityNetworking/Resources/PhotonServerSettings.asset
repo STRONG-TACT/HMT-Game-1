@@ -75,6 +75,11 @@ MonoBehaviour:
   - MovePingCursorOnCharacterRPC
   - DropPinAtRpc
   - HandshakeSessionIds
+  - AddMoveToCharacterLocal
+  - DropPinAtLocal
+  - MovePingCursorOnCharacterLocal
+  - ReadyForNextPhaseLocal
+  - UndoPlanStepLocal
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
