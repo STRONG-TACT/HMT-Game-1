@@ -19,6 +19,7 @@ public class IntegratedGameManager : MonoBehaviour
     [Header("Game States")]
     public Character localChar;
     public GameStatus gameStatus = GameStatus.GetReady;
+    public int CurrentRound { get; protected set; } = 0;
     public int goalCount = 0;
     protected int remainingCharacterCount = 3;
     private Queue<Tile> eventQueue = new Queue<Tile>();
@@ -60,6 +61,7 @@ public class IntegratedGameManager : MonoBehaviour
 
     public virtual IEnumerator StartLevel() {
         gameStatus = GameStatus.GetReady;
+        CurrentRound = 0;
         UIManager.S.InitGameUI();
         UIManager.S.ResetTeamActionStatus();
         yield return new WaitForFixedUpdate();
@@ -70,6 +72,7 @@ public class IntegratedGameManager : MonoBehaviour
     protected virtual void StartPlayerTurn()
     {
         IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+        CurrentRound += 1;
         remainingCharacterCount = 3;
 
         foreach (Character chara in inSceneCharacters)

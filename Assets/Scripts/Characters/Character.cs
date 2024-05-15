@@ -572,49 +572,35 @@ public class Character : MonoBehaviour {
     }
     
     public JObject HMTStateRep(StateRepLevel level = StateRepLevel.Full) {
+        JObject ret = new JObject {
+            {"entityType", "Character" },
+            {"objKey", config.type.ToString() },
+            {"id", config.characterName},
+            {"characterId", CharacterId },
+            {"sightRange", config.sightRange },
+            {"monsterDice", config.monsterDice.ToString()},
+            {"trapDice", config.trapDice.ToString() },
+            {"stoneDice", config.stoneDice.ToString() },
+            {"ready", ReadyForNextPhase },      //This is visible in the TeamStatus UI so should always be here
+            {"dead", dead},                     //This is visible in the TeamStatus UI so should always be here
+        };
+
         switch (level) {
             case StateRepLevel.Full:
-                return new JObject {
-                    {"name", config.characterName},
-                    {"characterId", CharacterId },
-                    {"type", config.type.ToString()},
-                    {"sightRange", config.sightRange },
-                    {"monsterDice", config.monsterDice.ToString()},
-                    {"trapDice", config.trapDice.ToString() },
-                    {"stoneDice", config.stoneDice.ToString() },
-                    {"health", health},
-                    {"dead", dead},
-                    {"actionPoints", ActionPointsRemaining},
-                    {"actionPlan", new JArray(ActionPlan.Select(d => d.ToString())) }
-                };
+                ret["health"] = health;
+                ret["actionPoints"] = ActionPointsRemaining;
+                ret["actionPlan"] = new JArray(ActionPlan.Select(d => d.ToString()));
+                break;
             case StateRepLevel.TeamVisible:
-                return new JObject {
-                    {"name", config.characterName},
-                    {"characterId", CharacterId },
-                    {"type", config.type.ToString()},
-                    {"sightRange", config.sightRange },
-                    {"monsterDice", config.monsterDice.ToString()},
-                    {"trapDice", config.trapDice.ToString() },
-                    {"stoneDice", config.stoneDice.ToString() },
-                    {"health", health},
-                    {"dead", dead},
-                };
+                ret["health"] = health;         //Not sure why we agreed this should be here? It's not someting a human player can see
+                break;
             case StateRepLevel.TeamUnseen:
-                return new JObject {
-                    {"name", config.characterName},
-                    {"characterId", CharacterId },
-                    {"type", config.type.ToString()},
-                    {"sightRange", config.sightRange },
-                    {"monsterDice", config.monsterDice.ToString()},
-                    {"trapDice", config.trapDice.ToString() },
-                    {"stoneDice", config.stoneDice.ToString() },
-                    {"health", health},
-                    {"dead", dead},
-                };
+                break;
             default:
                 Debug.LogWarningFormat("Unknown StateRepLevel: {0}", level);
                 goto case StateRepLevel.Full;
         }
+        return ret;
     }
     
     // functions referenced only in local scene
