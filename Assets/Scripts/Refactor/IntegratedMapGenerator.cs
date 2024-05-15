@@ -44,10 +44,12 @@ public class IntegratedMapGenerator : MonoBehaviour
     }
 
     public void updateFogOfWar_map(int characterID)
+    public void UpdateFOWVisuals()
     {
         foreach (Tile tile in Map)
         {
             tile.updateFogOfWar_tile(characterID);
+            tile.SetFOWVisualsToCharacter(IntegratedGameManager.S.localChar.CharacterId);
         }
     }
 

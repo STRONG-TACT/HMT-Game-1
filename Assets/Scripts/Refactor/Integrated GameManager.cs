@@ -456,6 +456,7 @@ public class IntegratedGameManager : MonoBehaviour
 
                 //problem -> need to fix
                 IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
+                IntegratedMapGenerator.Instance.UpdateFOWVisuals();
             }
             else
             {
@@ -535,6 +536,7 @@ public class IntegratedGameManager : MonoBehaviour
                     }
                 }
                 IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
+                IntegratedMapGenerator.Instance.UpdateFOWVisuals();
             }
 
             //TODO this should probably be waiting for a button click in the future.

@@ -456,6 +456,7 @@ public class Character : MonoBehaviour {
             IntegratedMapGenerator.Instance.updateFogOfWar_map(CharacterId);
         }
 
+        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
 
         State = CharacterState.Idle;
         moving = false;
@@ -527,6 +528,7 @@ public class Character : MonoBehaviour {
             gameObject.SetActive(true);
             health = 3;
             IntegratedMapGenerator.Instance.updateFogOfWar_map(CharacterId);
+            IntegratedMapGenerator.Instance.UpdateFOWVisuals();
         }
     }
     
@@ -559,6 +561,7 @@ public class Character : MonoBehaviour {
         //MaskControl(true);
         Focused = true;
         IntegratedMapGenerator.Instance.updateFogOfWar_map(playerId);
+        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
         if(IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
             indicator.SetActive(true);
             foreach (GameObject one_path_indicator in path_indicator_list)

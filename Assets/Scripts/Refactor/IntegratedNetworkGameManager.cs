@@ -33,11 +33,11 @@ public class IntegratedNetworkGameManager : IntegratedGameManager
         
         yield return base.StartLevel();
         // this call will mark every tile as unseen
-        // IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
+        // IntegratedMapGenerator.Instance.UpdateFOWVisuals(localChar.CharacterId);
         // this call actually setup the correct FOW
         // the delay is needed because internal state of FOW needs physics trigger to work
         yield return new WaitForFixedUpdate();
-        IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
+        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
     }
 
 }

@@ -364,7 +364,7 @@ public class Tile : MonoBehaviour
 
 
 
-    public void updateFogOfWar_tile(int characterID)
+    public void SetFOWVisualsToCharacter(int characterID)
     {
         if (this.fogOfWarDictionary[characterID] == FogOfWarState.Unseen)
         {

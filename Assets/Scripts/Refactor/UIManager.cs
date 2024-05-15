@@ -109,17 +109,16 @@ public class UIManager : MonoBehaviour
         lastTimeReset = Time.time;
     }
 
+    private void Update() {
+        UpdateTimer();
+        UpdateTooltipHover();
+    }
 
-    public void InitGameUI()
-    {
+
+    public void InitGameUI() {
         CurrentPhaseLabel.text = "Level Starting";
-        CombatUI.SetActive(false);
-        
-        //GoalPanel.SetActive(true);
-        TeamInfoPanel.SetActive(true);
-        VictoryScreen.SetActive(false);
-        LossScreen.SetActive(false);
-
+        HideCombatUI();
+        ShowCommonHUD();
         VictoryScreen.SetActive(false);
         LossScreen.SetActive(false);
     }
@@ -552,13 +551,47 @@ public class UIManager : MonoBehaviour
 
     #region Timer
 
+    public float TimeRemaining {
+        get {
+            switch (IntegratedGameManager.S.gameStatus) {
+                case GameStatus.Player_Pinning:
+                case GameStatus.Player_Planning:
+                    return GameData.S.TurntimeLimit - Mathf.RoundToInt(Time.time - lastTimeReset);
+                default:
+                    return float.PositiveInfinity;
+            }
+        }
+    }
+
     public void ResetTurnTimer() {
         lastTimeReset = Time.time;
     }
 
-    private void UpdateTimer(int secondsLeft) {
-        TimeSpan timeSpan = TimeSpan.FromSeconds(secondsLeft);
-        TimerText.text = string.Format("{0}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
+    private void UpdateTimer() {
+        if (float.IsInfinity(TimeRemaining)) {
+            TimerText.text = "\u221E";
+        }
+        else {
+            TimeSpan timeSpan = TimeSpan.FromSeconds(TimeRemaining);
+            TimerText.text = string.Format("{0}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
+            if (TimeRemaining < 10) {
+                TimerText.color = Color.red;
+            }
+            else {
+                TimerText.color = Color.white;
+            }
+            if (TimeRemaining <= 0) {
+                switch (IntegratedGameManager.S.gameStatus) {
+                    case GameStatus.Player_Planning:
+                        SubmitPlan();
+                        break;
+                    case GameStatus.Player_Pinning:
+                        SubmitPins();
+                        break;
+                }
+            }
+
+        }
     }
 
     #endregion
@@ -602,6 +635,36 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region Combat Skill Tooltip
+
+    private void UpdateTooltipHover() {
+        //display combat skills when mouse hover on objects
+        Ray ray;
+        RaycastHit[] hits;
+        Camera mainCamera = Camera.main;
+        ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        //Debug.Log(mainCamera.orthographicSize);
+        hits = Physics.RaycastAll(ray, 1000f);
+        combatSkillDisplayActive = false;
+        foreach (RaycastHit hit in hits) {
+            GameObject hitObject = hit.collider.gameObject;
+            if (hitObject.tag == "Monster" || hitObject.tag == "Rock" || hitObject.tag == "Trap") {
+                Tile.FogOfWarState visibility;
+                if (hitObject.tag == "Monster") {
+                    visibility = hitObject.GetComponent<Monster>().currentTile.fogOfWarDictionary[IntegratedGameManager.S.localChar.CharacterId];
+                }
+                else {
+                    visibility = hitObject.GetComponent<Tile>().fogOfWarDictionary[IntegratedGameManager.S.localChar.CharacterId];
+                }
+                if (!combatSkillDisplayActive && visibility == Tile.FogOfWarState.Visible) {
+                    combatSkillDisplayActive = true;
+                    DisplayCombatSkills(hitObject, hitObject.tag);
+                }
+            }
+        }
+        if (!combatSkillDisplayActive) CombatSkillDisplay.SetActive(false);
+    }
+
+
 
     public void DisplayCombatSkills(GameObject opponent, String opponent_type) {
         Character currentCharacter = IntegratedGameManager.S.localChar;
@@ -699,58 +762,7 @@ public class UIManager : MonoBehaviour
 
     #endregion
 
-    private void Update() {
 
-        switch (IntegratedGameManager.S.gameStatus) {
-            case GameStatus.Player_Planning:
-                if (Time.time - lastTimeReset < GameData.S.TurntimeLimit) {
-                    UpdateTimer(GameData.S.TurntimeLimit - Mathf.RoundToInt(Time.time - lastTimeReset));
-                }
-                else {
-                    SubmitPlan();
-                }
-                break;
-            case GameStatus.Player_Pinning:
-                if (Time.time - lastTimeReset < GameData.S.TurntimeLimit) {
-                    UpdateTimer(GameData.S.TurntimeLimit - Mathf.RoundToInt(Time.time - lastTimeReset));
-                }
-                else {
-                    SubmitPins();
-                }
-
-                break;
-        }
-
-        //display combat skills when mouse hover on objects
-        Ray ray;
-        RaycastHit[] hits;
-        Camera mainCamera = Camera.main;
-        ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        //Debug.Log(mainCamera.orthographicSize);
-        hits = Physics.RaycastAll(ray, 1000f);
-        combatSkillDisplayActive = false;
-        foreach (RaycastHit hit in hits) {
-            GameObject hitObject = hit.collider.gameObject;
-            if (hitObject.tag == "Monster" || hitObject.tag == "Rock" || hitObject.tag == "Trap")
-            {
-                Tile.FogOfWarState visibility;
-                if (hitObject.tag == "Monster")
-                {
-                    visibility = hitObject.GetComponent<Monster>().currentTile.fogOfWarDictionary[IntegratedGameManager.S.localChar.CharacterId];
-                }
-                else
-                {
-                    visibility = hitObject.GetComponent<Tile>().fogOfWarDictionary[IntegratedGameManager.S.localChar.CharacterId];
-                }
-                if (!combatSkillDisplayActive && visibility == Tile.FogOfWarState.Visible)
-                {
-                    combatSkillDisplayActive = true;
-                    DisplayCombatSkills(hitObject, hitObject.tag);
-                }
-            }
-        }
-        if(!combatSkillDisplayActive) CombatSkillDisplay.SetActive(false);
-    }
 
 
 

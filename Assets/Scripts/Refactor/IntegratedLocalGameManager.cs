@@ -65,7 +65,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
         }
        
        CameraManager.S.ChangeTargetCharacter(index);
-       IntegratedMapGenerator.Instance.updateFogOfWar_map(localChar.CharacterId);
+       IntegratedMapGenerator.Instance.UpdateFOWVisuals();
     }
 
 }
