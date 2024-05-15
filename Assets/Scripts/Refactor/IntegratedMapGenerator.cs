@@ -11,6 +11,7 @@ public class IntegratedMapGenerator : MonoBehaviour
     public GameData gameData;
     public Transform tileParent;
     public Tile[,] Map;
+    public string CurrentLevelName { get; private set; }
 
     public Dictionary<string, string> AlternateSchema = new Dictionary<string, string>()
     {
@@ -43,12 +44,10 @@ public class IntegratedMapGenerator : MonoBehaviour
         Instance = this;
     }
 
-    public void updateFogOfWar_map(int characterID)
     public void UpdateFOWVisuals()
     {
         foreach (Tile tile in Map)
         {
-            tile.updateFogOfWar_tile(characterID);
             tile.SetFOWVisualsToCharacter(IntegratedGameManager.S.localChar.CharacterId);
         }
     }
@@ -97,37 +96,41 @@ public class IntegratedMapGenerator : MonoBehaviour
         // Split the file content into lines
         string[] lines = levelTextFile.text.Split('\n');
 
+        CurrentLevelName = lines[0].Trim(); 
+        string[] dimensions = lines[1].Split('x');
+        int colCount = int.Parse(dimensions[0]);
+        int rowCount = int.Parse(dimensions[1]);
+
+        //string[,] tileStrings = new string[colCount, rowCount];
+
+        Map = new Tile[colCount, rowCount];
+
+
         // Create a list to store tile data temporarily
         List<List<string>> tiles = new List<List<string>>();
 
         // Loop through each line and extract tiles
-        for (int i = 0; i < lines.Length; i++)
-        {
-            List<string> tileRow = new List<string>();
-            for (int j = 0; j < lines[i].Length; j += 2)
-            {
+        for (int i = 2; i < lines.Length; i++) {
+            for (int j = 0; j < lines[i].Length; j += 2) {
                 if (j + 1 < lines[i].Length) // make sure there is a pair of characters
                 {
+                    
                     string tile = lines[i][j].ToString() + lines[i][j + 1].ToString();
-                    tileRow.Add(tile);
+                    Debug.LogFormat("Adding Tile {0} at {1}, {2}", tile , j / 2, rowCount - i + 1);
+                    Map[  j / 2, rowCount - i + 1] = SpawnTile(rowCount - i + 1, j / 2,  tile);
                 }
             }
-            tiles.Add(tileRow);
         }
-
-        int rowCount = tiles.Count;
-        int colCount = tiles[0].Count;
         
-        Map = new Tile[rowCount, colCount];
-
+     
         // Calculate map width and length
         float mapWidth = colCount * (gameData.tileSize + gameData.tileGapLength) - gameData.tileGapLength;
-        float mapLength = rowCount * (gameData.tileSize + gameData.tileGapLength) - gameData.tileGapLength;
+        float mapHeight = rowCount * (gameData.tileSize + gameData.tileGapLength) - gameData.tileGapLength;
         // Calculate the middle point of map width and length
         float mapWidthMid = (colCount - 1) * (gameData.tileSize + gameData.tileGapLength) / 2;
-        float mapLengthMid = (rowCount - 1) * (gameData.tileSize + gameData.tileGapLength) / 2;
+        float mapHeightMid = (rowCount - 1) * (gameData.tileSize + gameData.tileGapLength) / 2;
 
-        for (int i = 0; i < rowCount; i++)
+/*        for (int i = 0; i < rowCount; i++)
         {
             Debug.Log("New Line");
             for (int j = 0; j < colCount; j++) {
@@ -135,21 +138,25 @@ public class IntegratedMapGenerator : MonoBehaviour
                 Map[i,j] = SpawnTile(i, j, tiles[i][j]);
             }
         }
-
-        GameObject wall1 = Instantiate(gameAssets.MapBoundary, new Vector3(-mapWidthMid, 0, 1), Quaternion.identity, tileParent);
-        wall1.GetComponent<BoxCollider>().size = new Vector3(mapWidth, 1, 1);
-        GameObject wall2 = Instantiate(gameAssets.MapBoundary, new Vector3(-mapWidthMid, 0, -mapLength), Quaternion.identity, tileParent);
-        wall2.GetComponent<BoxCollider>().size = new Vector3(mapWidth, 1, 1);
-        GameObject wall3 = Instantiate(gameAssets.MapBoundary, new Vector3(1, 0, -mapLengthMid), Quaternion.identity, tileParent);
-        wall3.GetComponent<BoxCollider>().size = new Vector3(1, 1, mapLength);
-        GameObject wall4 = Instantiate(gameAssets.MapBoundary, new Vector3(-mapWidth, 0, -mapLengthMid), Quaternion.identity, tileParent);
-        wall4.GetComponent<BoxCollider>().size = new Vector3(1, 1, mapLength);
+*/
+        GameObject wallSW = Instantiate(gameAssets.MapBoundary, new Vector3(mapWidthMid, 0, -1), Quaternion.identity, tileParent);
+        wallSW.GetComponent<BoxCollider>().size = new Vector3(mapWidth, 1, 1);
+        wallSW.name = "WallSW";
+        GameObject wallNW = Instantiate(gameAssets.MapBoundary, new Vector3(-1, 0, mapHeightMid), Quaternion.identity, tileParent);
+        wallNW.GetComponent<BoxCollider>().size = new Vector3(1, 1, mapHeight);
+        wallNW.name = "WallNW";
+        GameObject wallNE = Instantiate(gameAssets.MapBoundary, new Vector3(mapWidthMid, 0, mapHeight), Quaternion.identity, tileParent);
+        wallNE.GetComponent<BoxCollider>().size = new Vector3(mapWidth, 1, 1);
+        wallNE.name = "WallNE";
+        GameObject wallSE = Instantiate(gameAssets.MapBoundary, new Vector3(mapWidth, 0, mapHeightMid), Quaternion.identity, tileParent);
+        wallSE.GetComponent<BoxCollider>().size = new Vector3(1, 1, mapHeight);
+        wallSE.name = "WallSE";
     }
 
     private Tile SpawnTile(int row, int col, string code)
     {
-        float x = - col * (gameData.tileSize + gameData.tileGapLength);
-        float z = - row * (gameData.tileSize + gameData.tileGapLength);
+        float x = col * (gameData.tileSize + gameData.tileGapLength);
+        float z = row * (gameData.tileSize + gameData.tileGapLength);
         string name = SearchSchema(code);
 
         GameObject tileObj = null;

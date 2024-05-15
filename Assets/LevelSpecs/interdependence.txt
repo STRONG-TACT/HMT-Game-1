@@ -1,3 +1,5 @@
+interdependence
+7x7
 ####1S2S3S####
 3GM2##..######
 M2..M1..M1..##

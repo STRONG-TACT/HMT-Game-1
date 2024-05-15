@@ -4386,6 +4386,10 @@ PrefabInstance:
       value: n_CompetitionManager
       objectReference: {fileID: 0}
     - target: {fileID: 4543776451520676383, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
+      propertyPath: enableLogging
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4543776451520676383, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
       propertyPath: overrideAIMode
       value: 1
       objectReference: {fileID: 0}
