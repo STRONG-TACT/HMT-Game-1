@@ -53,22 +53,21 @@ public class NetworkLobbyManager : MonoBehaviour
 #endif
 
 
-    public void LocalTestSelected()
-    {
+    public void LocalTestSelected() {
+        string runID = System.Guid.NewGuid().ToString();
+        CompetitionMiddleware.Instance.LogStartRunLocal(runID);
         SceneManager.LoadScene(GlobalConstant.LOCAL_SCENE);
     }
     
     // ============ Server Connection & Handle ============
 
-    public void OnlinePlaySelected()
-    {
+    public void OnlinePlaySelected() {
         onBoardingState = OnBoardingState.Loading;
         LobbyNetwork.S.TryConnectToServer();
         LobbyUI.S.ShowLoadingUI("Connecting to Server...");
     }
 
-    public void OnConnectToServer()
-    {
+    public void OnConnectToServer() {
         onBoardingState = OnBoardingState.ChooseJoinRoomMode;
         // LobbyUI.S.ShowJoinRoomModeUI();
         CreateOrJoinRoomSelected();

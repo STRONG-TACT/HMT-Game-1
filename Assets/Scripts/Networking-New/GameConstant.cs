@@ -10,6 +10,7 @@ namespace GameConstant
         public const string LOCAL_SCENE = "Local_Animated";
         public const string NETWORK_SCENE = "NetworkGamePlay";
         public const int START_HEALTH = 3;
+        public const string GAME_VERSION = "1.0.0";
     }
     
     public enum OnBoardingState

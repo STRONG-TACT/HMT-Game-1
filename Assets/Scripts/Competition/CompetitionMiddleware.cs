@@ -4,9 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using GameConstant;
+using Photon.Pun;
 
-public class CompetitionMiddleware : MonoBehaviour
-{
+public class CompetitionMiddleware : MonoBehaviour {
 
     public static CompetitionMiddleware Instance = null;
 
@@ -30,14 +31,22 @@ public class CompetitionMiddleware : MonoBehaviour
     }
 
     public Dictionary<string, AgentRecord> RegisteredAgents = new Dictionary<string, AgentRecord>();
-    
-    public bool IsAI { get {
-        #if HMT_BUILD
+
+    public bool IsAI {
+        get {
+#if HMT_BUILD
             return !overrideAIMode;
-        #else
+#else
             return false;
-        #endif
-    } }
+#endif
+        }
+    }
+
+    private bool LogSystemEvents {
+        get {
+            return PhotonNetwork.IsMasterClient || (IntegratedGameManager.S != null && !IntegratedGameManager.S.isNetworkGame);
+        }
+    }
 
     private string currUserID = null;
     private string currSessionID = null;
@@ -47,8 +56,7 @@ public class CompetitionMiddleware : MonoBehaviour
     private string phase = null;
 
     // Start is called before the first frame update
-    void Awake()
-    {
+    void Awake() {
         if (Instance == null) {
             Instance = this;
             DontDestroyOnLoad(this);
@@ -64,8 +72,8 @@ public class CompetitionMiddleware : MonoBehaviour
     }
 
     private void OnDestroy() {
-        if(RegisteredAgents.Count > 0) {
-            foreach(KeyValuePair<string, AgentRecord> entry in RegisteredAgents) {
+        if (RegisteredAgents.Count > 0) {
+            foreach (KeyValuePair<string, AgentRecord> entry in RegisteredAgents) {
                 CallLogEvent(entry.Value.agentID, entry.Value.sessionID, 1001, "system", "end_session", "session_id", entry.Value.sessionID);
             }
         }
@@ -74,8 +82,8 @@ public class CompetitionMiddleware : MonoBehaviour
         }
     }
 
-    void SendPostRequestImmediate(string url, string json) {
-        using(UnityWebRequest www = UnityWebRequest.Post(url, json)) {
+    private void SendPostRequestImmediate(string url, string json) {
+        using (UnityWebRequest www = UnityWebRequest.Post(url, json)) {
             www.SetRequestHeader("Content-type", "application/json");
             Debug.LogFormat("Sending {0} request to {1} with data {2}, with", www.method, www.url, json);
             www.SendWebRequest();
@@ -83,7 +91,7 @@ public class CompetitionMiddleware : MonoBehaviour
     }
 
 
-    IEnumerator SendPostRequestFireAndForget(string url, string json) {
+    private IEnumerator SendPostRequestFireAndForget(string url, string json) {
         using (UnityWebRequest www = UnityWebRequest.Post(url, json)) {
             Debug.LogFormat("Sending {0} request to {1} with data {2}, with", www.method, www.url, json);
             www.SetRequestHeader("Content-type", "application/json");
@@ -94,7 +102,7 @@ public class CompetitionMiddleware : MonoBehaviour
         }
     }
 
-    IEnumerator SendPostRequestWithCallback(string url, string json, System.Action<JObject> callback) {
+    private IEnumerator SendPostRequestWithCallback(string url, string json, System.Action<JObject> callback) {
         using (UnityWebRequest www = UnityWebRequest.Post(url, json)) {
             Debug.LogFormat("Sending {0} request to {1} with data {2}, with", www.method, www.url, json);
             www.SetRequestHeader("Content-type", "application/json");
@@ -116,13 +124,17 @@ public class CompetitionMiddleware : MonoBehaviour
         LogStartSession();
     }
 
+    public void SetRunID(string runID) {
+        this.runID = runID;
+    }
+
     public void AddAIAgent(string target, string agentID) {
         AgentRecord record = new AgentRecord(agentID, System.Guid.NewGuid().ToString());
         RegisteredAgents[target] = record;
         CallLogEvent(agentID, record.sessionID, 1000, "system", "start_session", "session_id", currSessionID);
     }
 
-    public void CallListAgents(System.Action<JObject> callback) { 
+    public void CallListAgents(System.Action<JObject> callback) {
         //this till need to be a coroutine in some way
         SendPostRequestWithCallback(flaskURL + "/list_agents", JsonConvert.SerializeObject(new JObject { { "api_key", serverKey } }), callback);
     }
@@ -148,20 +160,20 @@ public class CompetitionMiddleware : MonoBehaviour
         //this can be fire and forget
     }
 
-    private void CallLogEvent(string userID, string sessionID, int eventId, string actor, string verb, string label, string value, bool immediate=false) {
+    private void CallLogEvent(string userID, string sessionID, int eventId, string actor, string verb, string label, string value, bool immediate = false) {
         CallLogEvent(userID, sessionID, eventId, actor, verb, new JObject { { label, value } }, false, immediate);
     }
 
-    private void CallLogEvent(int eventId, string actor, string verb, string label, string value, bool immediate=false) {
-        CallLogEvent(this.currUserID, this.currSessionID, eventId, actor, verb, new JObject { { label, value} }, false, immediate);
+    private void CallLogEvent(int eventId, string actor, string verb, string label, string value, bool immediate = false) {
+        CallLogEvent(this.currUserID, this.currSessionID, eventId, actor, verb, new JObject { { label, value } }, false, immediate);
     }
 
-    private void CallLogEvent(int eventId, string actor, string verb, JObject obj, bool includeContext, bool immediate=false) {
+    private void CallLogEvent(int eventId, string actor, string verb, JObject obj, bool includeContext = false, bool immediate = false) {
         CallLogEvent(this.currUserID, this.currSessionID, eventId, actor, verb, obj, includeContext, immediate);
     }
 
-    private void CallLogEvent(string userID, string sessionID, int eventID, string actor, string verb, JObject obj, bool includeContext, bool immediate=false) {
-        if(!enableLogging) { return; }
+    private void CallLogEvent(string userID, string sessionID, int eventID, string actor, string verb, JObject obj, bool includeContext = false, bool immediate = false) {
+        if (!enableLogging) { return; }
         JObject job = new JObject {
            {"api_key", serverKey},
            {"event_id", eventID},
@@ -173,10 +185,10 @@ public class CompetitionMiddleware : MonoBehaviour
            {"verb", verb},
            {"object", obj}
         };
-        if(includeContext) {
+        if (includeContext) {
             job["context"] = GenerateContext();
         }
-        if(immediate) {
+        if (immediate) {
             SendPostRequestImmediate(flaskURL + "/log_event", JsonConvert.SerializeObject(job));
         }
         else {
@@ -199,7 +211,17 @@ public class CompetitionMiddleware : MonoBehaviour
             LogEndSession();
         }
         this.currSessionID = System.Guid.NewGuid().ToString();
-        CallLogEvent(1000, "system", "start_session", "session_id", currSessionID);
+        CallLogEvent(1000, "system", "start_session",
+            new JObject {
+                {"session_id", currSessionID },
+                {"version", GlobalConstant.GAME_VERSION},
+                {"platform", Application.platform.ToString()},
+#if HMT_BUILD
+                {"HMT_BUILD",true },
+#else
+                {"HMT_BUILD",false },   
+#endif
+            });
     }
 
     private void LogEndSession() {
@@ -208,12 +230,34 @@ public class CompetitionMiddleware : MonoBehaviour
     }
 
 
-    public void LogStartRun(string runId) {
+    public void LogStartRunLocal(string runId) {
         if (runID != null) {
             LogEndRun();
         }
         this.runID = runId;
-        CallLogEvent(1010, "system", "start_run", "run_id", runID);
+        CallLogEvent(1002, "system", "start_run",
+            new JObject {
+                {"run_id", runId },
+                { "mode", "local"},
+            });
+    }
+
+    public void LogStartRunNetwork(string runId,
+                            string dwarfUserID, string dwarfSessionID, bool dwarfIsAI,
+                            string giantUserID, string giantSessionID, bool giantIsAI,
+                            string humanUserID, string humanSessionID, bool humanIsAI) {
+        if (runID != null) {
+            LogEndRun();
+        }
+        this.runID = runId;
+        CallLogEvent(1010, "system", "start_run",
+            new JObject {
+                {"run_id", runId },
+                {"mode", "network"},
+                {"dwarf", new JObject { { "user_id", dwarfUserID}, { "session_id", dwarfSessionID}, {"ai", dwarfIsAI } } },
+                {"giant", new JObject { { "user_id", giantUserID}, { "session_id", giantSessionID}, {"ai", giantIsAI } } },
+                {"human", new JObject { { "user_id", humanUserID}, { "session_id", humanSessionID}, {"ai", humanIsAI} } }
+            });
     }
 
     public void LogEndRun() {
@@ -222,6 +266,7 @@ public class CompetitionMiddleware : MonoBehaviour
     }
 
     public void LogStartLevel(string levelName) {
+        if (!LogSystemEvents) return;
         if (levelName != null) {
             LogEndLevel();
         }
@@ -230,11 +275,13 @@ public class CompetitionMiddleware : MonoBehaviour
     }
 
     public void LogEndLevel() {
+        if (!LogSystemEvents) return;
         CallLogEvent(1021, "system", "end_level", "level_name", level);
         level = null;
     }
 
     public void LogStartRound(int round) {
+        if (!LogSystemEvents) return;
         if (this.round != null) {
             LogEndRound();
         }
@@ -243,19 +290,22 @@ public class CompetitionMiddleware : MonoBehaviour
     }
 
     public void LogEndRound() {
+        if (!LogSystemEvents) return;
         CallLogEvent(1031, "system", "end_round", "round", round);
         round = null;
     }
 
     public void LogStartPhase(string phaseName) {
-        if(phase != null) {
+        if (!LogSystemEvents) return;
+        if (phase != null) {
             LogEndPhase();
         }
         this.phase = phaseName;
-        CallLogEvent(1040, "system", "start_phase","phase", phase);
+        CallLogEvent(1040, "system", "start_phase", "phase", phase);
     }
 
     public void LogEndPhase() {
+        if (!LogSystemEvents) return;
         CallLogEvent(1041, "system", "end_phase", "phase", phase);
         phase = null;
     }
@@ -268,7 +318,7 @@ public class CompetitionMiddleware : MonoBehaviour
     }
 
     public void LogJoinLobby(string roomName) {
-        CallLogEvent(2001, "player", "join_lobby","roomCode",roomName);
+        CallLogEvent(2001, "player", "join_lobby", "roomCode", roomName);
     }
 
     public void LogOpenHelp() {
@@ -281,7 +331,7 @@ public class CompetitionMiddleware : MonoBehaviour
 
     public void LogSubmit(string character) {
         if (RegisteredAgents.ContainsKey(character)) {
-            CallLogEvent(RegisteredAgents[character].agentID, RegisteredAgents[character].sessionID, 
+            CallLogEvent(RegisteredAgents[character].agentID, RegisteredAgents[character].sessionID,
                 3000, character, "submit", null, true);
         }
         else {
@@ -307,7 +357,7 @@ public class CompetitionMiddleware : MonoBehaviour
 
     public void LogAddPlan(string character, Character.Direction direct, IList<Character.Direction> resultPlan) {
         if (RegisteredAgents.ContainsKey(character)) {
-            CallLogEvent(RegisteredAgents[character].agentID, RegisteredAgents[character].sessionID, 
+            CallLogEvent(RegisteredAgents[character].agentID, RegisteredAgents[character].sessionID,
                 3101, character, "edit_plan",
                 new JObject { "edit", direct.ToString(), "result_plan", new JArray(resultPlan) }, true);
         }
@@ -347,24 +397,28 @@ public class CompetitionMiddleware : MonoBehaviour
     #region 4000s Logging Messages, Game System Events
 
     public void LogPlayerSpawn(string character, int x, int y) {
+        if (!LogSystemEvents) return;
         CallLogEvent(4001, character, "player_spawn",
             new JObject { { "x", x }, { "y", y } },
             true);
     }
 
     public void LogPlayerDeath(string character, int x, int y) {
+        if (!LogSystemEvents) return;
         CallLogEvent(4002, character, "player_death",
             new JObject { { "x", x }, { "y", y } },
             true);
     }
 
     public void LogChallengeSpawn(string challenge_name, int x, int y) {
+        if (!LogSystemEvents) return;
         CallLogEvent(4003, challenge_name, "challenge_spawn",
             new JObject { { "x", x }, { "y", y } },
             true);
     }
 
     public void LogChallengeDeath(string challenge_name, int x, int y) {
+        if (!LogSystemEvents) return;
         CallLogEvent(4004, challenge_name, "challenge_death",
             new JObject { { "x", x }, { "y", y } },
             true);
@@ -377,6 +431,7 @@ public class CompetitionMiddleware : MonoBehaviour
     /// <param name="giantMove"></param>
     /// <param name="humanMove"></param>
     public void LogMoveStep() {
+        if (!LogSystemEvents) return;
         CallLogEvent(4100, "system", "move_step", null, true);
     }
 
@@ -385,6 +440,7 @@ public class CompetitionMiddleware : MonoBehaviour
         IList<string> characterNames, IList<string> challengeNames,
         IList<int> characterRolls, IList<int> challengeRoles,
         float odds, bool outcome) {
+        if (!LogSystemEvents) return;
         CallLogEvent(4101, "system", "challenge_encounter",
             new JObject {
                 { "x", x },
@@ -400,12 +456,14 @@ public class CompetitionMiddleware : MonoBehaviour
     }
 
     public void LogClearShrine(string character, int x, int y) {
+        if (!LogSystemEvents) return;
         CallLogEvent(4102, character, "clear_shrine",
             new JObject { { "x", x }, { "y", y } },
             true);
     }
 
     public void LogClearGoal(string character, int x, int y) {
+        if (!LogSystemEvents) return;
         CallLogEvent(4103, character, "clear_goal",
             new JObject { { "x", x }, { "y", y } },
             true);
@@ -416,7 +474,7 @@ public class CompetitionMiddleware : MonoBehaviour
     #region 5000s Logging Messages, AI Agent Events
 
     public void LogHMTConnect(string service_target) {
-        if(!RegisteredAgents.ContainsKey(service_target)) {
+        if (!RegisteredAgents.ContainsKey(service_target)) {
             Debug.LogErrorFormat("Could not find agent record for service target {0}", service_target);
             return;
         }

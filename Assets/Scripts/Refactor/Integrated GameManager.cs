@@ -65,6 +65,7 @@ public class IntegratedGameManager : MonoBehaviour
         UIManager.S.InitGameUI();
         UIManager.S.ResetTeamActionStatus();
         yield return new WaitForFixedUpdate();
+        CompetitionMiddleware.Instance.LogStartLevel(IntegratedMapGenerator.Instance.CurrentLevelName);
         StartPlayerTurn();
     }
 
@@ -84,6 +85,7 @@ public class IntegratedGameManager : MonoBehaviour
             }
         }
 
+        CompetitionMiddleware.Instance.LogStartRound(CurrentRound);
         StartPlayerPinningPhase();
     }
 
@@ -104,6 +106,8 @@ public class IntegratedGameManager : MonoBehaviour
         foreach (Character chara in inSceneCharacters) {
             chara.StartPingPhase();
         }
+
+        CompetitionMiddleware.Instance.LogStartPhase("Pinning");
 
         if (remainingCharacterCount > 0) {
             localChar.FocusCharacter();
@@ -158,6 +162,8 @@ public class IntegratedGameManager : MonoBehaviour
             chara.StartPlanningPhase();
         }
 
+        CompetitionMiddleware.Instance.LogStartPhase("Planning");
+
         if (remainingCharacterCount <= 0 || CheckPhaseEnd()) {
             EndPlayerPlanningPhase();
         }
@@ -202,6 +208,8 @@ public class IntegratedGameManager : MonoBehaviour
         UIManager.S.HideCharacterPinUI();
         //moveFinishedCount = 0;       
         eventQueue = new Queue<Tile>();
+
+        CompetitionMiddleware.Instance.LogStartPhase("Player_Movement");
 
         currentCoroutine = StartCoroutine(CharacterMoveByStep());
     }
@@ -268,6 +276,8 @@ public class IntegratedGameManager : MonoBehaviour
         {
             m.MonsterTurnStart();
         }
+
+        CompetitionMiddleware.Instance.LogStartPhase("Monster_Movement");
 
         currentCoroutine = StartCoroutine(MonsterMoveByStep());
     }
