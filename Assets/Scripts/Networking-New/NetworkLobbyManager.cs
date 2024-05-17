@@ -126,7 +126,9 @@ public class NetworkLobbyManager : MonoBehaviour
 
         if (CompetitionMiddleware.Instance.IsAI) {
             //AIs are not allowed to create rooms so if the room doesn't exist we just bail
+        #if HMT_BUILD
             Debug.LogErrorFormat("Provided room name: {0} does not exist. Exiting Application", Args.GetArgValue("photonroom", ""));
+        #endif
             Application.Quit();
         }
         else {
