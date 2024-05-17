@@ -110,7 +110,6 @@ public class UIManager : MonoBehaviour
     }
 
     private void Update() {
-        UpdateTimer();
         UpdateTooltipHover();
     }
 
@@ -269,6 +268,7 @@ public class UIManager : MonoBehaviour
     }
 
     private void SubmitPins() {
+        //TODO we may want to send different names for these log functions
         PinningSystem.S.ClosePinWheel();
         NetworkMiddleware.S.CallReadyForNextPhase(IntegratedGameManager.S.localChar.CharacterId, true);
         UpdateCharacterPinUI();
@@ -563,16 +563,12 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void ResetTurnTimer() {
-        lastTimeReset = Time.time;
-    }
-
-    private void UpdateTimer() {
-        if (float.IsInfinity(TimeRemaining)) {
+    public void UpdateTurnTimer() {
+        if (float.IsInfinity(IntegratedGameManager.S.TimeRemaining)) {
             TimerText.text = "\u221E";
         }
         else {
-            TimeSpan timeSpan = TimeSpan.FromSeconds(TimeRemaining);
+            TimeSpan timeSpan = TimeSpan.FromSeconds(IntegratedGameManager.S.TimeRemaining);
             TimerText.text = string.Format("{0}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
             if (TimeRemaining < 10) {
                 TimerText.color = Color.red;
@@ -580,17 +576,6 @@ public class UIManager : MonoBehaviour
             else {
                 TimerText.color = Color.white;
             }
-            if (TimeRemaining <= 0) {
-                switch (IntegratedGameManager.S.gameStatus) {
-                    case GameStatus.Player_Planning:
-                        SubmitPlan();
-                        break;
-                    case GameStatus.Player_Pinning:
-                        SubmitPins();
-                        break;
-                }
-            }
-
         }
     }
 

@@ -33,7 +33,7 @@ public class IntegratedGame1Interface : HMTInterface {
     }
 
     public override IEnumerator ProcessCommand(Command command) {
-
+        CompetitionMiddleware.Instance.LogHMTInterfaceCall(GetTargetCharacterID(command.target), command);
         switch (IntegratedGameManager.S.gameStatus) {
             case GameConstant.GameStatus.GetReady:
                 command.SendErrorResponse("Game is not started yet.", 1002);
@@ -81,7 +81,24 @@ public class IntegratedGame1Interface : HMTInterface {
     public override IEnumerator Register(Command command) {
         string target = command.target;
         string agent_id = command.json["agent_id"].ToString();
-        CompetitionMiddleware.Instance.AddAIAgent(target, agent_id);
+        int character_id;
+        switch (target) {
+            case "dwarf":
+                character_id = dwarfID;
+                break;
+            case "giant":
+                character_id = giantID;
+                break;
+            case "human":
+                character_id = humanID;
+                break;
+            default:
+                command.SendErrorResponse(string.Format("Unknown HMT Target {0}. Make sure the targets are configured correctly in the Inspector", target), 9002);
+                yield break;
+        }
+
+
+        CompetitionMiddleware.Instance.AddAIAgent(target, agent_id, character_id);
 
 
         while(IntegratedGameManager.S == null) {
@@ -393,6 +410,19 @@ public class IntegratedGame1Interface : HMTInterface {
             case GameConstant.GameStatus.Player_Planning:
                 yield return ExecuteActionInPlanning(command);
                 break;
+        }
+    }
+
+    private int GetTargetCharacterID(string target) {
+        switch (target.ToLower()) {
+            case "giant":
+                return giantID;
+            case "human":
+                return humanID;
+            case "dwarf":
+                return dwarfID;
+            default:
+                return -1;
         }
     }
 

@@ -23,14 +23,18 @@ public class CompetitionMiddleware : MonoBehaviour {
     public struct AgentRecord {
         public string agentID;
         public string sessionID;
+        public string target;
+        public int characterID;
 
-        public AgentRecord(string agentID, string sessionID) {
+        public AgentRecord(string agentID, string sessionID, string target, int characterID) {
             this.agentID = agentID;
             this.sessionID = sessionID;
+            this.target = target;
+            this.characterID = characterID;
         }
     }
 
-    public Dictionary<string, AgentRecord> RegisteredAgents = new Dictionary<string, AgentRecord>();
+    public Dictionary<int, AgentRecord> RegisteredAgents = new Dictionary<int, AgentRecord>();
 
     public bool IsAI {
         get {
@@ -73,8 +77,8 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     private void OnDestroy() {
         if (RegisteredAgents.Count > 0) {
-            foreach (KeyValuePair<string, AgentRecord> entry in RegisteredAgents) {
-                CallLogEvent(entry.Value.agentID, entry.Value.sessionID, 1001, "system", "end_session", "session_id", entry.Value.sessionID);
+            foreach (AgentRecord entry in RegisteredAgents.Values) {
+                CallLogEvent(entry.agentID, entry.sessionID, 1001, "system", "end_session", "session_id", entry.sessionID);
             }
         }
         else {
@@ -128,9 +132,11 @@ public class CompetitionMiddleware : MonoBehaviour {
         this.runID = runID;
     }
 
-    public void AddAIAgent(string target, string agentID) {
-        AgentRecord record = new AgentRecord(agentID, System.Guid.NewGuid().ToString());
-        RegisteredAgents[target] = record;
+    public void AddAIAgent(string target, string agentID, int characterID) {
+        AgentRecord record = new AgentRecord(agentID, System.Guid.NewGuid().ToString(), target, characterID);
+        RegisteredAgents[characterID] = record;
+
+        LogHMTConnect(characterID);
         CallLogEvent(agentID, record.sessionID, 1000, "system", "start_session", "session_id", currSessionID);
     }
 
@@ -329,53 +335,66 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     #region 3000s Logging Messages, Player Actions
 
-    public void LogSubmit(string character) {
-        if (RegisteredAgents.ContainsKey(character)) {
-            CallLogEvent(RegisteredAgents[character].agentID, RegisteredAgents[character].sessionID,
-                3000, character, "submit", null, true);
+    public void LogSubmit(int characterId) {
+        // Apply tihs structure to all other similar functions
+        // make a system to convert from characterId to character name based on IntegratedGameManager
+        if (RegisteredAgents.ContainsKey(characterId)) {
+            CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
+                3000, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "submit", null, true);
         }
         else {
-            CallLogEvent(3000, character, "submit", null, true);
+            CallLogEvent(3000, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "submit", null, true);
         }
     }
 
-    public void LogPlacePin(string character, string pinType, int x, int y) {
-        if (RegisteredAgents.ContainsKey(character)) {
-            CallLogEvent(RegisteredAgents[character].agentID, RegisteredAgents[character].sessionID,
-                3100, character, "place_pin",
+    public void LogTimeOut(int characterId) {
+        if (RegisteredAgents.ContainsKey(characterId)) {
+            CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
+                3001, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "action_timeout", null, true);
+        }
+        else {
+            CallLogEvent(3001, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "action_timeout", null, true);
+        }
+    }
+
+
+    public void LogPlacePin(int characterId, string pinType, int x, int y) {
+        if (RegisteredAgents.ContainsKey(characterId)) {
+            CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
+                3100, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "place_pin",
                 new JObject { { "x", x }, { "y", y }, { "type", pinType } },
                 true);
         }
         else {
             CallLogEvent(3100,
-                character,
+                IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName,
                 "place_pin",
                 new JObject { { "x", x }, { "y", y }, { "type", pinType } },
                 true);
         }
     }
 
-    public void LogAddPlan(string character, Character.Direction direct, IList<Character.Direction> resultPlan) {
-        if (RegisteredAgents.ContainsKey(character)) {
-            CallLogEvent(RegisteredAgents[character].agentID, RegisteredAgents[character].sessionID,
-                3101, character, "edit_plan",
+    public void LogAddPlan(int characterId, Character.Direction direct, IList<Character.Direction> resultPlan) {
+        if (RegisteredAgents.ContainsKey(characterId)) {
+            CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
+                3101, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "edit_plan",
                 new JObject { "edit", direct.ToString(), "result_plan", new JArray(resultPlan) }, true);
         }
         else {
-            CallLogEvent(3101, character, "edit_plan",
+            CallLogEvent(3101, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "edit_plan",
                 new JObject { "edit", direct.ToString(), "result_plan", new JArray(resultPlan) },
                 true);
         }
     }
 
-    public void LogUndoPlan(string character, IList<Character.Direction> resultPlan) {
-        if (RegisteredAgents.ContainsKey(character)) {
-            CallLogEvent(RegisteredAgents[character].agentID, RegisteredAgents[character].sessionID,
-                3101, character, "edit_plan",
+    public void LogUndoPlan(int characterId, IList<Character.Direction> resultPlan) {
+        if (RegisteredAgents.ContainsKey(characterId)) {
+            CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
+                3101, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "edit_plan",
                 new JObject { "edit", "undo", "result_plan", new JArray(resultPlan) }, true);
         }
         else {
-            CallLogEvent(3101, character, "edit_plan",
+            CallLogEvent(3101, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "edit_plan",
                 new JObject { { "edit", "undo" }, { "result_plan", new JArray(resultPlan) } }, true);
         }
     }
@@ -386,7 +405,7 @@ public class CompetitionMiddleware : MonoBehaviour {
     /// <param name="character"></param>
     /// <param name="x"></param>
     /// <param name="y"></param>
-    public void LogInspectPlan(string character, int x, int y) {
+    public void LogInspectChallenge(string character, int x, int y) {
         CallLogEvent(3102, character, "inspect_challenge",
             new JObject { { "x", x }, { "y", y } },
             true);
@@ -473,25 +492,25 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     #region 5000s Logging Messages, AI Agent Events
 
-    public void LogHMTConnect(string service_target) {
-        if (!RegisteredAgents.ContainsKey(service_target)) {
-            Debug.LogErrorFormat("Could not find agent record for service target {0}", service_target);
+    public void LogHMTConnect(int characterId) {
+        if (!RegisteredAgents.ContainsKey(characterId)) {
+            Debug.LogErrorFormat("Could not find agent record for characterId {0}", characterId);
             return;
         }
-        AgentRecord record = RegisteredAgents[service_target];
+        AgentRecord record = RegisteredAgents[characterId];
         CallLogEvent(record.agentID, record.sessionID, 5000, record.agentID, "hmt_connect",
-            new JObject { { "service_target", service_target } },
+            new JObject { { "service_target", record.target } },
             true);
     }
 
-    public void LogHMTInterfaceCall(string service_target, JObject actionBlob) {
-        if (!RegisteredAgents.ContainsKey(service_target)) {
-            Debug.LogErrorFormat("Could not find agent record for service target {0}", service_target);
+    public void LogHMTInterfaceCall(int characterId, HMT.Command command) {
+        if (!RegisteredAgents.ContainsKey(characterId)) {
+            Debug.LogErrorFormat("Could not find agent record for service target {0}", characterId);
             return;
         }
-        AgentRecord record = RegisteredAgents[service_target];
+        AgentRecord record = RegisteredAgents[characterId];
         CallLogEvent(record.agentID, record.sessionID, 5001, record.agentID, "hmt_interface_call",
-            new JObject { { "service_target", service_target }, { "action_blob", actionBlob } },
+            new JObject { { "service_target", record.target }, { "command_json", command.json } },
             true);
     }
 

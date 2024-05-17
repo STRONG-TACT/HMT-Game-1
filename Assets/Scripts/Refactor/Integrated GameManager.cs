@@ -27,6 +27,21 @@ public class IntegratedGameManager : MonoBehaviour
     public int currentLevel = 1;
     public bool isNetworkGame;
 
+    private float lastTurnTimerReset = 0;
+
+    public float TimeRemaining {
+        get {
+            switch (gameStatus) {
+                case GameStatus.Player_Pinning:
+                case GameStatus.Player_Planning:
+                    return GameData.S.TurntimeLimit - Mathf.RoundToInt(Time.time - lastTurnTimerReset);
+                default:
+                    return float.PositiveInfinity;
+            }
+        }
+    }
+
+
     public List<Character> inSceneCharacters = new List<Character>();
     public List<Monster> inSceneMonsters = new List<Monster>();
 
@@ -59,6 +74,19 @@ public class IntegratedGameManager : MonoBehaviour
         StartCoroutine(StartLevel());
     }
 
+    protected virtual void Update() {
+        UIManager.S.UpdateTurnTimer();
+        if(TimeRemaining<= 0) {
+            TimeoutSubmit();
+        }
+    }
+
+    protected virtual void TimeoutSubmit() {  }
+
+    public void ResetTurnTimer() {
+        lastTurnTimerReset = Time.time;
+    }
+
     public virtual IEnumerator StartLevel() {
         gameStatus = GameStatus.GetReady;
         CurrentRound = 0;
@@ -89,18 +117,12 @@ public class IntegratedGameManager : MonoBehaviour
         StartPlayerPinningPhase();
     }
 
-    //protected virtual void PreparePlayerPinningPhase() 
-    //{
-    //    //just common operations, each derived class extend this
-       
-    //}
-
     protected virtual void StartPlayerPinningPhase()
     {
         Debug.Log("Start Pinning Phase.");
         gameStatus = GameStatus.Player_Pinning;
         UIManager.S.UpdateGamePhaseInfo();
-        UIManager.S.ResetTurnTimer();
+        ResetTurnTimer();
 
 
         foreach (Character chara in inSceneCharacters) {
@@ -156,7 +178,7 @@ public class IntegratedGameManager : MonoBehaviour
         //common operations only, derived classes extend this
         gameStatus = GameStatus.Player_Planning;
         UIManager.S.UpdateGamePhaseInfo();
-        UIManager.S.ResetTurnTimer();
+        ResetTurnTimer();
 
         foreach (Character chara in inSceneCharacters) {
             chara.StartPlanningPhase();

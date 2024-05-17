@@ -7,9 +7,6 @@ using GameConstant;
 public class IntegratedNetworkGameManager : IntegratedGameManager
 {
     
-
-    public static IntegratedGameManager S;
-    
     protected override void Awake()
     {
         base.Awake();
@@ -38,6 +35,22 @@ public class IntegratedNetworkGameManager : IntegratedGameManager
         // the delay is needed because internal state of FOW needs physics trigger to work
         yield return new WaitForFixedUpdate();
         IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+    }
+
+    protected override void TimeoutSubmit() {
+        base.TimeoutSubmit();
+        if (CompetitionMiddleware.Instance.IsAI) {
+            //iterate through the registered agent characters and call submit for them
+
+            foreach(CompetitionMiddleware.AgentRecord agent in CompetitionMiddleware.Instance.RegisteredAgents.Values) {
+                if (!inSceneCharacters[agent.characterID].ReadyForNextPhase) {
+                    NetworkMiddleware.S.CallReadyForNextPhase(agent.characterID, true);
+                }
+            }
+        }
+        else {
+            NetworkMiddleware.S.CallReadyForNextPhase(localChar.CharacterId,true);
+        }
     }
 
 }

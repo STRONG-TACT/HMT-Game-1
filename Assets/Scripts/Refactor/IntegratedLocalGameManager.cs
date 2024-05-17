@@ -21,6 +21,15 @@ public class IntegratedLocalGameManager : IntegratedGameManager
         UIManager.S.ShowCharacterSwitcher();
     }
 
+    protected override void TimeoutSubmit() {
+        base.TimeoutSubmit();
+        foreach(Character character in inSceneCharacters) {
+            if (!character.ReadyForNextPhase) {
+                NetworkMiddleware.S.CallReadyForNextPhaseAuto(character.CharacterId, true);
+            }
+        }
+    }
+
 
     protected override void StartPlayerPinningPhase()
     {

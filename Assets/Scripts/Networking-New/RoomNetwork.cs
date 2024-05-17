@@ -57,6 +57,16 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
         }
         else if (CompetitionMiddleware.Instance.IsAI) {
             while (CompetitionMiddleware.Instance.RegisteredAgents.Count + PhotonNetwork.CurrentRoom.PlayerCount < 4) {
+                /*
+                 * Agents register themselves to the HMTInterface as their first command.
+                 * This adds them to the RegisteredAgents dictionary.
+                 * Once we have agents equal to fill the available player slots (4 because this instance takes up a Photon seat),
+                 * we progress and handshake in the session Ids to master client, which should trigger progression to play
+                 * once all agents are registered. (see the HandshakeSessionIds RPC function).
+                 * 
+                 * We should benchmark this processs and consider if we want some kind of timeout both here locally
+                 * and/or on the web client end.
+                 */ 
                 yield return null;
             }
             foreach (var agent in CompetitionMiddleware.Instance.RegisteredAgents.Values) {
