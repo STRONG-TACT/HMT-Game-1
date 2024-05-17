@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,21 +16,25 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
 
     public static RoomNetwork S;
 
+    private List<string> CharacterMapping = null;
+
     private class PlayerEntry {
         public string userId;
         public string sessionId;
+        public int actorNumber;
         public bool isAI;
         public bool Ready;
 
-        public PlayerEntry(string userId, string sessionId, bool isAI) {
+        public PlayerEntry(int actorNumber, string userId, string sessionId, bool isAI) {
             this.userId = userId;
             this.sessionId = sessionId;
+            this.actorNumber = actorNumber;
             this.isAI = isAI;
             this.Ready = isAI;
         }
     }
 
-    private Dictionary<int, PlayerEntry> _playerEntries = new Dictionary<int, PlayerEntry>();
+    private Dictionary<string, PlayerEntry> _playerEntries = new Dictionary<string, PlayerEntry>();
 
     private void Awake() {
         if (S) Destroy(this);
@@ -43,10 +48,10 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
         if (PhotonNetwork.IsMasterClient) {
             _randomSeed = Random.Range(0, 10000);
             // SetupNetworkMiddleware(_randomSeed, PhotonNetwork.LocalPlayer.ActorNumber);
-            photonView.RPC("SetupNetworkMiddleware",
-                RpcTarget.MasterClient,
-                _randomSeed,
-                PhotonNetwork.LocalPlayer.ActorNumber);
+            //photonView.RPC("SetupNetworkMiddleware",
+            //    RpcTarget.MasterClient,
+            //    _randomSeed,
+            //    PhotonNetwork.LocalPlayer.ActorNumber);
             photonView.RPC("HandshakeSessionIds",
                 RpcTarget.MasterClient,
                 PhotonNetwork.LocalPlayer.ActorNumber,
@@ -56,6 +61,9 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
             yield break;
         }
         else if (CompetitionMiddleware.Instance.IsAI) {
+            float startTime = Time.time;
+            int minutes = 1;
+            Debug.LogFormat("Autonomus mode joined room, starting wait for {0} agents", 4- PhotonNetwork.CurrentRoom.PlayerCount);
             while (CompetitionMiddleware.Instance.RegisteredAgents.Count + PhotonNetwork.CurrentRoom.PlayerCount < 4) {
                 /*
                  * Agents register themselves to the HMTInterface as their first command.
@@ -67,12 +75,18 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
                  * We should benchmark this processs and consider if we want some kind of timeout both here locally
                  * and/or on the web client end.
                  */ 
+                if(Time.time - startTime > minutes*60) {
+                    Debug.LogFormat("Waiting for AIs to connect... {0} agents connected, {1} minutes", CompetitionMiddleware.Instance.RegisteredAgents.Count, minutes);
+                    minutes++;
+                }
                 yield return null;
             }
+
+            Debug.LogFormat("All agents connected (took {0} seconds), sending handshakes.", Time.time - startTime);
             foreach (var agent in CompetitionMiddleware.Instance.RegisteredAgents.Values) {
                 photonView.RPC("HandshakeSessionIds",
                                 RpcTarget.MasterClient,
-                                PhotonNetwork.LocalPlayer.ActorNumber,
+                                agent.characterID,
                                 agent.agentID,
                                 agent.sessionID,
                                 true);
@@ -89,7 +103,7 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
         yield break;
     }
 
-    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer) {
+/*    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer) {
         if (PhotonNetwork.IsMasterClient) {
             // sync network data to all clients' network middleware
             photonView.RPC("SetupNetworkMiddleware",
@@ -110,13 +124,21 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
     private void SetupNetworkMiddleware(int randomSeed, int characterID) {
         if (NetworkMiddleware.S.myCharacterID != -1) return;
         NetworkMiddleware.S.SetupMiddleware(randomSeed, characterID);
-    }
+    }*/
 
     [PunRPC]
     private void HandshakeSessionIds(int actorNumber, string userId, string sessionId, bool isAI) {
         if (PhotonNetwork.IsMasterClient) {
-            _playerEntries[actorNumber] = new PlayerEntry(userId, sessionId, isAI);
-
+            Debug.LogFormat("Recieved Session Id Handshake for actor:{0} userId:{1} sessionId:{2} isAI:{3}", actorNumber, userId, sessionId, isAI);
+            if (isAI) {
+                //TODO AI's send actorNumbers that are incrememnted CharacterIds we may want to treat them differently
+                // For now the incrememntation happens on send See Start above.
+                _playerEntries[userId] = new PlayerEntry(actorNumber, userId, sessionId, isAI);
+                CharacterMapping[actorNumber] = userId;
+            }
+            else {
+                _playerEntries[userId] = new PlayerEntry(actorNumber, userId, sessionId, isAI);
+            }
             if (ReadyCount() == 3) {
                 Debug.LogFormat("Recieved Handshake from an AI, locking room and moving on");
                 PhotonNetwork.CurrentRoom.IsOpen = false;
@@ -126,25 +148,45 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
         }
     }
 
-    //need a PUNRPC target for reciving the competition ids from clients
-    //store those in a mapping to character IDs
-
     private void CallBeginRun() {
+        if(CharacterMapping == null) {
+            CharacterMapping = CreateCharacterMapping();
+        }
         string runID = Guid.NewGuid().ToString();
-        photonView.RPC("BeginRunLocal", RpcTarget.All, runID);
+        _randomSeed = Random.Range(0, 10000);
+        photonView.RPC("BeginRunLocal", RpcTarget.All, runID, _randomSeed, CharacterMapping[0], CharacterMapping[1], CharacterMapping[2]);
     }
 
 
+
+
     [PunRPC]
-    private void BeginRunLocal(string runId) {
+    private void BeginRunLocal(string runId, int seed, string dwarfPlayer, string giantPlayer, string humanPlayer) {
+        Debug.LogFormat("BeginRunLocal runId:{0} seed:{1} dwarfPlayer:{2} giantPlayer:{3} humanPlayer:{4}, myUserID:{5}", runId, seed, dwarfPlayer, giantPlayer, humanPlayer, CompetitionMiddleware.Instance.UserID);
+
+
+
         if (PhotonNetwork.IsMasterClient) {
-            CompetitionMiddleware.Instance.LogStartRunNetwork(runId,
-                _playerEntries[1].userId, _playerEntries[1].sessionId, _playerEntries[1].isAI,
-                _playerEntries[2].userId, _playerEntries[2].sessionId, _playerEntries[2].isAI,
-                _playerEntries[3].userId, _playerEntries[3].sessionId, _playerEntries[3].isAI);
+            CompetitionMiddleware.Instance.LogStartGameNetwork(runId,
+                dwarfPlayer, _playerEntries[dwarfPlayer].sessionId, _playerEntries[dwarfPlayer].isAI,
+                giantPlayer, _playerEntries[giantPlayer].sessionId, _playerEntries[giantPlayer].isAI,
+                humanPlayer, _playerEntries[humanPlayer].sessionId, _playerEntries[humanPlayer].isAI);
         }
         else {
-            CompetitionMiddleware.Instance.SetRunID(runId);
+            CompetitionMiddleware.Instance.SetGameID(runId);
+        }
+
+        if (CompetitionMiddleware.Instance.IsAI) {
+            NetworkMiddleware.S.SetupMiddleware(seed, 0);
+        }
+        else if(CompetitionMiddleware.Instance.UserID == dwarfPlayer) {
+            NetworkMiddleware.S.SetupMiddleware(seed, 0);
+        }
+        else if (CompetitionMiddleware.Instance.UserID == giantPlayer) {
+            NetworkMiddleware.S.SetupMiddleware(seed, 1);
+        }
+        else if (CompetitionMiddleware.Instance.UserID == humanPlayer) {
+            NetworkMiddleware.S.SetupMiddleware(seed, 2);
         }
 
         SceneManager.LoadScene(GameConstant.GlobalConstant.NETWORK_SCENE);
@@ -157,13 +199,25 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
                 count++;
             }
         }
+        Debug.LogFormat("ReadyCount {0}", count);
         return count;
     }
+
+    private string actorNumberToUserID(int actorNumber) {
+        foreach (var entry in _playerEntries) {
+            if (entry.Value.actorNumber == actorNumber) {
+                return entry.Value.userId;
+            }
+        }
+        return null;
+    }
+
 
     [PunRPC]
     private void RegisterPlayerReady(int actorNumber) {
         Debug.Log($"Player {actorNumber} ready");
-        _playerEntries[actorNumber].Ready = true;
+        string userId = actorNumberToUserID(actorNumber);
+        _playerEntries[userId].Ready = true;
         if (ReadyCount() == 3) {
             CallBeginRun();
         }
@@ -175,25 +229,22 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
 
     public void LaunchGameWithAIsLocal() {
         string dwarfID, giantID, humanID;
-        //TODO make this more robust to changes in player-character mapping
-        if (_playerEntries.TryGetValue(1, out PlayerEntry playerEntry)) {
-            dwarfID = null;
-        }
-        else {
-            dwarfID = "random";
-        }
-        if (_playerEntries.TryGetValue(2, out playerEntry)) {
-            giantID = null;
-        }
-        else {
-            giantID = "random";
-        }
-        if (_playerEntries.TryGetValue(3, out playerEntry)) {
-            humanID = null;
-        }
-        else {
-            humanID = "random";
-        }
+        CharacterMapping = CreateCharacterMapping();
+        dwarfID = CharacterMapping[0] == "uniform" ? "uniform" : null;
+        giantID = CharacterMapping[1] == "uniform" ? "uniform" : null;
+        humanID = CharacterMapping[2] == "uniform" ? "uniform" : null;
         CompetitionMiddleware.Instance.CallLaunchGame(PhotonNetwork.CurrentRoom.Name, dwarfID, giantID, humanID);
+    }
+
+    private List<string> CreateCharacterMapping() {
+        List<string> characterMapping = new List<string>();
+        foreach (var entry in _playerEntries) {
+            characterMapping.Add(entry.Value.userId);
+        }
+        while (characterMapping.Count < 3) {
+            characterMapping.Add("uniform");
+        }
+        characterMapping.OrderBy(_ => Random.value).ToList();
+        return characterMapping;
     }
 }

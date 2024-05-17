@@ -116,7 +116,7 @@ public class IntegratedMapGenerator : MonoBehaviour
                 {
                     
                     string tile = lines[i][j].ToString() + lines[i][j + 1].ToString();
-                    Debug.LogFormat("Adding Tile {0} at {1}, {2}", tile , j / 2, rowCount - i + 1);
+                    //Debug.LogFormat("Adding Tile {0} at {1}, {2}", tile , j / 2, rowCount - i + 1);
                     Map[  j / 2, rowCount - i + 1] = SpawnTile(rowCount - i + 1, j / 2,  tile);
                 }
             }

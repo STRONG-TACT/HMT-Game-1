@@ -54,7 +54,7 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     private string currUserID = null;
     private string currSessionID = null;
-    private string runID = null;
+    private string gameID = null;
     private string level = null;
     private string round = null;
     private string phase = null;
@@ -101,7 +101,9 @@ public class CompetitionMiddleware : MonoBehaviour {
             www.SetRequestHeader("Content-type", "application/json");
             yield return www.SendWebRequest();
             if (www.result != UnityWebRequest.Result.Success) {
-                Debug.LogError(www.error);
+                Debug.LogErrorFormat("{0} on call to {1}, with {2}", www.error, url, json);
+            }else {
+                Debug.LogFormat("HTTP Request Response {0}: {1}", www.responseCode, www.result);
             }
         }
     }
@@ -112,7 +114,7 @@ public class CompetitionMiddleware : MonoBehaviour {
             www.SetRequestHeader("Content-type", "application/json");
             yield return www.SendWebRequest();
             if (www.result != UnityWebRequest.Result.Success) {
-                Debug.LogError(www.error);
+                Debug.LogErrorFormat("{0} on call to {1}, with {2}", www.error, url, json);
             }
             else {
                 callback(JsonConvert.DeserializeObject<JObject>(www.downloadHandler.text));
@@ -128,11 +130,13 @@ public class CompetitionMiddleware : MonoBehaviour {
         LogStartSession();
     }
 
-    public void SetRunID(string runID) {
-        this.runID = runID;
+    public void SetGameID(string gameID) {
+        this.gameID = gameID;
     }
 
     public void AddAIAgent(string target, string agentID, int characterID) {
+        Debug.LogFormat("Registering AI agent {0} with target {1} and characterID {2}", agentID, target, characterID);
+
         AgentRecord record = new AgentRecord(agentID, System.Guid.NewGuid().ToString(), target, characterID);
         RegisteredAgents[characterID] = record;
 
@@ -236,29 +240,29 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
 
-    public void LogStartRunLocal(string runId) {
-        if (runID != null) {
-            LogEndRun();
+    public void LogStartGameLocal(string gameID) {
+        if (this.gameID != null) {
+            LogEndGame();
         }
-        this.runID = runId;
+        this.gameID = gameID;
         CallLogEvent(1002, "system", "start_run",
             new JObject {
-                {"run_id", runId },
+                {"run_id", gameID },
                 { "mode", "local"},
             });
     }
 
-    public void LogStartRunNetwork(string runId,
+    public void LogStartGameNetwork(string gameID,
                             string dwarfUserID, string dwarfSessionID, bool dwarfIsAI,
                             string giantUserID, string giantSessionID, bool giantIsAI,
                             string humanUserID, string humanSessionID, bool humanIsAI) {
-        if (runID != null) {
-            LogEndRun();
+        if (this.gameID != null) {
+            LogEndGame();
         }
-        this.runID = runId;
+        this.gameID = gameID;
         CallLogEvent(1010, "system", "start_run",
             new JObject {
-                {"run_id", runId },
+                {"run_id", gameID },
                 {"mode", "network"},
                 {"dwarf", new JObject { { "user_id", dwarfUserID}, { "session_id", dwarfSessionID}, {"ai", dwarfIsAI } } },
                 {"giant", new JObject { { "user_id", giantUserID}, { "session_id", giantSessionID}, {"ai", giantIsAI } } },
@@ -266,9 +270,9 @@ public class CompetitionMiddleware : MonoBehaviour {
             });
     }
 
-    public void LogEndRun() {
-        CallLogEvent(1011, "system", "end_run", "run_id", runID);
-        runID = null;
+    public void LogEndGame() {
+        CallLogEvent(1011, "system", "end_run", "run_id", gameID);
+        gameID = null;
     }
 
     public void LogStartLevel(string levelName) {
@@ -503,6 +507,8 @@ public class CompetitionMiddleware : MonoBehaviour {
             true);
     }
 
+
+    //TODO need to figure out what to do with this for the Register Command, which predates the characterId system
     public void LogHMTInterfaceCall(int characterId, HMT.Command command) {
         if (!RegisteredAgents.ContainsKey(characterId)) {
             Debug.LogErrorFormat("Could not find agent record for service target {0}", characterId);

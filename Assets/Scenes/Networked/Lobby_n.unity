@@ -3326,6 +3326,10 @@ PrefabInstance:
       value: n_HMTInterface
       objectReference: {fileID: 0}
     - target: {fileID: 1279532905161452690, guid: 836215f7b9d40481c9494a79feab06d2, type: 3}
+      propertyPath: StartServerOnStart
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279532905161452690, guid: 836215f7b9d40481c9494a79feab06d2, type: 3}
       propertyPath: serviceTargets.Array.data[1]
       value: giant
       objectReference: {fileID: 0}
@@ -4387,11 +4391,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4543776451520676383, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
       propertyPath: enableLogging
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4543776451520676383, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
       propertyPath: overrideAIMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}

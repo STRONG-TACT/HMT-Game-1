@@ -33,17 +33,24 @@ public class NetworkLobbyManager : MonoBehaviour
             yield break;
         }
 
+
+        Debug.LogFormat("Starting Autonomous Launch Sequence");
+        Debug.LogFormat("photonroom: {0}, localmode: {1}", Args.GetArgValue("photonroom", ""), Args.GetArgValue("localmode",false));
+
         if(Args.GetArgValue("localmode", false)) {
+            Debug.Log("Starting Local Mode");
             LocalTestSelected();
             yield break;
         }
         else {
             //act like we cliked Online
+            Debug.Log("Starting Online Mode");
             OnlinePlaySelected();
             //spin until we're connected
             while(onBoardingState != OnBoardingState.CreateOrJoinRoom) {
                 yield return null;
             }
+
             //attempt to join a room, will need to edit that function to get the name
             JoinRoomAttempt(Args.GetArgValue("photonroom",""));
             yield break;
@@ -55,7 +62,7 @@ public class NetworkLobbyManager : MonoBehaviour
 
     public void LocalTestSelected() {
         string runID = System.Guid.NewGuid().ToString();
-        CompetitionMiddleware.Instance.LogStartRunLocal(runID);
+        CompetitionMiddleware.Instance.LogStartGameLocal(runID);
         SceneManager.LoadScene(GlobalConstant.LOCAL_SCENE);
     }
     

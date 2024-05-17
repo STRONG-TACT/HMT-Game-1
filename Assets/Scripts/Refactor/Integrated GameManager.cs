@@ -48,8 +48,7 @@ public class IntegratedGameManager : MonoBehaviour
     public static IntegratedGameManager S;
     public float excecutionStepTime = 1;
 
-    protected virtual void Awake()
-    {
+    protected virtual void Awake() {
         if (S) Destroy(this);
         else S = this;
     }
@@ -69,8 +68,14 @@ public class IntegratedGameManager : MonoBehaviour
         gameData = GameData.S;
         pinningSystem = PinningSystem.S;
         goalCount = 0;
-        localChar = inSceneCharacters[(isNetworkGame) ? NetworkMiddleware.S.myCharacterID : 0];
 
+        Debug.LogFormat("NetworkMiddleware.S.myCharacterID = {0}", NetworkMiddleware.S.myCharacterID);
+
+#if HMT_BUILD
+        localChar = inSceneCharacters[0]; //Agent'd don't care about the localChar
+#else
+        localChar = inSceneCharacters[(isNetworkGame) ? NetworkMiddleware.S.myCharacterID : 0];
+#endif
         StartCoroutine(StartLevel());
     }
 

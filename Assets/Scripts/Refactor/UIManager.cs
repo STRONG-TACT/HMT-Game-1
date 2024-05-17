@@ -49,10 +49,6 @@ public class UIManager : MonoBehaviour
     public Button GiantBtn;
     public Button HumanBtn;
 
-    [Header("Chracter Stats UI (Deprecated)")]
-    public GameObject[] DiceStats = new GameObject[3];
-    public GameObject[] BonusStats = new GameObject[3];
-
     [Header("Combat UI")]
     public GameObject CombatUI;
     public GameObject[] PlayerCombatSlots = new GameObject[3];

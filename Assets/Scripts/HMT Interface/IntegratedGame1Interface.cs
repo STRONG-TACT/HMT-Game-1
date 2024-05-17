@@ -20,6 +20,12 @@ public class IntegratedGame1Interface : HMTInterface {
     [Tooltip("The Index of the Human Character in the GameManager's inScheneCharaters Array")]
     public int humanID = 2;
 
+    private bool InGame {
+        get {
+            return IntegratedGameManager.S != null;
+        }
+    }
+
     // Start is called before the first frame update
     protected override void Start() {
         base.Start();
@@ -34,32 +40,34 @@ public class IntegratedGame1Interface : HMTInterface {
 
     public override IEnumerator ProcessCommand(Command command) {
         CompetitionMiddleware.Instance.LogHMTInterfaceCall(GetTargetCharacterID(command.target), command);
-        switch (IntegratedGameManager.S.gameStatus) {
-            case GameConstant.GameStatus.GetReady:
-                command.SendErrorResponse("Game is not started yet.", 1002);
-                break;
-            case GameConstant.GameStatus.GameEnd:
-                command.SendGameOverResponse("Game Over"); // may want to send more interesting information than this
-                yield break;
-            case GameConstant.GameStatus.Animation_Pause:
-                command.SendErrorResponse("Game in Deprecated Phase. This shouldn't be possible please report it.", 9001);
-                yield break;
-
-
-            case GameConstant.GameStatus.Player_Moving:
-            case GameConstant.GameStatus.Monster_Moving:
-                if(command.command == "execute_action") {
-                    command.SendIllegalActionResponse("Attempted Action in Movement Phase, actions are not allowed.", 2000);
+        if (InGame) {
+            switch (IntegratedGameManager.S.gameStatus) {
+                case GameConstant.GameStatus.GetReady:
+                    command.SendErrorResponse("Game is not started yet.", 1002);
+                    break;
+                case GameConstant.GameStatus.GameEnd:
+                    command.SendGameOverResponse("Game Over"); // may want to send more interesting information than this
                     yield break;
-                }
-                break;
-            case GameConstant.GameStatus.Player_Pinning:
-            case GameConstant.GameStatus.Player_Planning:
-                break;
-            default:
-                Debug.LogWarningFormat("Execute Action called in Unknown Game State {0}", IntegratedGameManager.S.gameStatus);
-                command.SendErrorResponse(string.Format("Game in Unknown Phase: {0}", IntegratedGameManager.S.gameStatus), 9000);
-                yield break;
+                case GameConstant.GameStatus.Animation_Pause:
+                    command.SendErrorResponse("Game in Deprecated Phase. This shouldn't be possible please report it.", 9001);
+                    yield break;
+
+
+                case GameConstant.GameStatus.Player_Moving:
+                case GameConstant.GameStatus.Monster_Moving:
+                    if (command.command == "execute_action") {
+                        command.SendIllegalActionResponse("Attempted Action in Movement Phase, actions are not allowed.", 2000);
+                        yield break;
+                    }
+                    break;
+                case GameConstant.GameStatus.Player_Pinning:
+                case GameConstant.GameStatus.Player_Planning:
+                    break;
+                default:
+                    Debug.LogWarningFormat("Execute Action called in Unknown Game State {0}", IntegratedGameManager.S.gameStatus);
+                    command.SendErrorResponse(string.Format("Game in Unknown Phase: {0}", IntegratedGameManager.S.gameStatus), 9000);
+                    yield break;
+            }
         }
 
 
@@ -101,7 +109,7 @@ public class IntegratedGame1Interface : HMTInterface {
         CompetitionMiddleware.Instance.AddAIAgent(target, agent_id, character_id);
 
 
-        while(IntegratedGameManager.S == null) {
+        while(!InGame) {
             yield return null;
         }
         while(IntegratedGameManager.S.gameStatus == GameConstant.GameStatus.GetReady) {

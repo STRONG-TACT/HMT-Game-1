@@ -4,15 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using GameConstant;
 
-public class IntegratedNetworkGameManager : IntegratedGameManager
-{
+public class IntegratedNetworkGameManager : IntegratedGameManager {
     
-    protected override void Awake()
-    {
+    protected override void Awake() {
         base.Awake();
         isNetworkGame = true;
-        if (S) Destroy(this);
-        else S = this;
     }
 
     protected override void Start()
