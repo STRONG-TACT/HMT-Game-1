@@ -25,6 +25,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
         base.TimeoutSubmit();
         foreach(Character character in inSceneCharacters) {
             if (!character.ReadyForNextPhase) {
+                CompetitionMiddleware.Instance.LogTimeOut(character.CharacterId);
                 NetworkMiddleware.S.CallReadyForNextPhaseAuto(character.CharacterId, true);
             }
         }

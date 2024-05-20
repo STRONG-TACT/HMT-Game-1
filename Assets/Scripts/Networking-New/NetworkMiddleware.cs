@@ -50,6 +50,8 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         return Random.Range(min, max);
     }
 
+    #region Common RPCs
+
     /// <summary>
     /// This is similar to the CallReadForNextPhase method but is meant to only be called when a 
     /// Ready state is set automatically rather than by player action. In this case the RPCs should 
@@ -67,6 +69,9 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     }
 
     public void CallReadyForNextPhase(int charID, bool ready) {
+        if (ready) {
+            CompetitionMiddleware.Instance.LogSubmit(charID);
+        }
         if (IntegratedGameManager.S.isNetworkGame) {
             photonView.RPC("ReadyForNextPhaseLocal", RpcTarget.All, charID, ready);
         }
@@ -93,6 +98,10 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         }
     }
 
+    #endregion
+
+    #region Pinning Phase RPCs
+
     public void CallMovePingCursorOnCharacter(int charID, Character.Direction direction) {
         if (IntegratedGameManager.S.isNetworkGame) {
             photonView.RPC("MovePingCursorOnCharacterLocal", RpcTarget.All,charID, direction);
@@ -107,8 +116,36 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         IntegratedGameManager.S.inSceneCharacters[charID].MovePingCursor(direction);
     }
 
+    public void CallDropPinAt(int charId, int pinTypeIdx, int row, int col) {
+        CompetitionMiddleware.Instance.LogPlacePin(charId, pinTypeIdx, row, col);
+        if (IntegratedGameManager.S.isNetworkGame) {
+            photonView.RPC(
+                "DropPinAtLocal",
+                RpcTarget.All,
+                pinTypeIdx,
+                row, col,
+                charId);
+        }
+        else {
+            DropPinAtLocal(charId, pinTypeIdx, row, col);
+        }
+
+    }
+
+    [PunRPC]
+    private void DropPinAtLocal(int charId, int pinTypeIdx, int row, int col) {
+        PinningSystem.S.InstantiatePin(pinTypeIdx, row, col, charId);
+        IntegratedGameManager.S.inSceneCharacters[charId].PinPlaced();
+        UIManager.S.UpdateCommonHUD();
+        UIManager.S.UpdateCharacterPinUI();
+    }
+
+    #endregion
+
+    #region Planning Phase RPCs
 
     public void CallAddMoveToCharacter(int charID, Character.Direction direction) {
+        CompetitionMiddleware.Instance.LogAddPlan(charID, direction);
         if (IntegratedGameManager.S.isNetworkGame) {
             photonView.RPC("AddMoveToCharacterLocal", RpcTarget.All, charID, direction);
         }
@@ -126,6 +163,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     }
 
     public void CallUndoPlanStep(int charID) {
+        CompetitionMiddleware.Instance.LogUndoPlan(charID);
         if (IntegratedGameManager.S.isNetworkGame) {
             photonView.RPC("UndoPlanStepLocal", RpcTarget.All, charID);
         }
@@ -141,26 +179,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         UIManager.S.UpdateCharacterPlanUI();
     }
 
-    public void CallDropPinAt(int charId, int pinTypeIdx, int row, int col) {
-        if (IntegratedGameManager.S.isNetworkGame) {
-            photonView.RPC(
-                "DropPinAtLocal", 
-                RpcTarget.All,
-                pinTypeIdx, 
-                row, col, 
-                charId);
-        }
-        else {
-            DropPinAtLocal(charId, pinTypeIdx, row, col);
-        }
-        
-    }
+    #endregion
 
-    [PunRPC]
-    private void DropPinAtLocal(int charId, int pinTypeIdx, int row, int col) {
-        PinningSystem.S.InstantiatePin(pinTypeIdx, row, col, charId);
-        IntegratedGameManager.S.inSceneCharacters[charId].PinPlaced();
-        UIManager.S.UpdateCommonHUD();
-        UIManager.S.UpdateCharacterPinUI();
-    }
+    
 }

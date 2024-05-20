@@ -40,11 +40,13 @@ public class IntegratedNetworkGameManager : IntegratedGameManager {
 
             foreach(CompetitionMiddleware.AgentRecord agent in CompetitionMiddleware.Instance.RegisteredAgents.Values) {
                 if (!inSceneCharacters[agent.characterID].ReadyForNextPhase) {
+                    CompetitionMiddleware.Instance.LogTimeOut(agent.characterID);
                     NetworkMiddleware.S.CallReadyForNextPhase(agent.characterID, true);
                 }
             }
         }
         else {
+            CompetitionMiddleware.Instance.LogTimeOut(localChar.CharacterId);
             NetworkMiddleware.S.CallReadyForNextPhase(localChar.CharacterId,true);
         }
     }

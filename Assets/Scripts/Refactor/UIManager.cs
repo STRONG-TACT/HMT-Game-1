@@ -269,6 +269,7 @@ public class UIManager : MonoBehaviour
         //TODO we may want to send different names for these log functions
         PinningSystem.S.ClosePinWheel();
         NetworkMiddleware.S.CallReadyForNextPhase(IntegratedGameManager.S.localChar.CharacterId, true);
+        
         UpdateCharacterPinUI();
     }
 
@@ -293,6 +294,7 @@ public class UIManager : MonoBehaviour
             PlanDownBtn.interactable = false;
             PlanLeftBtn.interactable = false;
             PlanRightBtn.interactable = false;
+            PlanWaitBtn.interactable = false;
             PlanUndoBtn.interactable = false;
             PlanSubmitBtn.interactable = false;
         }
@@ -302,24 +304,27 @@ public class UIManager : MonoBehaviour
             PlanDownBtn.interactable = false;
             PlanLeftBtn.interactable = false;
             PlanRightBtn.interactable = false;
+            PlanWaitBtn.interactable = false;
             PlanUndoBtn.interactable = true;
             PlanSubmitBtn.interactable = true;
         }
         // we haven't taken any actions so lock undo
         else if(currentCharacter.ActionPlan.Count == 0) {
-            PlanUpBtn.interactable = true;
-            PlanDownBtn.interactable = true;
-            PlanLeftBtn.interactable = true;
-            PlanRightBtn.interactable = true;
+            PlanUpBtn.interactable = currentCharacter.CheckMove(Character.Direction.Up);//    true;
+            PlanDownBtn.interactable = currentCharacter.CheckMove(Character.Direction.Down);// true;
+            PlanLeftBtn.interactable = currentCharacter.CheckMove(Character.Direction.Left); //true;
+            PlanRightBtn.interactable = currentCharacter.CheckMove(Character.Direction.Right);// true;
+            PlanWaitBtn.interactable = true;
             PlanUndoBtn.interactable = false;
             PlanSubmitBtn.interactable = true;
         }
         // fall through we unlock everything
         else {
-            PlanUpBtn.interactable = true;
-            PlanDownBtn.interactable = true;
-            PlanLeftBtn.interactable = true;
-            PlanRightBtn.interactable = true;
+            PlanUpBtn.interactable = currentCharacter.CheckMove(Character.Direction.Up);//    true;
+            PlanDownBtn.interactable = currentCharacter.CheckMove(Character.Direction.Down);// true;
+            PlanLeftBtn.interactable = currentCharacter.CheckMove(Character.Direction.Left); //true;
+            PlanRightBtn.interactable = currentCharacter.CheckMove(Character.Direction.Right);// true;
+            PlanWaitBtn.interactable = true;
             PlanUndoBtn.interactable = true;
             PlanSubmitBtn.interactable = true;
         }
@@ -329,11 +334,15 @@ public class UIManager : MonoBehaviour
         PlanUIPanel.SetActive(false);
     }
     public void AddMoveToCharacter(Character.Direction direction) {
-        NetworkMiddleware.S.CallAddMoveToCharacter(IntegratedGameManager.S.localChar.CharacterId, direction);
+        if (IntegratedGameManager.S.localChar.ActionPointsRemaining > 0 && IntegratedGameManager.S.localChar.CheckMove(direction)) {
+            NetworkMiddleware.S.CallAddMoveToCharacter(IntegratedGameManager.S.localChar.CharacterId, direction);
+        }
     }
 
     public void UndoPlanStep() {
-        NetworkMiddleware.S.CallUndoPlanStep(IntegratedGameManager.S.localChar.CharacterId);
+        if (IntegratedGameManager.S.localChar.ActionPlan.Count > 0) {
+            NetworkMiddleware.S.CallUndoPlanStep(IntegratedGameManager.S.localChar.CharacterId);
+        }
     }
 
     public void SubmitPlan() {

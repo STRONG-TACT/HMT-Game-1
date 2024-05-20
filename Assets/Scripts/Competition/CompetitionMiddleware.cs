@@ -370,40 +370,42 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
 
-    public void LogPlacePin(int characterId, string pinType, int x, int y) {
+    public void LogPlacePin(int characterId, int pinTypeIdx, int x, int y) {
         if (RegisteredAgents.ContainsKey(characterId)) {
             CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
                 3100, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "place_pin",
-                new JObject { { "x", x }, { "y", y }, { "type", pinType } },
+                new JObject { { "x", x }, { "y", y }, { "type", PinningSystem.PinIndxToPinType(pinTypeIdx) } },
                 true);
         }
         else {
             CallLogEvent(3100,
                 IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName,
                 "place_pin",
-                new JObject { { "x", x }, { "y", y }, { "type", pinType } },
+                new JObject { { "x", x }, { "y", y }, { "type", PinningSystem.PinIndxToPinType(pinTypeIdx) } },
                 true);
         }
     }
 
-    public void LogAddPlan(int characterId, Character.Direction direct, IList<Character.Direction> resultPlan) {
+    public void LogAddPlan(int characterId, Character.Direction direct) {
+        IList<Character.Direction> resultPlan = IntegratedGameManager.S.inSceneCharacters[characterId].ActionPlan;
         if (RegisteredAgents.ContainsKey(characterId)) {
             CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
                 3101, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "edit_plan",
-                new JObject { "edit", direct.ToString(), "result_plan", new JArray(resultPlan) }, true);
+                new JObject { { "edit", direct.ToString()}, { "result_plan", new JArray(resultPlan) } }, true);
         }
         else {
             CallLogEvent(3101, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "edit_plan",
-                new JObject { "edit", direct.ToString(), "result_plan", new JArray(resultPlan) },
+                new JObject { { "edit", direct.ToString() },{ "result_plan", new JArray(resultPlan) } },
                 true);
         }
     }
 
-    public void LogUndoPlan(int characterId, IList<Character.Direction> resultPlan) {
+    public void LogUndoPlan(int characterId) {
+        IList<Character.Direction> resultPlan = IntegratedGameManager.S.inSceneCharacters[characterId].ActionPlan;
         if (RegisteredAgents.ContainsKey(characterId)) {
             CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
                 3101, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "edit_plan",
-                new JObject { "edit", "undo", "result_plan", new JArray(resultPlan) }, true);
+                new JObject { { "edit", "undo" }, { "result_plan", new JArray(resultPlan) } }, true);
         }
         else {
             CallLogEvent(3101, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "edit_plan",

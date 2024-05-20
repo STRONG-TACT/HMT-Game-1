@@ -447,28 +447,6 @@ public class IntegratedGame1Interface : HMTInterface {
         }
     }
 
-    //Refernce PinningSystems idx2PinPrefab
-    private static int ResolvePinType(string pinType) {
-        switch (pinType.ToLower()) {
-            case "danger":
-            case "a":
-                return 1;
-            case "assist":
-            case "b":
-                return 2;
-            case "way":
-            case "omw":
-            case "c":
-                return 3;
-            case "unknown":
-            case "question":
-            case "d":
-                return 0;
-            default:
-                return -1;
-        }
-    }
-
     private static Character.Direction DirectionFromString(string direct) {
         switch (direct.ToLower()) {
             case "up":
@@ -522,7 +500,7 @@ public class IntegratedGame1Interface : HMTInterface {
                     yield break;
                 }
 
-                int pinType = ResolvePinType(inputs["type"].ToString());
+                int pinType = PinningSystem.PinTypeToPinIdx(inputs["type"].ToString());
                 Vector2Int pos = target.currentTile.GridPosition + target.pingCursor;
 
                 if (inputs.ContainsKey("x")) {
@@ -534,11 +512,19 @@ public class IntegratedGame1Interface : HMTInterface {
                     command.SendIllegalActionResponse(string.Format("Attempting to pin outside of map {0}, {1}", pos.x, pos.y),2001);
                     yield break;
                 }
-
-                NetworkMiddleware.S.CallDropPinAt(target.CharacterId, pinType, pos.x, pos.y);
+                if (target.ActionPointsRemaining == 0) {
+                    command.SendIllegalActionResponse("Out of Action Points, cannot place pin", 2002);
+                }
+                else {
+                    NetworkMiddleware.S.CallDropPinAt(target.CharacterId, pinType, pos.x, pos.y);
+                }
                 break;
 
             case "submit":
+                if (target.ReadyForNextPhase) {
+                    command.SendIllegalActionResponse("Cannot submit plan, already submitted", 2008);
+                    yield break;
+                }
                 NetworkMiddleware.S.CallReadyForNextPhase(target.CharacterId, true);
                 command.SendOKResponse("Pings Submited");
                 break;
@@ -547,7 +533,7 @@ public class IntegratedGame1Interface : HMTInterface {
             case "left":
             case "right":
                 if (target.ActionPointsRemaining == 0) {
-                    command.SendIllegalActionResponse("No Action Points Remaining on Pin Move",2002);
+                    command.SendIllegalActionResponse("Out of Action Points, cannot move pin cursor", 2002);
                 }
                 else {
                     NetworkMiddleware.S.CallMovePingCursorOnCharacter(target.CharacterId, DirectionFromString(action));
@@ -588,6 +574,10 @@ public class IntegratedGame1Interface : HMTInterface {
                 command.SendIllegalActionResponse("Pin Command Sent in Planning Phase",2004);
                 yield break;
             case "submit":
+                if (target.ReadyForNextPhase) {
+                    command.SendIllegalActionResponse("Cannot submit plan, already submitted",2008);
+                    yield break;
+                }
                 NetworkMiddleware.S.CallReadyForNextPhase(target.CharacterId, true);
                 command.SendOKResponse("Plan Submited");
                 break;

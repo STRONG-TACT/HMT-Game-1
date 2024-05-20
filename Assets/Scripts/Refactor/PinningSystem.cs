@@ -137,4 +137,40 @@ public class PinningSystem : MonoBehaviour
         
         ClosePinWheel();
     }
+
+    public static int PinTypeToPinIdx(string pinType) {
+        switch (pinType.ToLower()) {
+            case "danger":
+            case "a":
+                return 1;
+            case "assist":
+            case "b":
+                return 2;
+            case "way":
+            case "omw":
+            case "c":
+                return 3;
+            case "unknown":
+            case "question":
+            case "d":
+                return 0;
+            default:
+                return -1;
+        }
+    }
+
+    public static string PinIndxToPinType(int idx) {
+        switch (idx) {
+            case 0:
+                return "d";
+            case 1:
+                return "a";
+            case 2:
+                return "b";
+            case 3:
+                return "c";
+            default:
+                return "Unknown";
+        }
+    }
 }
