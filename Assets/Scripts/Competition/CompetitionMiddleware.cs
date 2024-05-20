@@ -439,8 +439,9 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     #region 4000s Logging Messages, Game System Events
 
-    public void LogPlayerSpawn(string character, int x, int y) {
+    public void LogPlayerSpawn(int characterId, int x, int y) {
         if (!LogSystemEvents) return;
+        string character = IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName;
         CallLogEvent(4001, character, "player_spawn",
             new JObject { { "x", x }, { "y", y } },
             true);

@@ -473,6 +473,18 @@ PrefabInstance:
       propertyPath: TimerText
       value: 
       objectReference: {fileID: 688945536}
+    - target: {fileID: 6070971950461641543, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: config
+      value: 
+      objectReference: {fileID: 11400000, guid: ddef099a6c3811c4c91188e77be96c42, type: 2}
+    - target: {fileID: 6070971950461641559, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: config
+      value: 
+      objectReference: {fileID: 11400000, guid: c6b44fe2a04fe7b44872f86875a07caf, type: 2}
+    - target: {fileID: 6070971950461641565, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: config
+      value: 
+      objectReference: {fileID: 11400000, guid: c716ed11fa455404ab8b58937cdf7629, type: 2}
     - target: {fileID: 6070971950651353378, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: sceneViewId
       value: 1

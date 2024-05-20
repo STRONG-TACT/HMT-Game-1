@@ -59,7 +59,7 @@ public class IntegratedGameManager : MonoBehaviour
     {
         Character targetChara = inSceneCharacters[ID];
         Vector3 newPosition = new Vector3(x, targetChara.transform.position.y, z);
-        targetChara.setStartPos(newPosition);
+        targetChara.SetStartPosition(newPosition);
     }
 
 
@@ -349,8 +349,7 @@ public class IntegratedGameManager : MonoBehaviour
             foreach (Monster mon in inSceneMonsters)
             {
                 Tile currentTile = mon.currentTile;
-                if (currentTile.enemyList.Count > 1)
-                {
+                if (currentTile.MultipleMonsters) {
                     int startRow = currentTile.row;
                     int startCol = currentTile.col;
                     bool foundSpot = false;
@@ -369,9 +368,12 @@ public class IntegratedGameManager : MonoBehaviour
                                     if (IntegratedMapGenerator.Instance.InMap(targetRow, targetCol))
                                     {
                                         Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(targetRow, targetCol);
-                                        if (targetTile.tileType == Tile.ObstacleType.None && targetTile.enemyList.Count == 0
-                                            && targetTile.charaList.Count == 0 && targetTile.gameObject.tag != "Rock" && targetTile.gameObject.tag != "Trap" && targetTile.gameObject.layer != LayerMask.NameToLayer("Impassible"))
-                                        {
+                                        if (targetTile.tileType == Tile.ObstacleType.None && !targetTile.IsOccupied) {                                             
+                                        //    targetTile.enemyList.Count == 0
+                                        //    && targetTile.charaList.Count == 0 && targetTile.gameObject.tag != "Rock" && targetTile.gameObject.tag != "Trap" && targetTile.gameObject.layer != LayerMask.NameToLayer("Impassible"))
+                                        // The second line of this conditional should not be necessary as it is covered by the Obstacle type.
+                                        // if a tile were to fall through to that line it would be a case of a misconfigured prefab.
+                                        //{
                                             availablePos.Add(targetTile);
                                         }
                                     }
@@ -402,128 +404,97 @@ public class IntegratedGameManager : MonoBehaviour
         }
 
         Debug.Log("Monster moving phase ended.");
-        foreach (Character chara in inSceneCharacters)
-        {
-            if (chara.dead)
-            {
-                chara.RespawnCountdown();
-                //update life status ui if character respawns
-                if (!chara.dead) {
-                    UIManager.S.UpdateCharacterLifeStatus(chara.CharacterId, true);
-                }
-            }
-        }
+        //foreach (Character chara in inSceneCharacters)
+        //{
+        //    if (chara.dead)
+        //    {
+        //        chara.RespawnCheck();
+        //        //update life status ui if character respawns
+        //        if (!chara.dead) {
+        //            UIManager.S.UpdateCharacterLifeStatus(chara.CharacterId, true);
+        //        }
+        //    }
+        //}
         StartPlayerTurn();
     }
 
     // Execute all the events happened within one step time
     // Combat.ExecuteCombat() is the actual combat function
-    protected virtual IEnumerator ExecuteCombatOneByOne()
-    {
+    protected virtual IEnumerator ExecuteCombatOneByOne() {
         Debug.LogFormat("Exectuing {0} events in queue.", eventQueue.Count);
 
-        while (eventQueue.Count != 0)
-        {
+        while (eventQueue.Count != 0) {
             bool win = false;
             Tile t = eventQueue.Dequeue();
+            Debug.LogFormat("Processing Event at {0}, {1}", t.row, t.col);            
+            
+            bool visibility = t.fogOfWarDictionary[localChar.CharacterId] == Tile.FogOfWarState.Visible;
+            Combat.FightType challengeType;
 
-            Debug.LogFormat("Processing Event at {0}, {1}", t.row, t.col);
-            Tile.FogOfWarState fow_state = t.fogOfWarDictionary[localChar.CharacterId];
-            bool visibility;
-            if (fow_state == Tile.FogOfWarState.Visible)
-            {
-                visibility = true;
-            }
-            else
-            {
-                visibility = false;
-            }
-            switch (t.tileType)
-            {
+            switch (t.tileType) {
                 case Tile.ObstacleType.None:
+                    challengeType = Combat.FightType.Monster;
                     win = Combat.ExecuteCombat(Combat.FightType.Monster, t, visibility);
                     break;
                 case Tile.ObstacleType.Trap:
+                    challengeType = Combat.FightType.Trap;
                     win = Combat.ExecuteCombat(Combat.FightType.Trap, t, visibility);
                     break;
                 case Tile.ObstacleType.Rock:
+                    challengeType = Combat.FightType.Rock;
                     win = Combat.ExecuteCombat(Combat.FightType.Rock, t, visibility);
                     break;
+                default:
+                    Debug.LogWarning("Unknown Combat Type Encountered");
+                    continue;
             }
             //play attack animation for all characters and monster on the tile
             //make a copy of the characters and monsters that are originally in the tile. So that if a character or monster moves elsewhere, we can still find it
-            List<Character> copiedCharacters = new List<Character>(t.charaList);
-            List<Monster> copiedEnemies = new List<Monster>(t.enemyList);
-            foreach (Character c in copiedCharacters)
-            {
+            List<Character> copiedCharacters = t.CharacterList;
+            List<Monster> copiedEnemies = t.EnemyList;
+            foreach (Character c in copiedCharacters) {
                 c.State = Character.CharacterState.Attacking;
             }
-            foreach (Monster mo in copiedEnemies)
-            {
+            foreach (Monster mo in copiedEnemies) {
                 mo.State = Monster.CharacterState.Attacking;
             }
 
-            if (win)
-            {
+            if (win) {
                 // if the character(s) won the battle, destory the enemies
                 Debug.Log("Character won.");
-                switch (t.tileType)
-                {
-                    case Tile.ObstacleType.None:
-                        foreach (Monster m in t.enemyList)
-                        {
-                            m.Kill(excecutionStepTime);
-                            inSceneMonsters.Remove(m);
-                        }
-                        t.enemyList.Clear();
+                switch (challengeType) {
+                    case Combat.FightType.Monster:
+                        t.ClearMonsters();
                         break;
-                    case Tile.ObstacleType.Trap:
-                    case Tile.ObstacleType.Rock:
-                        var copy = new Dictionary<int, Tile.FogOfWarState>();
-                        foreach (KeyValuePair<int, Tile.FogOfWarState> entry in t.fogOfWarDictionary)
-                        {
-                           copy.Add(entry.Key, entry.Value);
-                        }
-                        GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
-                        Tile newTile = opentile.GetComponent<Tile>();
-                        newTile.fogOfWarDictionary = copy;
-                        newTile.row = t.row;
-                        newTile.col = t.col;
-                        IntegratedMapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
-                        Destroy(t.gameObject);
+                    case Combat.FightType.Trap:
+                    case Combat.FightType.Rock:
+                        IntegratedMapGenerator.Instance.ClearTile(t.col, t.row);
                         break;
                 }
 
                 //problem -> need to fix
                 IntegratedMapGenerator.Instance.UpdateFOWVisuals();
             }
-            else
-            {
+            else {
                 // If not, reduce health except rock
                 // If character's turn, all remaining steps should be cleared.
                 Debug.Log("Enemy won.");
 
                 List<Character> deadChara = new List<Character>();
                 List<Character> aliveChara = new List<Character>();
-                switch (t.tileType)
-                {
+                switch (t.tileType) {
                     case Tile.ObstacleType.None:
-                        reduceCharacterHealth(t.charaList, deadChara, aliveChara);
-                        if (gameStatus == GameStatus.Player_Moving)
-                        {
-                            clearCharacterMoves(t.charaList);
+                        foreach(Character chara in t.CharacterList) {
+                            chara.TakeDamage();
                         }
-
+                        
                         // if player got defeated by monster on a shrine tile
                         // and the player correspond to that shrine tile
                         // then we should "unreach" the shrine
-                        if (t.gameObject.CompareTag("Goal"))
-                        {
+                        if (t.gameObject.CompareTag("Goal")) {
                             Shrine shrine = t.gameObject.GetComponentInChildren<Shrine>();
-                            foreach (var character in t.charaList)
-                            {
-                                if (shrine.CheckShrineType(character))
-                                {
+                            foreach (var character in t.CharacterList) {
+                                if (shrine.CheckShrineType(character)) {
                                     GoalUnReached(character.CharacterId);
                                     shrine.ReturnOrb();
                                 }
@@ -531,48 +502,29 @@ public class IntegratedGameManager : MonoBehaviour
                         }
                         break;
                     case Tile.ObstacleType.Trap:
-                        reduceCharacterHealth(t.charaList, deadChara, aliveChara);
-                        clearCharacterMoves(t.charaList);
-                        Dictionary<int, Tile.FogOfWarState> fogOfWarDictionary = new Dictionary<int, Tile.FogOfWarState>();
-                        foreach (KeyValuePair<int, Tile.FogOfWarState> entry in t.fogOfWarDictionary)
-                        {
-                            fogOfWarDictionary.Add(entry.Key, entry.Value);
+                        foreach(Character chara in t.CharacterList) {
+                            chara.TakeDamage();
                         }
-                        GameObject opentile = Instantiate(FindObjectOfType<GameAssets>().OpenTile, new Vector3(t.transform.position.x, 0, t.transform.position.z), Quaternion.identity, t.transform.parent);
-                        Tile newTile = opentile.GetComponent<Tile>();
-                        newTile.fogOfWarDictionary = fogOfWarDictionary;
-                        newTile.row = t.row;
-                        newTile.col = t.col;
-                        IntegratedMapGenerator.Instance.SetTileAt(newTile.row, newTile.col, newTile);
-                        Destroy(t.gameObject);
+                        IntegratedMapGenerator.Instance.ClearTile(t.col, t.row);
                         break;
                     case Tile.ObstacleType.Rock:
-                        foreach (Character c in t.charaList)
-                        {
-                            aliveChara.Add(c);
+                        foreach (Character c in t.CharacterList) {
+                            c.ResetPlan();
                         }
-
-                        clearCharacterMoves(t.charaList);
                         break;
                 }
 
-                foreach (Character c in deadChara)
-                {
-                    t.charaList.Remove(c);
-                }
-                if (gameStatus == GameStatus.Player_Moving)
-                {
-                    foreach (Character c in aliveChara)
-                    {
-                        c.Retreat();
-                    }
-                }
-                else if (gameStatus == GameStatus.Monster_Moving && aliveChara.Count > 0)
-                {
-                    foreach (Monster m in t.enemyList)
-                    {
-                        m.Retreat();
-                    }
+                switch(gameStatus) {
+                    case GameStatus.Player_Moving:
+                        foreach (Character c in t.CharacterList) {
+                            c.Retreat();
+                        }
+                        break;
+                    case GameStatus.Monster_Moving:
+                        foreach (Monster m in t.EnemyList) {
+                            m.Retreat();
+                        }
+                        break;
                 }
                 IntegratedMapGenerator.Instance.UpdateFOWVisuals();
             }
@@ -612,7 +564,7 @@ public class IntegratedGameManager : MonoBehaviour
     {
         foreach (Character c in charaList)
         {
-            c.DecrementHealth();
+            c.TakeDamage();
 
             if (c.dead)
             {
@@ -649,6 +601,13 @@ public class IntegratedGameManager : MonoBehaviour
         UIManager.S.UpdateCharacterGoalStatus(charaID, false);
         goalCount -= 1;
         Debug.Log("refunded");
+    }
+
+    public virtual void CharacterDied(int charaID) {
+        UIManager.S.UpdateCharacterLifeStatus(charaID, false);
+        UIManager.S.UpdateCommonHUD();
+        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+        CheckLoseCondition();
     }
 
     // Called by Tile.OnTriggerEnter(), when an event happens at the newTile

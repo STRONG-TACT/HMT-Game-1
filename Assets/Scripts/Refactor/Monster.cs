@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using UnityEngine;
 
 public class Monster : MonoBehaviour
@@ -180,7 +181,7 @@ public class Monster : MonoBehaviour
                 Debug.Log(string.Format("monsterID: {0}, turnFinished", monsterId));
                 turnFinished = true;
             }
-            Debug.Log(string.Format("monsterID: {0}, direction: {1}, movement: {2}, count: {3}", monsterId, direction, config.movement, moveCount));
+            Debug.Log(string.Format("monsterID: {0}, direction: {1}, StartingActionPoints: {2}, count: {3}", monsterId, direction, config.movement, moveCount));
         }
         State = CharacterState.Idle;
         moving = false;
@@ -199,7 +200,7 @@ public class Monster : MonoBehaviour
         direction.Normalize();
         if (direction != Vector3.zero)
         {
-            // Create a rotation that looks in the direction of movement
+            // Create a rotation that looks in the direction of StartingActionPoints
             moving = true;
             Quaternion targetRotation = Quaternion.LookRotation(direction);
             model.rotation = targetRotation;
@@ -217,7 +218,11 @@ public class Monster : MonoBehaviour
     }
 
     private void OnDestroy() {
-        currentTile.enemyList.Remove(this);
+        currentTile.RemoveMonster(this);
+    }
+
+    public void Kill() {
+        Kill(IntegratedGameManager.S.excecutionStepTime);
     }
 
     public void Kill(float stepTime) {

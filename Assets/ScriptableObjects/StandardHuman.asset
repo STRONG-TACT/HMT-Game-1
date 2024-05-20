@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Human
   type: 0
-  movement: 4
+  StartingActionPoints: 5
+  StartingHealth: 3
   monsterDice:
     type: 8
     bonus: 0
@@ -25,8 +26,6 @@ MonoBehaviour:
     type: 6
     bonus: 0
   sightRange: 2
-  cameraPosition: {x: 0, y: 0, z: 0}
-  dieFaces: 010000000200000003000000040000000500000006000000
   characterIcon: {fileID: 21300000, guid: 84bedc0588834bb4595092c86e34fbbe, type: 3}
   youAreIcon: {fileID: 21300000, guid: a740938bd89e1e1428b00a651f693ae6, type: 3}
   color: {r: 0, g: 1, b: 0, a: 1}

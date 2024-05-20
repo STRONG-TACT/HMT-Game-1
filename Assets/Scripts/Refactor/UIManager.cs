@@ -236,7 +236,7 @@ public class UIManager : MonoBehaviour
     public void UpdateCommonHUD() {
         Character currentCharacter = IntegratedGameManager.S.localChar;
         UpdateHealthPanel(currentCharacter.Health);
-        UpdateActionPanel(currentCharacter.ActionPointsRemaining, currentCharacter.config.movement);
+        UpdateActionPanel(currentCharacter.ActionPointsRemaining, currentCharacter.config.StartingActionPoints);
 
     }
 

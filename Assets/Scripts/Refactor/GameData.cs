@@ -22,6 +22,14 @@ public class GameData : MonoBehaviour
     [Tooltip("The number of seconds a player has to take their turn in each Phase.")]
     public int TurntimeLimit = 120;
 
+    [Tooltip("The number of lives a character starts the game with.")]
+    [Min(1)]
+    public int LivesPerCharacter = 3;
+
+    [Tooltip("The number of Start Turns a character has to sit out before they can respawn.")]
+    [Min(1)]
+    public int RespawnDelay = 1;
+
     public static GameData S;
 
     private void Awake()

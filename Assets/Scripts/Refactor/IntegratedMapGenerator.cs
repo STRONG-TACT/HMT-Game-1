@@ -75,6 +75,23 @@ public class IntegratedMapGenerator : MonoBehaviour
         return true;
     }
 
+    public void ClearTile(int x, int y) {
+        Tile target = GetTileAt(x, y);
+/*      Shouldn't need to copy the map you should be able to just move it over
+        var fowMap = new Dictionary<int, Tile.FogOfWarState>();
+        foreach (KeyValuePair<int, Tile.FogOfWarState> entry in target.fogOfWarDictionary) {
+            fowMap.Add(entry.Key, entry.Value);
+        }
+*/
+        GameObject newOpenTileGO = Instantiate(gameAssets.OpenTile, target.transform.position, Quaternion.identity, tileParent);
+        Tile newTile = newOpenTileGO.GetComponent<Tile>();
+        newTile.fogOfWarDictionary = target.fogOfWarDictionary;
+        newTile.row = target.row;
+        newTile.col = target.col;
+        SetTileAt(x,y,newTile);
+        Destroy(target.gameObject);
+    }
+
     public bool InMap(int x, int y) {
         return x >= 0 && x < Map.GetLength(0) && y >= 0 && y < Map.GetLength(1);
     }
@@ -247,14 +264,17 @@ public class IntegratedMapGenerator : MonoBehaviour
         {
             case "1Spawn":
                 IntegratedGameManager.S.setCharaPosition(0, x, z);
+                CompetitionMiddleware.Instance.LogPlayerSpawn(0, tileObj.col, tileObj.row);
                 break;
 
             case "2Spawn":
                 IntegratedGameManager.S.setCharaPosition(1, x, z);
+                CompetitionMiddleware.Instance.LogPlayerSpawn(1, tileObj.col, tileObj.row);
                 break;
 
             case "3Spawn":
                 IntegratedGameManager.S.setCharaPosition(2, x, z);
+                CompetitionMiddleware.Instance.LogPlayerSpawn(2, tileObj.col, tileObj.row);
                 break;
 
             case "1Goal":

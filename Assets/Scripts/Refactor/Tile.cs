@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Tile : MonoBehaviour
@@ -55,9 +56,54 @@ public class Tile : MonoBehaviour
         }
     }
 
+    public bool IsOccupied {
+        get {
+            return enemyList.Count > 0 || charaList.Count > 0;
+        }
+    }
+
+    public bool IsOccupiedByEnemy {
+        get {
+            return enemyList.Count > 0;
+        }
+    }
+
+    /// <summary>
+    /// A list of characters on the tile. This is a copy of the actual list, so it can be modified without affecting the actual list.
+    /// </summary>
+    public List<Character> CharacterList {
+        get {
+            return new List<Character>(charaList);
+        }
+    }
+
+    /// <summary>
+    /// A list of characters on the tile that are still alive. This is a copy of the actual list, so it can be modified without affecting the actual list.
+    /// </summary>
+    public List<Character> LivingCharacterList {
+        get {
+            return charaList.Select(c => c).Where(c => !c.dead).ToList();
+        }
+    }
+
+    /// <summary>
+    /// A list of the enemies on the tile. This is a copy of the actual list, so it can be modified without affecting the actual list.
+    /// </summary>
+    public List<Monster> EnemyList {
+        get {
+            return new List<Monster>(enemyList);
+        }
+    }
+
+    public bool MultipleMonsters {
+        get {
+            return enemyList.Count > 1;
+        }
+    }
+
     // Lists of enemies and characters on this tile
-    public List<Monster> enemyList;
-    public List<Character> charaList;
+    private List<Monster> enemyList;
+    private List<Character> charaList;
     public List<Pin> pinList;
     public Shrine shrine = null;
 
@@ -69,13 +115,16 @@ public class Tile : MonoBehaviour
 
     private void Awake()
     {
+        charaList = new List<Character>();
+        enemyList = new List<Monster>();
         seen_material = Resources.Load<Material>("seen");
         unseen_material = Resources.Load<Material>("unseen");
-        fogOfWarDictionary = new Dictionary<int, Tile.FogOfWarState>();
-        fogOfWarDictionary.Add(0, Tile.FogOfWarState.Unseen);
-        fogOfWarDictionary.Add(1, Tile.FogOfWarState.Unseen);
-        fogOfWarDictionary.Add(2, Tile.FogOfWarState.Unseen);
-        
+        fogOfWarDictionary = new Dictionary<int, FogOfWarState> {
+            { 0, FogOfWarState.Unseen },
+            { 1, FogOfWarState.Unseen },
+            { 2, FogOfWarState.Unseen }
+        };
+
         Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
         foreach (Renderer renderer in renderers)
         {
@@ -86,6 +135,18 @@ public class Tile : MonoBehaviour
     private void Start()
     {
         
+    }
+
+    public void ClearMonsters() {
+        foreach(Monster m in enemyList) {
+            m.Kill();
+            IntegratedGameManager.S.inSceneMonsters.Remove(m);
+        }
+        enemyList = new List<Monster>();
+    }
+
+    public void RemoveMonster(Monster monster) {
+        enemyList.Remove(monster);
     }
 
     private void OnTriggerStay(Collider col)
@@ -364,19 +425,28 @@ public class Tile : MonoBehaviour
 
 
 
-    public void SetFOWVisualsToCharacter(int characterID)
-    {
-        if (this.fogOfWarDictionary[characterID] == FogOfWarState.Unseen)
-        {
-            setRenderer(FogOfWarState.Unseen);
-        }
-        else if (this.fogOfWarDictionary[characterID] == FogOfWarState.Seen)
-        {
-            setRenderer(FogOfWarState.Seen);
-        }
-        else if (this.fogOfWarDictionary[characterID] == FogOfWarState.Visible)
-        {
-            setRenderer(FogOfWarState.Visible);
+    public void SetFOWVisualsToCharacter(int characterID) {
+        switch (fogOfWarDictionary[characterID]) {
+            case FogOfWarState.Unseen:
+                setRenderer(FogOfWarState.Unseen);
+                break;
+            case FogOfWarState.Seen:
+                setRenderer(FogOfWarState.Seen);
+                break;
+            case FogOfWarState.Visible:
+                Character focusChar = IntegratedGameManager.S.inSceneCharacters[characterID];
+                if (focusChar.dead) {
+                    if (this != focusChar.currentTile) {
+                        setRenderer(FogOfWarState.Seen);
+                    }
+                    else {
+                        setRenderer(FogOfWarState.Visible);
+                    }
+                }
+                else {
+                    setRenderer(FogOfWarState.Visible);
+                }
+                break;
         }
     }
 

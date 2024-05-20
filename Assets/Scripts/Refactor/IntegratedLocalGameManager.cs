@@ -73,6 +73,14 @@ public class IntegratedLocalGameManager : IntegratedGameManager
             UIManager.S.UpdateCharacterPlanUI();
             //player.UpdateCharacterUI();
         }
+        else {
+            localChar.UnFocusCharacter();
+            localChar = inSceneCharacters[index];
+            localChar.FocusCharacter();
+            UIManager.S.UpdateCommonHUD();
+            UIManager.S.HideCharacterPinUI();
+            UIManager.S.HideCharacterPlanUI();
+        }
        
        CameraManager.S.ChangeTargetCharacter(index);
        IntegratedMapGenerator.Instance.UpdateFOWVisuals();

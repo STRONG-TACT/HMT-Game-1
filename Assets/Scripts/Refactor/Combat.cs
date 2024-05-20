@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using GameConstant;
+using System.Linq;
 
 public class Combat : MonoBehaviour {
     public enum FightType {
@@ -73,7 +74,7 @@ public class Combat : MonoBehaviour {
         int enemyScore = 0;
         int charaScore = 0;
 
-        foreach (Character c in tile.charaList) {
+        foreach (Character c in tile.LivingCharacterList) {
             charaIDs.Add(c.CharacterId);
             int outcome = c.config.monsterDice.Roll();
             charaScores.Add(outcome);
@@ -81,7 +82,7 @@ public class Combat : MonoBehaviour {
         }
 
         if (type == FightType.Monster) {
-            foreach (Monster m in tile.enemyList) {
+            foreach (Monster m in tile.EnemyList) {
                 int outcome = m.config.combatDice.Roll();
                 enemyScores.Add(outcome);
                 enemyScore += outcome;

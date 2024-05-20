@@ -169,7 +169,7 @@ public class IntegratedGame1Interface : HMTInterface {
                                 scene.Add(rep);
                                 break;
                         }
-                        foreach (Character character in tile.charaList) {
+                        foreach (Character character in tile.CharacterList) {
                             if (character == target) {
                                 rep = character.HMTStateRep(Character.StateRepLevel.Full);
                                 rep["x"] = x;
@@ -184,7 +184,7 @@ public class IntegratedGame1Interface : HMTInterface {
                             }
                             scene.Add(rep);
                         }
-                        foreach (Monster monster in tile.enemyList) {
+                        foreach (Monster monster in tile.EnemyList) {
                             rep = monster.HMTStateRep();
                             rep["x"] = x;
                             rep["y"] = y;
@@ -259,7 +259,7 @@ public class IntegratedGame1Interface : HMTInterface {
                         scene.Add(rep);
                         break;
                 }
-                foreach (Character character in tile.charaList) {
+                foreach (Character character in tile.CharacterList) {
                     rep = character.HMTStateRep();
                     rep["x"] = x;
                     rep["y"] = y;
@@ -267,7 +267,7 @@ public class IntegratedGame1Interface : HMTInterface {
                     rep["pinCursorY"] = character.pingCursor.y + x;
                     scene.Add(rep);
                 }
-                foreach (Monster monster in tile.enemyList) {
+                foreach (Monster monster in tile.EnemyList) {
                     rep = monster.HMTStateRep();
                     rep["x"] = x;
                     rep["y"] = y;
@@ -341,7 +341,7 @@ public class IntegratedGame1Interface : HMTInterface {
                                 scene.Add(rep);
                                 break;
                         }
-                        foreach (Character character in tile.charaList) {
+                        foreach (Character character in tile.CharacterList) {
                             if (character == target) {
                                 rep = character.HMTStateRep(Character.StateRepLevel.Full);
                                 rep["x"] = x;
@@ -356,7 +356,7 @@ public class IntegratedGame1Interface : HMTInterface {
                             }
                             scene.Add(rep);
                         }
-                        foreach (Monster monster in tile.enemyList) {
+                        foreach (Monster monster in tile.EnemyList) {
                             rep = monster.HMTStateRep();
                             rep["x"] = x;
                             rep["y"] = y;

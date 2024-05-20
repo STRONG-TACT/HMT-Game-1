@@ -14,9 +14,13 @@ public class CharacterConfig : ScriptableObject {
     public string characterName;
     [Tooltip("The Type of character to use, used for graphical model and icons.")]
     public CharacterType type;
-    [Tooltip("Movement Limit.")]
+    [Tooltip("The number of action points a character starts a round with.")]
     [Min(1)]
-    public int movement;
+    public int StartingActionPoints;
+
+    [Tooltip("The number of hearts a chracter starts a life with.")]
+    [Min(1)]
+    public int StartingHealth = 3;
 
     [Tooltip("Combat dice when facing monsters.")]
     public Combat.Dice monsterDice;

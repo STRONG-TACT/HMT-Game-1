@@ -1,9 +1,9 @@
+using GameConstant;
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using GameConstant;
-using Newtonsoft.Json.Linq;
 
 /// <summary>
 /// 4/5/24 refactor change this older version of character to a integrated version
@@ -59,8 +59,8 @@ public class Character : MonoBehaviour {
     public Transform visibilityMask { get; private set; }
 
     //Health
-    public int Health { get { return health; } }
-    private int health = 3;
+    public int Health { get; private set; } = 3;
+    public int Lives { get; private set; } = 3;
 
     //Death and death round count down
     public bool dead = false;
@@ -131,17 +131,19 @@ public class Character : MonoBehaviour {
 
     public int ActionPointsRemaining {
         get {
-            return config.movement - ActionPlan.Count - pinsPlaced;
+            return config.StartingActionPoints - ActionPlan.Count - pinsPlaced;
         }
     }
-    
+
+    #region Setup
+
     private void Start()
     {
         movePoint = transform.position;
         prevMovePointPos = movePoint;
         characterMask = transform.Find("CharacterMask");
         visibilityMask = transform.Find("VisibleMask");
-        health = 3;
+        
         
         model = transform.Find("Model");
         if(model == null) {
@@ -153,18 +155,42 @@ public class Character : MonoBehaviour {
         State = CharacterState.Idle;
     }
     
-    public void setStartPos(Vector3 newPosition)
+    public void SetStartPosition(Vector3 newPosition)
     {
         transform.position = newPosition;
         startPos = newPosition;
         movePoint = transform.position;
         prevMovePointPos = movePoint;
     }
-    
+
+    public void SetUpConfig(CharacterConfig config, int characterId, GameData gameData) {
+        this.config = config;
+        CharacterId = characterId;
+        path_indicator_offset = gameData.tileSize * 0.15f;
+        stepLength = gameData.tileSize + gameData.tileGapLength;
+        Health = config.StartingHealth;
+        Lives = gameData.LivesPerCharacter;
+
+        indicator_offset = new Vector3(0.1f, 0.5f, -0.1f) * gameData.tileSize;
+        //Debug.Log(indicator_offset);
+        indicator.transform.position += indicator_offset;
+        characterMask = transform.Find("CharacterMask");
+        visibilityMask = transform.Find("VisibleMask");
+        ResetActionPoints();
+
+        float maskScale = gameData.tileSize * (config.sightRange * 2f + 1f) + gameData.tileGapLength * (config.sightRange * 2f);
+        characterMask.localScale = new Vector3(gameData.tileSize, 0, gameData.tileSize);
+        visibilityMask.localScale = new Vector3(maskScale, 0, maskScale);
+        //characterMask.localScale = cellScale;
+        //visibilityMask.localScale = cellScale * config.sightRange;
+    }
+
+    #endregion
+
     public void ResetActionPoints() {
         if (dead) {
             ActionPlan.Clear();
-            for(int i = 0; i <config.movement; i++) {
+            for(int i = 0; i <config.StartingActionPoints; i++) {
                 ActionPlan.Add(Direction.Wait);
             }
         }
@@ -175,7 +201,40 @@ public class Character : MonoBehaviour {
 
         moving = false;
     }
-    
+
+    #region Focus Management
+
+    public void FocusCharacter() {
+        //MaskControl(true);
+        Focused = true;
+        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+        if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
+            indicator.SetActive(true);
+            foreach (GameObject one_path_indicator in path_indicator_list) {
+                one_path_indicator.SetActive(true);
+            }
+            foreach (GameObject one_combat_indicator in combat_indicator_list) {
+                one_combat_indicator.SetActive(true);
+            }
+        }
+    }
+
+    public void UnFocusCharacter() {
+        //MaskControl(false);
+        Focused = false;
+        indicator.SetActive(false);
+        foreach (GameObject one_path_indicator in path_indicator_list) {
+            one_path_indicator.SetActive(false);
+        }
+        foreach (GameObject one_combat_indicator in combat_indicator_list) {
+            one_combat_indicator.SetActive(false);
+        }
+    }
+
+    #endregion
+
+    #region Pinning Phase
+
     public void StartPingPhase() {
         pingCursor = Vector2Int.zero;
         NetworkMiddleware.S.CallReadyForNextPhase(CharacterId, dead);
@@ -185,19 +244,9 @@ public class Character : MonoBehaviour {
         pingCursor = Vector2Int.zero;
         ReadyForNextPhase = false;
     }
-    
-    public void ResetPlan() {
-        ActionPlan.Clear();
-    }
-    
-    public void StartPlanningPhase()
-    {
-        ResetPlan();
-        NetworkMiddleware.S.CallReadyForNextPhaseAuto(CharacterId, ActionPointsRemaining == 0 || dead);
-    }
 
     public bool MovePingCursor(Character.Direction direction) {
-        if (ActionPointsRemaining <= 0) { 
+        if (ActionPointsRemaining <= 0) {
             return false;
         }
         else {
@@ -213,8 +262,8 @@ public class Character : MonoBehaviour {
                     }
                     break;
                 case Character.Direction.Left:
-                    if(pingCursor.x > 0) { 
-                        pingCursor+= Vector2Int.left;
+                    if (pingCursor.x > 0) {
+                        pingCursor += Vector2Int.left;
                     }
                     break;
                 case Character.Direction.Right:
@@ -228,13 +277,29 @@ public class Character : MonoBehaviour {
             return true;
         }
     }
-    
+
     public void PinPlaced() {
         pinsPlaced += 1;
         pingCursor = Vector2Int.zero;
         if (ActionPointsRemaining == 0) {
             NetworkMiddleware.S.CallReadyForNextPhase(CharacterId, true);
         }
+    }
+
+    #endregion
+
+    #region Planning Phase
+
+    public void ResetPlan() {
+        ActionPlan.Clear();
+    }
+    
+    public void StartPlanningPhase() {
+        ResetPlan();
+        if(dead) {
+            RespawnCheck();
+        }
+        NetworkMiddleware.S.CallReadyForNextPhaseAuto(CharacterId, ActionPointsRemaining == 0 || dead);
     }
     
     public bool CheckMove(Direction direction) {
@@ -392,7 +457,11 @@ public class Character : MonoBehaviour {
         }
         path_indicator_positions.Clear();
     }
-    
+
+    #endregion
+
+    #region Movement Phase
+
     public IEnumerator TakeNextMove(float stepTime) {
         if(ActionPlan.Count == 0) {
             yield break;
@@ -440,130 +509,113 @@ public class Character : MonoBehaviour {
         State = CharacterState.Idle;
         moving = false;
     }
+
+    public void Retreat() {
+        transform.position = prevMovePointPos;
+        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+        movePoint = prevMovePointPos;
+    }
+
+    #endregion
+
+    #region Shrine and Goal Checks
     
-    private void OnTriggerEnter(Collider col)
-    {
-        if (col.gameObject.tag == "Goal")
-        {
+    private void OnTriggerEnter(Collider col) {
+        if (col.gameObject.tag == "Goal") {
             Shrine shrine = col.gameObject.GetComponent<Shrine>();
-            if (shrine != null && shrine.CheckShrineType(this))
-            {
+            if (shrine != null && shrine.CheckShrineType(this)) {
                 IntegratedGameManager.S.GoalReached(CharacterId);
             }
         }
     }
     
-    private void OnTriggerStay(Collider col)
-    {
-        if (col.gameObject.tag == "Door")
-        {
-            if (IntegratedGameManager.S.goalCount >= 3)
-            { //TODO: take th conditional logic out of the character and move it to the Manager
+    private void OnTriggerStay(Collider col) {
+        if (col.gameObject.tag == "Door") {
+            if (IntegratedGameManager.S.goalCount >= 3) { //TODO: take th conditional logic out of the character and move it to the Manager
                 IntegratedGameManager.S.NextLevel();
             }
         }
     }
-    
-    public void DecrementHealth()
-    {
-        health -= 1;
-        Debug.Log(string.Format("Character {0} health: {1}", config.characterName, health));
 
-        if (health == 0)
-        {
-            Debug.Log(string.Format("Character {0} Died!", config.characterName));
-            StartCoroutine(characterDeath());
+    #endregion
+
+    #region Death and Respawn
+    public void TakeDamage(int damageAmount = 1) {
+        Health -= damageAmount;
+        if(IntegratedGameManager.S.gameStatus == GameStatus.Player_Moving) {
+            ResetPlan();
+        }
+        //Debug.Log(string.Format("Character {0} health: {1}", config.characterName, health));
+
+        if (Health == 0) {
+            //Debug.Log(string.Format("Character {0} Died!", config.characterName));
+            Die();
         }
     }
+
+    /*
+     * When a Character dies:
+     * 1. Set their state to Die
+     * 2. Immediately set their death flag to true
+     * 3. Set their respawn counter
+     * 4. Leave their body where it is
+     */ 
     
-    public IEnumerator characterDeath() {
+    public void Die() {
+        if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Moving) {
+            transform.position = prevMovePointPos;
+        }
         State = CharacterState.Die;
-        float animationLength = 0f;
-        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-        animationLength = stateInfo.length;
-
-        // Wait for the duration of the animation
-        yield return new WaitForSeconds(animationLength);
-        State = CharacterState.Idle;
-
         dead = true;
+        Lives -= 1;
         respawnCountdown = 2;
-        gameObject.SetActive(false);
-        transform.position = startPos;
+        ResetPlan();
+        IntegratedGameManager.S.CharacterDied(CharacterId);
 
-        movePoint = startPos;
-        prevMovePointPos = movePoint;
+
+
+        //// Wait for the duration of the animation
         
-        IntegratedGameManager.S.CheckLoseCondition();
+        //State = CharacterState.Idle;
+
+        //dead = true;
+        //respawnCountdown = 2;
+        //gameObject.SetActive(false);
+        //transform.position = startPos;
+
+        //movePoint = startPos;
+        //prevMovePointPos = movePoint;
+        
+        
     }
     
-    public void RespawnCountdown()
-    {
-        respawnCountdown -= 1;
+    public void RespawnCheck() {
+        if (Lives > 0) {
+            respawnCountdown -= 1;
 
-        if (respawnCountdown == 0)
-        {
-            dead = false;
-            gameObject.SetActive(true);
-            health = 3;
-            IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+            if (respawnCountdown == 0) {
+                ActionPlan.Clear();
+                State = CharacterState.Idle;
+                dead = false;
+                Health = config.StartingHealth;
+                transform.position = startPos;
+                transform.rotation = Quaternion.identity;
+                IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+            }
         }
     }
     
-    public void QuickRespawn()
-    {
+    public void QuickRespawn() {
         ActionPlan.Clear();
         State = CharacterState.Idle;
         respawnCountdown = 0;
         dead = false;
-        gameObject.SetActive(true);
-        health = 3;
+        Health = config.StartingHealth;
     }
-    
-    public void Retreat()
-    {
-        transform.position = prevMovePointPos;
-        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
-        movePoint = prevMovePointPos;
-    }
-    
-    public void FocusCharacter() {
-        //MaskControl(true);
-        Focused = true;
-        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
-        if(IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
-            indicator.SetActive(true);
-            foreach (GameObject one_path_indicator in path_indicator_list)
-            {
-                one_path_indicator.SetActive(true); 
-            }
-            foreach (GameObject one_combat_indicator in combat_indicator_list)
-            {
-                one_combat_indicator.SetActive(true);
-            }
-        }
-    }
-    
-    public void SetUpConfig(CharacterConfig config, int characterId, GameData gameData)
-    {
-        this.config = config;
-        CharacterId = characterId;
-        path_indicator_offset = gameData.tileSize * 0.15f;
-        stepLength = gameData.tileSize + gameData.tileGapLength;
-        
-        indicator_offset = new Vector3(0.1f, 0.5f, -0.1f) * gameData.tileSize;
-        Debug.Log(indicator_offset);
-        indicator.transform.position += indicator_offset;
-        characterMask = transform.Find("CharacterMask");
-        visibilityMask = transform.Find("VisibleMask");
-        ResetActionPoints();
-        
-        float maskScale = gameData.tileSize * (config.sightRange * 2f + 1f) + gameData.tileGapLength * (config.sightRange * 2f);
-        characterMask.localScale = new Vector3(gameData.tileSize, 0, gameData.tileSize);
-        visibilityMask.localScale = new Vector3(maskScale,0,maskScale);
-        //characterMask.localScale = cellScale;
-        //visibilityMask.localScale = cellScale * config.sightRange;
-    }
+
+    #endregion
+
+    #region HMT State Representation
 
     public enum StateRepLevel {
         Full = 0,
@@ -587,12 +639,12 @@ public class Character : MonoBehaviour {
 
         switch (level) {
             case StateRepLevel.Full:
-                ret["health"] = health;
+                ret["health"] = Health;
                 ret["actionPoints"] = ActionPointsRemaining;
                 ret["actionPlan"] = new JArray(ActionPlan.Select(d => d.ToString()));
                 break;
             case StateRepLevel.TeamVisible:
-                ret["health"] = health;         //Not sure why we agreed this should be here? It's not someting a human player can see
+                ret["health"] = Health;         //Not sure why we agreed this should be here? It's not someting a human player can see
                 break;
             case StateRepLevel.TeamUnseen:
                 break;
@@ -602,20 +654,9 @@ public class Character : MonoBehaviour {
         }
         return ret;
     }
-    
-    // functions referenced only in local scene
-    public void UnFocusCharacter() {
-        //MaskControl(false);
-        Focused = false;
-        indicator.SetActive(false);
-        foreach (GameObject one_path_indicator in path_indicator_list)
-        {
-            one_path_indicator.SetActive(false);
-        }
-        foreach (GameObject one_combat_indicator in combat_indicator_list)
-        {
-            one_combat_indicator.SetActive(false);
-        }
-    }
+
+    #endregion
+
+
 }
 

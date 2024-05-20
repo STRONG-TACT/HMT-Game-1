@@ -89,15 +89,49 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         
         if (ready) {
             if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning) {
+                UIManager.S.UpdateCharacterPinUI();
                 IntegratedGameManager.S.CheckPingPhaseEnd();
             }
 
             if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
+                UIManager.S.UpdateCharacterPlanUI();
                 IntegratedGameManager.S.CheckPlanPhaseEnd();
             }
         }
     }
 
+/*    public void CallSpawnCharacter(int charId, int row, int col) {
+        if (IntegratedGameManager.S.isNetworkGame) {
+            photonView.RPC("SpawnCharacterLocal", RpcTarget.All, charId, row, col);
+        }
+        else {
+            SpawnCharacterLocal(charId, row, col);
+        }
+    }
+
+    [PunRPC]
+    private void SpawnCharacterLocal(int charId, int row, int col) {
+        IntegratedGameManager.S.SpawnCharacter(charId, row, col);
+    }
+
+    public void CallCharacterDied(int charId) {
+        if(IntegratedGameManager.S.isNetworkGame) {
+            photonView.RPC("CharacterDiedLocal", RpcTarget.All, charId);
+        }
+        else {
+            CharacterDiedLocal(charId);
+        }
+    }
+
+    [PunRPC]
+    private void CharacterDiedLocal(int charId) {
+
+
+
+
+        IntegratedGameManager.S.inSceneCharacters[charId].Die();
+    }
+*/
     #endregion
 
     #region Pinning Phase RPCs
@@ -181,5 +215,4 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     #endregion
 
-    
 }
