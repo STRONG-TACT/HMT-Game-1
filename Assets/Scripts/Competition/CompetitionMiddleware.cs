@@ -56,7 +56,7 @@ public class CompetitionMiddleware : MonoBehaviour {
     private string currSessionID = null;
     private string gameID = null;
     private string level = null;
-    private string round = null;
+    private int round = -1;
     private string phase = null;
 
     // Start is called before the first frame update
@@ -170,8 +170,16 @@ public class CompetitionMiddleware : MonoBehaviour {
         //this can be fire and forget
     }
 
+    private void CallLogEvent(string userID, string sessionID, int eventId, string actor, string verb, string label, int value, bool immediate = false) {
+        CallLogEvent(userID, sessionID, eventId, actor, verb, new JObject { { label, value } }, false, immediate);
+    }
+
     private void CallLogEvent(string userID, string sessionID, int eventId, string actor, string verb, string label, string value, bool immediate = false) {
         CallLogEvent(userID, sessionID, eventId, actor, verb, new JObject { { label, value } }, false, immediate);
+    }
+
+    private void CallLogEvent(int eventId, string actor, string verb, string label, int value, bool immediate = false) {
+        CallLogEvent(this.currUserID, this.currSessionID, eventId, actor, verb, new JObject { { label, value } }, false, immediate);
     }
 
     private void CallLogEvent(int eventId, string actor, string verb, string label, string value, bool immediate = false) {
@@ -245,9 +253,9 @@ public class CompetitionMiddleware : MonoBehaviour {
             LogEndGame();
         }
         this.gameID = gameID;
-        CallLogEvent(1002, "system", "start_run",
+        CallLogEvent(1002, "system", "start_game",
             new JObject {
-                {"run_id", gameID },
+                {"game_id", gameID },
                 { "mode", "local"},
             });
     }
@@ -260,9 +268,9 @@ public class CompetitionMiddleware : MonoBehaviour {
             LogEndGame();
         }
         this.gameID = gameID;
-        CallLogEvent(1010, "system", "start_run",
+        CallLogEvent(1010, "system", "start_game",
             new JObject {
-                {"run_id", gameID },
+                {"game_id", gameID },
                 {"mode", "network"},
                 {"dwarf", new JObject { { "user_id", dwarfUserID}, { "session_id", dwarfSessionID}, {"ai", dwarfIsAI } } },
                 {"giant", new JObject { { "user_id", giantUserID}, { "session_id", giantSessionID}, {"ai", giantIsAI } } },
@@ -271,7 +279,7 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
     public void LogEndGame() {
-        CallLogEvent(1011, "system", "end_run", "run_id", gameID);
+        CallLogEvent(1011, "system", "end_game", "game_id", gameID);
         gameID = null;
     }
 
@@ -292,17 +300,17 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     public void LogStartRound(int round) {
         if (!LogSystemEvents) return;
-        if (this.round != null) {
+        if (this.round > 0) {
             LogEndRound();
         }
-        this.round = round.ToString();
+        this.round = round;
         CallLogEvent(1030, "system", "start_round", "round", this.round);
     }
 
     public void LogEndRound() {
         if (!LogSystemEvents) return;
         CallLogEvent(1031, "system", "end_round", "round", round);
-        round = null;
+        round = -1;
     }
 
     public void LogStartPhase(string phaseName) {
@@ -409,9 +417,19 @@ public class CompetitionMiddleware : MonoBehaviour {
     /// <param name="character"></param>
     /// <param name="x"></param>
     /// <param name="y"></param>
-    public void LogInspectChallenge(string character, int x, int y) {
-        CallLogEvent(3102, character, "inspect_challenge",
-            new JObject { { "x", x }, { "y", y } },
+    public void LogInspectChallenge(int characterId, int x, int y, string challengeType, 
+                                    Combat.Dice selfDie, Combat.Dice partner1, Combat.Dice partner2, Combat.Dice challenge) {
+
+
+        CallLogEvent(3102, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "inspect_challenge",
+            new JObject {
+                { "x", x }, { "y", y },
+                { "challenge_type", challengeType },
+                { "self_die", selfDie.ToString() },
+                { "partner1_die", partner1.ToString() },
+                { "partner2_die", partner2.ToString() },
+                { "challenge_die", challenge.ToString() },
+            },
             true);
     }
 

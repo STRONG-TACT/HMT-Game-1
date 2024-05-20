@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using GameConstant;
 
-public class Combat : MonoBehaviour
-{
-    public enum FightType
-    {
+public class Combat : MonoBehaviour {
+    public enum FightType {
         Rock = 0,
         Trap = 1,
         Monster = 2
     }
 
-    public enum DiceSize
-    {
+    public enum DiceSize {
         D0 = 0,
         D4 = 4,
         D6 = 6,
@@ -49,7 +46,7 @@ public class Combat : MonoBehaviour
                 return Random.Range(1, (int)type + 1) + bonus;
             }
         }
-        
+
         public int NetworkRoll() {
             if (type == DiceSize.D0) {
                 return bonus;
@@ -58,10 +55,17 @@ public class Combat : MonoBehaviour
                 return NetworkMiddleware.S.NextRandomInt(1, (int)type + 1) + bonus;
             }
         }
+
+        public IList<int> Values() {
+            List<int> values = new List<int>();
+            for (int i = 1; i <= (int)type; i++) {
+                values.Add(i + bonus);
+            }
+            return values;
+        }
     }
 
-    public static bool ExecuteCombat(FightType type, Tile tile, bool visibility)
-    {
+    public static bool ExecuteCombat(FightType type, Tile tile, bool visibility) {
         bool result = false;
         List<int> charaIDs = new List<int>();
         List<int> enemyScores = new List<int>();
@@ -69,37 +73,125 @@ public class Combat : MonoBehaviour
         int enemyScore = 0;
         int charaScore = 0;
 
-        foreach (Character c in tile.charaList)
-        {
+        foreach (Character c in tile.charaList) {
             charaIDs.Add(c.CharacterId);
             int outcome = c.config.monsterDice.Roll();
             charaScores.Add(outcome);
             charaScore += outcome;
         }
 
-        if (type == FightType.Monster)
-        {
-            foreach (Monster m in tile.enemyList)
-            {
+        if (type == FightType.Monster) {
+            foreach (Monster m in tile.enemyList) {
                 int outcome = m.config.combatDice.Roll();
                 enemyScores.Add(outcome);
                 enemyScore += outcome;
             }
         }
-        else if (type == FightType.Trap || type == FightType.Rock)
-        {
+        else if (type == FightType.Trap || type == FightType.Rock) {
             int outcome = tile.dice.Roll();
             enemyScore += outcome;
             //enemyScore += tile.diceBonus;
             enemyScores.Add(enemyScore);
         }
 
-        if (enemyScore <= charaScore)
-        {
+        if (enemyScore <= charaScore) {
             result = true;
         }
 
         UIManager.S.ShowCombatUI(type, charaIDs, charaScores, enemyScores, charaScore, enemyScore, result, visibility);
-            return result;
+        return result;
+    }
+
+    private static (int wins, int total) CalculateOddsOpponentInnerLoop(int p1, int p2, int p3, IList<Dice> opponents) {
+        var wins = 0;
+        var total = 0;
+
+        switch (opponents.Count) {
+            case 1:
+                foreach (int o1 in opponents[0].Values()) {
+                    if (p1 + p2 + p3 >= o1) {
+                        wins++;
+                    }
+                    total++;
+                }
+                break;
+
+            case 2:
+                foreach (int o1 in opponents[0].Values()) {
+                    foreach (int o2 in opponents[1].Values()) {
+                        if (p1 + p2 + p3 >= o1 + o2) {
+                            wins++;
+                        }
+                        total++;
+                    }
+                }
+                break;
+            case 3:
+                foreach (int o1 in opponents[0].Values()) {
+                    foreach (int o2 in opponents[1].Values()) {
+                        foreach (int o3 in opponents[2].Values()) {
+                            if (p1 + p2 + p3 >= o1 + o2 + o3) {
+                                wins++;
+                            }
+                            total++;
+                        }
+                    }
+                }
+                break;
+            default:
+                Debug.LogWarningFormat("Calculate Odds called with {0} opponents", opponents.Count);
+                break;
+        }
+
+        return (wins, total);
+    }
+
+
+    public static float CalculateOdds(Dice player, IList<Dice> opponents) {
+        return CalculateOdds(new List<Dice> { player }, opponents);
+    }
+
+    public static float CalculateOdds(IList<Dice> players, Dice opponent) {
+        return CalculateOdds(players, new List<Dice> { opponent });
+    }
+
+    public static float CalculateOdds(Dice player, Dice opponent) {
+        return CalculateOdds(new List<Dice> { player }, new List<Dice> { opponent });
+    }
+
+    public static float CalculateOdds(IList<Dice> players, IList<Dice> opponents) {
+        float wins = 0;
+        float total = 0;
+
+        switch(players.Count) {
+            case 1:
+                foreach (int p1 in players[0].Values()) {
+                    var (w, t) = CalculateOddsOpponentInnerLoop(p1, 0, 0, opponents);
+                    wins += w;
+                    total += t;
+                }
+                break;
+            case 2:
+                foreach (int p1 in players[0].Values()) {
+                    foreach (int p2 in players[1].Values()) {
+                        var (w, t) = CalculateOddsOpponentInnerLoop(p1, p2, 0, opponents);
+                        wins += w;
+                        total += t;
+                    }
+                }
+                break;
+            case 3:
+                foreach (int p1 in players[0].Values()) {
+                    foreach (int p2 in players[1].Values()) {
+                        foreach (int p3 in players[2].Values()) {
+                            var (w, t) = CalculateOddsOpponentInnerLoop(p1, p2, p3, opponents);
+                            wins += w;
+                            total += t;
+                        }
+                    }
+                }
+                break;
+        }
+        return wins / total;
     }
 }

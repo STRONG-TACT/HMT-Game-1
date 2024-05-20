@@ -39,6 +39,11 @@ public class GameAssets : MonoBehaviour
     public Sprite deadIcon;
     public Sprite aliveIcon;
 
+    public Sprite GetCharacterIcon(Character character) {
+        return GetCharacterIcon(character.config.type); 
+    }
+
+
     public Sprite GetCharacterIcon(CharacterConfig.CharacterType character) {
         return character switch {
             CharacterConfig.CharacterType.Dwarf => dwarfIcon,
@@ -55,7 +60,19 @@ public class GameAssets : MonoBehaviour
     public Sprite D8;
     public Sprite D10;
 
-    public Sprite GetDiceIcon(Combat.DiceSize dice)
+    public Sprite GetDiceSprite(Tile tile) {
+        return GetDiceSprite(tile.dice);
+    }
+
+    public Sprite GetDiceSprite(Monster monster) {
+        return GetDiceSprite(monster.config.combatDice.type);
+    }
+
+    public Sprite GetDiceSprite(Combat.Dice die) {
+        return GetDiceSprite(die.type);
+    }
+
+    public Sprite GetDiceSprite(Combat.DiceSize dice)
     {
         return dice switch
         {

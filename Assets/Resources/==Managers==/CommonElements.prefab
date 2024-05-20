@@ -13394,14 +13394,6 @@ MonoBehaviour:
   DwarfBtn: {fileID: 2116196793298679766}
   GiantBtn: {fileID: 3634486348051412388}
   HumanBtn: {fileID: 8787445866513838314}
-  DiceStats:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  BonusStats:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   CombatUI: {fileID: 6070971949871136171}
   PlayerCombatSlots:
   - {fileID: 6070971950890848491}
@@ -13420,32 +13412,32 @@ MonoBehaviour:
   VictoryScreen: {fileID: 6070971950453866390}
   LossScreen: {fileID: 6070971949270404873}
   combat_skill_display_offset: {x: 0, y: 2, z: 0}
-  CombatSkillDisplay: {fileID: 6070971950376955399}
-  opponent_icon: {fileID: 6070971950249347178}
-  opponent_dice: {fileID: 6070971950744178268}
-  opponent_bonus: {fileID: 6070971949532439571}
-  self_icons:
-  - {fileID: 6070971950161124581}
-  - {fileID: 6070971950486892881}
-  - {fileID: 6070971950684072941}
-  - {fileID: 6070971951146506053}
-  partner1_icons:
-  - {fileID: 6070971949091952237}
-  - {fileID: 6070971949497076065}
-  partner2_icons:
-  - {fileID: 6070971950290953484}
-  - {fileID: 6070971949582059137}
-  self_dices:
-  - {fileID: 6070971950192993014}
-  - {fileID: 6070971950708270831}
-  - {fileID: 6070971950114673833}
-  - {fileID: 6070971950460685323}
-  partner1_dices:
-  - {fileID: 6070971950111665481}
-  - {fileID: 6070971949422943262}
-  partner2_dices:
-  - {fileID: 6070971950891734583}
-  - {fileID: 6070971951172069329}
+  CombatSkillTooltip: {fileID: 6070971950376955399}
+  TooltipChallengeTypeIcon: {fileID: 6070971950249347176}
+  TooltipChallengeDieIcon: {fileID: 6070971950744178258}
+  TooltipChallengeBonusText: {fileID: 6070971949532439569}
+  TooltipSelfPortraitIcons:
+  - {fileID: 6070971950161124507}
+  - {fileID: 6070971950486892887}
+  - {fileID: 6070971950684072931}
+  - {fileID: 6070971951146506107}
+  TooltipPartner1PortraitIcons:
+  - {fileID: 6070971949091952227}
+  - {fileID: 6070971949497076071}
+  TooltipPartner2PortraitIcons:
+  - {fileID: 6070971950290953474}
+  - {fileID: 6070971949582059143}
+  TooltipSelfDiceIcons:
+  - {fileID: 6070971950192993012}
+  - {fileID: 6070971950708270829}
+  - {fileID: 6070971950114673839}
+  - {fileID: 6070971950460685321}
+  TooltipPartner1DiceIcons:
+  - {fileID: 6070971950111665487}
+  - {fileID: 6070971949422943260}
+  TooltipPartner2DiceIcons:
+  - {fileID: 6070971950891734581}
+  - {fileID: 6070971951172069335}
 --- !u!1 &6070971950891734583
 GameObject:
   m_ObjectHideFlags: 0

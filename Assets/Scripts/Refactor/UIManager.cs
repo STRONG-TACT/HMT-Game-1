@@ -6,6 +6,8 @@ using UnityEngine.UI;
 using GameConstant;
 using System;
 using System.Reflection;
+using System.Threading;
+using System.ComponentModel;
 
 
 public class UIManager : MonoBehaviour
@@ -66,16 +68,16 @@ public class UIManager : MonoBehaviour
     //Combat Skill Display
     [Header("Combat Tooltip")]
     public Vector3 combat_skill_display_offset = new Vector3(0, 2f, 0);
-    public GameObject CombatSkillDisplay;
-    public GameObject opponent_icon;
-    public GameObject opponent_dice;
-    public GameObject opponent_bonus;
-    public GameObject[] self_icons = new GameObject[4];
-    public GameObject[] partner1_icons = new GameObject[2];
-    public GameObject[] partner2_icons = new GameObject[2];
-    public GameObject[] self_dices = new GameObject[4];
-    public GameObject[] partner1_dices = new GameObject[2];
-    public GameObject[] partner2_dices = new GameObject[2];
+    public GameObject CombatSkillTooltip;
+    public Image TooltipChallengeTypeIcon;
+    public Image TooltipChallengeDieIcon;
+    public TextMeshProUGUI TooltipChallengeBonusText;
+    public Image[] TooltipSelfPortraitIcons = new Image[4];
+    public Image[] TooltipPartner1PortraitIcons = new Image[2];
+    public Image[] TooltipPartner2PortraitIcons = new Image[2];
+    public Image[] TooltipSelfDiceIcons = new Image[4];
+    public Image[] TooltipPartner1DiceIcons = new Image[2];
+    public Image[] TooltipPartner2DiceIcons = new Image[2];
     bool combatSkillDisplayActive;
 
     public static UIManager S;
@@ -106,7 +108,7 @@ public class UIManager : MonoBehaviour
     }
 
     private void Update() {
-        UpdateTooltipHover();
+        TooltipHoverUpdate();
     }
 
 
@@ -617,7 +619,9 @@ public class UIManager : MonoBehaviour
 
     #region Combat Skill Tooltip
 
-    private void UpdateTooltipHover() {
+    private GameObject tooltipTarget = null;
+
+    private void TooltipHoverUpdate() {
         //display combat skills when mouse hover on objects
         Ray ray;
         RaycastHit[] hits;
@@ -628,117 +632,135 @@ public class UIManager : MonoBehaviour
         combatSkillDisplayActive = false;
         foreach (RaycastHit hit in hits) {
             GameObject hitObject = hit.collider.gameObject;
-            if (hitObject.tag == "Monster" || hitObject.tag == "Rock" || hitObject.tag == "Trap") {
-                Tile.FogOfWarState visibility;
-                if (hitObject.tag == "Monster") {
-                    visibility = hitObject.GetComponent<Monster>().currentTile.fogOfWarDictionary[IntegratedGameManager.S.localChar.CharacterId];
+
+            Tile tile;
+            Combat.FightType challengeType;
+            switch (hitObject.tag) {
+                case "Monster":
+                    tile = hitObject.GetComponent<Monster>().currentTile;
+                    challengeType = Combat.FightType.Monster;
+                    break;
+                case "Rock":
+                    tile = hitObject.GetComponent<Tile>();
+                    challengeType = Combat.FightType.Rock;
+                    break;
+                case "Trap":
+                    tile = hitObject.GetComponent<Tile>();
+                    challengeType = Combat.FightType.Trap;
+                    break;
+                default:
+                    continue;
+            }
+            if (!combatSkillDisplayActive && tile != null && tile.fogOfWarDictionary[IntegratedGameManager.S.localChar.CharacterId] == Tile.FogOfWarState.Visible) {
+                if (hitObject != tooltipTarget) {
+                    tooltipTarget = hitObject;
+                    /*
+                     * UpdateChallengetooltipIcons send a log message so we want to make sure we don't send a bunch of messages in a row.
+                     */ 
+                    UpdateChallengeTooltipIcons(hitObject, challengeType, tile);
                 }
-                else {
-                    visibility = hitObject.GetComponent<Tile>().fogOfWarDictionary[IntegratedGameManager.S.localChar.CharacterId];
-                }
-                if (!combatSkillDisplayActive && visibility == Tile.FogOfWarState.Visible) {
-                    combatSkillDisplayActive = true;
-                    DisplayCombatSkills(hitObject, hitObject.tag);
-                }
+                Vector3 corrected_offset = combat_skill_display_offset * mainCamera.orthographicSize / 3; //correct display offset according to current zoom in value of the camera
+                Vector3 displayPosition = mainCamera.WorldToScreenPoint(hitObject.transform.position + corrected_offset);
+                CombatSkillTooltip.transform.position = displayPosition;
+                CombatSkillTooltip.SetActive(true);
+                combatSkillDisplayActive = true;
             }
         }
-        if (!combatSkillDisplayActive) CombatSkillDisplay.SetActive(false);
+        if (!combatSkillDisplayActive) {
+            CombatSkillTooltip.SetActive(false);
+        }
     }
 
 
 
-    public void DisplayCombatSkills(GameObject opponent, String opponent_type) {
+    public void UpdateChallengeTooltipIcons(GameObject opponent, Combat.FightType challengeType, Tile tile) {
         Character currentCharacter = IntegratedGameManager.S.localChar;
         Character partner1 = null;
         Character partner2 = null;
 
-        
-        Camera mainCamera = Camera.main;
-        Vector3 corrected_offset = combat_skill_display_offset * mainCamera.orthographicSize / 3; //correct display offset according to current zoom in value of the camera
-        Vector3 displayPosition = mainCamera.WorldToScreenPoint(opponent.transform.position + corrected_offset);
-        CombatSkillDisplay.transform.position = displayPosition;
-        Sprite self_icon_sprite = null;
-        Sprite partner1_icon_sprite = null;
-        Sprite partner2_icon_sprite = null;
-        TextMeshProUGUI opponent_bonus_text = opponent_bonus.GetComponent<TextMeshProUGUI>();
-        CombatSkillDisplay.SetActive(true);
 
+        Sprite self_icon_sprite, partner1_icon_sprite, partner2_icon_sprite, challengeSprite;
+        Combat.Dice self_die, partner1_die, partner2_die, challengeDie;
+        string challengeBonus;
+        
         switch (currentCharacter.config.type){
             case CharacterConfig.CharacterType.Dwarf:
-                partner1 = GameObject.Find("n_Giant").GetComponent<Character>(); // Giant
-                partner2 = GameObject.Find("n_Human").GetComponent<Character>(); // Human
-                self_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Dwarf);
-                partner1_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Giant);
-                partner2_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Human);
+                partner1 = IntegratedGameManager.S.inSceneCharacters[1];    // Giant
+                partner2 = IntegratedGameManager.S.inSceneCharacters[2];    // Human
                 break;
             case CharacterConfig.CharacterType.Human:
-                partner1 = GameObject.Find("n_Dwarf").GetComponent<Character>(); // Dwarf
-                partner2 = GameObject.Find("n_Giant").GetComponent<Character>(); // Giant
-                self_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Human);
-                partner1_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Dwarf);
-                partner2_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Giant);
+                partner1 = IntegratedGameManager.S.inSceneCharacters[0];    // Dwarf
+                partner2 = IntegratedGameManager.S.inSceneCharacters[1];    // Giant
                 break;
             case CharacterConfig.CharacterType.Giant:
-                partner1 = GameObject.Find("n_Dwarf").GetComponent<Character>(); // Dwarf
-                partner2 = GameObject.Find("n_Human").GetComponent<Character>(); // human
-                self_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Giant);
-                partner1_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Dwarf);
-                partner2_icon_sprite = gameAssets.GetCharacterIcon(CharacterConfig.CharacterType.Human);
+                partner1 = IntegratedGameManager.S.inSceneCharacters[0];    // Dwarf
+                partner2 = IntegratedGameManager.S.inSceneCharacters[2];    // human
                 break;
         }
+
+        self_icon_sprite = gameAssets.GetCharacterIcon(currentCharacter);
+        partner1_icon_sprite = gameAssets.GetCharacterIcon(partner1);
+        partner2_icon_sprite = gameAssets.GetCharacterIcon(partner2);
+
         //Display character icons
-        foreach (GameObject self_icon in self_icons)
-            self_icon.GetComponent<Image>().sprite = self_icon_sprite;
-        foreach (GameObject partner1_icon in partner1_icons)
-            partner1_icon.GetComponent<Image>().sprite = partner1_icon_sprite;
-        foreach (GameObject partner2_icon in partner2_icons)
-            partner2_icon.GetComponent<Image>().sprite = partner2_icon_sprite;
+        foreach (Image self_icon in TooltipSelfPortraitIcons)
+            self_icon.sprite = self_icon_sprite;
+        foreach (Image partner1_icon in TooltipPartner1PortraitIcons)
+            partner1_icon.sprite = partner1_icon_sprite;
+        foreach (Image partner2_icon in TooltipPartner2PortraitIcons)
+            partner2_icon.sprite = partner2_icon_sprite;
 
         //Display Character dice, opponent dice, and opponent icon
-        switch (opponent_type) {
-            case "Monster":
-                //Character dice
-                foreach (GameObject self_dice in self_dices)
-                    self_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(currentCharacter.config.monsterDice.type);
-                foreach (GameObject partner1_dice in partner1_dices)
-                    partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner1.config.monsterDice.type);
-                foreach (GameObject partner1_dice in partner2_dices)
-                    partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner2.config.monsterDice.type);
-                //opponent dice
-                opponent_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(opponent.GetComponent<Monster>().config.combatDice.type);
-                opponent_bonus_text.text = opponent.GetComponent<Monster>().config.combatDice.bonus.ToString();
-                //opponent icon
-                opponent_icon.GetComponent<Image>().sprite = opponent.GetComponent<Monster>().icon;
+        switch (challengeType) {
+            case Combat.FightType.Monster:
+                self_die = currentCharacter.config.monsterDice;
+                partner1_die = partner1.config.monsterDice;
+                partner2_die = partner2.config.monsterDice;
+
+                Monster monster = opponent.GetComponent<Monster>();
+                challengeSprite = monster.icon;
+                challengeDie = monster.config.combatDice;
+                challengeBonus = monster.config.combatDice.bonus.ToString();
                 break;
-            case "Rock":
-                //Character dice
-                foreach (GameObject self_dice in self_dices)
-                    self_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(currentCharacter.config.stoneDice.type);
-                foreach (GameObject partner1_dice in partner1_dices)
-                    partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner1.config.stoneDice.type);
-                foreach (GameObject partner1_dice in partner2_dices)
-                    partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner2.config.stoneDice.type);
-                //opponent dice
-                opponent_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(opponent.GetComponent<Tile>().dice.type);
-                opponent_bonus_text.text = opponent.GetComponent<Tile>().dice.bonus.ToString();
-                //opponent icon
-                opponent_icon.GetComponent<Image>().sprite = gameAssets.rockIcon;
+
+            case Combat.FightType.Rock:
+                self_die = currentCharacter.config.stoneDice;
+                partner1_die = partner1.config.stoneDice;
+                partner2_die = partner2.config.stoneDice;
+
+                challengeSprite = gameAssets.rockIcon;
+                challengeDie = tile.dice;
+                challengeBonus = tile.dice.bonus.ToString();
                 break;
-            case "Trap":
-                //Character dice
-                foreach (GameObject self_dice in self_dices)
-                    self_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(currentCharacter.config.trapDice.type);
-                foreach (GameObject partner1_dice in partner1_dices)
-                    partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner1.config.trapDice.type);
-                foreach (GameObject partner1_dice in partner2_dices)
-                    partner1_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(partner2.config.trapDice.type);
-                //opponent dice
-                opponent_dice.GetComponent<Image>().sprite = gameAssets.GetDiceIcon(opponent.GetComponent<Tile>().dice.type);
-                opponent_bonus_text.text = opponent.GetComponent<Tile>().dice.bonus.ToString();
-                //opponent icon
-                opponent_icon.GetComponent<Image>().sprite = gameAssets.trapIcon;
+            
+            case Combat.FightType.Trap:
+                self_die = currentCharacter.config.trapDice;
+                partner1_die = partner1.config.trapDice;
+                partner2_die = partner2.config.trapDice;
+
+                challengeSprite = gameAssets.trapIcon;
+                challengeDie = tile.dice;
+                challengeBonus = tile.dice.bonus.ToString();
                 break;
+
+            default:
+                Debug.LogErrorFormat("Unknown Combat Type {0} in Tooltip", challengeType);
+                return;
         }
+
+        foreach (Image self_dice in TooltipSelfDiceIcons)
+            self_dice.sprite = gameAssets.GetDiceSprite(self_die);
+        foreach (Image partner1_dice in TooltipPartner1DiceIcons)
+            partner1_dice.sprite = gameAssets.GetDiceSprite(partner1_die);
+        foreach (Image partner1_dice in TooltipPartner2DiceIcons)
+            partner1_dice.sprite = gameAssets.GetDiceSprite(partner2_die);
+        //opponent dice
+        TooltipChallengeDieIcon.sprite = gameAssets.GetDiceSprite(challengeDie);
+        TooltipChallengeBonusText.text = challengeBonus;
+        TooltipChallengeTypeIcon.sprite = challengeSprite;
+        CompetitionMiddleware.Instance.LogInspectChallenge(currentCharacter.CharacterId,
+            tile.col, tile.row, challengeType.ToString(),
+            self_die, partner1_die, partner2_die, challengeDie);
     }
 
     #endregion
