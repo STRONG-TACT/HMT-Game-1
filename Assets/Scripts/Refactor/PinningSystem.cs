@@ -64,8 +64,8 @@ public class PinningSystem : MonoBehaviour
 
     private void Update()
     {
-        Debug.LogFormat("GameManager Is null? {0}", IntegratedGameManager.S == null);
-        Debug.LogFormat("localChar Is null? {0}", IntegratedGameManager.S.localChar == null);
+        //Debug.LogFormat("GameManager Is null? {0}", IntegratedGameManager.S == null);
+        //Debug.LogFormat("localChar Is null? {0}", IntegratedGameManager.S.localChar == null);
         if (IntegratedGameManager.S.localChar.ReadyForNextPhase) return;
         
         if (isPinned)
