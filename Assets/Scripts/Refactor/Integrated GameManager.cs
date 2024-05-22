@@ -459,6 +459,9 @@ public class IntegratedGameManager : MonoBehaviour
                 mo.State = Monster.CharacterState.Attacking;
             }
 
+            //wait for animation to play
+            yield return new WaitForSeconds(UIManager.S.animationDuration * 3);
+
             if (win) {
                 // if the character(s) won the battle, destory the enemies
                 Debug.Log("Character won.");
