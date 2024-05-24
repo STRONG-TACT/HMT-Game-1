@@ -177,15 +177,20 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
         }
 
         if (CompetitionMiddleware.Instance.IsAI) {
+            PhotonNetwork.LocalPlayer.NickName = "AI AGENT";
             NetworkMiddleware.S.SetupMiddleware(seed, 0);
         }
-        else if(CompetitionMiddleware.Instance.UserID == dwarfPlayer) {
+        else if(CompetitionMiddleware.Instance.UserID == dwarfPlayer)
+        {
+            PhotonNetwork.LocalPlayer.NickName = "Dwarf";
             NetworkMiddleware.S.SetupMiddleware(seed, 0);
         }
         else if (CompetitionMiddleware.Instance.UserID == giantPlayer) {
+            PhotonNetwork.LocalPlayer.NickName = "Giant";
             NetworkMiddleware.S.SetupMiddleware(seed, 1);
         }
         else if (CompetitionMiddleware.Instance.UserID == humanPlayer) {
+            PhotonNetwork.LocalPlayer.NickName = "Human";
             NetworkMiddleware.S.SetupMiddleware(seed, 2);
         }
 

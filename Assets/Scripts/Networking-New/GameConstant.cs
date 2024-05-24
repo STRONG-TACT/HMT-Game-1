@@ -6,6 +6,7 @@ namespace GameConstant
 {
     public class GlobalConstant
     {
+        public const string LOBBY_SCENE = "Lobby_n";
         public const string ROOM_SCENE = "Room_n";
         public const string LOCAL_SCENE = "Local_Animated";
         public const string NETWORK_SCENE = "NetworkGamePlay";

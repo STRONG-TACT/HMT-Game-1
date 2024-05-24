@@ -50,5 +50,4 @@ public class IntegratedNetworkGameManager : IntegratedGameManager {
             NetworkMiddleware.S.CallReadyForNextPhase(localChar.CharacterId,true);
         }
     }
-
 }

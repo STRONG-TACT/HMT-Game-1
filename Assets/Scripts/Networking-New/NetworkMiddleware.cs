@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using GameConstant;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -32,11 +33,6 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
             S = this;
             DontDestroyOnLoad(this.gameObject);
         }
-    }
-
-    private void Start()
-    {
-
     }
 
     public void SetupMiddleware(int randomSeed_, int characterID_) {
@@ -215,4 +211,10 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     #endregion
 
+    // handling player disconnect
+    public override void OnPlayerLeftRoom(Player player)
+    {
+        Debug.Log($"Player {player.NickName} has left the room");
+        UIManager.S.ShowOtherPlayerDisconnectUI(player.NickName);
+    }
 }

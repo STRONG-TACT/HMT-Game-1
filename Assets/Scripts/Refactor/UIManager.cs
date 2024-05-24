@@ -8,6 +8,7 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.ComponentModel;
+using UnityEngine.SceneManagement;
 
 
 public class UIManager : MonoBehaviour
@@ -81,6 +82,10 @@ public class UIManager : MonoBehaviour
     public Image[] TooltipPartner1DiceIcons = new Image[2];
     public Image[] TooltipPartner2DiceIcons = new Image[2];
     bool combatSkillDisplayActive;
+
+    [Header("Network Status UI")] 
+    public GameObject networkStatusHandle;
+    public TMP_Text networkStatusMsg;
 
     public static UIManager S;
 
@@ -840,6 +845,22 @@ public class UIManager : MonoBehaviour
         CompetitionMiddleware.Instance.LogInspectChallenge(currentCharacter.CharacterId,
             tile.col, tile.row, challengeType.ToString(),
             self_die, partner1_die, partner2_die, challengeDie);
+    }
+
+    #endregion
+
+    #region Network StatusnUI
+
+    public void ShowOtherPlayerDisconnectUI(string playerName)
+    {
+        networkStatusMsg.text = $"Player {playerName} disconnected from the game." +
+                                $"This game will not be recorded";
+        networkStatusHandle.SetActive(true);
+    }
+
+    public void ReturnToLobby()
+    {
+        SceneManager.LoadScene(GlobalConstant.LOBBY_SCENE);
     }
 
     #endregion
