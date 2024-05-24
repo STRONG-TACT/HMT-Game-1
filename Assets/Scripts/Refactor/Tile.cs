@@ -62,6 +62,12 @@ public class Tile : MonoBehaviour
         }
     }
 
+    public bool IsOccupiedByPlayer {
+        get {
+            return charaList.Count > 0;
+        }
+    }
+
     public bool IsOccupiedByEnemy {
         get {
             return enemyList.Count > 0;
@@ -89,7 +95,7 @@ public class Tile : MonoBehaviour
     /// <summary>
     /// A list of the enemies on the tile. This is a copy of the actual list, so it can be modified without affecting the actual list.
     /// </summary>
-    public List<Monster> EnemyList {
+    public List<Monster> MonsterList {
         get {
             return new List<Monster>(enemyList);
         }

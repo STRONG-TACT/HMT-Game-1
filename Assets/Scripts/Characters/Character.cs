@@ -31,7 +31,7 @@ public class Character : MonoBehaviour {
     public int playerId;
 
     public CharacterConfig config;
-    public int CharacterId;
+    public int CharacterId { get; private set; }
     public Tile currentTile;
 
     private Vector3 indicator_offset;
@@ -55,6 +55,7 @@ public class Character : MonoBehaviour {
     
     public bool ReadyForNextPhase = false;
 
+
     public Transform characterMask { get; private set; }
     public Transform visibilityMask { get; private set; }
 
@@ -62,7 +63,7 @@ public class Character : MonoBehaviour {
     public int Health { get; private set; } = 3;
     public int Lives { get; private set; } = 3;
 
-    //Death and death round count down
+    //Death and death currRound count down
     public bool dead = false;
     public int respawnCountdown = 0;
 
@@ -163,13 +164,14 @@ public class Character : MonoBehaviour {
         prevMovePointPos = movePoint;
     }
 
-    public void SetUpConfig(CharacterConfig config, int characterId, GameData gameData) {
+    public void SetUpConfig(CharacterConfig config, int characterId, int lives) {
         this.config = config;
         CharacterId = characterId;
+        GameData gameData = GameData.S;
         path_indicator_offset = gameData.tileSize * 0.15f;
         stepLength = gameData.tileSize + gameData.tileGapLength;
         Health = config.StartingHealth;
-        Lives = gameData.LivesPerCharacter;
+        Lives = lives;
 
         indicator_offset = new Vector3(0.1f, 0.5f, -0.1f) * gameData.tileSize;
         //Debug.Log(indicator_offset);
@@ -237,6 +239,9 @@ public class Character : MonoBehaviour {
 
     public void StartPingPhase() {
         pingCursor = Vector2Int.zero;
+        if (dead) {
+            RespawnCheck();
+        }
         NetworkMiddleware.S.CallReadyForNextPhase(CharacterId, dead);
     }
     
@@ -296,9 +301,7 @@ public class Character : MonoBehaviour {
     
     public void StartPlanningPhase() {
         ResetPlan();
-        if(dead) {
-            RespawnCheck();
-        }
+       
         NetworkMiddleware.S.CallReadyForNextPhaseAuto(CharacterId, ActionPointsRemaining == 0 || dead);
     }
     
@@ -568,11 +571,11 @@ public class Character : MonoBehaviour {
         State = CharacterState.Die;
         dead = true;
         Lives -= 1;
-        respawnCountdown = 2;
+        respawnCountdown = GameData.S.RespawnDelay;
         ResetPlan();
         IntegratedGameManager.S.CharacterDied(CharacterId);
 
-
+        CompetitionMiddleware.Instance.LogPlayerDeath(CharacterId, currentTile.col, currentTile.row);
 
         //// Wait for the duration of the animation
         
@@ -600,6 +603,7 @@ public class Character : MonoBehaviour {
                 Health = config.StartingHealth;
                 transform.position = startPos;
                 transform.rotation = Quaternion.identity;
+                //TODO this might need to wait a beat for collision checks
                 IntegratedMapGenerator.Instance.UpdateFOWVisuals();
             }
         }

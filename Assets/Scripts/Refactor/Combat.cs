@@ -82,7 +82,7 @@ public class Combat : MonoBehaviour {
         }
 
         if (type == FightType.Monster) {
-            foreach (Monster m in tile.EnemyList) {
+            foreach (Monster m in tile.MonsterList) {
                 int outcome = m.config.combatDice.Roll();
                 enemyScores.Add(outcome);
                 enemyScore += outcome;

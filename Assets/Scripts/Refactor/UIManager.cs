@@ -28,9 +28,9 @@ public class UIManager : MonoBehaviour
 
     [Header("Team Status Panel")]
     public GameObject TeamInfoPanel;
-    public GameObject[] GoalStatusIcons = new GameObject[3];
-    public GameObject[] LifeStatusIcons = new GameObject[3];
-    public GameObject[] ActionStatusIcons = new GameObject[3];
+    public Image[] GoalStatusIcons = new Image[3];
+    public Image[] LifeStatusIcons = new Image[3];
+    public Image[] ActionStatusIcons = new Image[3];
 
     [Header("Planning UI")]
     public GameObject PlanUIPanel;
@@ -186,33 +186,33 @@ public class UIManager : MonoBehaviour
 
     #region Common HUD
 
-    private void UpdateHealthPanel(int health) {
+    private void UpdateHealthPanel(Character character) {
         foreach (Transform child in HealthPanel.transform.GetComponentsInChildren<Transform>()) {
             child.gameObject.SetActive(false);
         }
 
-        for (int i = 0; i < health; i++) {
+        for (int i = 0; i < character.Health; i++) {
             HealthPanel.transform.GetChild(i).gameObject.SetActive(true);
         }
-
-        for (int j = 0; j < GlobalConstant.START_HEALTH - health; j++) {
-            HealthPanel.transform.GetChild(j + GlobalConstant.START_HEALTH).gameObject.SetActive(true);
+        //TODO Fix these references based on the Chracter's config 
+        for (int j = 0; j < character.config.StartingHealth - character.Health; j++) {
+            HealthPanel.transform.GetChild(j + character.config.StartingHealth).gameObject.SetActive(true);
         }
 
         HealthPanel.gameObject.SetActive(true);
     }
 
-    private void UpdateActionPanel(int current_actionPointCount, int total_actionPointCount) {
+    private void UpdateActionPanel(Character character) {
         foreach (Transform child in ActionPanel.transform.GetComponentsInChildren<Transform>()) {
             child.gameObject.SetActive(false);
         }
 
-        for (int i = 0; i < total_actionPointCount; i++) {
+        for (int i = 0; i < character.config.StartingActionPoints; i++) {
             ActionPanel.transform.GetChild(i).gameObject.SetActive(true);
             ActionPanel.transform.GetChild(i).gameObject.GetComponent<Image>().sprite = gameAssets.actionpoint_grey;
         }
 
-        for (int i = 0; i < current_actionPointCount; i++) {
+        for (int i = 0; i < character.ActionPointsRemaining; i++) {
             ActionPanel.transform.GetChild(i).gameObject.SetActive(true);
             ActionPanel.transform.GetChild(i).gameObject.GetComponent<Image>().sprite = gameAssets.actionpoint;
         }
@@ -235,8 +235,8 @@ public class UIManager : MonoBehaviour
 
     public void UpdateCommonHUD() {
         Character currentCharacter = IntegratedGameManager.S.localChar;
-        UpdateHealthPanel(currentCharacter.Health);
-        UpdateActionPanel(currentCharacter.ActionPointsRemaining, currentCharacter.config.StartingActionPoints);
+        UpdateHealthPanel(currentCharacter);
+        UpdateActionPanel(currentCharacter);
 
     }
 
@@ -487,25 +487,25 @@ public class UIManager : MonoBehaviour
     public void UpdateCharacterGoalStatus(int charID, bool reached = true)
     {
         if (reached)
-            GoalStatusIcons[charID].GetComponent<Image>().sprite = gameAssets.GetGoalFilled(charID);
+            GoalStatusIcons[charID].sprite = gameAssets.GetGoalFilled(charID);
         else 
-            GoalStatusIcons[charID].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(charID);
+            GoalStatusIcons[charID].sprite = gameAssets.GetGoalUnfilled(charID);
     }
     
     public void ResetTeamGoalStatus()
     {
         //GoalPanel.SetActive(false);
-        GoalStatusIcons[0].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(0);
-        GoalStatusIcons[1].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(1);
-        GoalStatusIcons[2].GetComponent<Image>().sprite = gameAssets.GetGoalUnfilled(2);
+        GoalStatusIcons[0].sprite = gameAssets.GetGoalUnfilled(0);
+        GoalStatusIcons[1].sprite = gameAssets.GetGoalUnfilled(1);
+        GoalStatusIcons[2].sprite = gameAssets.GetGoalUnfilled(2);
     }
 
     public void UpdateCharacterLifeStatus(int charID, bool alive = true)
     {
         if (alive)
-            LifeStatusIcons[charID].GetComponent<Image>().sprite = gameAssets.aliveIcon;
+            LifeStatusIcons[charID].sprite = gameAssets.aliveIcon;
         else
-            LifeStatusIcons[charID].GetComponent<Image>().sprite = gameAssets.deadIcon;
+            LifeStatusIcons[charID].sprite = gameAssets.deadIcon;
 
     }
 
@@ -577,7 +577,7 @@ public class UIManager : MonoBehaviour
         else {
             TimeSpan timeSpan = TimeSpan.FromSeconds(IntegratedGameManager.S.TimeRemaining);
             TimerText.text = string.Format("{0}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
-            if (TimeRemaining < 10) {
+            if (IntegratedGameManager.S.TimeRemaining < 10) {
                 TimerText.color = Color.red;
             }
             else {

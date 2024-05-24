@@ -14,7 +14,7 @@ public class CharacterConfig : ScriptableObject {
     public string characterName;
     [Tooltip("The Type of character to use, used for graphical model and icons.")]
     public CharacterType type;
-    [Tooltip("The number of action points a character starts a round with.")]
+    [Tooltip("The number of action points a character starts a currRound with.")]
     [Min(1)]
     public int StartingActionPoints;
 

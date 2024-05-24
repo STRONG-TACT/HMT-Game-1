@@ -3,9 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// This class essentially functions as a Game Configuration Manager and could at this point
+/// probably be accomplished by using a Scriptable Object since it no longer has any logic
+/// beyond integrity checks on Start.
+/// </summary>
 public class GameData : MonoBehaviour
 {
-    public bool Initialized { get; private set; } = false;
 
     public TextAsset[] levelTextFiles;
     [Tooltip("The Configurations of Characters. Original order was: Dwarf, Giant, Human")]
@@ -28,7 +32,7 @@ public class GameData : MonoBehaviour
 
     [Tooltip("The number of Start Turns a character has to sit out before they can respawn.")]
     [Min(1)]
-    public int RespawnDelay = 1;
+    public int RespawnDelay = 2;
 
     public static GameData S;
 
@@ -47,12 +51,5 @@ public class GameData : MonoBehaviour
         {
             Debug.LogError("GameData: inSceneCharacters must have exactly 3 elements.");
         }
-
-        for (int i = 0; i < characterConfigs.Length; i++)
-        {
-            IntegratedGameManager.S.inSceneCharacters[i].SetUpConfig(characterConfigs[i], i, this);
-        }
-
-        Initialized = true;
     }
 }

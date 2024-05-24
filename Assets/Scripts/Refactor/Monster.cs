@@ -1,8 +1,9 @@
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using UnityEngine;
+using GameConstant;
+using System.Linq;
 
 public class Monster : MonoBehaviour
 {
@@ -41,7 +42,7 @@ public class Monster : MonoBehaviour
 
     public bool turnFinished = false;
     public bool moving = false;
-    private int moveCount = 0;
+    public int MovesLeftThisTurn { get; private set; } = 0;
 
     private float stepLength;
 
@@ -50,6 +51,9 @@ public class Monster : MonoBehaviour
     private Transform model;
     private Animator animator;
     private CharacterState characterState;
+
+    private List<Character.Direction> movementPlan = new List<Character.Direction>();
+    private bool currentDirection = false;
 
     public enum CharacterState
     {
@@ -118,43 +122,126 @@ public class Monster : MonoBehaviour
 
         stepLength = data.tileSize + data.tileGapLength;
         ObjKey = code;
+
+        currentDirection = NetworkMiddleware.S.NextRandomInt(0, 2) != 0;
     }
     
-    public void MonsterTurnStart()
-    {
+    public void MonsterTurnStart() {
         turnFinished = false;
-        moveCount = 0;
+        MovesLeftThisTurn = config.movement;
+    }
+
+    public List<Character.Direction > PlanNextMove() {
+        movementPlan = new List<Character.Direction >();
+        if (MovesLeftThisTurn <=0) {
+            movementPlan.Add(Character.Direction.Wait);
+        }
+        else {
+            switch (config.movementStyle) {
+                case MonsterConfig.MovementStyle.Static:
+                    movementPlan.Add(Character.Direction.Wait);
+                    break;
+                case MonsterConfig.MovementStyle.Horizontal:
+                    if (currentDirection) {
+                        if (CheckMove(Character.Direction.Right)) {
+                            movementPlan.Add(Character.Direction.Right);
+                            movementPlan.Add(Character.Direction.Wait);
+                        }
+                        else {
+                            movementPlan.Add(Character.Direction.Left);
+                            movementPlan.Add(Character.Direction.Wait);
+                        }
+                    }
+                    else {
+                        if (CheckMove(Character.Direction.Left)) {
+                            movementPlan.Add(Character.Direction.Left);
+                            movementPlan.Add(Character.Direction.Wait);
+                        }
+                        else {
+                            movementPlan.Add(Character.Direction.Right);
+                            movementPlan.Add(Character.Direction.Wait);
+                        }
+                    }
+                    break;
+                case MonsterConfig.MovementStyle.Vertical:
+                    if (currentDirection) {
+                        if (CheckMove(Character.Direction.Up)) {
+                            movementPlan.Add(Character.Direction.Up);
+                            movementPlan.Add(Character.Direction.Wait);
+                        }
+                        else {
+                            movementPlan.Add(Character.Direction.Down);
+                            movementPlan.Add(Character.Direction.Wait);
+                        }
+                    }
+                    else {
+                        if (CheckMove(Character.Direction.Down)) {
+                            movementPlan.Add(Character.Direction.Down);
+                            movementPlan.Add(Character.Direction.Wait);
+                        }
+                        else {
+                            movementPlan.Add(Character.Direction.Up);
+                            movementPlan.Add(Character.Direction.Wait);
+                        }
+                    }
+                    break;
+
+                case MonsterConfig.MovementStyle.RandomWalk:
+                    movementPlan = new List<Character.Direction> {
+                        Character.Direction.Up, 
+                        Character.Direction.Down,
+                        Character.Direction.Left,
+                        Character.Direction.Right };
+                    movementPlan = movementPlan.Where(x => CheckMove(x)).OrderBy(x => NetworkMiddleware.S.NextRandom()).ToList();
+                    movementPlan.Add(Character.Direction.Wait);
+                    break;
+            }
+        }
+        return movementPlan;
+    }
+
+    public Character.Direction NextMove() {
+        if (movementPlan.Count > 0) {
+            return movementPlan[0];
+        }
+        return Character.Direction.Wait;
+    }
+
+    public Vector2Int NextMoveCoordinates() {
+        Vector2Int nextMove = new Vector2Int(currentTile.col, currentTile.row);
+        if (movementPlan.Count > 0) {
+            switch (movementPlan[0]) {
+                case Character.Direction.Up:
+                    nextMove += Vector2Int.up;
+                    break;
+                case Character.Direction.Down:
+                    nextMove += Vector2Int.down;
+                    break;
+                case Character.Direction.Left:
+                    nextMove += Vector2Int.left;
+                    break;
+                case Character.Direction.Right:
+                    nextMove += Vector2Int.right;
+                    break;
+            }
+        }
+        return nextMove;
+    }
+
+    public void PopPlanMove() {
+        if (movementPlan.Count > 0) {
+            movementPlan.RemoveAt(0);
+        }
     }
     
     public IEnumerator TakeNextMove(float stepTime) {
-        if(moveCount >= config.movement) {
+        if(MovesLeftThisTurn >= config.movement) {
             yield break;
         }
         moving = true;
         prevMovePointPos = transform.position;
-        Character.Direction direction = Character.Direction.Wait;
-        List<Character.Direction> directions = new List<Character.Direction>() { 
-            Character.Direction.Up,
-            Character.Direction.Down,
-            Character.Direction.Left,
-            Character.Direction.Right};
-        
-        // shuffle directions
-        for (int i = 0; i < directions.Count; i++) {
-            int j = Random.Range(i, directions.Count);
-            Character.Direction temp = directions[i];
-            directions[i] = directions[j];
-            directions[j] = temp;
-        }
 
-        for (int i =0; i < directions.Count; i++) {
-            if (CheckMove(directions[i])) {
-                direction = directions[i];
-                break;
-            }
-        }
-
-        Vector3 moveVec = direction switch {
+        Vector3 moveVec = movementPlan[0] switch {
             Character.Direction.Up => Vector3.forward,
             Character.Direction.Down => Vector3.back,
             Character.Direction.Left => Vector3.left,
@@ -176,12 +263,12 @@ public class Monster : MonoBehaviour
             }
             transform.position = target;
             model.rotation = targetRotation;
-            moveCount += 1;
-            if (moveCount >= config.movement) {
+            MovesLeftThisTurn -= 1;
+            if (MovesLeftThisTurn <= 0) {
                 Debug.Log(string.Format("monsterID: {0}, turnFinished", monsterId));
                 turnFinished = true;
             }
-            Debug.Log(string.Format("monsterID: {0}, direction: {1}, StartingActionPoints: {2}, count: {3}", monsterId, direction, config.movement, moveCount));
+            Debug.Log(string.Format("monsterID: {0}, direction: {1}, StartingActionPoints: {2}, count: {3}", monsterId, movementPlan[0], config.movement, MovesLeftThisTurn));
         }
         State = CharacterState.Idle;
         moving = false;
@@ -285,7 +372,7 @@ public class Monster : MonoBehaviour
             {"entityType","monster" },
             {"objKey", ObjKey },
             {"id", HMTObjID },
-            {"type", config.type.ToString() },
+            //{"type", config.configName },
             {"actionPoints", config.movement },
             {"combatDice", config.combatDice.ToString() }
         };

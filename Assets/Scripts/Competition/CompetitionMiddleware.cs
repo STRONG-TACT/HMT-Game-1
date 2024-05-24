@@ -14,7 +14,10 @@ public class CompetitionMiddleware : MonoBehaviour {
     public string flaskURL = "https://localhost";
     public string serverKey = "NOTSET";
     public bool overrideAIMode = true;
-    public bool enableLogging = true;
+    [Tooltip("Whether logs should be send to the server.")]
+    public bool HttpSendLogs = true;
+    [Tooltip("Wheter logs should be printed to the console window and, in compiled builds, to the player log file.")]
+    public bool DebugTraceLogs = true;
 
     public string UserID { get { return currUserID; } }
 
@@ -54,10 +57,10 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     private string currUserID = null;
     private string currSessionID = null;
-    private string gameID = null;
-    private string level = null;
-    private int round = -1;
-    private string phase = null;
+    private string currGameId = null;
+    private string currLevel = null;
+    private int currRound = -1;
+    private string currPhase = null;
 
     // Start is called before the first frame update
     void Awake() {
@@ -66,6 +69,8 @@ public class CompetitionMiddleware : MonoBehaviour {
             DontDestroyOnLoad(this);
         }
         else {
+            this.RegisteredAgents = new Dictionary<int, AgentRecord>();
+            this.currSessionID = null;
             Destroy(this.gameObject);
         }
     }
@@ -81,23 +86,27 @@ public class CompetitionMiddleware : MonoBehaviour {
                 CallLogEvent(entry.agentID, entry.sessionID, 1001, "system", "end_session", "session_id", entry.sessionID);
             }
         }
-        else {
+        else if(currSessionID != null) {
             LogEndSession();
         }
     }
 
-    private void SendPostRequestImmediate(string url, string json) {
+    private void SendPostRequestImmediate(string url, string json, bool supressDebug = false) {
         using (UnityWebRequest www = UnityWebRequest.Post(url, json)) {
             www.SetRequestHeader("Content-type", "application/json");
-            Debug.LogFormat("Sending {0} request to {1} with data {2}, with", www.method, www.url, json);
+            if (!supressDebug) {
+                Debug.LogFormat("Sending {0} request to {1} with data {2}, with", www.method, www.url, json);
+            }
             www.SendWebRequest();
         }
     }
 
 
-    private IEnumerator SendPostRequestFireAndForget(string url, string json) {
+    private IEnumerator SendPostRequestFireAndForget(string url, string json, bool supressDebug = false) {
         using (UnityWebRequest www = UnityWebRequest.Post(url, json)) {
-            Debug.LogFormat("Sending {0} request to {1} with data {2}, with", www.method, www.url, json);
+            if (!supressDebug) {
+                Debug.LogFormat("Sending {0} request to {1} with data {2}, with", www.method, www.url, json);
+            }
             www.SetRequestHeader("Content-type", "application/json");
             yield return www.SendWebRequest();
             if (www.result != UnityWebRequest.Result.Success) {
@@ -108,9 +117,11 @@ public class CompetitionMiddleware : MonoBehaviour {
         }
     }
 
-    private IEnumerator SendPostRequestWithCallback(string url, string json, System.Action<JObject> callback) {
+    private IEnumerator SendPostRequestWithCallback(string url, string json, System.Action<JObject> callback, bool supressDebug=false) {
         using (UnityWebRequest www = UnityWebRequest.Post(url, json)) {
-            Debug.LogFormat("Sending {0} request to {1} with data {2}, with", www.method, www.url, json);
+            if (!supressDebug) {
+                Debug.LogFormat("Sending {0} request to {1} with data {2}, with", www.method, www.url, json);
+            }
             www.SetRequestHeader("Content-type", "application/json");
             yield return www.SendWebRequest();
             if (www.result != UnityWebRequest.Result.Success) {
@@ -131,7 +142,7 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
     public void SetGameID(string gameID) {
-        this.gameID = gameID;
+        this.currGameId = gameID;
     }
 
     public void AddAIAgent(string target, string agentID, int characterID) {
@@ -167,7 +178,7 @@ public class CompetitionMiddleware : MonoBehaviour {
 
 
     public void CallReportResult() {
-        //this can be fire and forget
+        //TODO this needs to be filled
     }
 
     private void CallLogEvent(string userID, string sessionID, int eventId, string actor, string verb, string label, int value, bool immediate = false) {
@@ -191,7 +202,7 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
     private void CallLogEvent(string userID, string sessionID, int eventID, string actor, string verb, JObject obj, bool includeContext = false, bool immediate = false) {
-        if (!enableLogging) { return; }
+        if (!HttpSendLogs && !DebugTraceLogs) { return; }
         JObject job = new JObject {
            {"api_key", serverKey},
            {"event_id", eventID},
@@ -206,11 +217,17 @@ public class CompetitionMiddleware : MonoBehaviour {
         if (includeContext) {
             job["context"] = GenerateContext();
         }
-        if (immediate) {
-            SendPostRequestImmediate(flaskURL + "/log_event", JsonConvert.SerializeObject(job));
+
+        if (DebugTraceLogs) { 
+            Debug.LogFormat("Log <color=cyan>{0}</color> <color=yellow>{1}</color> Full JSON: {2}", eventID, verb, job.ToString(Formatting.None));
         }
-        else {
-            StartCoroutine(SendPostRequestFireAndForget(flaskURL + "/log_event", JsonConvert.SerializeObject(job)));
+        if (HttpSendLogs) {
+            if (immediate) {
+                SendPostRequestImmediate(flaskURL + "/log_event", JsonConvert.SerializeObject(job), true);
+            }
+            else {
+                StartCoroutine(SendPostRequestFireAndForget(flaskURL + "/log_event", JsonConvert.SerializeObject(job), true));
+            }
         }
     }
 
@@ -249,10 +266,10 @@ public class CompetitionMiddleware : MonoBehaviour {
 
 
     public void LogStartGameLocal(string gameID) {
-        if (this.gameID != null) {
+        if (currGameId != null) {
             LogEndGame();
         }
-        this.gameID = gameID;
+        currGameId = gameID;
         CallLogEvent(1002, "system", "start_game",
             new JObject {
                 {"game_id", gameID },
@@ -264,10 +281,10 @@ public class CompetitionMiddleware : MonoBehaviour {
                             string dwarfUserID, string dwarfSessionID, bool dwarfIsAI,
                             string giantUserID, string giantSessionID, bool giantIsAI,
                             string humanUserID, string humanSessionID, bool humanIsAI) {
-        if (this.gameID != null) {
+        if (currGameId != null) {
             LogEndGame();
         }
-        this.gameID = gameID;
+        currGameId = gameID;
         CallLogEvent(1010, "system", "start_game",
             new JObject {
                 {"game_id", gameID },
@@ -279,53 +296,53 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
     public void LogEndGame() {
-        CallLogEvent(1011, "system", "end_game", "game_id", gameID);
-        gameID = null;
+        CallLogEvent(1011, "system", "end_game", "game_id", currGameId);
+        currGameId = null;
     }
 
     public void LogStartLevel(string levelName) {
         if (!LogSystemEvents) return;
-        if (levelName != null) {
+        if (currLevel != null) {
             LogEndLevel();
         }
-        this.level = levelName;
-        CallLogEvent(1020, "system", "start_level", "level_name", level);
+        currLevel = levelName;
+        CallLogEvent(1020, "system", "start_level", "level_name", currLevel);
     }
 
     public void LogEndLevel() {
         if (!LogSystemEvents) return;
-        CallLogEvent(1021, "system", "end_level", "level_name", level);
-        level = null;
+        CallLogEvent(1021, "system", "end_level", "level_name", currLevel);
+        currLevel = null;
     }
 
     public void LogStartRound(int round) {
         if (!LogSystemEvents) return;
-        if (this.round > 0) {
+        if (this.currRound > 0) {
             LogEndRound();
         }
-        this.round = round;
-        CallLogEvent(1030, "system", "start_round", "round", this.round);
+        this.currRound = round;
+        CallLogEvent(1030, "system", "start_round", "currRound", this.currRound);
     }
 
     public void LogEndRound() {
         if (!LogSystemEvents) return;
-        CallLogEvent(1031, "system", "end_round", "round", round);
-        round = -1;
+        CallLogEvent(1031, "system", "end_round", "currRound", currRound);
+        currRound = -1;
     }
 
     public void LogStartPhase(string phaseName) {
         if (!LogSystemEvents) return;
-        if (phase != null) {
+        if (currPhase != null) {
             LogEndPhase();
         }
-        this.phase = phaseName;
-        CallLogEvent(1040, "system", "start_phase", "phase", phase);
+        this.currPhase = phaseName;
+        CallLogEvent(1040, "system", "start_phase", "currPhase", currPhase);
     }
 
     public void LogEndPhase() {
         if (!LogSystemEvents) return;
-        CallLogEvent(1041, "system", "end_phase", "phase", phase);
-        phase = null;
+        CallLogEvent(1041, "system", "end_phase", "currPhase", currPhase);
+        currPhase = null;
     }
     #endregion
 
@@ -447,8 +464,9 @@ public class CompetitionMiddleware : MonoBehaviour {
             true);
     }
 
-    public void LogPlayerDeath(string character, int x, int y) {
+    public void LogPlayerDeath(int characterId, int x, int y) {
         if (!LogSystemEvents) return;
+        string character = IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName;
         CallLogEvent(4002, character, "player_death",
             new JObject { { "x", x }, { "y", y } },
             true);
@@ -469,15 +487,50 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
     /// <summary>
-    /// Used to log steps during either the player or monster move phases. Plan information and directions should be inferable from state.
+    /// Used to log steps during either the player or monster move phases. 
+    /// Plan information and directions should be inferable from state.
     /// </summary>
     /// <param name="dwarfMove"></param>
     /// <param name="giantMove"></param>
     /// <param name="humanMove"></param>
-    public void LogMoveStep() {
+    public void LogPlayerMoveStep() {
         if (!LogSystemEvents) return;
-        CallLogEvent(4100, "system", "move_step", null, true);
+        CallLogEvent(4100, "system", "move_step", 
+            new JObject {
+                {"dwarf", 
+                    new JObject {
+                        "done", IntegratedGameManager.S.inSceneCharacters[0].ActionPlan.Count == 0,
+                        "move", IntegratedGameManager.S.inSceneCharacters[0].ActionPlan.Count > 0 ? IntegratedGameManager.S.inSceneCharacters[0].ActionPlan[0].ToString() : "none",
+                    }
+                },
+                {"giant", 
+                                   new JObject {
+                        "done", IntegratedGameManager.S.inSceneCharacters[1].ActionPlan.Count == 0,
+                        "move", IntegratedGameManager.S.inSceneCharacters[1].ActionPlan.Count > 0 ? IntegratedGameManager.S.inSceneCharacters[1].ActionPlan[0].ToString() : "none",
+                    }
+                },
+                {"human", 
+                                   new JObject {
+                        "done", IntegratedGameManager.S.inSceneCharacters[2].ActionPlan.Count == 0,
+                        "move", IntegratedGameManager.S.inSceneCharacters[2].ActionPlan.Count > 0 ? IntegratedGameManager.S.inSceneCharacters[2].ActionPlan[0].ToString() : "none",
+                    }
+                }
+            }, true);
     }
+
+    public void LogMonsterMoveStep(IList<Monster> monsters) {
+        if (!LogSystemEvents) return;
+        JObject job = new JObject();
+        foreach(Monster monster in IntegratedGameManager.S.inSceneMonsters) {
+            job.Add(new JObject { monster.ObjKey,
+                           new JObject {
+                    "done", monster.MovesLeftThisTurn == 0,
+                    "move", monster.NextMove(),
+                }
+            });
+        }
+    }
+
 
 
     public void LogChallengeEncounter(int x, int y,
