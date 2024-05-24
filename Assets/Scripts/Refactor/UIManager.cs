@@ -52,6 +52,8 @@ public class UIManager : MonoBehaviour
     public Button HumanBtn;
 
     [Header("Combat UI")]
+    public float animationDuration = 1.5f;
+    public float spinSpeed = 360.0f;
     public GameObject CombatUI;
     public GameObject[] PlayerCombatSlots = new GameObject[3];
     public GameObject[] EnemyCombatSlots = new GameObject[4];
@@ -109,6 +111,7 @@ public class UIManager : MonoBehaviour
 
     private void Update() {
         TooltipHoverUpdate();
+        //StartCoroutine(DiceAnimation(PlayerCombatSlots[0].transform.GetChild(2).gameObject));
     }
 
 
@@ -354,12 +357,27 @@ public class UIManager : MonoBehaviour
     #region Combat UI
 
     public void ShowCombatUI(Combat.FightType type, List<int> charaIDs, List<int> charaDice, List<int> enemyDice,
+                         int playerScore, int enemyScore, bool win, bool visible = true)
+    {
+        StartCoroutine(CombatUICoroutine(type, charaIDs, charaDice, enemyDice, playerScore, enemyScore, win, visible));
+    }
+
+    public IEnumerator CombatUICoroutine(Combat.FightType type, List<int> charaIDs, List<int> charaDice, List<int> enemyDice,
                              int playerScore, int enemyScore, bool win, bool visible=true)
     {
         GameObject scoreBoard = CombatUI.transform.Find("Scoreboard").gameObject;
         GameObject vsText = CombatUI.transform.Find("VSText").gameObject;
         GameObject inProgressText = CombatUI.transform.Find("InProgressText").gameObject;
         GameObject UnknownOpponentSlot = CombatUI.transform.Find("UnknownOpponent").gameObject;
+        CombatUI.SetActive(true);
+
+
+        PlayerFinalScore.text = "";
+        EnemyFinalScore.text = "";
+        ResultMessage.text = "";
+        WinBG.SetActive(false);
+        LoseBG.SetActive(false);
+
 
         if (visible == true)
         {
@@ -384,15 +402,21 @@ public class UIManager : MonoBehaviour
                 case 0:
                     PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.dwarfIcon;
                     if(visible == true)
+                    {
+                        StartCoroutine(DiceAnimation(PlayerCombatSlots[i].transform.GetChild(2).gameObject));
                         PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    }
                     else
                         PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = "";
                     PlayerCombatSlots[i].SetActive(true);
                     break;
                 case 1:
-                    PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.giantIcon;
+                    PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.giantIcon;   
                     if (visible == true)
+                    {
+                        StartCoroutine(DiceAnimation(PlayerCombatSlots[i].transform.GetChild(2).gameObject));
                         PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    }
                     else
                         PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = "";
                     PlayerCombatSlots[i].SetActive(true);
@@ -400,7 +424,10 @@ public class UIManager : MonoBehaviour
                 case 2:
                     PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.humanIcon;
                     if (visible == true)
+                    {
+                        StartCoroutine(DiceAnimation(PlayerCombatSlots[i].transform.GetChild(2).gameObject));
                         PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
+                    }
                     else
                         PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = "";
                     PlayerCombatSlots[i].SetActive(true);
@@ -420,6 +447,7 @@ public class UIManager : MonoBehaviour
             // TODO: differenciate monster types
             for (int i = 0; i < enemyDice.Count; i++)
             {
+                StartCoroutine(DiceAnimation(EnemyCombatSlots[i].transform.GetChild(2).gameObject));
                 EnemyCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.monsterIcon;
                 EnemyCombatSlots[i].GetComponentInChildren<TMP_Text>().text = enemyDice[0].ToString();
                 EnemyCombatSlots[i].SetActive(true);
@@ -427,18 +455,22 @@ public class UIManager : MonoBehaviour
         }
         else if (type == Combat.FightType.Trap)
         {
+            StartCoroutine(DiceAnimation(EnemyCombatSlots[0].transform.GetChild(2).gameObject));
             EnemyCombatSlots[0].GetComponentInChildren<Image>().sprite = gameAssets.trapIcon;
             EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>().text = enemyDice[0].ToString();
             EnemyCombatSlots[0].SetActive(true);
         }
         else if (type == Combat.FightType.Rock)
-        {
+        {                
+            StartCoroutine(DiceAnimation(EnemyCombatSlots[0].transform.GetChild(2).gameObject));
             EnemyCombatSlots[0].GetComponentInChildren<Image>().sprite = gameAssets.rockIcon;
             EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>().text = enemyDice[0].ToString();
             EnemyCombatSlots[0].SetActive(true);
         }
 
-        if(visible == true) 
+        yield return new WaitForSeconds(animationDuration);
+
+        if (visible == true) 
         {
             PlayerFinalScore.text = playerScore.ToString();
             EnemyFinalScore.text = enemyScore.ToString();
@@ -449,6 +481,23 @@ public class UIManager : MonoBehaviour
             EnemyFinalScore.text = "";
         }
 
+        //expand and shrink the score text 
+        float shrink_rate = 0.04f;
+        for(int i=0; i<animationDuration*50; i++)
+        {
+            PlayerFinalScore.gameObject.transform.localScale += new Vector3(shrink_rate, shrink_rate, shrink_rate);
+            EnemyFinalScore.gameObject.transform.localScale += new Vector3(shrink_rate, shrink_rate, shrink_rate);
+            yield return new WaitForSeconds(0.01f);
+        }
+        for (int i = 0; i < animationDuration*50; i++)
+        {
+            PlayerFinalScore.gameObject.transform.localScale -= new Vector3(shrink_rate, shrink_rate, shrink_rate);
+            EnemyFinalScore.gameObject.transform.localScale -= new Vector3(shrink_rate, shrink_rate, shrink_rate);
+            yield return new WaitForSeconds(0.01f);
+        }
+
+
+        
 
         if (win)
         {
@@ -462,8 +511,9 @@ public class UIManager : MonoBehaviour
             LoseBG.SetActive(true);
             ResultMessage.text = "Failed to defeat the opponent!";
         }
+        yield return new WaitForSeconds(animationDuration);
 
-        CombatUI.SetActive(true);
+        yield return null;
     }
     
     public void HideCombatUI()
@@ -479,6 +529,26 @@ public class UIManager : MonoBehaviour
 
         CombatUI.SetActive(false);
     }
+
+    private IEnumerator DiceAnimation(GameObject dice) 
+    {
+        dice.SetActive(true);
+        float elapsedTime = 0.0f;
+        while (elapsedTime < animationDuration)
+        {
+            float deltaRotation = spinSpeed * Time.deltaTime;
+            dice.transform.Rotate(Vector3.up, deltaRotation); 
+            dice.transform.Rotate(Vector3.right, deltaRotation); 
+            dice.transform.Rotate(Vector3.forward, deltaRotation); 
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        dice.SetActive(false);
+    }
+
+
+
 
     #endregion
 
