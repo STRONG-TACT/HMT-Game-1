@@ -16,6 +16,9 @@ public class MonsterConfig : ScriptableObject {
 
     [Tooltip("How the monster should move on its turn.")]
     public MovementStyle movementStyle;
+
+    [Tooltip("If True, Horizontal and Vertical monsters will randomly pick a starting direction. If False, they will start moving Right and Up respectively")]
+    public bool RandomizeInitialDirection;
     
     [Tooltip("Movement Limit.")]
     [Min(1)]

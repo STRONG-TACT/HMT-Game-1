@@ -40,7 +40,6 @@ public class Monster : MonoBehaviour
     private Vector3 movePoint;
     private Vector3 prevMovePointPos;
 
-    public bool turnFinished = false;
     public bool moving = false;
     public int MovesLeftThisTurn { get; private set; } = 0;
 
@@ -123,11 +122,15 @@ public class Monster : MonoBehaviour
         stepLength = data.tileSize + data.tileGapLength;
         ObjKey = code;
 
-        currentDirection = NetworkMiddleware.S.NextRandomInt(0, 2) != 0;
+        if (config.RandomizeInitialDirection) {
+            currentDirection = NetworkMiddleware.S.NextRandom() > 0.5f;
+        }
+        else {
+            currentDirection = true;
+        }
     }
     
     public void MonsterTurnStart() {
-        turnFinished = false;
         MovesLeftThisTurn = config.movement;
     }
 
@@ -235,7 +238,7 @@ public class Monster : MonoBehaviour
     }
     
     public IEnumerator TakeNextMove(float stepTime) {
-        if(MovesLeftThisTurn >= config.movement) {
+        if(MovesLeftThisTurn <= 0) {
             yield break;
         }
         moving = true;
@@ -266,7 +269,6 @@ public class Monster : MonoBehaviour
             MovesLeftThisTurn -= 1;
             if (MovesLeftThisTurn <= 0) {
                 Debug.Log(string.Format("monsterID: {0}, turnFinished", monsterId));
-                turnFinished = true;
             }
             Debug.Log(string.Format("monsterID: {0}, direction: {1}, StartingActionPoints: {2}, count: {3}", monsterId, movementPlan[0], config.movement, MovesLeftThisTurn));
         }

@@ -499,20 +499,20 @@ public class CompetitionMiddleware : MonoBehaviour {
             new JObject {
                 {"dwarf", 
                     new JObject {
-                        "done", IntegratedGameManager.S.inSceneCharacters[0].ActionPlan.Count == 0,
-                        "move", IntegratedGameManager.S.inSceneCharacters[0].ActionPlan.Count > 0 ? IntegratedGameManager.S.inSceneCharacters[0].ActionPlan[0].ToString() : "none",
+                        { "done", IntegratedGameManager.S.inSceneCharacters[0].ActionPlan.Count == 0 },
+                        { "move", IntegratedGameManager.S.inSceneCharacters[0].ActionPlan.Count > 0 ? IntegratedGameManager.S.inSceneCharacters[0].ActionPlan[0].ToString() : "none" },
                     }
                 },
                 {"giant", 
-                                   new JObject {
-                        "done", IntegratedGameManager.S.inSceneCharacters[1].ActionPlan.Count == 0,
-                        "move", IntegratedGameManager.S.inSceneCharacters[1].ActionPlan.Count > 0 ? IntegratedGameManager.S.inSceneCharacters[1].ActionPlan[0].ToString() : "none",
+                    new JObject {
+                        { "done", IntegratedGameManager.S.inSceneCharacters[1].ActionPlan.Count == 0 },
+                        { "move", IntegratedGameManager.S.inSceneCharacters[1].ActionPlan.Count > 0 ? IntegratedGameManager.S.inSceneCharacters[1].ActionPlan[0].ToString() : "none" },
                     }
                 },
                 {"human", 
-                                   new JObject {
-                        "done", IntegratedGameManager.S.inSceneCharacters[2].ActionPlan.Count == 0,
-                        "move", IntegratedGameManager.S.inSceneCharacters[2].ActionPlan.Count > 0 ? IntegratedGameManager.S.inSceneCharacters[2].ActionPlan[0].ToString() : "none",
+                    new JObject {
+                        { "done", IntegratedGameManager.S.inSceneCharacters[2].ActionPlan.Count == 0 },
+                        { "move", IntegratedGameManager.S.inSceneCharacters[2].ActionPlan.Count > 0 ? IntegratedGameManager.S.inSceneCharacters[2].ActionPlan[0].ToString() : "none" },
                     }
                 }
             }, true);
@@ -522,12 +522,10 @@ public class CompetitionMiddleware : MonoBehaviour {
         if (!LogSystemEvents) return;
         JObject job = new JObject();
         foreach(Monster monster in IntegratedGameManager.S.inSceneMonsters) {
-            job.Add(new JObject { monster.ObjKey,
-                           new JObject {
-                    "done", monster.MovesLeftThisTurn == 0,
-                    "move", monster.NextMove(),
-                }
-            });
+            job[monster.ObjKey] = new JObject {
+                            { "done", monster.MovesLeftThisTurn == 0 },
+                            { "move", monster.NextMove().ToString() }
+                        };
         }
     }
 

@@ -322,7 +322,9 @@ public class IntegratedGameManager : MonoBehaviour
     protected void DeconflictMonsterPlans (List<Monster> monstersMoving) {
         Dictionary<Vector2Int, List<Monster>> conflicts = new Dictionary<Vector2Int, List<Monster>>();
         bool conflicted = true;
+        int countflictLoops = 0;
         while (conflicted) {
+            Debug.Log("Deconflict Loop: " + countflictLoops++);
             foreach (Monster m in monstersMoving) {
                 if (conflicts.ContainsKey(m.NextMoveCoordinates())) {
                     conflicts[m.NextMoveCoordinates()].Add(m);
@@ -359,8 +361,10 @@ public class IntegratedGameManager : MonoBehaviour
                 monstersMoving.Add(m);
             }
         }
-
+        int monsterMoveSteps = 0;
         while (monstersMoving.Count > 0) {
+            monsterMoveSteps++;
+            Debug.Log("Monster Move Step: " + monsterMoveSteps);
             foreach(Monster m in monstersMoving) {
                 m.PlanNextMove();
             }
