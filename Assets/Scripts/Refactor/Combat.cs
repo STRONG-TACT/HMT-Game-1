@@ -69,35 +69,82 @@ public class Combat : MonoBehaviour {
     public static bool ExecuteCombat(FightType type, Tile tile, bool visibility) {
         bool result = false;
         List<int> charaIDs = new List<int>();
+        List<Dice> charaDice = new List<Dice>();
         List<int> enemyScores = new List<int>();
+        List<Dice> enemyDice = new List<Dice>();
         List<int> charaScores = new List<int>();
+        List<string> challenges = new List<string>();
         int enemyScore = 0;
         int charaScore = 0;
 
-        foreach (Character c in tile.LivingCharacterList) {
-            charaIDs.Add(c.CharacterId);
-            int outcome = c.config.monsterDice.Roll();
-            charaScores.Add(outcome);
-            charaScore += outcome;
+        
+
+        int roll;
+
+        switch (type) {
+            case FightType.Monster:
+                foreach (Character c in tile.LivingCharacterList) {
+                    charaIDs.Add(c.CharacterId);
+                    roll = c.config.monsterDice.Roll();
+                    charaDice.Add(c.config.monsterDice);
+                    charaScores.Add(roll);
+                    charaScore += roll;
+                }
+                foreach (Monster m in tile.MonsterList) {
+                    roll = m.config.combatDice.Roll();
+                    enemyDice.Add(m.config.combatDice);
+                    challenges.Add(m.ObjKey);
+                    enemyScores.Add(roll);
+                    enemyScore += roll;
+                }
+                break;
+            case FightType.Trap:
+                foreach (Character c in tile.LivingCharacterList) {
+                    charaIDs.Add(c.CharacterId);
+                    roll = c.config.trapDice.Roll();
+                    charaDice.Add(c.config.trapDice);
+                    charaScores.Add(roll);
+                    charaScore += roll;
+                }
+                roll = tile.dice.Roll();
+                enemyScore += roll;
+                enemyScores.Add(roll);
+                enemyDice.Add(tile.dice);
+                enemyScores.Add(enemyScore);
+                challenges.Add(tile.ObjKey);
+                break;
+            case FightType.Rock:
+                foreach (Character c in tile.LivingCharacterList) {
+                    charaIDs.Add(c.CharacterId);
+                    roll = c.config.stoneDice.Roll();
+                    charaDice.Add(c.config.stoneDice);
+                    charaScores.Add(roll);
+                    charaScore += roll;
+                }
+                roll = tile.dice.Roll();
+                enemyScore += roll;
+                enemyScores.Add(roll);
+                enemyDice.Add(tile.dice);
+                enemyScores.Add(enemyScore);
+                challenges.Add(tile.ObjKey);
+                break;
         }
 
-        if (type == FightType.Monster) {
-            foreach (Monster m in tile.MonsterList) {
-                int outcome = m.config.combatDice.Roll();
-                enemyScores.Add(outcome);
-                enemyScore += outcome;
-            }
-        }
-        else if (type == FightType.Trap || type == FightType.Rock) {
-            int outcome = tile.dice.Roll();
-            enemyScore += outcome;
-            //enemyScore += tile.diceBonus;
-            enemyScores.Add(enemyScore);
-        }
 
-        if (enemyScore <= charaScore) {
+        
+        if (charaScore >= enemyScore) {
             result = true;
         }
+
+        if (CompetitionMiddleware.Instance.LogSystemEvents) {
+            CompetitionMiddleware.Instance.LogChallengeEncounter(
+                tile.col, tile.row,
+                charaIDs.Select(id => IntegratedGameManager.S.inSceneCharacters[id].config.characterName).ToList(),
+                challenges,
+                charaScores, enemyScores,
+                CalculateOdds(charaDice, enemyDice), result);
+        }
+
 
         UIManager.S.ShowCombatUI(type, charaIDs, charaScores, enemyScores, charaScore, enemyScore, result, visibility);
         return result;

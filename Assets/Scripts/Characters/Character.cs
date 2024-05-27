@@ -534,9 +534,7 @@ public class Character : MonoBehaviour {
     
     private void OnTriggerStay(Collider col) {
         if (col.gameObject.tag == "Door") {
-            if (IntegratedGameManager.S.goalCount >= 3) { //TODO: take th conditional logic out of the character and move it to the Manager
-                IntegratedGameManager.S.NextLevel();
-            }
+            IntegratedGameManager.S.CheckGoalReached(CharacterId);
         }
     }
 

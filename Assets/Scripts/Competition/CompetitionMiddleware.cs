@@ -49,7 +49,7 @@ public class CompetitionMiddleware : MonoBehaviour {
         }
     }
 
-    private bool LogSystemEvents {
+    public bool LogSystemEvents {
         get {
             return PhotonNetwork.IsMasterClient || (IntegratedGameManager.S != null && !IntegratedGameManager.S.isNetworkGame);
         }
@@ -550,16 +550,23 @@ public class CompetitionMiddleware : MonoBehaviour {
             true);
     }
 
-    public void LogClearShrine(string character, int x, int y) {
+    public void LogClearShrine(int characterID, int x, int y) {
         if (!LogSystemEvents) return;
-        CallLogEvent(4102, character, "clear_shrine",
+        CallLogEvent(4102, IntegratedGameManager.S.inSceneCharacters[characterID].config.characterName, "clear_shrine",
             new JObject { { "x", x }, { "y", y } },
             true);
     }
 
-    public void LogClearGoal(string character, int x, int y) {
+    public void LogRevokeShrine(int characterID, int x, int y) {
         if (!LogSystemEvents) return;
-        CallLogEvent(4103, character, "clear_goal",
+        CallLogEvent(4103, IntegratedGameManager.S.inSceneCharacters[characterID].config.characterName, "revoke_shrine",
+            new JObject { { "x", x }, { "y", y } },
+            true);
+    }
+
+    public void LogClearGoal(int characterID, int x, int y) {
+        if (!LogSystemEvents) return;
+        CallLogEvent(4104, IntegratedGameManager.S.inSceneCharacters[characterID].config.characterName, "clear_goal",
             new JObject { { "x", x }, { "y", y } },
             true);
     }

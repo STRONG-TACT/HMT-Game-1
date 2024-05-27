@@ -646,12 +646,16 @@ public class IntegratedGameManager : MonoBehaviour
     // Called by Character.OnTriggerEnter(), when a character collide with its goal
     public virtual void GoalReached(int charaID)
     {
+        Tile tile = inSceneCharacters[charaID].currentTile;
+        CompetitionMiddleware.Instance.LogClearShrine(charaID, tile.col, tile.row);
         UIManager.S.UpdateCharacterGoalStatus(charaID);
         goalCount += 1;
     }
 
     public virtual void GoalUnReached(int charaID)
     {
+        Tile tile = inSceneCharacters[charaID].currentTile;
+        CompetitionMiddleware.Instance.LogRevokeShrine(charaID, tile.col, tile.row);
         UIManager.S.UpdateCharacterGoalStatus(charaID, false);
         goalCount -= 1;
         Debug.Log("refunded");
@@ -683,9 +687,13 @@ public class IntegratedGameManager : MonoBehaviour
 
     // Called by Character.OnTriggerEnter(), when all three goals fetched and one character collide with the door after that
     // "Move" to next currLevel by reset all relevant constants, delete monsters and tiles (tiles done by map generator) this currLevel, and reset chara status
-    public virtual void NextLevel()
+    public virtual void CheckGoalReached(int charaID)
     {
-        StartCoroutine(PrepareForNextLevel());
+        if (goalCount >= 3) { //TODO: take th conditional logic out of the character and move it to the Manager
+            Tile tile = inSceneCharacters[charaID].currentTile;
+            CompetitionMiddleware.Instance.LogClearGoal(charaID, tile.col, tile.row);
+            StartCoroutine(PrepareForNextLevel());
+        }
     }
 
     protected virtual IEnumerator PrepareForNextLevel() {

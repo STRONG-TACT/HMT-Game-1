@@ -316,6 +316,7 @@ public class Monster : MonoBehaviour
 
     public void Kill(float stepTime) {
         State = CharacterState.Die;
+        CompetitionMiddleware.Instance.LogChallengeDeath(ObjKey, currentTile.col, currentTile.row);
         StartCoroutine(KillCoroutine(stepTime));
     }
 
