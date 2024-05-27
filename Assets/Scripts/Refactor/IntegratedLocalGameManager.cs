@@ -32,18 +32,18 @@ public class IntegratedLocalGameManager : IntegratedGameManager
     }
 
 
-    protected override void StartPlayerPinningPhase()
-    {
-        // Local version of player planning stage
-        if (remainingCharacterCount > 0) {
-            UIManager.S.SwitchCharacterTo(0);
-        }
-        base.StartPlayerPinningPhase();
-    }
+    //protected override void StartPlayerPinningPhase()
+    //{
+    //    // Local version of player planning stage
+    //    if (!CheckPhaseEnd()) {
+    //        UIManager.S.SwitchCharacterTo(localChar.CharacterId);
+    //    }
+    //    base.StartPlayerPinningPhase();
+    //}
 
-    protected override void StartPlayerPlanningPhase() {
-        base.StartPlayerPlanningPhase();
-    }
+    //protected override void StartPlayerPlanningPhase() {
+    //    base.StartPlayerPlanningPhase();
+    //}
 
 
 

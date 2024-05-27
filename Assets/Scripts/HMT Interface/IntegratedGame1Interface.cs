@@ -134,7 +134,7 @@ public class IntegratedGame1Interface : HMTInterface {
         ret["gameData"] = new JObject {
             {"boardWidth", map.Map.GetLength(0)},
             {"boardHeight", map.Map.GetLength(1)},
-            {"level", gameManager.currentLevel },
+            {"currLevel", gameManager.currentLevel },
             {"currentPhase", gameManager.gameStatus.ToString() },
             {"timer", UIManager.S.TimeRemaining.ToString() }
         };
@@ -184,7 +184,7 @@ public class IntegratedGame1Interface : HMTInterface {
                             }
                             scene.Add(rep);
                         }
-                        foreach (Monster monster in tile.EnemyList) {
+                        foreach (Monster monster in tile.MonsterList) {
                             rep = monster.HMTStateRep();
                             rep["x"] = x;
                             rep["y"] = y;
@@ -226,7 +226,7 @@ public class IntegratedGame1Interface : HMTInterface {
         ret["gameData"] = new JObject {
             {"boardWidth", map.Map.GetLength(0)},
             {"boardHeight", map.Map.GetLength(1)},
-            {"level", gameManager.currentLevel },
+            {"currLevel", gameManager.currentLevel },
             {"currentPhase", gameManager.gameStatus.ToString() },
             {"timer", UIManager.S.TimeRemaining.ToString() }
         };
@@ -267,7 +267,7 @@ public class IntegratedGame1Interface : HMTInterface {
                     rep["pinCursorY"] = character.pingCursor.y + x;
                     scene.Add(rep);
                 }
-                foreach (Monster monster in tile.EnemyList) {
+                foreach (Monster monster in tile.MonsterList) {
                     rep = monster.HMTStateRep();
                     rep["x"] = x;
                     rep["y"] = y;
@@ -306,7 +306,7 @@ public class IntegratedGame1Interface : HMTInterface {
         ret["gameData"] = new JObject {
             {"boardWidth", map.Map.GetLength(0)},
             {"boardHeight", map.Map.GetLength(1)},
-            {"level", gameManager.currentLevel },
+            {"currLevel", gameManager.currentLevel },
             {"currentPhase", gameManager.gameStatus.ToString() },
             {"timer", UIManager.S.TimeRemaining.ToString() }
         };
@@ -356,7 +356,7 @@ public class IntegratedGame1Interface : HMTInterface {
                             }
                             scene.Add(rep);
                         }
-                        foreach (Monster monster in tile.EnemyList) {
+                        foreach (Monster monster in tile.MonsterList) {
                             rep = monster.HMTStateRep();
                             rep["x"] = x;
                             rep["y"] = y;

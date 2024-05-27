@@ -46,6 +46,10 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         return Random.Range(min, max);
     }
 
+    public float NextRandom() {
+        return Random.value;
+    }
+
     #region Common RPCs
 
     /// <summary>

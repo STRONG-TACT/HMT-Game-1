@@ -54,7 +54,11 @@ public class IntegratedMapGenerator : MonoBehaviour
 
     private void Start()
     {
-        LoadLevel(gameData.levelTextFiles[0]);
+        //LoadLevel(gameData.levelTextFiles[0]);
+    }
+
+    public Tile GetTileAt(Vector2Int vec) {
+        return GetTileAt(vec.x, vec.y);
     }
 
 
@@ -113,7 +117,9 @@ public class IntegratedMapGenerator : MonoBehaviour
         // Split the file content into lines
         string[] lines = levelTextFile.text.Split('\n');
 
-        CurrentLevelName = lines[0].Trim(); 
+        CurrentLevelName = lines[0].Trim();
+
+        CompetitionMiddleware.Instance.LogStartLevel(CurrentLevelName);
         string[] dimensions = lines[1].Split('x');
         int colCount = int.Parse(dimensions[0]);
         int rowCount = int.Parse(dimensions[1]);
@@ -122,7 +128,7 @@ public class IntegratedMapGenerator : MonoBehaviour
 
         Map = new Tile[colCount, rowCount];
 
-
+        
         // Create a list to store tile data temporarily
         List<List<string>> tiles = new List<List<string>>();
 
@@ -253,7 +259,7 @@ public class IntegratedMapGenerator : MonoBehaviour
             return AlternateSchema[code];
         }
         else {
-            Debug.LogErrorFormat("A unknown code {0} in level map file.", code);
+            Debug.LogErrorFormat("A unknown code {0} in currLevel map file.", code);
             return "";
         }
     }
@@ -263,17 +269,17 @@ public class IntegratedMapGenerator : MonoBehaviour
         switch (tileName)
         {
             case "1Spawn":
-                IntegratedGameManager.S.setCharaPosition(0, x, z);
+                IntegratedGameManager.S.SetupCharacter(0, x, z);
                 CompetitionMiddleware.Instance.LogPlayerSpawn(0, tileObj.col, tileObj.row);
                 break;
 
             case "2Spawn":
-                IntegratedGameManager.S.setCharaPosition(1, x, z);
+                IntegratedGameManager.S.SetupCharacter(1, x, z);
                 CompetitionMiddleware.Instance.LogPlayerSpawn(1, tileObj.col, tileObj.row);
                 break;
 
             case "3Spawn":
-                IntegratedGameManager.S.setCharaPosition(2, x, z);
+                IntegratedGameManager.S.SetupCharacter(2, x, z);
                 CompetitionMiddleware.Instance.LogPlayerSpawn(2, tileObj.col, tileObj.row);
                 break;
 

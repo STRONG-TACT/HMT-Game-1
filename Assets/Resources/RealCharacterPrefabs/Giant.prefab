@@ -756,11 +756,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerId: 1
-  config: {fileID: 0}
+  config: {fileID: 11400000, guid: c716ed11fa455404ab8b58937cdf7629, type: 2}
   CharacterId: 0
   currentTile: {fileID: 0}
   path_indicator: {fileID: 8989618856613533639, guid: 8ed031e9d11189d4c996eca60573b7ca, type: 3}
-  indicator: {fileID: 3505686729531890713, guid: 464096dd7904cb34eabdcd9b59d7bfe1, type: 3}
+  indicator: {fileID: 3505686730418620717}
   combat_indicator: {fileID: 3893728144243371889, guid: d6a5ac4d0d570c24da178c243013580c, type: 3}
   ActionPlan: 
   moving: 0
@@ -2069,6 +2069,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 464096dd7904cb34eabdcd9b59d7bfe1, type: 3}
+--- !u!1 &3505686730418620717 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3505686729531890713, guid: 464096dd7904cb34eabdcd9b59d7bfe1, type: 3}
+  m_PrefabInstance: {fileID: 1273730356}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4318216664770892695 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4318216663536027299, guid: 464096dd7904cb34eabdcd9b59d7bfe1, type: 3}

@@ -2,18 +2,21 @@ using UnityEngine;
 
 
 [CreateAssetMenu(fileName = "NewMonsterConfig", menuName = "Monster/MonsterConfig")]
-public class MonsterConfig : ScriptableObject
-{
-    public enum MonsterType
-    {
-        L_Monster,
-        M_Monster,
-        S_Monster,
-        Boss
+public class MonsterConfig : ScriptableObject {
+
+    public enum MovementStyle {
+        RandomWalk = 0,
+        Vertical = 1,
+        Horizontal = 2,
+        Static = 3
     }
 
-    [Tooltip("The Type of character to use, used for graphical model and icons.")]
-    public MonsterType type;
+    [Tooltip("Name of the type of monster")]
+    public string configName;
+
+    [Tooltip("How the monster should move on its turn.")]
+    public MovementStyle movementStyle;
+    
     [Tooltip("Movement Limit.")]
     [Min(1)]
     public int movement;
