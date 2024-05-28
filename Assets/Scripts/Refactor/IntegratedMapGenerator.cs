@@ -128,9 +128,6 @@ public class IntegratedMapGenerator : MonoBehaviour
 
         Map = new Tile[colCount, rowCount];
 
-        
-        // Create a list to store tile data temporarily
-        List<List<string>> tiles = new List<List<string>>();
 
         // Loop through each line and extract tiles
         for (int i = 2; i < lines.Length; i++) {
@@ -153,15 +150,19 @@ public class IntegratedMapGenerator : MonoBehaviour
         float mapWidthMid = (colCount - 1) * (gameData.tileSize + gameData.tileGapLength) / 2;
         float mapHeightMid = (rowCount - 1) * (gameData.tileSize + gameData.tileGapLength) / 2;
 
-/*        for (int i = 0; i < rowCount; i++)
-        {
-            Debug.Log("New Line");
-            for (int j = 0; j < colCount; j++) {
-                Debug.Log(tiles[i][j]);
-                Map[i,j] = SpawnTile(i, j, tiles[i][j]);
-            }
-        }
-*/
+        /*        for (int i = 0; i < rowCount; i++)
+                {
+                    Debug.Log("New Line");
+                    for (int j = 0; j < colCount; j++) {
+                        Debug.Log(tiles[i][j]);
+                        Map[i,j] = SpawnTile(i, j, tiles[i][j]);
+                    }
+                }
+        */
+
+        StartCoroutine(LogCharacterSpawns());
+        
+
         GameObject wallSW = Instantiate(gameAssets.MapBoundary, new Vector3(mapWidthMid, 0, -1), Quaternion.identity, tileParent);
         wallSW.GetComponent<BoxCollider>().size = new Vector3(mapWidth, 1, 1);
         wallSW.name = "WallSW";
@@ -174,6 +175,14 @@ public class IntegratedMapGenerator : MonoBehaviour
         GameObject wallSE = Instantiate(gameAssets.MapBoundary, new Vector3(mapWidth, 0, mapHeightMid), Quaternion.identity, tileParent);
         wallSE.GetComponent<BoxCollider>().size = new Vector3(1, 1, mapHeight);
         wallSE.name = "WallSE";
+    }
+
+    IEnumerator LogCharacterSpawns() {
+        yield return new WaitForFixedUpdate();
+        for (int i = 0; i < IntegratedGameManager.S.inSceneCharacters.Count; i++) {
+            Tile tile = IntegratedGameManager.S.inSceneCharacters[i].currentTile;
+            CompetitionMiddleware.Instance.LogPlayerSpawn(i, tile.col, tile.row);
+        }
     }
 
     private Tile SpawnTile(int row, int col, string code)
@@ -270,17 +279,14 @@ public class IntegratedMapGenerator : MonoBehaviour
         {
             case "1Spawn":
                 IntegratedGameManager.S.SetupCharacter(0, x, z);
-                CompetitionMiddleware.Instance.LogPlayerSpawn(0, tileObj.col, tileObj.row);
                 break;
 
             case "2Spawn":
                 IntegratedGameManager.S.SetupCharacter(1, x, z);
-                CompetitionMiddleware.Instance.LogPlayerSpawn(1, tileObj.col, tileObj.row);
                 break;
 
             case "3Spawn":
                 IntegratedGameManager.S.SetupCharacter(2, x, z);
-                CompetitionMiddleware.Instance.LogPlayerSpawn(2, tileObj.col, tileObj.row);
                 break;
 
             case "1Goal":

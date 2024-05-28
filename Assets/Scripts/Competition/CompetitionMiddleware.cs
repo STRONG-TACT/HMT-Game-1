@@ -255,8 +255,15 @@ public class CompetitionMiddleware : MonoBehaviour {
         JArray shrines = new JArray();
         JArray characters = new JArray ( IntegratedGameManager.S.inSceneCharacters.Select(c => c.HMTStateRep(Character.StateRepLevel.Full)).ToArray() );
 
-        for(int x = 0; x < IntegratedMapGenerator.Instance.Map.GetLength(0); x++) {
-            for(int y = IntegratedMapGenerator.Instance.Map.GetLength(1)-1; y >=0 ; y--) {
+        for (int y = IntegratedMapGenerator.Instance.Map.GetLength(1) - 1; y >= 0; y--) {
+            if(y < IntegratedMapGenerator.Instance.Map.GetLength(1) - 1) {
+                maplayout += "\n";
+                dwarf_map += "\n";
+                giant_map += "\n";
+                human_map += "\n";
+            }
+            for (int x = 0; x < IntegratedMapGenerator.Instance.Map.GetLength(0); x++) {
+            
                 Tile tile = IntegratedMapGenerator.Instance.GetTileAt(x, y);
                 maplayout += tile.ObjKey;
                 dwarf_map += tile.fogOfWarDictionary[0].ToString()[0];
@@ -274,10 +281,6 @@ public class CompetitionMiddleware : MonoBehaviour {
                 }
 
             }
-            maplayout += "\n";
-            dwarf_map += "\n";
-            giant_map += "\n";
-            human_map += "\n";
         }
 
         ret["map"] = new JObject {

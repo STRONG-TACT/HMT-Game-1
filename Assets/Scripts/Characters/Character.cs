@@ -645,12 +645,24 @@ public class Character : MonoBehaviour {
                 ret["respawnCounter"] = respawnCountdown;
                 ret["actionPoints"] = ActionPointsRemaining;
                 ret["actionPlan"] = new JArray(ActionPlan.Select(d => d.ToString()));
-                ret["pinCursorX"] = pingCursor.x + currentTile.col;
-                ret["pinCursorY"] = pingCursor.y + currentTile.row;
+                if (currentTile == null) {
+                    ret["pinCursorX"] = pingCursor.x + 0;
+                    ret["pinCursorY"] = pingCursor.y + 0;
+                }
+                else {
+                    ret["pinCursorX"] = pingCursor.x + currentTile.col;
+                    ret["pinCursorY"] = pingCursor.y + currentTile.row;
+                }
                 goto case StateRepLevel.TeamVisible;
             case StateRepLevel.TeamVisible:
-                ret["x"] = currentTile.col;
-                ret["y"] = currentTile.row;
+                if (currentTile == null) {
+                    ret["x"] = -1;
+                    ret["y"] = -1;
+                }
+                else {
+                    ret["x"] = currentTile.col;
+                    ret["y"] = currentTile.row;
+                }
                 break;
             case StateRepLevel.TeamUnseen:
                 break;
