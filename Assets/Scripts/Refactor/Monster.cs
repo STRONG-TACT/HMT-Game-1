@@ -377,7 +377,24 @@ public class Monster : MonoBehaviour
             {"id", HMTObjID },
             //{"type", config.configName },
             {"actionPoints", config.movement },
-            {"combatDice", config.combatDice.ToString() }
+            {"combatDice", config.combatDice.ToString() },
+            {"x", currentTile.col },
+            {"y", currentTile.row }
+        };
+    }
+
+    public JObject LogStateRep() {
+        return new JObject {
+            {"entityType","monster" },
+            {"objKey", ObjKey },
+            {"id", HMTObjID },
+            {"type", config.configName },
+            {"moveStyle", config.movementStyle.ToString() },
+            {"currDirection", currentDirection.ToString() },
+            {"actionPoints", MovesLeftThisTurn },
+            {"combatDice", config.combatDice.ToString() },
+            {"x", currentTile.col },
+            {"y", currentTile.row }
         };
     }
 }

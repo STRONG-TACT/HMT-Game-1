@@ -148,68 +148,44 @@ public class IntegratedGame1Interface : HMTInterface {
                     continue;
                 }
                 Tile tile = map.Map[x, y];
-                JObject rep;
                 switch (tile.fogOfWarDictionary[target.CharacterId]) {
                     case Tile.FogOfWarState.Visible:
                         switch (tile.gameObject.tag) {
                             case "Walls":
                             case "Trap":
                             case "Rock":
-                                rep = tile.HMTStateRep();
-                                rep["x"] = x;
-                                rep["y"] = y;
-                                scene.Add(rep);
-                                break;
                             case "Door":
                             case "Goal":
-                                rep = tile.HMTStateRep();
-                                rep["x"] = x;
-                                rep["y"] = y;
-                                rep["subGoalCount"] = gameManager.goalCount;
-                                scene.Add(rep);
+                                scene.Add(tile.HMTStateRep());
                                 break;
                         }
                         foreach (Character character in tile.CharacterList) {
                             if (character == target) {
-                                rep = character.HMTStateRep(Character.StateRepLevel.Full);
-                                rep["x"] = x;
-                                rep["y"] = y;
-                                rep["pinCursorX"] = character.pingCursor.x + x;
-                                rep["pinCursorY"] = character.pingCursor.y + x;
+                                scene.Add(character.HMTStateRep(Character.StateRepLevel.Full));
                             }
                             else {
-                                rep = character.HMTStateRep(Character.StateRepLevel.TeamVisible);
-                                rep["x"] = x;
-                                rep["y"] = y;
+                                scene.Add(character.HMTStateRep(Character.StateRepLevel.TeamVisible));
                             }
-                            scene.Add(rep);
                         }
                         foreach (Monster monster in tile.MonsterList) {
-                            rep = monster.HMTStateRep();
-                            rep["x"] = x;
-                            rep["y"] = y;
-                            scene.Add(rep);
+                            scene.Add(monster.HMTStateRep());
                         }
                         if (tile.shrine != null) {
-                            rep = tile.shrine.HMTStateRep();
-                            rep["x"] = x;
-                            rep["y"] = y;
-                            scene.Add(rep);
+                            scene.Add(tile.shrine.HMTStateRep());
                         }
                         break;
                     case Tile.FogOfWarState.Seen:
                     case Tile.FogOfWarState.Unseen:
                         if (tile.shrine != null) {
-                            rep = tile.shrine.HMTStateRep();
-                            scene.Add(rep);
+                            scene.Add(tile.shrine.HMTStateRep());
+                        }
+                        foreach (Character character in tile.CharacterList) {
+                            scene.Add(character.HMTStateRep(Character.StateRepLevel.TeamUnseen));
                         }
                         break;
                 }
                 foreach (Pin pin in tile.pinList) { //this one moves out
-                    rep = pin.HMTStateRep();
-                    rep["x"] = x;
-                    rep["y"] = y;
-                    scene.Add(rep);
+                    scene.Add(pin.HMTStateRep());
                 }
             }
         }
@@ -240,50 +216,26 @@ public class IntegratedGame1Interface : HMTInterface {
                     continue;
                 } 
                 Tile tile = map.Map[x, y];
-                JObject rep;
                 switch (tile.gameObject.tag) {
                     case "Walls":
                     case "Trap":
                     case "Rock":
-                        rep = tile.HMTStateRep();
-                        rep["x"] = x;
-                        rep["y"] = y;
-                        scene.Add(rep);
-                        break;
                     case "Door":
                     case "Goal":
-                        rep = tile.HMTStateRep();
-                        rep["x"] = x;
-                        rep["y"] = y;
-                        rep["subGoalCount"] = gameManager.goalCount;
-                        scene.Add(rep);
+                        scene.Add(tile.HMTStateRep());
                         break;
                 }
                 foreach (Character character in tile.CharacterList) {
-                    rep = character.HMTStateRep();
-                    rep["x"] = x;
-                    rep["y"] = y;
-                    rep["pinCursorX"] = character.pingCursor.x + x;
-                    rep["pinCursorY"] = character.pingCursor.y + x;
-                    scene.Add(rep);
+                    scene.Add(character.HMTStateRep(Character.StateRepLevel.Full));
                 }
                 foreach (Monster monster in tile.MonsterList) {
-                    rep = monster.HMTStateRep();
-                    rep["x"] = x;
-                    rep["y"] = y;
-                    scene.Add(rep);
+                    scene.Add(monster.HMTStateRep());
                 }
                 foreach (Pin pin in tile.pinList) {
-                    rep = pin.HMTStateRep();
-                    rep["x"] = x;
-                    rep["y"] = y;
-                    scene.Add(rep);
+                    scene.Add(pin.HMTStateRep());
                 }
                 if (tile.shrine != null) {
-                    rep = tile.shrine.HMTStateRep();
-                    rep["x"] = x;
-                    rep["y"] = y;
-                    scene.Add(rep);
+                    scene.Add(tile.shrine.HMTStateRep());
                 }
             }
         }
@@ -320,53 +272,30 @@ public class IntegratedGame1Interface : HMTInterface {
                     continue;
                 }
                 Tile tile = map.Map[x, y];
-                JObject rep;
                 switch (tile.fogOfWarDictionary[target.CharacterId]) {
                     case Tile.FogOfWarState.Visible:
                         switch (tile.gameObject.tag) {
                             case "Walls":
                             case "Trap":
                             case "Rock":
-                                rep = tile.HMTStateRep();
-                                rep["x"] = x;
-                                rep["y"] = y;
-                                scene.Add(rep);
-                                break;
                             case "Door":
                             case "Goal":
-                                rep = tile.HMTStateRep();
-                                rep["x"] = x;
-                                rep["y"] = y;
-                                rep["subGoalCount"] = gameManager.goalCount;
-                                scene.Add(rep);
+                                scene.Add(tile.HMTStateRep());
                                 break;
                         }
                         foreach (Character character in tile.CharacterList) {
                             if (character == target) {
-                                rep = character.HMTStateRep(Character.StateRepLevel.Full);
-                                rep["x"] = x;
-                                rep["y"] = y;
-                                rep["pinCursorX"] = character.pingCursor.x + x;
-                                rep["pinCursorY"] = character.pingCursor.y + x;
+                                scene.Add(character.HMTStateRep(Character.StateRepLevel.Full));
                             }
                             else {
-                                rep = character.HMTStateRep(Character.StateRepLevel.TeamVisible);
-                                rep["x"] = x;
-                                rep["y"] = y;
+                                scene.Add(character.HMTStateRep(Character.StateRepLevel.TeamVisible));
                             }
-                            scene.Add(rep);
                         }
                         foreach (Monster monster in tile.MonsterList) {
-                            rep = monster.HMTStateRep();
-                            rep["x"] = x;
-                            rep["y"] = y;
-                            scene.Add(rep);
+                            scene.Add(monster.HMTStateRep());
                         }
                         if (tile.shrine != null) {
-                            rep = tile.shrine.HMTStateRep();
-                            rep["x"] = x;
-                            rep["y"] = y;
-                            scene.Add(rep);
+                            scene.Add(tile.shrine.HMTStateRep());
                         }
                         break;
                     case Tile.FogOfWarState.Seen:
@@ -374,33 +303,23 @@ public class IntegratedGame1Interface : HMTInterface {
                             case "Walls":
                             case "Trap":
                             case "Rock":
-                                rep = tile.HMTStateRep();
-                                rep["x"] = x;
-                                rep["y"] = y;
-                                scene.Add(rep);
-                                break;
                             case "Door":
                             case "Goal":
-                                rep = tile.HMTStateRep();
-                                rep["x"] = x;
-                                rep["y"] = y;
-                                rep["subGoalCount"] = gameManager.goalCount;
-                                scene.Add(rep);
+                                scene.Add(tile.HMTStateRep());
                                 break;
                         }
                         goto case Tile.FogOfWarState.Unseen;
                     case Tile.FogOfWarState.Unseen:
                         if (tile.shrine != null) {
-                            rep = tile.shrine.HMTStateRep();
-                            scene.Add(rep);
+                            scene.Add(tile.shrine.HMTStateRep());
+                        }
+                        foreach (Character character in tile.CharacterList) {
+                            scene.Add(character.HMTStateRep(Character.StateRepLevel.TeamUnseen));
                         }
                         break;
                 }
                 foreach (Pin pin in tile.pinList) { //this one moves out
-                    rep = pin.HMTStateRep();
-                    rep["x"] = x;
-                    rep["y"] = y;
-                    scene.Add(rep);
+                    scene.Add(pin.HMTStateRep());
                 }
             }
         }

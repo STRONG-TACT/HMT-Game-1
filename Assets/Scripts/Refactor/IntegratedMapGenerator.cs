@@ -286,6 +286,7 @@ public class IntegratedMapGenerator : MonoBehaviour
             case "1Goal":
                 GameObject goal1 = Instantiate(gameAssets.Goals[0], new Vector3(x, 0f, z), Quaternion.identity);
                 tileObj.shrine = goal1.GetComponent<Shrine>();
+                tileObj.shrine.tile = tileObj;
                 tileObj.shrine.ObjKey = code;
                 tileObj.tag = "Goal";
                 goal1.transform.parent = tileObj.transform;
@@ -294,6 +295,7 @@ public class IntegratedMapGenerator : MonoBehaviour
             case "2Goal":
                 GameObject goal2 = Instantiate(gameAssets.Goals[1], new Vector3(x, 0f, z), Quaternion.identity);
                 tileObj.shrine = goal2.GetComponent<Shrine>();
+                tileObj.shrine.tile = tileObj;
                 tileObj.shrine.ObjKey = code;
                 tileObj.tag = "Goal";
                 goal2.transform.parent = tileObj.transform;
@@ -302,6 +304,7 @@ public class IntegratedMapGenerator : MonoBehaviour
             case "3Goal":
                 GameObject goal3 = Instantiate(gameAssets.Goals[2], new Vector3(x, 0f, z), Quaternion.identity);
                 tileObj.shrine = goal3.GetComponent<Shrine>();
+                tileObj.shrine.tile = tileObj;
                 tileObj.shrine.ObjKey = code;
                 tileObj.tag = "Goal";
                 goal3.transform.parent = tileObj.transform;

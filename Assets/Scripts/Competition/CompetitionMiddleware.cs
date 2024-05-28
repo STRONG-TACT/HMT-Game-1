@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using GameConstant;
 using Photon.Pun;
+using System.Linq;
 
 public class CompetitionMiddleware : MonoBehaviour {
 
@@ -231,11 +232,65 @@ public class CompetitionMiddleware : MonoBehaviour {
         }
     }
 
-
     private JObject GenerateContext() {
         //this is a placeholder for now
         //include the run_id in here eventually
-        return null;
+        if(IntegratedGameManager.S == null || IntegratedMapGenerator.Instance == null) {
+            return null;
+        }
+        JObject ret = new JObject {
+            {"level", currLevel },
+            {"round", currRound },
+            {"phase", currPhase },
+            {"timer", IntegratedGameManager.S.TimeRemaining },
+            {"shrineCount", IntegratedGameManager.S.goalCount }
+        };
+
+        string maplayout = "";
+        string dwarf_map = "";
+        string giant_map = "";
+        string human_map = "";
+
+        JArray challenges = new JArray();
+        JArray shrines = new JArray();
+        JArray characters = new JArray ( IntegratedGameManager.S.inSceneCharacters.Select(c => c.HMTStateRep(Character.StateRepLevel.Full)).ToArray() );
+
+        for(int x = 0; x < IntegratedMapGenerator.Instance.Map.GetLength(0); x++) {
+            for(int y = IntegratedMapGenerator.Instance.Map.GetLength(1)-1; y >=0 ; y--) {
+                Tile tile = IntegratedMapGenerator.Instance.GetTileAt(x, y);
+                maplayout += tile.ObjKey;
+                dwarf_map += tile.fogOfWarDictionary[0].ToString()[0];
+                giant_map += tile.fogOfWarDictionary[1].ToString()[0];
+                human_map += tile.fogOfWarDictionary[2].ToString()[0];
+
+                if(tile.tileType == Tile.ObstacleType.Trap || tile.tileType == Tile.ObstacleType.Rock) {
+                    challenges.Add(tile.HMTStateRep());
+                }
+                if(tile.shrine != null) {
+                    shrines.Add(tile.shrine.HMTStateRep());
+                }
+                foreach(Monster monster in tile.MonsterList) {
+                    challenges.Add(monster.LogStateRep());
+                }
+
+            }
+            maplayout += "\n";
+            dwarf_map += "\n";
+            giant_map += "\n";
+            human_map += "\n";
+        }
+
+        ret["map"] = new JObject {
+            {"layout", maplayout },
+            {"dwarfView", dwarf_map },
+            {"giantView", giant_map },
+            {"humanView", human_map }
+        };
+        ret["characters"] = characters;
+        ret["challenges"] = challenges;
+        ret["shrines"] = shrines;
+
+        return ret;
     }
 
     #region 1000s Logging Messages, Progression Events
@@ -348,11 +403,11 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     #region 2000s Logging Messages, Out of Game Interactions
 
-    public void LogCreateLobby(string roomName) {
+    public void LogCreateRoom(string roomName) {
         CallLogEvent(2000, "player", "create_lobby", "roomCode", roomName);
     }
 
-    public void LogJoinLobby(string roomName) {
+    public void LogJoinRoom(string roomName) {
         CallLogEvent(2001, "player", "join_lobby", "roomCode", roomName);
     }
 

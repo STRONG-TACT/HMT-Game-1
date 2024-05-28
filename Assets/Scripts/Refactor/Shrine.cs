@@ -32,6 +32,8 @@ public class Shrine : MonoBehaviour
     public CharacterConfig.CharacterType CharacterType;
     public bool Reached { get; private set; } = true;
 
+    public Tile tile;
+
     Transform shrineStone;
     
     void Start()
@@ -59,6 +61,10 @@ public class Shrine : MonoBehaviour
             {"objKey",ObjKey },
             {"id", HMTObjID },
             { "character", CharacterType.ToString() },
-            { "reached", Reached } };
+            { "reached", Reached },
+            {"x", tile.col },
+            {"y", tile.row }
+        };
+
     }
 }

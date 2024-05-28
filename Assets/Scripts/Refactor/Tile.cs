@@ -1,5 +1,4 @@
 using Newtonsoft.Json.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -475,8 +474,11 @@ public class Tile : MonoBehaviour
         ret["objKey"] = _objKey;
         if(_objKey == "**") {
             ret["entityType"] = "Goal";
+            ret["subGoalCount"] = IntegratedGameManager.S.goalCount;
         }
         ret["id"] = HMTObjID;
+        ret["x"] = col;
+        ret["y"] = row;
         if (tileType == ObstacleType.Rock || tileType == ObstacleType.Trap) {
             ret["challenge"] = dice.ToString();
         }

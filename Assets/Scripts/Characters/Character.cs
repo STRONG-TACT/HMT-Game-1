@@ -642,11 +642,15 @@ public class Character : MonoBehaviour {
         switch (level) {
             case StateRepLevel.Full:
                 ret["health"] = Health;
+                ret["respawnCounter"] = respawnCountdown;
                 ret["actionPoints"] = ActionPointsRemaining;
                 ret["actionPlan"] = new JArray(ActionPlan.Select(d => d.ToString()));
-                break;
+                ret["pinCursorX"] = pingCursor.x + currentTile.col;
+                ret["pinCursorY"] = pingCursor.y + currentTile.row;
+                goto case StateRepLevel.TeamVisible;
             case StateRepLevel.TeamVisible:
-                ret["health"] = Health;         //Not sure why we agreed this should be here? It's not someting a human player can see
+                ret["x"] = currentTile.col;
+                ret["y"] = currentTile.row;
                 break;
             case StateRepLevel.TeamUnseen:
                 break;
