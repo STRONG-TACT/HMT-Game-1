@@ -78,7 +78,7 @@ public class Tile : MonoBehaviour
     /// </summary>
     public List<Character> CharacterList {
         get {
-            return new List<Character>(charaList);
+            return new List<Character>(charaList).OrderBy(c => c.CharacterId).ToList();
         }
     }
 
@@ -87,7 +87,7 @@ public class Tile : MonoBehaviour
     /// </summary>
     public List<Character> LivingCharacterList {
         get {
-            return charaList.Select(c => c).Where(c => !c.dead).ToList();
+            return charaList.Select(c => c).Where(c => !c.dead).OrderBy(c => c.CharacterId).ToList();
         }
     }
 
@@ -96,7 +96,7 @@ public class Tile : MonoBehaviour
     /// </summary>
     public List<Monster> MonsterList {
         get {
-            return new List<Monster>(enemyList);
+            return new List<Monster>(enemyList).OrderBy(m => m.ObjKey).ToList();
         }
     }
 
