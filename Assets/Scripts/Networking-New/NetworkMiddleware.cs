@@ -156,9 +156,9 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
             photonView.RPC(
                 "DropPinAtLocal",
                 RpcTarget.All,
+                charId,
                 pinTypeIdx,
-                row, col,
-                charId);
+                row, col);
         }
         else {
             DropPinAtLocal(charId, pinTypeIdx, row, col);
