@@ -124,7 +124,7 @@ public class PinningSystem : MonoBehaviour
 
     public void InstantiatePin(int charID, int pinIdx, int tileRow, int tileCol) {
         GameObject pinObj;
-        Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(tileRow, tileCol);
+        Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(tileCol, tileRow);
 
         pinObj = Instantiate(idx2PinPrefab[pinIdx], targetTile.GetNextPingLocation() + pin_icon_offset, Quaternion.Euler(0, 180, 0));
         pinObj.transform.SetParent(targetTile.transform);
