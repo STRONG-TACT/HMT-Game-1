@@ -78,7 +78,17 @@ public class IntegratedGameManager : MonoBehaviour
         Debug.LogFormat("NetworkMiddleware.S.myCharacterID = {0}", NetworkMiddleware.S.myCharacterID);
 
 #if HMT_BUILD
-        localChar = inSceneCharacters[0]; //Agent'd don't care about the localChar
+        if (isNetworkGame) {
+            if (CompetitionMiddleware.Instance.overrideAIMode) {
+                localChar = inSceneCharacters[NetworkMiddleware.S.myCharacterID];
+            }
+            else {
+                localChar = inSceneCharacters[0]; // AI Agent's just assume the focus character is dwarf because they don't actually need it.
+            }   
+        }
+        else {
+            localChar = inSceneCharacters[0];
+        }
 #else
         localChar = inSceneCharacters[(isNetworkGame) ? NetworkMiddleware.S.myCharacterID : 0];
 #endif
