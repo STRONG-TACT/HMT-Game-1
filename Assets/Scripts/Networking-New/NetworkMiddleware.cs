@@ -168,7 +168,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     [PunRPC]
     private void DropPinAtLocal(int charId, int pinTypeIdx, int row, int col) {
-        PinningSystem.S.InstantiatePin(pinTypeIdx, row, col, charId);
+        PinningSystem.S.InstantiatePin(charId, pinTypeIdx, row, col);
         IntegratedGameManager.S.inSceneCharacters[charId].PinPlaced();
         UIManager.S.UpdateCommonHUD();
         UIManager.S.UpdateCharacterPinUI();
