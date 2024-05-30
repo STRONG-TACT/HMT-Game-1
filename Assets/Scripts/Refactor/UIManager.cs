@@ -25,7 +25,8 @@ public class UIManager : MonoBehaviour
     [Header("Timer Panel")]
     public GameObject TimerPanel;
     public TextMeshProUGUI TimerText;
-    private float lastTimeReset;
+    [Tooltip("When there are less than this number of seconds left the timer will start to flash red.")]
+    public int warningTime = 10;
 
     [Header("Team Status Panel")]
     public GameObject TeamInfoPanel;
@@ -110,8 +111,6 @@ public class UIManager : MonoBehaviour
         DwarfBtn.onClick.AddListener(delegate { SwitchCharacter(0); });
         GiantBtn.onClick.AddListener(delegate { SwitchCharacter(1); });
         HumanBtn.onClick.AddListener(delegate { SwitchCharacter(2); });
-
-        lastTimeReset = Time.time;
     }
 
     private void Update() {
@@ -633,26 +632,14 @@ public class UIManager : MonoBehaviour
 
     #region Timer
 
-    public float TimeRemaining {
-        get {
-            switch (IntegratedGameManager.S.gameStatus) {
-                case GameStatus.Player_Pinning:
-                case GameStatus.Player_Planning:
-                    return GameData.S.TurntimeLimit - Mathf.RoundToInt(Time.time - lastTimeReset);
-                default:
-                    return float.PositiveInfinity;
-            }
-        }
-    }
-
     public void UpdateTurnTimer() {
         if (float.IsInfinity(IntegratedGameManager.S.TimeRemaining)) {
             TimerText.text = "\u221E";
         }
         else {
-            TimeSpan timeSpan = TimeSpan.FromSeconds(IntegratedGameManager.S.TimeRemaining);
+            TimeSpan timeSpan = TimeSpan.FromSeconds(Mathf.Max(Mathf.RoundToInt(IntegratedGameManager.S.TimeRemaining), 0));
             TimerText.text = string.Format("{0}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
-            if (IntegratedGameManager.S.TimeRemaining < 10) {
+            if (IntegratedGameManager.S.TimeRemaining < warningTime && Mathf.RoundToInt(Mathf.Abs(IntegratedGameManager.S.TimeRemaining) * 5) % 2 == 0) {
                 TimerText.color = Color.red;
             }
             else {

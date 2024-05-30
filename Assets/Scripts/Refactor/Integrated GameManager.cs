@@ -34,7 +34,7 @@ public class IntegratedGameManager : MonoBehaviour
             switch (gameStatus) {
                 case GameStatus.Player_Pinning:
                 case GameStatus.Player_Planning:
-                    return GameData.S.TurntimeLimit - Mathf.RoundToInt(Time.time - lastTurnTimerReset);
+                    return GameData.S.TurntimeLimit - (Time.time - lastTurnTimerReset);
                 default:
                     return float.PositiveInfinity;
             }

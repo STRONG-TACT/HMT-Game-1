@@ -136,7 +136,7 @@ public class IntegratedGame1Interface : HMTInterface {
             {"boardHeight", map.Map.GetLength(1)},
             {"currLevel", gameManager.currentLevel },
             {"currentPhase", gameManager.gameStatus.ToString() },
-            {"timer", UIManager.S.TimeRemaining.ToString() }
+            {"timer", IntegratedGameManager.S.TimeRemaining.ToString() }
         };
 
         JArray scene = new JArray();
@@ -204,7 +204,7 @@ public class IntegratedGame1Interface : HMTInterface {
             {"boardHeight", map.Map.GetLength(1)},
             {"currLevel", gameManager.currentLevel },
             {"currentPhase", gameManager.gameStatus.ToString() },
-            {"timer", UIManager.S.TimeRemaining.ToString() }
+            {"timer", IntegratedGameManager.S.TimeRemaining.ToString() }
         };
 
         JArray scene = new JArray();
@@ -260,7 +260,7 @@ public class IntegratedGame1Interface : HMTInterface {
             {"boardHeight", map.Map.GetLength(1)},
             {"currLevel", gameManager.currentLevel },
             {"currentPhase", gameManager.gameStatus.ToString() },
-            {"timer", UIManager.S.TimeRemaining.ToString() }
+            {"timer", IntegratedGameManager.S.TimeRemaining.ToString() }
         };
 
         JArray scene = new JArray();
