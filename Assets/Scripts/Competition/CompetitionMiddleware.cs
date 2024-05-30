@@ -118,6 +118,10 @@ public class CompetitionMiddleware : MonoBehaviour {
         }
     }
 
+    private IEnumerator SendPostRequestWithCallback(string url, System.Action<JObject> callback, bool supressDebug = false) {
+        return SendPostRequestWithCallback(url, JsonConvert.SerializeObject(new JObject { { "api_key", serverKey } }), callback, supressDebug);
+    }
+
     private IEnumerator SendPostRequestWithCallback(string url, string json, System.Action<JObject> callback, bool supressDebug=false) {
         using (UnityWebRequest www = UnityWebRequest.Post(url, json)) {
             if (!supressDebug) {
@@ -158,7 +162,11 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     public void CallListAgents(System.Action<JObject> callback) {
         //this till need to be a coroutine in some way
-        SendPostRequestWithCallback(flaskURL + "/list_agents", JsonConvert.SerializeObject(new JObject { { "api_key", serverKey } }), callback);
+        StartCoroutine(SendPostRequestWithCallback(flaskURL + "/list_agents", callback));
+    }
+
+    public void CallVerifyCompetitionId(System.Action<JObject> callback) {
+        StartCoroutine(SendPostRequestWithCallback(flaskURL + "/verify_competition_id", callback));
     }
 
     public void CallLaunchGame(string photonRoom, string dwarfPlayerId, string giantPlayerId, string humanPlayerId) {
