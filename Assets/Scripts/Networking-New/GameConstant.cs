@@ -9,6 +9,7 @@ namespace GameConstant
         public const string LOBBY_SCENE = "Lobby_n";
         public const string ROOM_SCENE = "Room_n";
         public const string LOCAL_SCENE = "Local_Animated";
+        public const string SURVEY_SCENE = "Survey_scene";
         public const string NETWORK_SCENE = "NetworkGamePlay";
         public const string GAME_VERSION = "1.0.0";
     }

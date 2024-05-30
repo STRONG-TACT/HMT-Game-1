@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Newtonsoft.Json.Linq;
 
 public class LobbyUI : MonoBehaviour
 {
@@ -28,6 +29,9 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI competitionIDUIText;
 
     public bool RememberMe;
+    private bool CheckCompetitionIDCoroutineRunning;
+    private bool verificationCompleted = false;
+    private bool isCompetitionIDValid = false;
 
     private void Awake()
     {
@@ -50,7 +54,7 @@ public class LobbyUI : MonoBehaviour
         {
             ShowConsentFormUI();
         }
-        if (competitionID == "")
+        else if (competitionID == "")
         {
             ShowCompetitionIDUI();
         }
@@ -137,11 +141,45 @@ public class LobbyUI : MonoBehaviour
         RememberMe = isOn;
     }
 
+    public void ResetCompetitionID()
+    {
+        PlayerPrefs.DeleteAll();
+        DisableAllUI();
+        ShowConsentFormUI();
+    }
+
     public void SetCompetitionID() {
-        if(competitionIdText.text == "") {
-            return;
+        if (!CheckCompetitionIDCoroutineRunning)
+        {
+            CheckCompetitionIDCoroutineRunning = true;
+            StartCoroutine(CheckCompetitionIDCoroutine());
         }
-        //Debug.Log(RememberMe);
+    }
+
+    // Callback method to handle the verification response
+    private void OnVerifyCompetitionIDResponse(JObject response)
+    {
+        if (response != null && response.ContainsKey("valid") && response["valid"].ToObject<bool>())
+        {
+            Debug.Log("Competition ID is valid.");
+            isCompetitionIDValid = true;
+        }
+        else
+        {
+            Debug.LogError("Invalid competition ID.");
+            isCompetitionIDValid = false;
+        }
+
+        verificationCompleted = true;
+    }
+
+    private IEnumerator CheckCompetitionIDCoroutine()
+    {
+        if (competitionIdText.text == "")
+        {
+            CheckCompetitionIDCoroutineRunning = false;
+            yield break;
+        }
         if (RememberMe)
         {
             PlayerPrefs.SetString("competitionID", competitionIdText.text);
@@ -150,18 +188,36 @@ public class LobbyUI : MonoBehaviour
         {
             PlayerPrefs.DeleteKey("competitionID");
         }
-        competitionIDUIText.text = "Competition ID: " + competitionIdText.text;
-        CompetitionMiddleware.Instance.SetUserID(competitionIdText.text);
-        competitionIDUI.SetActive(false);
-        ShowStartSceneUI();
+
+        verificationCompleted = false;
+        isCompetitionIDValid = false;
+        CompetitionMiddleware.Instance.CallVerifyCompetitionId(OnVerifyCompetitionIDResponse);
+
+        // Wait for the verification to complete
+        while (!verificationCompleted)
+        {
+            yield return null;
+        }
+        if (isCompetitionIDValid)
+        {
+            competitionIDUIText.text = "Competition ID: " + competitionIdText.text;
+            CompetitionMiddleware.Instance.SetUserID(competitionIdText.text);
+            competitionIDUI.SetActive(false);
+            ShowStartSceneUI();
+        }
+        CheckCompetitionIDCoroutineRunning = false;
     }
 
     public void ConsentFormAnswer(bool Agree)
     {
         if (Agree)
         {
-            PlayerPrefs.SetInt("consent_agreed", 1);
-            DisableConsentFormUI();
+            if (RememberMe)
+            {
+                PlayerPrefs.SetInt("consent_agreed", 1);
+            }
+            //DisableConsentFormUI();
+            ShowCompetitionIDUI();
         }
         else
         {
