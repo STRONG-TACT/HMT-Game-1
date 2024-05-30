@@ -12,13 +12,13 @@ public class PinningSystem : MonoBehaviour
     private Ray ray;
     private RaycastHit hit;
     private Tile focusedTile;
-    private GameObject tile;
+    //private GameObject tile;
 
     public GameObject pinWheel;
     private Vector3 pinPosition = new Vector3(0,0,0);
     //public Sprite[] pinWheelBtnImg = new Sprite[5]; // 0: danger, 1: Assist, 2: OMW, 3: Unknown, 4: cancel; 
     //public Sprite[] pinWheelBtnPressedImg = new Sprite[5]; // 0: danger, 1: Assist, 2: OMW, 3: Unknown, 4: cancel; 
-    private bool isPinned;
+    public bool PinUIUp { get; private set; }
     public Vector3 ui_offset = new Vector3(0,0.3f,0);
     public Vector3 pin_icon_offset = new Vector3(0.3f, 0.3f, 0.3f);
     // stores a list of 
@@ -66,16 +66,15 @@ public class PinningSystem : MonoBehaviour
     {
         //Debug.LogFormat("GameManager Is null? {0}", IntegratedGameManager.S == null);
         //Debug.LogFormat("localChar Is null? {0}", IntegratedGameManager.S.localChar == null);
-        if (IntegratedGameManager.S.localChar.ReadyForNextPhase) return;
+        if (IntegratedGameManager.S.localChar.ReadyForNextPhase || IntegratedGameManager.S.gameStatus != GameStatus.Player_Pinning) return;
         
-        if (isPinned)
-        {
-            pinPosition = mainCamera.WorldToScreenPoint(tile.transform.position + ui_offset);
-            pinWheel.transform.position = pinPosition;
-        }
+        //if (PinUIUp)
+        //{
+        //    pinPosition = mainCamera.WorldToScreenPoint(tile.transform.position + ui_offset);
+        //    pinWheel.transform.position = pinPosition;
+        //}
         
-        if (Input.GetMouseButtonDown(0) && IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning)
-        {
+        if (Input.GetMouseButtonDown(0)) {
             if (EventSystem.current.IsPointerOverGameObject()) {
                 //Debug.Log("mouse clicked on UI");
                 return;
@@ -84,22 +83,19 @@ public class PinningSystem : MonoBehaviour
 
             ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
-            if (!isPinned)
-            {
-                if (Physics.Raycast(ray, out hit, 1000f, LayerMask.GetMask("Ground")))  // if raycast on ground
-                {
-                    tile = hit.transform.gameObject;
-                    focusedTile = tile.GetComponent<Tile>();
+            if (!PinUIUp) {
+                // if raycast on ground
+                if (Physics.Raycast(ray, out hit, 1000f, LayerMask.GetMask("Ground"))) { 
+                    focusedTile = hit.transform.gameObject.GetComponent<Tile>();
                     //Debug.LogFormat("tile location: {0}, {1}", focusedTile.row, focusedTile.col);
                     Debug.Log(focusedTile.row);
                     Debug.Log(focusedTile.col);
                     //Debug.LogFormat("Mouse hit object {0}", hit.transform.gameObject.name);
-                    pinWheel.transform.gameObject.SetActive(true);
-                    isPinned = true;
+                    ShowPinWheel();
                 }
             }
             else {
-                PinningSystem.S.ClosePinWheel();
+                ClosePinWheel();
             }
         }
     }
@@ -112,10 +108,17 @@ public class PinningSystem : MonoBehaviour
     }
     
     // ========== Pin Wheel Buttons ==========
+    public void ShowPinWheel() {
+        pinWheel.SetActive(true);
+        pinPosition = mainCamera.WorldToScreenPoint(focusedTile.transform.position + ui_offset);
+        pinWheel.transform.position = pinPosition;
+        PinUIUp = true;
+    }
+    
     public void ClosePinWheel()
     {
         pinWheel.SetActive(false);
-        isPinned = false;
+        PinUIUp = false;
     }
     
     public void DropPin(int pinTypeIdx) {

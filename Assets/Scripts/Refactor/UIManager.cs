@@ -707,6 +707,14 @@ public class UIManager : MonoBehaviour
 
     private void TooltipHoverUpdate() {
         //display combat skills when mouse hover on objects
+        if (PinningSystem.S.PinUIUp) {
+            tooltipTarget = null;
+            combatSkillDisplayActive = false;
+            CombatSkillTooltip.SetActive(false);
+            return;
+        }
+        
+        
         Ray ray;
         RaycastHit[] hits;
         Camera mainCamera = Camera.main;
