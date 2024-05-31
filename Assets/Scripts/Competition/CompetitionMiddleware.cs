@@ -165,8 +165,12 @@ public class CompetitionMiddleware : MonoBehaviour {
         StartCoroutine(SendPostRequestWithCallback(flaskURL + "/list_agents", callback));
     }
 
-    public void CallVerifyCompetitionId(System.Action<JObject> callback) {
-        StartCoroutine(SendPostRequestWithCallback(flaskURL + "/verify_competition_id", callback));
+    public void CallVerifyCompetitionId(string compId, System.Action<JObject> callback) {
+        JObject job = new JObject {
+            {"api_key", serverKey },
+            { "competition_id", compId }
+        };
+        StartCoroutine(SendPostRequestWithCallback(flaskURL + "/verify_competition_id", JsonConvert.SerializeObject(job), callback));
     }
 
     public void CallLaunchGame(string photonRoom, string dwarfPlayerId, string giantPlayerId, string humanPlayerId) {
@@ -336,7 +340,7 @@ public class CompetitionMiddleware : MonoBehaviour {
             LogEndGame();
         }
         currGameId = gameID;
-        CallLogEvent(1002, "system", "start_game",
+        CallLogEvent(1010, "system", "start_game",
             new JObject {
                 {"game_id", gameID },
                 { "mode", "local"},
@@ -414,17 +418,58 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     #region 2000s Logging Messages, Out of Game Interactions
 
-    public void LogCreateRoom(string roomName) {
-        CallLogEvent(2000, "player", "create_lobby", "roomCode", roomName);
+    public void LogJoinQueue() {
+        CallLogEvent(2000, "player", "join_queue", null);
+    }
+
+    public void LogLeaveQueue() {
+        CallLogEvent(2001, "player", "leave_queue", null);
+    }
+
+    public void LogQueueTimeout(string newCondition) { 
+        CallLogEvent(2002, "player", "queue_timeout", "new_condition", newCondition);
     }
 
     public void LogJoinRoom(string roomName) {
-        CallLogEvent(2001, "player", "join_lobby", "roomCode", roomName);
+        CallLogEvent(2010, "player", "join_room", "roomCode", roomName);
+    }
+
+    public void LogLeaveRoom(string roomName) {
+        CallLogEvent(2011, "player", "leave_room", "roomCode", roomName);
+    }
+
+    public void LogCreateRoom(string roomName) {
+        CallLogEvent(2012, "player", "create_room", "roomCode", roomName);
+    }
+
+    public void LogReadyUp() {
+        CallLogEvent(2020, "player", "ready_up", null);
+    }
+
+    public void LogUnready() {
+        CallLogEvent(2021, "player", "unready", null);
+    }
+
+    public void LogSurveyResponse(IList<string> questions, IList<string> responses) {
+        JArray answers = new JArray();
+        for (int i = 0; i < questions.Count; i++) {
+            answers.Add(new JObject {
+                {"question" , questions[i] },
+                {"response" , responses[i]}
+
+
+            });
+        }
+
+        CallLogEvent(2099, "player", "survey_response", new JObject {{ "questions", answers }});
     }
 
     public void LogOpenHelp() {
-        CallLogEvent(2010, "player", "open_help", "menu", "help");
+        CallLogEvent(2100, "player", "open_help", "menu", "help");
     }
+
+
+
 
     #endregion
 
