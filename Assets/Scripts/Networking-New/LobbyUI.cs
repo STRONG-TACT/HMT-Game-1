@@ -191,7 +191,7 @@ public class LobbyUI : MonoBehaviour
 
         verificationCompleted = false;
         isCompetitionIDValid = false;
-        CompetitionMiddleware.Instance.CallVerifyCompetitionId(OnVerifyCompetitionIDResponse);
+        CompetitionMiddleware.Instance.CallVerifyCompetitionId(competitionIdText.text, OnVerifyCompetitionIDResponse);
 
         // Wait for the verification to complete
         while (!verificationCompleted)
