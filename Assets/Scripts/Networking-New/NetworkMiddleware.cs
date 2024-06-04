@@ -248,5 +248,6 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         {
             CompetitionMiddleware.Instance.CallReportResult(playerInfo);
         }
+        Debug.LogWarning("!!");
     }
 }
