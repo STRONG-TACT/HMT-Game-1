@@ -280,7 +280,7 @@ public class CompetitionMiddleware : MonoBehaviour {
         if (includeContext) {
             job["context"] = GenerateContext();
         }
-
+  
         if (DebugTraceLogs) { 
             Debug.LogFormat("Log <color=cyan>{0}</color> <color=yellow>{1}</color> Full JSON: {2}", eventID, verb, job.ToString(Formatting.None));
         }

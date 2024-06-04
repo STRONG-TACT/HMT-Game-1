@@ -46,7 +46,7 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
         Debug.Log("Am I the master: " + PhotonNetwork.IsMasterClient);
 
         if (PhotonNetwork.IsMasterClient) {
-            _randomSeed = Random.Range(0, 10000);
+            _randomSeed = Random.Range(0, 999999999);
             // SetupNetworkMiddleware(_randomSeed, PhotonNetwork.LocalPlayer.ActorNumber);
             //photonView.RPC("SetupNetworkMiddleware",
             //    RpcTarget.MasterClient,

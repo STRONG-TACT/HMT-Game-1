@@ -1,15 +1,23 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using GameConstant;
 using HMT;
+using Photon.Pun;
+using Photon.Realtime;
+using Random = UnityEngine.Random;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class NetworkLobbyManager : MonoBehaviour
 {
     public OnBoardingState onBoardingState = OnBoardingState.ChooseGameMode;
     public OnBoardingState playChoice = OnBoardingState.ChooseGameMode;
+
+    private int _numPerson;
+    public List<RoomInfo> ListOfRooms;
     
     // Singleton reference
     public static NetworkLobbyManager S;
@@ -105,9 +113,46 @@ public class NetworkLobbyManager : MonoBehaviour
     public void OnJoinLobbySucceed()
     {
         onBoardingState = OnBoardingState.CreateOrJoinRoom;
-        LobbyUI.S.ShowCreateJoinRoomUI();
+        // LobbyUI.S.ShowCreateJoinRoomUI();
+        LobbyUI.S.ShowLoadingUI("Initializing Matchmaking System");
+        _numPerson = (Random.Range(0.0f, 1.0f) <
+                      MatchMakingParameter.ONE_PERSON_GAME_CHANCE) ? 1 : 2;
+        JointMatchmakingRoom();
     }
-    
+
+    private IEnumerator JointMatchmakingRoom()
+    {
+        Debug.Log($"Creating a room with {_numPerson} human players");
+        Hashtable roomPropertyHashTable = new Hashtable { { MatchMakingParameter.NUM_PERSON_KEY, _numPerson } };
+        RoomOptions roomOptions = new RoomOptions
+        {
+            MaxPlayers = 3,
+            CustomRoomPropertiesForLobby = new string[]{MatchMakingParameter.NUM_PERSON_KEY},
+            CustomRoomProperties = roomPropertyHashTable
+        };
+
+        LobbyUI.S.ShowLoadingUI("Searching for a Room to Join...");
+        if (_numPerson == 1)
+        {
+            yield return new WaitForSeconds(MatchMakingParameter.JOIN_ROOM_DELAY);
+            LobbyNetwork.S.TryCreateRoom(
+                Random.Range(0, MatchMakingParameter.ROOM_NAME_RANGE).ToString(), 
+                roomOptions);
+        }
+        else
+        {
+            // Note: not sure there's a more efficient way than this linear search
+            foreach (RoomInfo roomInfo in ListOfRooms)
+            {
+                object numPlayerProp = roomInfo.CustomProperties[MatchMakingParameter.NUM_PERSON_KEY];
+                if (numPlayerProp is int && (int)numPlayerProp == _numPerson && roomInfo.PlayerCount == 1)
+                {
+                    LobbyNetwork.S.TryJoinRoom(roomInfo.Name);
+                }
+            }
+        }
+    }
+
     /* TODO: !!!!!!!!!!!!!!!!
        Current hacky solution: join & create is the same button. Will try to join room with name
        first. If failed a room will be created with the same name. This is obviously NOT SAFE
@@ -162,6 +207,7 @@ public class NetworkLobbyManager : MonoBehaviour
         Debug.Log("Joined a room, initiating travel to room");
         SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
     }
+    
 
     // ============ Back Button Logic ============
 

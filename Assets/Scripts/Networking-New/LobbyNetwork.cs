@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
+using GameConstant;
 
 public class LobbyNetwork : MonoBehaviourPunCallbacks
 {
     public static LobbyNetwork S;
 
     public bool playerQuitConnection = false;
+
+    private RoomOptions _defaultRoomOptions = new RoomOptions { MaxPlayers = 3 };
     
     private void Awake()
     {
@@ -75,10 +79,16 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
         NetworkLobbyManager.S.OnJoinRoomAttemptFailed();
     }
 
-    public void TryCreateRoom(string roomName)
+    public void TryCreateRoom(string roomName, RoomOptions roomOptions = null)
     {
+        roomOptions ??= _defaultRoomOptions;
         Debug.Log($"Trying to create room {roomName}");
-        PhotonNetwork.CreateRoom(roomName, new RoomOptions { MaxPlayers = 3 });
+        PhotonNetwork.CreateRoom(roomName, roomOptions);
+    }
+
+    public void TryJoinRoomWithProperty(Hashtable expectedProperties)
+    {
+        PhotonNetwork.JoinRandomRoom(expectedProperties, 3);
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message)
@@ -95,5 +105,10 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         NetworkLobbyManager.S.OnRoomEntered();
+    }
+
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        NetworkLobbyManager.S.ListOfRooms = roomList;
     }
 }
