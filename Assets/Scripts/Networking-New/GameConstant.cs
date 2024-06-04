@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using UnityEngine;
 
 namespace GameConstant
@@ -12,6 +13,14 @@ namespace GameConstant
         public const string SURVEY_SCENE = "Survey_scene";
         public const string NETWORK_SCENE = "NetworkGamePlay";
         public const string GAME_VERSION = "1.0.0";
+    }
+
+    public class MatchMakingParameter
+    {
+        public const float ONE_PERSON_GAME_CHANCE = 0.5f;
+        public const string NUM_PERSON_KEY = "NPK";
+        public const int ROOM_NAME_RANGE = 999999999;
+        public const float JOIN_ROOM_DELAY = 6.0f;
     }
     
     public enum OnBoardingState
