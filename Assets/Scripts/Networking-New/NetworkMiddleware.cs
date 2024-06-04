@@ -241,4 +241,12 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
 
     }
+
+    public void CallLogLevelResult(Dictionary<string, Dictionary<string, string>> playerInfo)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            CompetitionMiddleware.Instance.CallReportResult(playerInfo);
+        }
+    }
 }

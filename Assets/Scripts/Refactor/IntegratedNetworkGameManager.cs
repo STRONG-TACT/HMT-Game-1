@@ -16,6 +16,8 @@ public class IntegratedNetworkGameManager : IntegratedGameManager {
         base.Start();
         localChar.FocusCharacter();
         UIManager.S.HideCharacterSwitcher();
+        // testing for report result log
+        LogLevelResult();
     }
     
     public override IEnumerator StartLevel()
