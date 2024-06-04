@@ -221,4 +221,12 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         Debug.Log($"Player {player.NickName} has left the room");
         UIManager.S.ShowOtherPlayerDisconnectUI(player.NickName);
     }
+
+    public void CallLogLevelResult(Dictionary<string, Dictionary<string, string>> playerInfo)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            CompetitionMiddleware.Instance.CallReportResult(playerInfo);
+        }
+    }
 }

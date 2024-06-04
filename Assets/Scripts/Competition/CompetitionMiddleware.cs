@@ -1,3 +1,4 @@
+using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections;
@@ -190,8 +191,41 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
 
-    public void CallReportResult() {
-        //TODO this needs to be filled
+    public void CallReportResult(Dictionary<string, Dictionary<string, string>> playerInfo)
+    {
+        JObject retObj = new JObject {
+            {"time_stamp", System.DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.ffff")},
+            {"game_id", currGameId},
+            {"level_name", currLevel},
+            {"rounds", currRound}
+        };
+
+        try {
+            foreach (string character in new string[] { "dwarf", "giant", "human" })
+            {
+                retObj[character] = new JObject
+                {
+                    { "player_type", playerInfo[character]["player_type"] },
+                    { "player_id", playerInfo[character]["player_id"] },
+                    { "health", int.Parse(playerInfo[character]["health"]) },
+                    { "max_health", int.Parse(playerInfo[character]["max_health"]) },
+                    { "lives", int.Parse(playerInfo[character]["lives"]) },
+                    { "max_lives", int.Parse(playerInfo[character]["max_lives"]) },
+                    { "respawned", bool.Parse(playerInfo[character]["respawned"]) },
+                };
+            }
+        }
+        catch (KeyNotFoundException e) {
+            Debug.LogError("Dictionary supplied to CallReportResult does not contain the correct keys.\n"
+                           + e.ToString());
+            return;
+        }
+        catch (FormatException e) {
+            Debug.LogError("Dictionary supplied to CallReportResult does not contain the correct playerInfo values.");
+            return;
+        }
+        
+        StartCoroutine(SendPostRequestFireAndForget(flaskURL + "/report_result", JsonConvert.SerializeObject(retObj)));
     }
 
     private void CallLogEvent(string userID, string sessionID, int eventId, string actor, string verb, string label, int value, bool immediate = false) {

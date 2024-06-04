@@ -771,4 +771,29 @@ public class IntegratedGameManager : MonoBehaviour
     public virtual void SwitchCharacter(int index)
     {
     }
+
+    protected void LogLevelResult()
+    {
+        Dictionary<string, Dictionary<string, string>>
+            playerInfo = new Dictionary<string, Dictionary<string, string>>();
+        for (int charID = 0; charID < 3; charID++)
+        {
+            playerInfo[inSceneCharacters[charID].config.characterName.ToLower()] = new Dictionary<string, string>
+            {
+                { "player_type", CompetitionMiddleware.Instance.RegisteredAgents.ContainsKey(charID) ? "ai" : "human" },
+                //TODO: refer to Lobby UI CheckCompetitionIDCoroutine()
+                { "player_id", "test_player_id" },
+                { "health", inSceneCharacters[charID].Health.ToString() },
+                //TODO: max_health field in character config
+                { "max_health", 3.ToString() },
+                { "lives", inSceneCharacters[charID].Lives.ToString() },
+                //TODO: max_lives field in character config
+                { "max_lives", 3.ToString() },
+                //TODO: keep track of respawn
+                { "respawned", false.ToString() }
+            };
+        }
+        
+        NetworkMiddleware.S.CallLogLevelResult(playerInfo);
+    }
 }
