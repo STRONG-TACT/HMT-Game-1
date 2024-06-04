@@ -194,7 +194,8 @@ public class CompetitionMiddleware : MonoBehaviour {
     public void CallReportResult(Dictionary<string, Dictionary<string, string>> playerInfo)
     {
         JObject retObj = new JObject {
-            {"time_stamp", System.DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.ffff")},
+            { "api_key", serverKey },
+            {"time", System.DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.ffff")},
             {"game_id", currGameId},
             {"level_name", currLevel},
             {"rounds", currRound}
