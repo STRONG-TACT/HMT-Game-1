@@ -2918,7 +2918,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 21300000, guid: 9af40e1ee801d4cb8ba2f6a7b7e24e52, type: 3}
     m_PressedSprite: {fileID: 21300000, guid: c117faa0f1d0b4f8c9f8a97741ba2762, type: 3}
     m_SelectedSprite: {fileID: 21300000, guid: 90232161e4a3e461a9424e98f32c92eb, type: 3}
-    m_DisabledSprite: {fileID: 21300000, guid: 90232161e4a3e461a9424e98f32c92eb, type: 3}
+    m_DisabledSprite: {fileID: 21300000, guid: ae647ca6c97009c40addf872ea68f33a, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -5986,7 +5986,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 21300000, guid: 91e40e6d927d8401bac103a3be58afd9, type: 3}
     m_PressedSprite: {fileID: 21300000, guid: 34d26159fda324c59b65de943d9f5a76, type: 3}
     m_SelectedSprite: {fileID: 21300000, guid: aac762b1135e54743acafb631d8c8819, type: 3}
-    m_DisabledSprite: {fileID: 21300000, guid: aac762b1135e54743acafb631d8c8819, type: 3}
+    m_DisabledSprite: {fileID: 21300000, guid: 024d3d416a20cc841a3f71643a9122b4, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -7054,7 +7054,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6070971949871136168
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8034,7 +8034,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 21300000, guid: d8336636b5206467b82444bb6e78abac, type: 3}
     m_PressedSprite: {fileID: 21300000, guid: a39002efe45bb45fdac328a35a99cbec, type: 3}
     m_SelectedSprite: {fileID: 21300000, guid: 52186f58b438542b78c4d1eae4fe25b2, type: 3}
-    m_DisabledSprite: {fileID: 21300000, guid: 52186f58b438542b78c4d1eae4fe25b2, type: 3}
+    m_DisabledSprite: {fileID: 21300000, guid: 3898928f53515dc46b50efda561dae8d, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -10007,7 +10007,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 21300000, guid: 4a152cafae55145708a3da1b4d4a12dc, type: 3}
     m_PressedSprite: {fileID: 21300000, guid: ea8584afd355943cfb515186269b76a3, type: 3}
     m_SelectedSprite: {fileID: 21300000, guid: 5d14c4e3ccb6a48bd8a2d3ba6100223d, type: 3}
-    m_DisabledSprite: {fileID: 21300000, guid: 5d14c4e3ccb6a48bd8a2d3ba6100223d, type: 3}
+    m_DisabledSprite: {fileID: 21300000, guid: a018c6add196bb0468607aaeca1d4169, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -11155,7 +11155,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 21300000, guid: c0b4bb9b2419d4c9f82713e4e1c93127, type: 3}
     m_PressedSprite: {fileID: 21300000, guid: ccdcb5af6a1bc4a84a5d6cd2569c496d, type: 3}
     m_SelectedSprite: {fileID: 21300000, guid: f9f824b53fda6425c82d447fa715b6ef, type: 3}
-    m_DisabledSprite: {fileID: 21300000, guid: f9f824b53fda6425c82d447fa715b6ef, type: 3}
+    m_DisabledSprite: {fileID: 21300000, guid: 5cfb7570677512a4595a487f0703c3f9, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -11912,7 +11912,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &6070971950672451396
 RectTransform:
   m_ObjectHideFlags: 0
@@ -13830,6 +13830,7 @@ MonoBehaviour:
   YouAreIcon: {fileID: 6070971949877368700}
   TimerPanel: {fileID: 6070971950130997087}
   TimerText: {fileID: 6070971949734665476}
+  warningTime: 10
   TeamInfoPanel: {fileID: 6070971951103539348}
   GoalStatusIcons:
   - {fileID: 6070971949914408896}
