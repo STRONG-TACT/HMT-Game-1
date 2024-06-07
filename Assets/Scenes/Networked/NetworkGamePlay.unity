@@ -230,7 +230,7 @@ MonoBehaviour:
   localChar: {fileID: 0}
   gameStatus: 0
   goalCount: 0
-  currentLevel: 1
+  currentLevel: 3
   isNetworkGame: 0
   inSceneCharacters:
   - {fileID: 1441866727}
@@ -428,10 +428,26 @@ PrefabInstance:
     - target: {fileID: 6070971950046871441, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: m_Camera
       value: 
-      objectReference: {fileID: 6070971950461641564}
+      objectReference: {fileID: 0}
     - target: {fileID: 6070971950046871441, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: m_RenderMode
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971950121737187, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_ClearFlags
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971950121737187, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0.6415094
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971950121737187, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0.6415094
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971950121737187, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0.6415094
       objectReference: {fileID: 0}
     - target: {fileID: 6070971950130997087, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: m_IsActive
@@ -534,8 +550,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!20 &6070971950461641564 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 4331550394342486141, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
-  m_PrefabInstance: {fileID: 6070971950461641562}
-  m_PrefabAsset: {fileID: 0}

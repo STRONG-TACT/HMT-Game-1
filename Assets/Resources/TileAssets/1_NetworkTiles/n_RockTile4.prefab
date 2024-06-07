@@ -65,8 +65,6 @@ MonoBehaviour:
     bonus: 5
   row: 0
   col: 0
-  enemyList: []
-  charaList: []
   pinList: []
   shrine: {fileID: 0}
   seen_material: {fileID: 0}
@@ -138,6 +136,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rock4
       objectReference: {fileID: 0}
+    - target: {fileID: 6084748123488572253, guid: 86aab0a82959f4b21835bfbe2e883047, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 31cf7d45927a4499fb7e5f371be24de5, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86aab0a82959f4b21835bfbe2e883047, type: 3}
 --- !u!4 &1620722763896075577 stripped

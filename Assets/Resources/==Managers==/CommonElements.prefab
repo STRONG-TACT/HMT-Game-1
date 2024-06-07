@@ -9584,7 +9584,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.7
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -13830,6 +13830,7 @@ MonoBehaviour:
   YouAreIcon: {fileID: 6070971949877368700}
   TimerPanel: {fileID: 6070971950130997087}
   TimerText: {fileID: 6070971949734665476}
+  warningTime: 10
   TeamInfoPanel: {fileID: 6070971951103539348}
   GoalStatusIcons:
   - {fileID: 6070971949914408896}

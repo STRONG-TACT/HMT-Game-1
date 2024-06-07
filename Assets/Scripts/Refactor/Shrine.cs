@@ -33,14 +33,10 @@ public class Shrine : MonoBehaviour
     public bool Reached { get; private set; } = true;
 
     public Tile tile;
-
+    
+    [SerializeReference]
     Transform shrineStone;
     
-    void Start()
-    {
-        shrineStone = transform.Find("ShrineStone");
-    }
-
     public bool CheckShrineType(Character character) {
         if (character.config.type == CharacterType) {
             Reached = true;
