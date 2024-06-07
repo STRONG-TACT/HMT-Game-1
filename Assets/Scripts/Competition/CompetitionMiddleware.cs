@@ -64,6 +64,8 @@ public class CompetitionMiddleware : MonoBehaviour {
     private int currRound = -1;
     private string currPhase = null;
 
+    private List<string> Conditions = new List<string>();
+
     // Start is called before the first frame update
     void Awake() {
         if (Instance == null) {
@@ -503,7 +505,23 @@ public class CompetitionMiddleware : MonoBehaviour {
         CallLogEvent(2100, "player", "open_help", "menu", "help");
     }
 
+    public void LogAssignCondition(string new_condition) {
+        Conditions.Add(new_condition);
+        CallLogEvent(2090, "system", "assign_condition",
+            new JObject {
+                {"new_condition", new_condition},
+                {"conditions", new JArray(Conditions) }
+            }, false);
+    }
 
+    public void LogRemoveCondition(string condition) {
+        Conditions.Remove(condition);
+        CallLogEvent(2091, "system", "remove_condition",
+                       new JObject {
+                {"condition", condition},
+                {"conditions", new JArray(Conditions) }
+            }, false);
+    }
 
 
     #endregion
@@ -743,6 +761,26 @@ public class CompetitionMiddleware : MonoBehaviour {
         CallLogEvent(record.agentID, record.sessionID, 5001, record.agentID, "hmt_interface_call",
             new JObject { { "service_target", record.target }, { "command_json", command.json } },
             true);
+    }
+
+    #endregion
+
+    #region 6000s Errors and Unexpected Events
+
+    public void LogDisconnect(string character) {
+        CallLogEvent(6000, "system", "disconnect", 
+            new JObject {
+                {"game_id", currGameId },
+                {"disconnecting_player", character }
+            }, true);
+    }
+
+    public void LogError(System.Exception exception) {
+        JObject error = new JObject {
+            { "message", exception.Message },
+            { "stack_trace", exception.StackTrace }
+        };
+        CallLogEvent(6999, "system", "error", error, true);
     }
 
     #endregion

@@ -218,8 +218,28 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     // handling player disconnect
     public override void OnPlayerLeftRoom(Player player)
     {
+        // If we're in the survey scene, ignore this whole callback
+        // Maybe even if the game is in an endstate
+
         Debug.Log($"Player {player.NickName} has left the room");
-        UIManager.S.ShowOtherPlayerDisconnectUI(player.NickName);
+        CompetitionMiddleware.Instance.LogDisconnect(player.NickName);
+
+        if (UIManager.S) { 
+            UIManager.S.ShowOtherPlayerDisconnectUI(player.NickName);
+
+            // The ShowOtherPlayerDisonnectedUI should have a button that takes you to the survey scene
+            
+        }
+
+#if HMT_BUILD
+        // If we're at the end of a game we might want to stay alive for a bit so the AI can know the game is over
+
+        if (!CompetitionMiddleware.Instance.overrideAIMode) {
+            Application.Quit();
+        }
+#endif
+
+
     }
 
     public void CallLogLevelResult(Dictionary<string, Dictionary<string, string>> playerInfo)
