@@ -628,9 +628,8 @@ public class Character : MonoBehaviour {
     public JObject HMTStateRep(StateRepLevel level = StateRepLevel.Full) {
         JObject ret = new JObject {
             {"entityType", "Character" },
-            {"objKey", config.type.ToString() },
-            {"id", config.characterName},
-            {"characterId", CharacterId },
+            {"objKey", "C"+(CharacterId+1) },
+            {"id", "C"+(CharacterId+1)+"1" },
             {"sightRange", config.sightRange },
             {"monsterDice", config.monsterDice.ToString()},
             {"trapDice", config.trapDice.ToString() },
@@ -642,6 +641,7 @@ public class Character : MonoBehaviour {
         switch (level) {
             case StateRepLevel.Full:
                 ret["health"] = Health;
+                ret["lives"] = Lives;
                 ret["respawnCounter"] = respawnCountdown;
                 ret["actionPoints"] = ActionPointsRemaining;
                 ret["actionPlan"] = new JArray(ActionPlan.Select(d => d.ToString()));
