@@ -5,6 +5,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Newtonsoft.Json.Linq;
+using UnityEngine.SceneManagement;
+using GameConstant;
 
 public class LobbyUI : MonoBehaviour
 {
@@ -18,7 +20,9 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private GameObject disconnectedUI;
     [SerializeField] private GameObject createJoinUI;
     [SerializeField] private GameObject competitionIDUI;
+    [SerializeField] private GameObject invalid_id_prompt;
     [SerializeField] private GameObject ConsentFormUI;
+    [SerializeField] private GameObject reset_id_UI;
 
     [Header("Text Input Fields")] 
     [SerializeField]
@@ -144,6 +148,7 @@ public class LobbyUI : MonoBehaviour
     public void ResetCompetitionID()
     {
         PlayerPrefs.DeleteAll();
+        invalid_id_prompt.SetActive(false);
         DisableAllUI();
         ShowConsentFormUI();
     }
@@ -167,6 +172,7 @@ public class LobbyUI : MonoBehaviour
         else
         {
             Debug.LogError("Invalid competition ID.");
+            invalid_id_prompt.SetActive(true);
             isCompetitionIDValid = false;
         }
 
@@ -203,6 +209,7 @@ public class LobbyUI : MonoBehaviour
             competitionIDUIText.text = "Competition ID: " + competitionIdText.text;
             CompetitionMiddleware.Instance.SetUserID(competitionIdText.text);
             competitionIDUI.SetActive(false);
+            reset_id_UI.SetActive(false);
             ShowStartSceneUI();
         }
         CheckCompetitionIDCoroutineRunning = false;
@@ -232,6 +239,10 @@ public class LobbyUI : MonoBehaviour
         PlayerPrefs.DeleteKey("competitionID");
         competitionIDUIText.text = "Competition ID: " + "Anonymous";
         CompetitionMiddleware.Instance.SetUserID( System.Guid.NewGuid().ToString());
+
+        //for testing survey scene only
+        //SceneManager.LoadScene(GlobalConstant.SURVEY_SCENE);
+        reset_id_UI.SetActive(false);
         ShowStartSceneUI();
     }
 }
