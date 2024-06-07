@@ -18,9 +18,10 @@ public class UIManager : MonoBehaviour
 
     [Header("Common HUD Elements")]
     public TMP_Text CurrentPhaseLabel;
+    public TMP_Text RoundCounter;
     public GameObject HealthPanel;
     public GameObject ActionPanel;
-    public Image YouAreIcon;
+    public GameObject YouAreIcon;
 
     [Header("Timer Panel")]
     public GameObject TimerPanel;
@@ -30,9 +31,14 @@ public class UIManager : MonoBehaviour
 
     [Header("Team Status Panel")]
     public GameObject TeamInfoPanel;
+    public GameObject[] Character_icons_alive;
+    public GameObject[] Character_icons_dead;
     public Image[] GoalStatusIcons = new Image[3];
     public Image[] LifeStatusIcons = new Image[3];
     public Image[] ActionStatusIcons = new Image[3];
+    public GameObject[] Dwarf_DeathCounters;
+    public GameObject[] Giant_DeathCounters;
+    public GameObject[] Human_DeathCounters;
 
     [Header("Planning UI")]
     public GameObject PlanUIPanel;
@@ -138,6 +144,7 @@ public class UIManager : MonoBehaviour
 
     public void UpdateGamePhaseInfo()
     {
+        RoundCounter.text = "Round: " + IntegratedGameManager.S.CurrentRound;
         if (IntegratedGameManager.S.localChar.dead)
         {
             CurrentPhaseLabel.text = "Waiting Respawn";
@@ -194,16 +201,41 @@ public class UIManager : MonoBehaviour
     #region Common HUD
 
     private void UpdateHealthPanel(Character character) {
-        foreach (Transform child in HealthPanel.transform.GetComponentsInChildren<Transform>()) {
+        GameObject hearts = HealthPanel.transform.GetChild(0).gameObject;
+        GameObject broken_hearts = HealthPanel.transform.GetChild(1).gameObject;
+        hearts.SetActive(true);
+        broken_hearts.SetActive(true);
+
+        /*
+        foreach (Transform child in hearts.transform.GetComponentsInChildren<Transform>()) {
+            child.gameObject.SetActive(false);
+        }
+        foreach (Transform child in broken_hearts.transform.GetComponentsInChildren<Transform>())
+        {
+            child.gameObject.SetActive(false);
+        }
+        */
+        foreach (Transform child in hearts.transform)
+        {
+            child.gameObject.SetActive(false);
+        }
+        foreach (Transform child in broken_hearts.transform)
+        {
             child.gameObject.SetActive(false);
         }
 
         for (int i = 0; i < character.Health; i++) {
-            HealthPanel.transform.GetChild(i).gameObject.SetActive(true);
+            hearts.transform.GetChild(i).gameObject.SetActive(true);
         }
+        /*
         //TODO Fix these references based on the Chracter's config 
         for (int j = 0; j < character.config.StartingHealth - character.Health; j++) {
             HealthPanel.transform.GetChild(j + character.config.StartingHealth).gameObject.SetActive(true);
+        }
+        */
+        for (int j = character.Health; j < character.config.StartingHealth; j++)
+        {
+            broken_hearts.transform.GetChild(j).gameObject.SetActive(true);
         }
 
         HealthPanel.gameObject.SetActive(true);
@@ -227,6 +259,23 @@ public class UIManager : MonoBehaviour
         ActionPanel.gameObject.SetActive(true);
     }
 
+    private void UpdateYouAreInfo(Character currentCharacter)
+    {
+        Image icon = YouAreIcon.GetComponent<Image>();
+        switch (currentCharacter.CharacterId)
+        {
+            case 0:
+                icon.sprite = gameAssets.youAreDwarf;
+                break;
+            case 1:
+                icon.sprite = gameAssets.youAreGiant;
+                break;
+            case 2:
+                icon.sprite = gameAssets.youAreHuman;
+                break;
+        }
+    }
+
     /// <summary>
     /// The Common HUD consists of the:
     /// 1. Action Points
@@ -237,6 +286,7 @@ public class UIManager : MonoBehaviour
         ActionPanel.SetActive(true);
         HealthPanel.SetActive(true);
         TeamInfoPanel.SetActive(true);
+        YouAreIcon.SetActive(true);
         UpdateCommonHUD();
     }
 
@@ -244,13 +294,14 @@ public class UIManager : MonoBehaviour
         Character currentCharacter = IntegratedGameManager.S.localChar;
         UpdateHealthPanel(currentCharacter);
         UpdateActionPanel(currentCharacter);
-
+        UpdateYouAreInfo(currentCharacter);
     }
 
     public void HideCommonHUD() {
         ActionPanel.SetActive(false);
         HealthPanel.SetActive(false);
         TeamInfoPanel.SetActive(false);
+        YouAreIcon.SetActive(true);
     }
 
 
@@ -574,12 +625,50 @@ public class UIManager : MonoBehaviour
         GoalStatusIcons[2].sprite = gameAssets.GetGoalUnfilled(2);
     }
 
+    public void UpdateCharacterDeathCounter(Character character)
+    {
+        GameObject[] death_counters = new GameObject[6];
+        switch (character.CharacterId)
+        {
+            case 1:
+                death_counters = Dwarf_DeathCounters;
+                break;
+            case 2:
+                death_counters = Giant_DeathCounters;
+                break;
+            case 3:
+                death_counters = Human_DeathCounters;
+                break;
+        }
+        foreach (GameObject death_counter in death_counters){
+            death_counter.SetActive(false);
+        }
+        for(int i=0; i<character.Deaths; i++)
+        {
+            death_counters[i].SetActive(true);
+        }
+    }
+
+
     public void UpdateCharacterLifeStatus(int charID, bool alive = true)
     {
+        /*
         if (alive)
             LifeStatusIcons[charID].sprite = gameAssets.aliveIcon;
         else
             LifeStatusIcons[charID].sprite = gameAssets.deadIcon;
+        */
+
+        if (alive)
+        {
+            Character_icons_alive[charID].SetActive(true);
+            Character_icons_dead[charID].SetActive(false);
+        }
+        else
+        {
+            Character_icons_alive[charID].SetActive(false);
+            Character_icons_dead[charID].SetActive(true);
+        }
 
     }
 

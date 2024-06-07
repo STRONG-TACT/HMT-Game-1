@@ -62,6 +62,7 @@ public class Character : MonoBehaviour {
     //Health
     public int Health { get; private set; } = 3;
     public int Lives { get; private set; } = 3;
+    public int Deaths { get; private set; } = 0;
 
     //Death and death currRound count down
     public bool dead = false;
@@ -569,6 +570,7 @@ public class Character : MonoBehaviour {
         State = CharacterState.Die;
         dead = true;
         Lives -= 1;
+        Deaths += 1;
         respawnCountdown = GameData.S.RespawnDelay;
         ResetPlan();
         IntegratedGameManager.S.CharacterDied(CharacterId);
@@ -628,9 +630,8 @@ public class Character : MonoBehaviour {
     public JObject HMTStateRep(StateRepLevel level = StateRepLevel.Full) {
         JObject ret = new JObject {
             {"entityType", "Character" },
-            {"objKey", config.type.ToString() },
-            {"id", config.characterName},
-            {"characterId", CharacterId },
+            {"objKey", "C"+(CharacterId+1) },
+            {"id", "C"+(CharacterId+1)+"1" },
             {"sightRange", config.sightRange },
             {"monsterDice", config.monsterDice.ToString()},
             {"trapDice", config.trapDice.ToString() },
@@ -642,6 +643,7 @@ public class Character : MonoBehaviour {
         switch (level) {
             case StateRepLevel.Full:
                 ret["health"] = Health;
+                ret["lives"] = Lives;
                 ret["respawnCounter"] = respawnCountdown;
                 ret["actionPoints"] = ActionPointsRemaining;
                 ret["actionPlan"] = new JArray(ActionPlan.Select(d => d.ToString()));
