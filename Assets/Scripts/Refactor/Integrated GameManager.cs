@@ -632,6 +632,7 @@ public class IntegratedGameManager : MonoBehaviour
 
             if (c.dead)
             {
+                UIManager.S.UpdateCharacterDeathCounter(c);
                 UIManager.S.UpdateCharacterLifeStatus(c.CharacterId, false);
                 deadChara.Add(c);
             }

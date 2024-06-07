@@ -62,6 +62,7 @@ public class Character : MonoBehaviour {
     //Health
     public int Health { get; private set; } = 3;
     public int Lives { get; private set; } = 3;
+    public int Deaths { get; private set; } = 0;
 
     //Death and death currRound count down
     public bool dead = false;
@@ -569,6 +570,7 @@ public class Character : MonoBehaviour {
         State = CharacterState.Die;
         dead = true;
         Lives -= 1;
+        Deaths += 1;
         respawnCountdown = GameData.S.RespawnDelay;
         ResetPlan();
         IntegratedGameManager.S.CharacterDied(CharacterId);
