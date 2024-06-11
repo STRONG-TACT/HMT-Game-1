@@ -220,6 +220,18 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     {
         // If we're in the survey scene, ignore this whole callback
         // Maybe even if the game is in an endstate
+        if(SuveryHandler.S != null)
+        {
+            Debug.Log("In survey scene, ignore player disconnect");
+            return;
+        }
+        if(IntegratedGameManager.S != null)
+        {
+            if(IntegratedGameManager.S.gameStatus == GameStatus.GameEnd)
+            {
+                return;
+            }
+        }
 
         Debug.Log($"Player {player.NickName} has left the room");
         CompetitionMiddleware.Instance.LogDisconnect(player.NickName);

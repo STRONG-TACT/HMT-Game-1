@@ -23,6 +23,7 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private GameObject invalid_id_prompt;
     [SerializeField] private GameObject ConsentFormUI;
     [SerializeField] private GameObject reset_id_UI;
+    [SerializeField] private GameObject prompt;
 
     [Header("Text Input Fields")] 
     [SerializeField]
@@ -74,6 +75,7 @@ public class LobbyUI : MonoBehaviour
     public void ShowGameModeUI()
     {
         DisableAllUI();
+        reset_id_UI.SetActive(false);
         gameModeUI.SetActive(true);
     }
 
@@ -113,9 +115,15 @@ public class LobbyUI : MonoBehaviour
         competitionIdText.text = PlayerPrefs.GetString("competitionID", String.Empty);
         competitionIDUI.SetActive(true);
     }
+    public void DisagreeConsent()
+    {
+        DisableAllUI();
+        prompt.SetActive(true);
+    }
 
     public void ShowConsentFormUI()
     {
+        DisableAllUI();
         ConsentFormUI.SetActive(true);
     }
     public void DisableConsentFormUI()
@@ -133,6 +141,7 @@ public class LobbyUI : MonoBehaviour
         createJoinUI.SetActive(false);
         ConsentFormUI.SetActive(false);
         competitionIDUI.SetActive(false);
+        prompt.SetActive(false);
     }
 
     public string GetRoomNameEntered()
@@ -209,7 +218,6 @@ public class LobbyUI : MonoBehaviour
             competitionIDUIText.text = "Competition ID: " + competitionIdText.text;
             CompetitionMiddleware.Instance.SetUserID(competitionIdText.text);
             competitionIDUI.SetActive(false);
-            reset_id_UI.SetActive(false);
             ShowStartSceneUI();
         }
         CheckCompetitionIDCoroutineRunning = false;
@@ -242,7 +250,6 @@ public class LobbyUI : MonoBehaviour
 
         //for testing survey scene only
         //SceneManager.LoadScene(GlobalConstant.SURVEY_SCENE);
-        reset_id_UI.SetActive(false);
         ShowStartSceneUI();
     }
 }
