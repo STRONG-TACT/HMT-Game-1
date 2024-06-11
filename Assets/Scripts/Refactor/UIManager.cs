@@ -9,10 +9,16 @@ using System.Reflection;
 using System.Threading;
 using System.ComponentModel;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
+using Photon.Realtime;
 
 
 public class UIManager : MonoBehaviour
 {
+    [Header("Character References")]
+    public Character dwarf;
+    public Character giant;
+    public Character human;
     [Header("Scene References")]
     public GameAssets gameAssets;
 
@@ -39,6 +45,9 @@ public class UIManager : MonoBehaviour
     public GameObject[] Dwarf_DeathCounters;
     public GameObject[] Giant_DeathCounters;
     public GameObject[] Human_DeathCounters;
+    public GameObject[] Dwarf_LifeCounters;
+    public GameObject[] Giant_LifeCounters;
+    public GameObject[] Human_LifeCounters;
 
     [Header("Planning UI")]
     public GameObject PlanUIPanel;
@@ -129,6 +138,8 @@ public class UIManager : MonoBehaviour
         CurrentPhaseLabel.text = "Level Starting";
         HideCombatUI();
         ShowCommonHUD();
+        InitCharacterDeathCounter();
+        networkStatusHandle.SetActive(false);
         VictoryScreen.SetActive(false);
         LossScreen.SetActive(false);
     }
@@ -537,7 +548,7 @@ public class UIManager : MonoBehaviour
         }
 
         //expand and shrink the score text 
-        float shrink_rate = 0.04f;
+        float shrink_rate = 0.02f;
         for(int i=0; i<animationDuration*50; i++)
         {
             PlayerFinalScore.gameObject.transform.localScale += new Vector3(shrink_rate, shrink_rate, shrink_rate);
@@ -625,25 +636,50 @@ public class UIManager : MonoBehaviour
         GoalStatusIcons[2].sprite = gameAssets.GetGoalUnfilled(2);
     }
 
+    public void InitCharacterDeathCounter()
+    {
+        UpdateCharacterDeathCounter(dwarf);
+        UpdateCharacterDeathCounter(giant);
+        UpdateCharacterDeathCounter(human);
+    }
+
+
     public void UpdateCharacterDeathCounter(Character character)
     {
-        GameObject[] death_counters = new GameObject[6];
+        GameObject[] death_counters = null;
+        GameObject[] life_counters = null;
+        Debug.Log("Character ID");
+        Debug.Log(character.CharacterId);
         switch (character.CharacterId)
         {
-            case 1:
+            case 0:
                 death_counters = Dwarf_DeathCounters;
+                life_counters = Dwarf_LifeCounters;
+                break;
+            case 1:
+                death_counters = Giant_DeathCounters;
+                life_counters = Giant_LifeCounters;
                 break;
             case 2:
-                death_counters = Giant_DeathCounters;
-                break;
-            case 3:
                 death_counters = Human_DeathCounters;
+                life_counters = Human_LifeCounters;
                 break;
+            default:
+                Debug.Log("Error in updating deathCounter -> invalid characterID");
+                return;
+        }
+        foreach (GameObject life_counter in life_counters)
+        {
+            life_counter.SetActive(false);
         }
         foreach (GameObject death_counter in death_counters){
             death_counter.SetActive(false);
         }
-        for(int i=0; i<character.Deaths; i++)
+        for (int i = character.Deaths; i < character.Lives; i++)
+        {
+            life_counters[i].SetActive(true);
+        }
+        for (int i=0; i<character.Deaths; i++)
         {
             death_counters[i].SetActive(true);
         }
@@ -944,7 +980,12 @@ public class UIManager : MonoBehaviour
 
     public void ReturnToLobby()
     {
-        SceneManager.LoadScene(GlobalConstant.LOBBY_SCENE);
+        if (PhotonNetwork.IsConnected)
+        {
+            Debug.Log("Photon is connected. Disconnecting...");
+            PhotonNetwork.Disconnect();
+        }
+        SceneManager.LoadScene(GlobalConstant.SURVEY_SCENE);
     }
 
     #endregion

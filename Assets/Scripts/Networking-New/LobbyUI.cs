@@ -23,6 +23,7 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private GameObject invalid_id_prompt;
     [SerializeField] private GameObject ConsentFormUI;
     [SerializeField] private GameObject reset_id_UI;
+    [SerializeField] private GameObject prompt;
 
     [Header("Text Input Fields")] 
     [SerializeField]
@@ -74,6 +75,7 @@ public class LobbyUI : MonoBehaviour
     public void ShowGameModeUI()
     {
         DisableAllUI();
+        reset_id_UI.SetActive(false);
         gameModeUI.SetActive(true);
     }
 
@@ -113,9 +115,15 @@ public class LobbyUI : MonoBehaviour
         competitionIdText.text = PlayerPrefs.GetString("competitionID", String.Empty);
         competitionIDUI.SetActive(true);
     }
+    public void DisagreeConsent()
+    {
+        DisableAllUI();
+        prompt.SetActive(true);
+    }
 
     public void ShowConsentFormUI()
     {
+        DisableAllUI();
         ConsentFormUI.SetActive(true);
     }
     public void DisableConsentFormUI()
@@ -133,6 +141,7 @@ public class LobbyUI : MonoBehaviour
         createJoinUI.SetActive(false);
         ConsentFormUI.SetActive(false);
         competitionIDUI.SetActive(false);
+        prompt.SetActive(false);
     }
 
     public string GetRoomNameEntered()
@@ -148,6 +157,7 @@ public class LobbyUI : MonoBehaviour
     public void ResetCompetitionID()
     {
         PlayerPrefs.DeleteAll();
+        competitionIDUIText.text = "Competition ID: ";
         invalid_id_prompt.SetActive(false);
         DisableAllUI();
         ShowConsentFormUI();
@@ -171,7 +181,7 @@ public class LobbyUI : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Invalid competition ID.");
+            //Debug.LogError("Invalid competition ID.");
             invalid_id_prompt.SetActive(true);
             isCompetitionIDValid = false;
         }
@@ -209,28 +219,21 @@ public class LobbyUI : MonoBehaviour
             competitionIDUIText.text = "Competition ID: " + competitionIdText.text;
             CompetitionMiddleware.Instance.SetUserID(competitionIdText.text);
             competitionIDUI.SetActive(false);
-            reset_id_UI.SetActive(false);
             ShowStartSceneUI();
         }
         CheckCompetitionIDCoroutineRunning = false;
     }
 
-    public void ConsentFormAnswer(bool Agree)
+    public void AgreeConsent()
     {
-        if (Agree)
+
+        if (RememberMe)
         {
-            if (RememberMe)
-            {
-                PlayerPrefs.SetInt("consent_agreed", 1);
-            }
-            //DisableConsentFormUI();
-            ShowCompetitionIDUI();
+            PlayerPrefs.SetInt("consent_agreed", 1);
         }
-        else
-        {
-            PlayerPrefs.SetInt("consent_agreed", 0);
-            //need further edit: what to do when user don't agree with consent form
-        }
+        //DisableConsentFormUI();
+        ShowCompetitionIDUI();
+
 
     }
 
@@ -242,7 +245,6 @@ public class LobbyUI : MonoBehaviour
 
         //for testing survey scene only
         //SceneManager.LoadScene(GlobalConstant.SURVEY_SCENE);
-        reset_id_UI.SetActive(false);
         ShowStartSceneUI();
     }
 }

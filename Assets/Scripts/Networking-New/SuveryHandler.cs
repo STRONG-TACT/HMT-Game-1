@@ -15,6 +15,15 @@ public class SuveryHandler : MonoBehaviour
     private List<string> responses;
 
 
+    public static SuveryHandler S;
+
+    private void Awake()
+    {
+        if (S) Destroy(this);
+        else S = this;
+    }
+
+
     // Start is called before the first frame update
     void Start()
     {
