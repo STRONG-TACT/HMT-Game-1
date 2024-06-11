@@ -28,4 +28,4 @@ MonoBehaviour:
   sightRange: 3
   characterIcon: {fileID: 21300000, guid: ef146bac666375346acc6ebaf3d7ea20, type: 3}
   youAreIcon: {fileID: 21300000, guid: 3bad94e67ea4b654799da51969fe0b70, type: 3}
-  color: {r: 0, g: 0, b: 1, a: 1}
+  color: {r: 0.25882354, g: 0.4901961, b: 0.7607844, a: 1}

@@ -92,7 +92,7 @@ public class IntegratedGameManager : MonoBehaviour
 #else
         localChar = inSceneCharacters[(isNetworkGame) ? NetworkMiddleware.S.myCharacterID : 0];
 #endif
-        currentLevel = 1;
+        //currentLevel = 1;
         StartCoroutine(StartLevel());
     }
 

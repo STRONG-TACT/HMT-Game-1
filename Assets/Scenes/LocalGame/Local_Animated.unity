@@ -216,7 +216,7 @@ MonoBehaviour:
   localChar: {fileID: 0}
   gameStatus: 0
   goalCount: 0
-  currentLevel: 1
+  currentLevel: 3
   isNetworkGame: 0
   inSceneCharacters:
   - {fileID: 913249313}
@@ -317,6 +317,49 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 836215f7b9d40481c9494a79feab06d2, type: 3}
+--- !u!1 &1100032774
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1100032776}
+  - component: {fileID: 1100032775}
+  m_Layer: 0
+  m_Name: Screenshotter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1100032775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1100032774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2a744c435f888445bb2b78d6df45b63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1100032776
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1100032774}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -13.683041, y: -2.9984126, z: 11.810743}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1136102503 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6070971950461641565, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
@@ -469,6 +512,38 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6070971950121737187, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_ClearFlags
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971950121737187, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0.6415094
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971950121737187, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0.6415094
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971950121737187, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0.6415094
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971950221804341, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_Color.b
+      value: 0.7672
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971950221804341, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_Color.g
+      value: 0.90479565
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971950221804341, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_Color.r
+      value: 0.959
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971950221804341, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6070971950263813834, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: TimerText
       value: 
@@ -488,6 +563,10 @@ PrefabInstance:
     - target: {fileID: 6070971950651353378, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: sceneViewId
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070971951046079248, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: TurntimeLimit
+      value: 120
       objectReference: {fileID: 0}
     - target: {fileID: 7962385126523836600, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: m_Enabled
