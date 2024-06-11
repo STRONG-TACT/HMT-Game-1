@@ -157,6 +157,7 @@ public class LobbyUI : MonoBehaviour
     public void ResetCompetitionID()
     {
         PlayerPrefs.DeleteAll();
+        competitionIDUIText.text = "Competition ID: ";
         invalid_id_prompt.SetActive(false);
         DisableAllUI();
         ShowConsentFormUI();
@@ -180,7 +181,7 @@ public class LobbyUI : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Invalid competition ID.");
+            //Debug.LogError("Invalid competition ID.");
             invalid_id_prompt.SetActive(true);
             isCompetitionIDValid = false;
         }
@@ -223,22 +224,16 @@ public class LobbyUI : MonoBehaviour
         CheckCompetitionIDCoroutineRunning = false;
     }
 
-    public void ConsentFormAnswer(bool Agree)
+    public void AgreeConsent()
     {
-        if (Agree)
+
+        if (RememberMe)
         {
-            if (RememberMe)
-            {
-                PlayerPrefs.SetInt("consent_agreed", 1);
-            }
-            //DisableConsentFormUI();
-            ShowCompetitionIDUI();
+            PlayerPrefs.SetInt("consent_agreed", 1);
         }
-        else
-        {
-            PlayerPrefs.SetInt("consent_agreed", 0);
-            //need further edit: what to do when user don't agree with consent form
-        }
+        //DisableConsentFormUI();
+        ShowCompetitionIDUI();
+
 
     }
 
