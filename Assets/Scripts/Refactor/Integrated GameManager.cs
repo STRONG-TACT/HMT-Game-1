@@ -523,7 +523,7 @@ public class IntegratedGameManager : MonoBehaviour
             }
 
             //wait for animation to play
-            yield return new WaitForSeconds(UIManager.S.animationDuration * 3);
+            yield return new WaitForSeconds(UIManager.S.animationDuration * 4);
 
             if (win) {
                 // if the character(s) won the battle, destory the enemies

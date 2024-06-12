@@ -146,7 +146,7 @@ public class Combat : MonoBehaviour {
         }
 
 
-        UIManager.S.ShowCombatUI(type, charaIDs, charaScores, enemyScores, charaScore, enemyScore, result, visibility);
+        UIManager.S.ShowCombatUI(type, charaIDs, charaDice, enemyDice, charaScores, enemyScores, charaScore, enemyScore, result, visibility);
         return result;
     }
 

@@ -422,13 +422,13 @@ public class UIManager : MonoBehaviour
 
     #region Combat UI
 
-    public void ShowCombatUI(Combat.FightType type, List<int> charaIDs, List<int> charaDice, List<int> enemyDice,
+    public void ShowCombatUI(Combat.FightType type, List<int> charaIDs, List<Combat.Dice> charaDice, List<Combat.Dice> enemyDice, List<int> charaScores, List<int> enemyScores,
                          int playerScore, int enemyScore, bool win, bool visible = true)
     {
-        StartCoroutine(CombatUICoroutine(type, charaIDs, charaDice, enemyDice, playerScore, enemyScore, win, visible));
+        StartCoroutine(CombatUICoroutine(type, charaIDs, charaDice, enemyDice, charaScores, enemyScores, playerScore, enemyScore, win, visible));
     }
 
-    public IEnumerator CombatUICoroutine(Combat.FightType type, List<int> charaIDs, List<int> charaDice, List<int> enemyDice,
+    public IEnumerator CombatUICoroutine(Combat.FightType type, List<int> charaIDs, List<Combat.Dice> charaDice, List<Combat.Dice> enemyDice, List<int> charaScores, List<int> enemyScores,
                              int playerScore, int enemyScore, bool win, bool visible=true)
     {
         GameObject scoreBoard = CombatUI.transform.Find("Scoreboard").gameObject;
@@ -460,48 +460,35 @@ public class UIManager : MonoBehaviour
             inProgressText.SetActive(true);
             UnknownOpponentSlot.SetActive(true);
         }
-
         for (int i = 0; i < charaIDs.Count; i++)
         {
+            GameObject dice_ui = PlayerCombatSlots[i].transform.GetChild(0).gameObject;
+            if (visible == true)
+            {
+                dice_ui.SetActive(true);
+                StartCoroutine(DiceAnimation(dice_ui, PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>(), charaScores[i], charaDice[i]));
+            }
+            else
+            {
+                dice_ui.SetActive(false);
+                PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = "";
+            }
             switch (charaIDs[i])
             {
                 case 0:
                     PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.dwarfIcon;
-                    if(visible == true)
-                    {
-                        StartCoroutine(DiceAnimation(PlayerCombatSlots[i].transform.GetChild(2).gameObject));
-                        PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
-                    }
-                    else
-                        PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = "";
-                    PlayerCombatSlots[i].SetActive(true);
                     break;
                 case 1:
                     PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.giantIcon;   
-                    if (visible == true)
-                    {
-                        StartCoroutine(DiceAnimation(PlayerCombatSlots[i].transform.GetChild(2).gameObject));
-                        PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
-                    }
-                    else
-                        PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = "";
-                    PlayerCombatSlots[i].SetActive(true);
                     break;
                 case 2:
                     PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.humanIcon;
-                    if (visible == true)
-                    {
-                        StartCoroutine(DiceAnimation(PlayerCombatSlots[i].transform.GetChild(2).gameObject));
-                        PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = charaDice[i].ToString();
-                    }
-                    else
-                        PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = "";
-                    PlayerCombatSlots[i].SetActive(true);
                     break;
                 default:
                     Debug.Log("Character ID out of scope in ShowCombatUI");
                     break;
             }
+            PlayerCombatSlots[i].SetActive(true);
         }
 
         if (visible == false) 
@@ -511,30 +498,30 @@ public class UIManager : MonoBehaviour
         else if (type == Combat.FightType.Monster)
         {
             // TODO: differenciate monster types
-            for (int i = 0; i < enemyDice.Count; i++)
+            for (int i = 0; i < enemyScores.Count; i++)
             {
-                StartCoroutine(DiceAnimation(EnemyCombatSlots[i].transform.GetChild(2).gameObject));
+                GameObject dice_ui = EnemyCombatSlots[i].transform.GetChild(0).gameObject;
+                StartCoroutine(DiceAnimation(dice_ui, EnemyCombatSlots[i].GetComponentInChildren<TMP_Text>(), enemyScores[i], enemyDice[i]));
                 EnemyCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.monsterIcon;
-                EnemyCombatSlots[i].GetComponentInChildren<TMP_Text>().text = enemyDice[0].ToString();
                 EnemyCombatSlots[i].SetActive(true);
             }
         }
         else if (type == Combat.FightType.Trap)
         {
-            StartCoroutine(DiceAnimation(EnemyCombatSlots[0].transform.GetChild(2).gameObject));
+            GameObject dice_ui = EnemyCombatSlots[0].transform.GetChild(0).gameObject;
+            StartCoroutine(DiceAnimation(dice_ui, EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>(), enemyScores[0], enemyDice[0]));
             EnemyCombatSlots[0].GetComponentInChildren<Image>().sprite = gameAssets.trapIcon;
-            EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>().text = enemyDice[0].ToString();
             EnemyCombatSlots[0].SetActive(true);
         }
         else if (type == Combat.FightType.Rock)
-        {                
-            StartCoroutine(DiceAnimation(EnemyCombatSlots[0].transform.GetChild(2).gameObject));
+        {
+            GameObject dice_ui = EnemyCombatSlots[0].transform.GetChild(0).gameObject;
+            StartCoroutine(DiceAnimation(dice_ui, EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>(), enemyScores[0], enemyDice[0]));
             EnemyCombatSlots[0].GetComponentInChildren<Image>().sprite = gameAssets.rockIcon;
-            EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>().text = enemyDice[0].ToString();
             EnemyCombatSlots[0].SetActive(true);
         }
 
-        yield return new WaitForSeconds(animationDuration);
+        yield return new WaitForSeconds(animationDuration*2);
 
         if (visible == true) 
         {
@@ -596,21 +583,31 @@ public class UIManager : MonoBehaviour
         CombatUI.SetActive(false);
     }
 
-    private IEnumerator DiceAnimation(GameObject dice) 
+    private IEnumerator DiceAnimation(GameObject diceUI, TMP_Text scoreDisplay, int score, Combat.Dice diceStat) 
     {
-        dice.SetActive(true);
+        diceUI.SetActive(true);
         float elapsedTime = 0.0f;
+        float scoreUpdateTime = 0.0f;
         while (elapsedTime < animationDuration)
         {
             float deltaRotation = spinSpeed * Time.deltaTime;
-            dice.transform.Rotate(Vector3.up, deltaRotation); 
-            dice.transform.Rotate(Vector3.right, deltaRotation); 
-            dice.transform.Rotate(Vector3.forward, deltaRotation); 
+            //diceUI.transform.Rotate(Vector3.up, deltaRotation); 
+            //diceUI.transform.Rotate(Vector3.right, deltaRotation); 
+            diceUI.transform.Rotate(Vector3.forward, deltaRotation);
+
+            //update random score every 0.2 seconds
+            if(elapsedTime - scoreUpdateTime >= 0.2f)
+            {
+                scoreDisplay.text = UnityEngine.Random.Range(1, (int)diceStat.type + 1).ToString();
+                scoreUpdateTime = elapsedTime;
+            }
 
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        dice.SetActive(false);
+        scoreDisplay.text = score.ToString();
+        //diceUI.SetActive(false);
+        yield return new WaitForSeconds(animationDuration);
     }
 
 
@@ -973,8 +970,8 @@ public class UIManager : MonoBehaviour
 
     public void ShowOtherPlayerDisconnectUI(string playerName)
     {
-        networkStatusMsg.text = $"Player {playerName} disconnected from the game." +
-                                $"This game will not be recorded";
+        networkStatusMsg.text = $"Unfortunately, player {playerName} was disconnected from the game!" +
+                                $"\nThis game will not be recorded.";
         networkStatusHandle.SetActive(true);
     }
 
