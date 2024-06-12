@@ -64,7 +64,7 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()
     {
         Debug.Log("Joined Lobby");
-        NetworkLobbyManager.S.OnJoinLobbySucceed();
+        StartCoroutine(NetworkLobbyManager.S.OnJoinLobbySucceed());
     }
 
     public void TryJoinRoom(string roomName)
