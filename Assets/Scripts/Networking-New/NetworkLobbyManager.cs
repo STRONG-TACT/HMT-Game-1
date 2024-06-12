@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using GameConstant;
 using HMT;
+using Newtonsoft.Json.Linq;
 using Photon.Pun;
 using Photon.Realtime;
 using Random = UnityEngine.Random;
@@ -18,6 +19,10 @@ public class NetworkLobbyManager : MonoBehaviour
 
     private int _numPerson;
     public List<RoomInfo> ListOfRooms;
+
+    private float _twoHumanChance;
+    private float _timeoutLimit;
+    private bool _matchmakingConfigSet;
     
     // Singleton reference
     public static NetworkLobbyManager S;
@@ -26,6 +31,10 @@ public class NetworkLobbyManager : MonoBehaviour
     {
         if (S) Destroy(this);
         else S = this;
+
+        _matchmakingConfigSet = false;
+        _twoHumanChance = MatchMakingParameter.TWO_PERSON_GAME_CHANCE;
+        _timeoutLimit = MatchMakingParameter.TIMEOUT_LIMIT;
     }
 
 
@@ -110,14 +119,39 @@ public class NetworkLobbyManager : MonoBehaviour
         LobbyUI.S.ShowLoadingUI();
     }
 
-    public void OnJoinLobbySucceed()
+    public IEnumerator OnJoinLobbySucceed()
     {
         onBoardingState = OnBoardingState.CreateOrJoinRoom;
-        // LobbyUI.S.ShowCreateJoinRoomUI();
         LobbyUI.S.ShowLoadingUI("Initializing Matchmaking System");
-        _numPerson = (Random.Range(0.0f, 1.0f) <
-                      MatchMakingParameter.ONE_PERSON_GAME_CHANCE) ? 1 : 2;
+        
+        CompetitionMiddleware.Instance.CallMatchmakingConfig(OnMatchmakingConfigResponse);
+        while (!_matchmakingConfigSet)
+        {
+            yield break;
+        }
+        
+        _numPerson = (Random.Range(0.0f, 1.0f) < _twoHumanChance) ? 2 : 1;
         JointMatchmakingRoom();
+    }
+    
+    private void OnMatchmakingConfigResponse(JObject response)
+    {
+        if (response != null 
+            && response.ContainsKey("two_human_prob") 
+            && response.ContainsKey("timeout_limit"))
+        {
+            _twoHumanChance = response["two_human_prob"].ToObject<float>();
+            _timeoutLimit = response["timeout_limit"].ToObject<float>();
+            Debug.Log($"Matchmaking parameter fetched from server with " +
+                      $"two_human_prob: {_twoHumanChance} and timeout limit: {_timeoutLimit}");
+        }
+        else
+        {
+            Debug.LogError("failed to retrieve matchmaking parameter from server, " +
+                           "reverting to built in default one");
+        }
+
+        _matchmakingConfigSet = true;
     }
 
     private IEnumerator JointMatchmakingRoom()
@@ -134,7 +168,7 @@ public class NetworkLobbyManager : MonoBehaviour
         LobbyUI.S.ShowLoadingUI("Searching for a Room to Join...");
         if (_numPerson == 1)
         {
-            yield return new WaitForSeconds(MatchMakingParameter.JOIN_ROOM_DELAY);
+            yield return new WaitForSeconds(MatchMakingParameter.TIMEOUT_LIMIT);
             LobbyNetwork.S.TryCreateRoom(
                 Random.Range(0, MatchMakingParameter.ROOM_NAME_RANGE).ToString(), 
                 roomOptions);

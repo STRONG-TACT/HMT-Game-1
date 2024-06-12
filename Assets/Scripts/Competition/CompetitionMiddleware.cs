@@ -169,6 +169,10 @@ public class CompetitionMiddleware : MonoBehaviour {
         StartCoroutine(SendPostRequestWithCallback(flaskURL + "/verify_competition_id", callback));
     }
 
+    public void CallMatchmakingConfig(System.Action<JObject> callback) {
+        StartCoroutine(SendPostRequestWithCallback(flaskURL + "/matchmaking_config", callback));
+    }
+
     public void CallLaunchGame(string photonRoom, string dwarfPlayerId, string giantPlayerId, string humanPlayerId) {
         //this may benefit form being a coroutine as well
 
