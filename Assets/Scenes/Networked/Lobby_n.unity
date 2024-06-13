@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657815, g: 0.49641192, b: 0.57481617, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4709,7 +4709,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1132410325}
   m_Direction: 2
   m_Value: 0.99999857
-  m_Size: 0.25570616
+  m_Size: 0.2557062
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7587,7 +7587,7 @@ MonoBehaviour:
   ConsentFormUI: {fileID: 1550488656}
   reset_id_UI: {fileID: 1021033485}
   prompt: {fileID: 342523033}
-  roomSelectText: {fileID: 1993745472}
+  roomSelectText: {fileID: 963941247}
   competitionIdText: {fileID: 1689862464}
   competitionIDUIText: {fileID: 1857214400}
   RememberMe: 0
