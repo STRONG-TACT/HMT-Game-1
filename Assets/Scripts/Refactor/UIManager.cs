@@ -42,12 +42,12 @@ public class UIManager : MonoBehaviour
     public Image[] GoalStatusIcons = new Image[3];
     public Image[] LifeStatusIcons = new Image[3];
     public Image[] ActionStatusIcons = new Image[3];
-    public GameObject[] Dwarf_DeathCounters;
-    public GameObject[] Giant_DeathCounters;
-    public GameObject[] Human_DeathCounters;
-    public GameObject[] Dwarf_LifeCounters;
-    public GameObject[] Giant_LifeCounters;
-    public GameObject[] Human_LifeCounters;
+    public RawImage[] Dwarf_DeathCounters;
+    public RawImage[] Giant_DeathCounters;
+    public RawImage[] Human_DeathCounters;
+    public RawImage[] Dwarf_LifeCounters;
+    public RawImage[] Giant_LifeCounters;
+    public RawImage[] Human_LifeCounters;
 
     [Header("Planning UI")]
     public GameObject PlanUIPanel;
@@ -643,8 +643,8 @@ public class UIManager : MonoBehaviour
 
     public void UpdateCharacterDeathCounter(Character character)
     {
-        GameObject[] death_counters = null;
-        GameObject[] life_counters = null;
+        RawImage[] death_counters = null;
+        RawImage[] life_counters = null;
         Debug.Log("Character ID");
         Debug.Log(character.CharacterId);
         switch (character.CharacterId)
@@ -665,20 +665,20 @@ public class UIManager : MonoBehaviour
                 Debug.Log("Error in updating deathCounter -> invalid characterID");
                 return;
         }
-        foreach (GameObject life_counter in life_counters)
+        foreach (RawImage life_counter in life_counters)
         {
-            life_counter.SetActive(false);
+            life_counter.enabled = false;
         }
-        foreach (GameObject death_counter in death_counters){
-            death_counter.SetActive(false);
+        foreach (RawImage death_counter in death_counters){
+            death_counter.enabled = false;
         }
         for (int i = character.Deaths; i < character.Lives; i++)
         {
-            life_counters[i].SetActive(true);
+            life_counters[i].enabled = true;
         }
         for (int i=0; i<character.Deaths; i++)
         {
-            death_counters[i].SetActive(true);
+            death_counters[i].enabled = true;
         }
     }
 
