@@ -571,9 +571,10 @@ public class Character : MonoBehaviour {
         dead = true;
         Lives -= 1;
         Deaths += 1;
-        respawnCountdown = GameData.S.RespawnDelay;
+        respawnCountdown = GameData.S.RespawnDelay+1;
         ResetPlan();
         IntegratedGameManager.S.CharacterDied(CharacterId);
+        UIManager.S.UpdateDeathCounterPanel();
 
         CompetitionMiddleware.Instance.LogPlayerDeath(CharacterId, currentTile.col, currentTile.row);
 
@@ -597,6 +598,8 @@ public class Character : MonoBehaviour {
             respawnCountdown -= 1;
 
             if (respawnCountdown == 0) {
+                Debug.Log("Respawn in RespawnCheck");
+                UIManager.S.UpdateCharacterLifeStatus(CharacterId, true);
                 ActionPlan.Clear();
                 State = CharacterState.Idle;
                 dead = false;
@@ -610,6 +613,7 @@ public class Character : MonoBehaviour {
     }
     
     public void QuickRespawn() {
+        Debug.Log("Respawn in QuickRespawn");
         ActionPlan.Clear();
         State = CharacterState.Idle;
         respawnCountdown = 0;

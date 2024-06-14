@@ -138,7 +138,7 @@ public class UIManager : MonoBehaviour
         CurrentPhaseLabel.text = "Level Starting";
         HideCombatUI();
         ShowCommonHUD();
-        InitCharacterDeathCounter();
+        UpdateDeathCounterPanel();
         networkStatusHandle.SetActive(false);
         VictoryScreen.SetActive(false);
         LossScreen.SetActive(false);
@@ -228,15 +228,18 @@ public class UIManager : MonoBehaviour
         */
         foreach (Transform child in hearts.transform)
         {
-            child.gameObject.SetActive(false);
+            child.gameObject.GetComponent<Image>().enabled = false;
+            //child.gameObject.SetActive(false);
         }
         foreach (Transform child in broken_hearts.transform)
         {
-            child.gameObject.SetActive(false);
+            child.gameObject.GetComponent<Image>().enabled = false;
+            //child.gameObject.SetActive(false);
         }
 
         for (int i = 0; i < character.Health; i++) {
-            hearts.transform.GetChild(i).gameObject.SetActive(true);
+            //hearts.transform.GetChild(i).gameObject.SetActive(true);
+            hearts.transform.GetChild(i).gameObject.GetComponent<Image>().enabled = true;
         }
         /*
         //TODO Fix these references based on the Chracter's config 
@@ -246,7 +249,8 @@ public class UIManager : MonoBehaviour
         */
         for (int j = character.Health; j < character.config.StartingHealth; j++)
         {
-            broken_hearts.transform.GetChild(j).gameObject.SetActive(true);
+            //broken_hearts.transform.GetChild(j).gameObject.SetActive(true);
+            broken_hearts.transform.GetChild(j).gameObject.GetComponent<Image>().enabled = true;
         }
 
         HealthPanel.gameObject.SetActive(true);
@@ -633,7 +637,7 @@ public class UIManager : MonoBehaviour
         GoalStatusIcons[2].sprite = gameAssets.GetGoalUnfilled(2);
     }
 
-    public void InitCharacterDeathCounter()
+    public void UpdateDeathCounterPanel()
     {
         UpdateCharacterDeathCounter(dwarf);
         UpdateCharacterDeathCounter(giant);
@@ -672,7 +676,7 @@ public class UIManager : MonoBehaviour
         foreach (RawImage death_counter in death_counters){
             death_counter.enabled = false;
         }
-        for (int i = character.Deaths; i < character.Lives; i++)
+        for (int i = character.Deaths; i < character.config.StartingHealth; i++)
         {
             life_counters[i].enabled = true;
         }

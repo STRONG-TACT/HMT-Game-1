@@ -400,7 +400,7 @@ public class IntegratedGameManager : MonoBehaviour
                 break;
             }
 
-            //after all combat done, if multiple monster oppcuies the same tile, they move until every tile contains at most 1 monster
+            //after all combats are done, if multiple monster oppcuies the same tile, they move until every tile contains at most 1 monster
             foreach (Monster mon in inSceneMonsters.OrderByDescending(m => m.config.movementStyle)) {
                 Tile currentTile = mon.currentTile;
                 if (currentTile.MultipleMonsters) {
@@ -597,7 +597,7 @@ public class IntegratedGameManager : MonoBehaviour
             yield return new WaitForSeconds(2 * excecutionStepTime);
             foreach (Character c in copiedCharacters)
             {
-                if (c != null)
+                if (c != null && !c.dead)
                 {
                     c.State = Character.CharacterState.Idle;
                 }

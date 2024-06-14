@@ -68,12 +68,14 @@ public class PinningSystem : MonoBehaviour
         //Debug.LogFormat("localChar Is null? {0}", IntegratedGameManager.S.localChar == null);
         if (IntegratedGameManager.S.localChar.ReadyForNextPhase || IntegratedGameManager.S.gameStatus != GameStatus.Player_Pinning) return;
         
-        //if (PinUIUp)
-        //{
-        //    pinPosition = mainCamera.WorldToScreenPoint(tile.transform.position + ui_offset);
-        //    pinWheel.transform.position = pinPosition;
-        //}
-        
+
+        if (PinUIUp)
+        {
+            pinPosition = mainCamera.WorldToScreenPoint(focusedTile.transform.position + ui_offset);
+            pinWheel.transform.position = pinPosition;
+        }
+
+
         if (Input.GetMouseButtonDown(0)) {
             if (EventSystem.current.IsPointerOverGameObject()) {
                 //Debug.Log("mouse clicked on UI");
