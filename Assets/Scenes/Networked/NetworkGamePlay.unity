@@ -230,7 +230,7 @@ MonoBehaviour:
   localChar: {fileID: 0}
   gameStatus: 0
   goalCount: 0
-  currentLevel: 3
+  currentLevel: 1
   isNetworkGame: 0
   inSceneCharacters:
   - {fileID: 1441866727}

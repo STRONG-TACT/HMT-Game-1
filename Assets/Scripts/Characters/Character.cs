@@ -601,13 +601,35 @@ public class Character : MonoBehaviour {
                 Debug.Log("Respawn in RespawnCheck");
                 UIManager.S.UpdateCharacterLifeStatus(CharacterId, true);
                 ActionPlan.Clear();
-                State = CharacterState.Idle;
                 dead = false;
                 Health = config.StartingHealth;
-                transform.position = startPos;
-                transform.rotation = Quaternion.identity;
+               // transform.position = startPos;
+               // transform.rotation = Quaternion.identity;
                 //TODO this might need to wait a beat for collision checks
                 IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+
+                //Manually turn on the animator and renderer of the character
+                Animator[] char_animators = this.GetComponentsInChildren<Animator>(true);
+                foreach (Animator char_animator in char_animators)
+                {
+                    if (char_animator != null)
+                    {
+
+                        char_animator.enabled = true;
+                    }
+                }
+                Renderer[] char_renderers = this.GetComponentsInChildren<Renderer>(true);
+                foreach (Renderer char_renderer in char_renderers)
+                {
+                    if (char_renderer != null)
+                    {
+                        if (char_renderer.gameObject.tag != "TileGround" && char_renderer.gameObject.tag != "VisibleMask")
+                        {
+                            char_renderer.enabled = true;
+                        }
+                    }
+                }
+                State = CharacterState.Idle;
             }
         }
     }
@@ -615,10 +637,31 @@ public class Character : MonoBehaviour {
     public void QuickRespawn() {
         Debug.Log("Respawn in QuickRespawn");
         ActionPlan.Clear();
-        State = CharacterState.Idle;
         respawnCountdown = 0;
         dead = false;
         Health = config.StartingHealth;
+        //Manually turn on the animator and renderer of the character
+        Animator[] char_animators = this.GetComponentsInChildren<Animator>(true);
+        foreach (Animator char_animator in char_animators)
+        {
+            if (char_animator != null)
+            {
+
+                char_animator.enabled = true;
+            }
+        }
+        Renderer[] char_renderers = this.GetComponentsInChildren<Renderer>(true);
+        foreach (Renderer char_renderer in char_renderers)
+        {
+            if (char_renderer != null)
+            {
+                if (char_renderer.gameObject.tag != "TileGround" && char_renderer.gameObject.tag != "VisibleMask")
+                {
+                    char_renderer.enabled = true;
+                }
+            }
+        }
+        State = CharacterState.Idle;
     }
 
     #endregion

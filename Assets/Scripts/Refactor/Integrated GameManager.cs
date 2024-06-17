@@ -134,6 +134,10 @@ public class IntegratedGameManager : MonoBehaviour
         foreach (Character chara in inSceneCharacters)
         {
             chara.ResetActionPoints();
+            if (!chara.dead)
+            {
+                chara.State = Character.CharacterState.Idle;
+            }
         }
 
         CompetitionMiddleware.Instance.LogStartRound(CurrentRound);
@@ -150,6 +154,13 @@ public class IntegratedGameManager : MonoBehaviour
 
         foreach (Character chara in inSceneCharacters) {
             chara.StartPingPhase();
+            //chara.State = Character.CharacterState.Idle;
+            Debug.Log("Character dead state at start of pinning phase");
+            Debug.Log(chara.dead);
+            if (chara.dead == false)
+            {
+                chara.State = Character.CharacterState.Idle;
+            }
         }
 
         CompetitionMiddleware.Instance.LogStartPhase("Pinning");
@@ -334,6 +345,17 @@ public class IntegratedGameManager : MonoBehaviour
         bool conflicted = true;
         int countflictLoops = 0;
         while (conflicted) {
+            //Manually clear all conflicted monster's move plan if conflict cannot be solved
+            if(countflictLoops > 100)
+            {
+                foreach (List<Monster> m_list in conflicts.Values)
+                {
+                    foreach (Monster m in m_list) {
+                        m.ClearPlanMove();
+                    }
+                }
+                break;
+            }
             Debug.Log("Deconflict Loop: " + countflictLoops++);
             foreach (Monster m in monstersMoving) {
                 if (conflicts.ContainsKey(m.NextMoveCoordinates())) {
@@ -378,7 +400,7 @@ public class IntegratedGameManager : MonoBehaviour
             foreach(Monster m in monstersMoving) {
                 m.PlanNextMove();
             }
-
+            //Debug.Log("Test Game Frozen -----------------");
             DeconflictMonsterPlans(monstersMoving);
             CompetitionMiddleware.Instance.LogMonsterMoveStep(monstersMoving);
             foreach (Monster m in monstersMoving) {
@@ -476,7 +498,6 @@ public class IntegratedGameManager : MonoBehaviour
                 }
             }
         }
-
         Debug.Log("Monster moving currPhase ended.");
         StartPlayerTurn();
     }

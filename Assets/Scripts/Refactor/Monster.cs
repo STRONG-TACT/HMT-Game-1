@@ -231,6 +231,12 @@ public class Monster : MonoBehaviour
         return nextMove;
     }
 
+    public void ClearPlanMove()
+    {
+        movementPlan.Clear();
+        MovesLeftThisTurn = 0;
+    }
+
     public void PopPlanMove() {
         if (movementPlan.Count > 0) {
             movementPlan.RemoveAt(0);
