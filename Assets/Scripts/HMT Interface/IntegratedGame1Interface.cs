@@ -39,7 +39,9 @@ public class IntegratedGame1Interface : HMTInterface {
     }
 
     public override IEnumerator ProcessCommand(Command command) {
-        CompetitionMiddleware.Instance.LogHMTInterfaceCall(GetTargetCharacterID(command.target), command);
+        if (command.command != "register") {
+            CompetitionMiddleware.Instance.LogHMTInterfaceCall(GetTargetCharacterID(command.target), command);
+        }
         if (InGame) {
             switch (IntegratedGameManager.S.gameStatus) {
                 case GameConstant.GameStatus.GetReady:
