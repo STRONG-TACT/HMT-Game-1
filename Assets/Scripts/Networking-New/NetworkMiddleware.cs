@@ -68,6 +68,30 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         }
     }
 
+
+    public void SyncStartPlayerturn()
+    {
+        if (IntegratedGameManager.S.isNetworkGame)
+        {
+            photonView.RPC("SyncStartPlayerTurnLocal", RpcTarget.All);
+        }
+        else
+        {
+            IntegratedGameManager.S.readyForPlayerTurn = true;
+        }
+    }
+
+    [PunRPC]
+    private void SyncStartPlayerTurnLocal()
+    {
+
+        foreach (Character chara in IntegratedGameManager.S.inSceneCharacters)
+        {
+            chara.ReadyForNextPhase = false;
+        }
+        IntegratedGameManager.S.readyForPlayerTurn = true;
+    }
+
     public void CallReadyForNextPhase(int charID, bool ready) {
         if (ready) {
             CompetitionMiddleware.Instance.LogSubmit(charID);

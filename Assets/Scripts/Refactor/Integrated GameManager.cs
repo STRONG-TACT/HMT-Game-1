@@ -26,6 +26,7 @@ public class IntegratedGameManager : MonoBehaviour
     protected Coroutine currentCoroutine = null;
     public int currentLevel = 1;
     public bool isNetworkGame;
+    public bool readyForPlayerTurn;
 
     private float lastTurnTimerReset = 0;
 
@@ -121,7 +122,14 @@ public class IntegratedGameManager : MonoBehaviour
         UIManager.S.ResetTeamGoalStatus();
 
         yield return new WaitForFixedUpdate();
-        
+
+        //StartPlayerTurn();
+        NetworkMiddleware.S.SyncStartPlayerturn();
+        while (!readyForPlayerTurn)
+        {
+
+        }
+        readyForPlayerTurn = false;
         StartPlayerTurn();
     }
 
@@ -154,9 +162,6 @@ public class IntegratedGameManager : MonoBehaviour
 
         foreach (Character chara in inSceneCharacters) {
             chara.StartPingPhase();
-            //chara.State = Character.CharacterState.Idle;
-            Debug.Log("Character dead state at start of pinning phase");
-            Debug.Log(chara.dead);
             if (chara.dead == false)
             {
                 chara.State = Character.CharacterState.Idle;
@@ -356,7 +361,8 @@ public class IntegratedGameManager : MonoBehaviour
                 }
                 break;
             }
-            Debug.Log("Deconflict Loop: " + countflictLoops++);
+            countflictLoops++;
+            //Debug.Log("Deconflict Loop: " + countflictLoops++);
             foreach (Monster m in monstersMoving) {
                 if (conflicts.ContainsKey(m.NextMoveCoordinates())) {
                     conflicts[m.NextMoveCoordinates()].Add(m);
@@ -499,6 +505,13 @@ public class IntegratedGameManager : MonoBehaviour
             }
         }
         Debug.Log("Monster moving currPhase ended.");
+        //StartPlayerTurn();
+        NetworkMiddleware.S.SyncStartPlayerturn();
+        while (!readyForPlayerTurn)
+        {
+
+        }
+        readyForPlayerTurn = false;
         StartPlayerTurn();
     }
 

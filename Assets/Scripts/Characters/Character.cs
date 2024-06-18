@@ -550,7 +550,7 @@ public class Character : MonoBehaviour {
         //Debug.Log(string.Format("Character {0} health: {1}", config.characterName, health));
 
         if (Health == 0) {
-            //Debug.Log(string.Format("Character {0} Died!", config.characterName));
+            Debug.Log(string.Format("Character {0} Died!", config.characterName));
             Die();
         }
     }
@@ -568,9 +568,9 @@ public class Character : MonoBehaviour {
             transform.position = prevMovePointPos;
         }
         State = CharacterState.Die;
-        dead = true;
         Lives -= 1;
         Deaths += 1;
+        dead = true;
         respawnCountdown = GameData.S.RespawnDelay+1;
         ResetPlan();
         IntegratedGameManager.S.CharacterDied(CharacterId);

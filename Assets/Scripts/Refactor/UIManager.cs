@@ -527,6 +527,8 @@ public class UIManager : MonoBehaviour
 
         yield return new WaitForSeconds(animationDuration*2);
 
+        Debug.Log("player score: " + playerScore.ToString());
+        Debug.Log("enemy score: " + enemyScore.ToString());
         if (visible == true) 
         {
             PlayerFinalScore.text = playerScore.ToString();
