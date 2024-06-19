@@ -129,17 +129,27 @@ public class Tile : MonoBehaviour
             { 1, FogOfWarState.Unseen },
             { 2, FogOfWarState.Unseen }
         };
-
-    }
-    private void Start()
-    {
-
         Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
         foreach (Renderer renderer in renderers)
         {
             // Store the original materials
             originalMaterials[renderer] = renderer.materials;
         }
+    }
+    private void Start()
+    {
+        /*
+        if(gameObject.tag == "Goal")
+        {
+            Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                // Store the original materials
+                originalMaterials[renderer] = renderer.materials;
+            }
+        }
+        */
+
     }
 
     public void ClearMonsters() {
