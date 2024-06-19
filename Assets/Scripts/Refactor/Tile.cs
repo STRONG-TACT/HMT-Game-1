@@ -130,16 +130,16 @@ public class Tile : MonoBehaviour
             { 2, FogOfWarState.Unseen }
         };
 
+    }
+    private void Start()
+    {
+
         Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
         foreach (Renderer renderer in renderers)
         {
             // Store the original materials
             originalMaterials[renderer] = renderer.materials;
         }
-    }
-    private void Start()
-    {
-        
     }
 
     public void ClearMonsters() {
@@ -397,7 +397,7 @@ public class Tile : MonoBehaviour
                         kvp.Key.materials = kvp.Value;
                     }
                 }
-                else Debug.Log("Fog of War State Error in NetworkTile");
+                else Debug.LogError("Fog of War State Error in NetworkTile");
                 //if state is "unseen" or "seen", change the material for tile ground
                 /*
                 else if (state == FogOfWarState.Unseen || state == FogOfWarState.Seen)
