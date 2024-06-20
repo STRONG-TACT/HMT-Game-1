@@ -77,7 +77,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         }
         else
         {
-            IntegratedGameManager.S.readyForPlayerTurn = true;
+            IntegratedGameManager.S.readyForPlayerTurnCount = 3;
         }
     }
 
@@ -89,7 +89,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         {
             chara.ReadyForNextPhase = false;
         }
-        IntegratedGameManager.S.readyForPlayerTurn = true;
+        IntegratedGameManager.S.readyForPlayerTurnCount ++;
     }
 
     public void CallReadyForNextPhase(int charID, bool ready) {

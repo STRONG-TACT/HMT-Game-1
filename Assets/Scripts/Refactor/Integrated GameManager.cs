@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using GameConstant;
 using System.Linq;
+using Photon.Pun;
 
 public class IntegratedGameManager : MonoBehaviour
 {
@@ -26,7 +27,7 @@ public class IntegratedGameManager : MonoBehaviour
     protected Coroutine currentCoroutine = null;
     public int currentLevel = 1;
     public bool isNetworkGame;
-    public bool readyForPlayerTurn;
+    public int readyForPlayerTurnCount = 0;
 
     private float lastTurnTimerReset = 0;
 
@@ -123,19 +124,20 @@ public class IntegratedGameManager : MonoBehaviour
 
         yield return new WaitForFixedUpdate();
 
-        //StartPlayerTurn();
         NetworkMiddleware.S.SyncStartPlayerturn();
-        while (!readyForPlayerTurn)
+        // Wait until all clients are ready
+        while (readyForPlayerTurnCount < 3)
         {
-
+            yield return null;
         }
-        readyForPlayerTurn = false;
+        readyForPlayerTurnCount = 0;
         StartPlayerTurn();
     }
 
 
-    protected virtual void StartPlayerTurn()
+    public virtual void StartPlayerTurn()
     {
+
         IntegratedMapGenerator.Instance.UpdateFOWVisuals();
         CurrentRound += 1;
 
@@ -351,6 +353,7 @@ public class IntegratedGameManager : MonoBehaviour
         int countflictLoops = 0;
         while (conflicted) {
             //Manually clear all conflicted monster's move plan if conflict cannot be solved
+            /*
             if(countflictLoops > 100)
             {
                 foreach (List<Monster> m_list in conflicts.Values)
@@ -361,6 +364,7 @@ public class IntegratedGameManager : MonoBehaviour
                 }
                 break;
             }
+            */
             countflictLoops++;
             //Debug.Log("Deconflict Loop: " + countflictLoops++);
             foreach (Monster m in monstersMoving) {
@@ -383,7 +387,9 @@ public class IntegratedGameManager : MonoBehaviour
                     else {
                         conflicted = true;
                         conflicts[loc].OrderBy(m => m.config.movementStyle);
-                        conflicts[loc][0].PopPlanMove();
+                        //conflicts[loc][0].PopPlanMove();
+                        conflicts[loc][0].ClearPlanMove();
+                        conflicts[loc].RemoveAt(0);
                     }
                 }
             }
@@ -407,7 +413,8 @@ public class IntegratedGameManager : MonoBehaviour
                 m.PlanNextMove();
             }
             //Debug.Log("Test Game Frozen -----------------");
-            DeconflictMonsterPlans(monstersMoving);
+            //Deconflict function is causing game frozen and out of sync issue. Disable this for now
+            //DeconflictMonsterPlans(monstersMoving);
             CompetitionMiddleware.Instance.LogMonsterMoveStep(monstersMoving);
             foreach (Monster m in monstersMoving) {
                 StartCoroutine(m.TakeNextMove(excecutionStepTime));
@@ -428,74 +435,8 @@ public class IntegratedGameManager : MonoBehaviour
                 break;
             }
 
-            //after all combats are done, if multiple monster oppcuies the same tile, they move until every tile contains at most 1 monster
-            foreach (Monster mon in inSceneMonsters.OrderByDescending(m => m.config.movementStyle)) {
-                Tile currentTile = mon.currentTile;
-                if (currentTile.MultipleMonsters) {
-                    int startRow = currentTile.row;
-                    int startCol = currentTile.col;
-                    bool foundSpot = false;
-                    //move monster to nearest avaiable tile where there is no character and no other monster on it
-                    for (int distance = 1; distance < Math.Max(IntegratedMapGenerator.Instance.Map.GetLength(0), IntegratedMapGenerator.Instance.Map.GetLength(1)); distance++)
-                    {
-                        if (!foundSpot)
-                        {
-                            List<Tile> availablePos = new List<Tile>();
-                            switch (mon.config.movementStyle) {
-                                case MonsterConfig.MovementStyle.Horizontal:
-                                    for (int colOffset = distance * -1; colOffset < distance + 1; colOffset++) {
-                                        int targetRow = startRow;
-                                        int targetCol = startCol + colOffset;
-                                        if (IntegratedMapGenerator.Instance.InMap(targetRow, targetCol)) {
-                                            Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(targetRow, targetCol);
-                                            if (targetTile.tileType == Tile.ObstacleType.None && !targetTile.IsOccupied) {
-                                                availablePos.Add(targetTile);
-                                            }
-                                        }
-                                    }
-                                    break;
-                                case MonsterConfig.MovementStyle.Vertical:
-                                    for (int rowOffset = distance * -1; rowOffset < distance + 1; rowOffset++) {
-                                        int targetRow = startRow + rowOffset;
-                                        int targetCol = startCol;
-                                        if (IntegratedMapGenerator.Instance.InMap(targetRow, targetCol)) {
-                                            Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(targetRow, targetCol);
-                                            if (targetTile.tileType == Tile.ObstacleType.None && !targetTile.IsOccupied) {
-                                                availablePos.Add(targetTile);
-                                            }
-                                        }
-                                    }
-                                    break;
-                                case MonsterConfig.MovementStyle.RandomWalk:
-                                    for (int rowOffset = distance * -1; rowOffset < distance + 1; rowOffset++) {
-                                        for (int colOffset = distance * -1; colOffset < distance + 1; colOffset++) {
-                                            int targetRow = startRow + rowOffset;
-                                            int targetCol = startCol + colOffset;
-                                            if (IntegratedMapGenerator.Instance.InMap(targetRow, targetCol)) {
-                                                Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(targetRow, targetCol);
-                                                if (targetTile.tileType == Tile.ObstacleType.None && !targetTile.IsOccupied) {
-                                                    availablePos.Add(targetTile);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    break;
-                                case MonsterConfig.MovementStyle.Static:
-                                    Debug.LogError("Static monster should not be in the same tile");
-                                    break;
-                            }
-
-                            if (availablePos.Count > 0) {
-                                foundSpot = true;
-                                //select a random tile in the avaiable positions to move
-                                int randomIndex = NetworkMiddleware.S.NextRandomInt(0, availablePos.Count);
-                                Tile selectedTile = availablePos[randomIndex];
-                                yield return StartCoroutine(mon.moveToTargetLocation(selectedTile.transform.position, excecutionStepTime));
-                            }
-                        }
-                    }
-                }
-            }
+            yield return StartCoroutine(SeparateDuplicateMonster());
+            
 
             monstersMoving.Clear();
             foreach (Monster m in inSceneMonsters) {
@@ -504,16 +445,107 @@ public class IntegratedGameManager : MonoBehaviour
                 }
             }
         }
+        //This function call here is necessary, otherwise monster won't separate if combat happens
+        yield return StartCoroutine(SeparateDuplicateMonster());
         Debug.Log("Monster moving currPhase ended.");
         //StartPlayerTurn();
         NetworkMiddleware.S.SyncStartPlayerturn();
-        while (!readyForPlayerTurn)
+        // Wait until all clients are ready
+        while (readyForPlayerTurnCount < 3)
         {
-
+            yield return null;
         }
-        readyForPlayerTurn = false;
+        readyForPlayerTurnCount = 0;
         StartPlayerTurn();
     }
+
+    //after all combats are done, if multiple monster oppcuies the same tile, they move until every tile contains at most 1 monster
+    protected virtual IEnumerator SeparateDuplicateMonster()
+    {
+        foreach (Monster mon in inSceneMonsters.OrderByDescending(m => m.config.movementStyle))
+        {
+            Tile currentTile = mon.currentTile;
+            if (currentTile.MultipleMonsters)
+            {
+                int startRow = currentTile.row;
+                int startCol = currentTile.col;
+                bool foundSpot = false;
+                //move monster to nearest avaiable tile where there is no character and no other monster on it
+                for (int distance = 1; distance < Math.Max(IntegratedMapGenerator.Instance.Map.GetLength(0), IntegratedMapGenerator.Instance.Map.GetLength(1)); distance++)
+                {
+                    if (!foundSpot)
+                    {
+                        List<Tile> availablePos = new List<Tile>();
+                        switch (mon.config.movementStyle)
+                        {
+                            case MonsterConfig.MovementStyle.Horizontal:
+                                for (int colOffset = distance * -1; colOffset < distance + 1; colOffset++)
+                                {
+                                    int targetRow = startRow;
+                                    int targetCol = startCol + colOffset;
+                                    if (IntegratedMapGenerator.Instance.InMap(targetRow, targetCol))
+                                    {
+                                        Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(targetRow, targetCol);
+                                        if (targetTile.tileType == Tile.ObstacleType.None && !targetTile.IsOccupied)
+                                        {
+                                            availablePos.Add(targetTile);
+                                        }
+                                    }
+                                }
+                                break;
+                            case MonsterConfig.MovementStyle.Vertical:
+                                for (int rowOffset = distance * -1; rowOffset < distance + 1; rowOffset++)
+                                {
+                                    int targetRow = startRow + rowOffset;
+                                    int targetCol = startCol;
+                                    if (IntegratedMapGenerator.Instance.InMap(targetRow, targetCol))
+                                    {
+                                        Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(targetRow, targetCol);
+                                        if (targetTile.tileType == Tile.ObstacleType.None && !targetTile.IsOccupied)
+                                        {
+                                            availablePos.Add(targetTile);
+                                        }
+                                    }
+                                }
+                                break;
+                            case MonsterConfig.MovementStyle.RandomWalk:
+                                for (int rowOffset = distance * -1; rowOffset < distance + 1; rowOffset++)
+                                {
+                                    for (int colOffset = distance * -1; colOffset < distance + 1; colOffset++)
+                                    {
+                                        int targetRow = startRow + rowOffset;
+                                        int targetCol = startCol + colOffset;
+                                        if (IntegratedMapGenerator.Instance.InMap(targetRow, targetCol))
+                                        {
+                                            Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(targetRow, targetCol);
+                                            if (targetTile.tileType == Tile.ObstacleType.None && !targetTile.IsOccupied)
+                                            {
+                                                availablePos.Add(targetTile);
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            case MonsterConfig.MovementStyle.Static:
+                                Debug.LogError("Static monster should not be in the same tile");
+                                break;
+                        }
+
+                        if (availablePos.Count > 0)
+                        {
+                            foundSpot = true;
+                            //select a random tile in the avaiable positions to move
+                            int randomIndex = NetworkMiddleware.S.NextRandomInt(0, availablePos.Count);
+                            Tile selectedTile = availablePos[randomIndex];
+                            yield return StartCoroutine(mon.moveToTargetLocation(selectedTile.transform.position, excecutionStepTime));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 
     // Execute all the events happened within one step time
     // Combat.ExecuteCombat() is the actual combat function
@@ -615,12 +647,12 @@ public class IntegratedGameManager : MonoBehaviour
                 switch(gameStatus) {
                     case GameStatus.Player_Moving:
                         foreach (Character c in t.CharacterList) {
-                            c.Retreat();
+                            yield return c.Retreat();
                         }
                         break;
                     case GameStatus.Monster_Moving:
                         foreach (Monster m in t.MonsterList) {
-                            m.Retreat();
+                            yield return m.Retreat();
                         }
                         break;
                 }

@@ -232,7 +232,7 @@ MonoBehaviour:
   goalCount: 0
   currentLevel: 4
   isNetworkGame: 0
-  readyForPlayerTurn: 0
+  readyForPlayerTurnCount: 0
   inSceneCharacters:
   - {fileID: 1441866727}
   - {fileID: 1464507125}

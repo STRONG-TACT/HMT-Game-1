@@ -171,8 +171,32 @@ public class Tile : MonoBehaviour
             Character mask_character = col.gameObject.transform.parent.GetComponent<Character>();
             //Debug.Log(mask_character.CharacterId);
             fogOfWarDictionary[mask_character.CharacterId] = FogOfWarState.Visible;
-
         }
+        
+        else if(col.gameObject.tag == "Character")
+        {
+            Character character = col.gameObject.GetComponent<Character>();
+            if (!character.dead)
+            {
+                if (!charaList.Contains(character))
+                {
+                    character.currentTile = this;
+                    charaList.Add(character);
+                }
+            }
+        }
+        else if (col.gameObject.tag == "Monster")
+        {
+            Monster monster = col.gameObject.GetComponent<Monster>();
+            monster.currentTile = this;
+            if (!enemyList.Contains(monster))
+            {
+                monster.currentTile = this;
+                enemyList.Add(monster);
+            }
+        }
+
+        
     }
 
     private void OnTriggerEnter(Collider col) {
@@ -205,10 +229,17 @@ public class Tile : MonoBehaviour
 
         if (charaList.Count != 0 && enemyList.Count != 0)
         {
+            List<Character> character_to_remove = new List<Character>();
             foreach (var character in charaList)
             {
                 if (character.dead)
-                    charaList.Remove(character);
+                {
+                    character_to_remove.Add(character);
+                }
+            }
+            foreach (var character in character_to_remove)
+            {
+                charaList.Remove(character);
             }
             if (charaList.Count != 0)
                 IntegratedGameManager.S.updateEventQueue(this);

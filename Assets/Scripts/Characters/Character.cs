@@ -466,6 +466,36 @@ public class Character : MonoBehaviour {
 
     #region Movement Phase
 
+
+    public IEnumerator moveToTargetLocation(Vector3 target, float stepTime)
+    {
+        float timeStart = Time.time;
+
+        State = CharacterState.Walking;
+        Vector3 origin = transform.position;
+        //Vector3 target = transform.position + moveVec * stepLength;
+        Vector3 direction = target - origin;
+        // Normalize the direction
+        direction.Normalize();
+        if (direction != Vector3.zero)
+        {
+            // Create a rotation that looks in the direction of StartingActionPoints
+            moving = true;
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            model.rotation = targetRotation;
+            while (Time.time - timeStart < stepTime)
+            {
+                float t = (Time.time - timeStart) / stepTime;
+                transform.position = Vector3.Lerp(origin, target, t);
+                yield return null;
+            }
+            transform.position = target;
+            model.rotation = targetRotation;
+        }
+        State = CharacterState.Idle;
+        moving = false;
+    }
+
     public IEnumerator TakeNextMove(float stepTime) {
         if(ActionPlan.Count == 0) {
             yield break;
@@ -514,16 +544,26 @@ public class Character : MonoBehaviour {
         moving = false;
     }
 
+    /*
     public void Retreat() {
         transform.position = prevMovePointPos;
         IntegratedMapGenerator.Instance.UpdateFOWVisuals();
         movePoint = prevMovePointPos;
     }
+    */
+
+    public IEnumerator Retreat()
+    {
+        yield return StartCoroutine(moveToTargetLocation(prevMovePointPos, IntegratedGameManager.S.excecutionStepTime));
+        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+        movePoint = prevMovePointPos;
+    }
+
 
     #endregion
 
     #region Shrine and Goal Checks
-    
+
     private void OnTriggerEnter(Collider col) {
         if (col.gameObject.tag == "Goal") {
             Shrine shrine = col.gameObject.GetComponent<Shrine>();

@@ -233,6 +233,7 @@ public class Monster : MonoBehaviour
 
     public void ClearPlanMove()
     {
+        //moving = false;
         movementPlan.Clear();
         MovesLeftThisTurn = 0;
     }
@@ -336,12 +337,20 @@ public class Monster : MonoBehaviour
         yield break;
     }
     
+    /*
     public void Retreat()
     {
         transform.position = prevMovePointPos;
         movePoint = prevMovePointPos;
     }
-    
+    */
+
+    public IEnumerator Retreat()
+    {
+        yield return StartCoroutine(moveToTargetLocation(prevMovePointPos, IntegratedGameManager.S.excecutionStepTime));
+        movePoint = prevMovePointPos;
+    }
+
     public bool CheckMove(Character.Direction direction)
     {
         Vector3 moveVec = direction switch
