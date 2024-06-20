@@ -286,4 +286,66 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         }
         Debug.LogWarning("!!");
     }
+
+    #region Combat RPC
+
+    public void SyncExecuteCombat(Combat.FightType type, Tile tile, bool visibility)
+    {
+
+
+        if (IntegratedGameManager.S.isNetworkGame)
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                Combat.S.ExecuteCombat(type, tile, visibility);
+                photonView.RPC("SyncCombatResult", RpcTarget.All, Combat.S.result, Combat.S.charaIDs.ToArray(), Combat.S.charaDiceStats.ToArray(),
+                    Combat.S.enemyScores.ToArray(), Combat.S.enemyDiceStats.ToArray(), Combat.S.charaScores.ToArray(), Combat.S.challenges.ToArray(), Combat.S.enemyScore, Combat.S.charaScore, visibility);
+            }
+            photonView.RPC("CombatResultReadyRPC", RpcTarget.All);
+        }
+        else
+        {
+
+            Combat.S.ExecuteCombat(type, tile, visibility);
+            IntegratedGameManager.S.CombatResultSyncedCount = 3;
+        }
+    }
+
+    [PunRPC]
+    private void SyncCombatResult(
+        bool result,
+        int[] charaIDs,
+        int[] charaDiceStats,
+        int[] enemyScores,
+        int[] enemyDiceStats,
+        int[] charaScores,
+        string[] challenges,
+        int enemyScore,
+        int charaScore,
+        bool visibility)
+    {
+        Combat.S.charaIDs = new List<int>(charaIDs);
+        Combat.S.result = result;
+        Combat.S.charaDiceStats = new List<int>(charaDiceStats);
+        Combat.S.enemyScores = new List<int>(enemyScores);
+        Combat.S.enemyDiceStats = new List<int>(enemyDiceStats);
+        Combat.S.charaScores = new List<int>(charaScores);
+        Combat.S.challenges = new List<string>(challenges);
+        Combat.S.enemyScore = enemyScore;
+        Combat.S.charaScore = charaScore;
+    }
+
+    [PunRPC]
+    private void CombatResultReadyRPC()
+    {
+        IntegratedGameManager.S.CombatResultSyncedCount++;
+    }
+
+
+
+    #endregion
+
+
+
+
 }

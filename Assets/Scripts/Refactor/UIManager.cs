@@ -426,14 +426,14 @@ public class UIManager : MonoBehaviour
 
     #region Combat UI
 
-    public void ShowCombatUI(Combat.FightType type, List<int> charaIDs, List<Combat.Dice> charaDice, List<Combat.Dice> enemyDice, List<int> charaScores, List<int> enemyScores,
-                         int playerScore, int enemyScore, bool win, bool visible = true)
+    public void ShowCombatUI(Combat.FightType type, List<int> charaIDs, List<int> charaDice, List<int> enemyDice, List<int> charaScores, List<int> enemyScores,
+                         int playerFinalScore, int enemyFinalScore, bool win, bool visible = true)
     {
-        StartCoroutine(CombatUICoroutine(type, charaIDs, charaDice, enemyDice, charaScores, enemyScores, playerScore, enemyScore, win, visible));
+        StartCoroutine(CombatUICoroutine(type, charaIDs, charaDice, enemyDice, charaScores, enemyScores, playerFinalScore, enemyFinalScore, win, visible));
     }
 
-    public IEnumerator CombatUICoroutine(Combat.FightType type, List<int> charaIDs, List<Combat.Dice> charaDice, List<Combat.Dice> enemyDice, List<int> charaScores, List<int> enemyScores,
-                             int playerScore, int enemyScore, bool win, bool visible=true)
+    public IEnumerator CombatUICoroutine(Combat.FightType type, List<int> charaIDs, List<int> charaDice, List<int> enemyDice, List<int> charaScores, List<int> enemyScores,
+                             int playerFinalScore, int enemyFinalScore, bool win, bool visible=true)
     {
         GameObject scoreBoard = CombatUI.transform.Find("Scoreboard").gameObject;
         GameObject vsText = CombatUI.transform.Find("VSText").gameObject;
@@ -527,12 +527,12 @@ public class UIManager : MonoBehaviour
 
         yield return new WaitForSeconds(animationDuration*2);
 
-        Debug.Log("player score: " + playerScore.ToString());
-        Debug.Log("enemy score: " + enemyScore.ToString());
+        //Debug.Log("player score: " + playerFinalScore.ToString());
+        //Debug.Log("enemy score: " + enemyFinalScore.ToString());
         if (visible == true) 
         {
-            PlayerFinalScore.text = playerScore.ToString();
-            EnemyFinalScore.text = enemyScore.ToString();
+            PlayerFinalScore.text = playerFinalScore.ToString();
+            EnemyFinalScore.text = enemyFinalScore.ToString();
         }
         else
         {
@@ -589,7 +589,7 @@ public class UIManager : MonoBehaviour
         CombatUI.SetActive(false);
     }
 
-    private IEnumerator DiceAnimation(GameObject diceUI, TMP_Text scoreDisplay, int score, Combat.Dice diceStat) 
+    private IEnumerator DiceAnimation(GameObject diceUI, TMP_Text scoreDisplay, int score, int diceStat) 
     {
         diceUI.SetActive(true);
         float elapsedTime = 0.0f;
@@ -604,7 +604,7 @@ public class UIManager : MonoBehaviour
             //update random score every 0.2 seconds
             if(elapsedTime - scoreUpdateTime >= 0.2f)
             {
-                scoreDisplay.text = UnityEngine.Random.Range(1, (int)diceStat.type + 1).ToString();
+                scoreDisplay.text = UnityEngine.Random.Range(1, diceStat + 1).ToString();
                 scoreUpdateTime = elapsedTime;
             }
 

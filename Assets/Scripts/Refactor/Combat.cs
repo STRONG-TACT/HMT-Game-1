@@ -5,6 +5,29 @@ using GameConstant;
 using System.Linq;
 
 public class Combat : MonoBehaviour {
+
+    public bool result = false;
+    public List<int> charaIDs = new List<int>();
+    public List<Dice> charaDice = new List<Dice>();
+    public List<int> enemyScores = new List<int>();
+    public List<Dice> enemyDice = new List<Dice>();
+    public List<int> charaDiceStats = new List<int>();
+    public List<int> enemyDiceStats = new List<int>();
+    public List<int> charaScores = new List<int>();
+    public List<string> challenges = new List<string>();
+    public int enemyScore = 0;
+    public int charaScore = 0;
+
+    public static Combat S;
+
+    private void Awake()
+    {
+        if (S) Destroy(this);
+        else S = this;
+
+    }
+
+
     public enum FightType {
         Rock = 0,
         Trap = 1,
@@ -66,7 +89,9 @@ public class Combat : MonoBehaviour {
         }
     }
 
-    public static bool ExecuteCombat(FightType type, Tile tile, bool visibility) {
+    public bool ExecuteCombat(FightType type, Tile tile, bool visibility) {
+
+        /*
         bool result = false;
         List<int> charaIDs = new List<int>();
         List<Dice> charaDice = new List<Dice>();
@@ -76,8 +101,19 @@ public class Combat : MonoBehaviour {
         List<string> challenges = new List<string>();
         int enemyScore = 0;
         int charaScore = 0;
+        */
 
-        
+        result = false;
+        charaIDs = new List<int>();
+        charaDice = new List<Dice>();
+        enemyScores = new List<int>();
+        enemyDice = new List<Dice>();
+        charaScores = new List<int>();
+        challenges = new List<string>();
+        charaDiceStats = new List<int>();
+        enemyDiceStats = new List<int>();
+        enemyScore = 0;
+        charaScore = 0;
 
         int roll;
 
@@ -86,12 +122,14 @@ public class Combat : MonoBehaviour {
                 foreach (Character c in tile.LivingCharacterList) {
                     charaIDs.Add(c.CharacterId);
                     roll = c.config.monsterDice.Roll();
+                    Debug.Log("Character " + c.CharacterId.ToString() + "Rolled: " + roll.ToString());
                     charaDice.Add(c.config.monsterDice);
                     charaScores.Add(roll);
                     charaScore += roll;
                 }
                 foreach (Monster m in tile.MonsterList) {
                     roll = m.config.combatDice.Roll();
+                    Debug.Log("Monster Rolled : " + roll.ToString());
                     enemyDice.Add(m.config.combatDice);
                     challenges.Add(m.ObjKey);
                     enemyScores.Add(roll);
@@ -102,11 +140,13 @@ public class Combat : MonoBehaviour {
                 foreach (Character c in tile.LivingCharacterList) {
                     charaIDs.Add(c.CharacterId);
                     roll = c.config.trapDice.Roll();
+                    Debug.Log("Character " + c.CharacterId.ToString() + "Rolled: " + roll.ToString());
                     charaDice.Add(c.config.trapDice);
                     charaScores.Add(roll);
                     charaScore += roll;
                 }
                 roll = tile.dice.Roll();
+                Debug.Log("Trap Rolled : " + roll.ToString());
                 enemyScore += roll;
                 enemyScores.Add(roll);
                 enemyDice.Add(tile.dice);
@@ -117,11 +157,13 @@ public class Combat : MonoBehaviour {
                 foreach (Character c in tile.LivingCharacterList) {
                     charaIDs.Add(c.CharacterId);
                     roll = c.config.stoneDice.Roll();
+                    Debug.Log("Character " + c.CharacterId.ToString() + "Rolled: " + roll.ToString());
                     charaDice.Add(c.config.stoneDice);
                     charaScores.Add(roll);
                     charaScore += roll;
                 }
                 roll = tile.dice.Roll();
+                Debug.Log("Rock Rolled : " + roll.ToString());
                 enemyScore += roll;
                 enemyScores.Add(roll);
                 enemyDice.Add(tile.dice);
@@ -129,9 +171,11 @@ public class Combat : MonoBehaviour {
                 challenges.Add(tile.ObjKey);
                 break;
         }
-
-
         
+
+        Debug.Log("player score in combat script: " + charaScore.ToString());
+        Debug.Log("enemy score in combar script: " + enemyScore.ToString());
+
         if (charaScore >= enemyScore) {
             result = true;
         }
@@ -145,8 +189,16 @@ public class Combat : MonoBehaviour {
                 CalculateOdds(charaDice, enemyDice), result);
         }
 
+        foreach (Dice dice in charaDice)
+        {
+            charaDiceStats.Add((int)dice.type);
+        }
+        foreach (Dice dice in enemyDice)
+        {
+            enemyDiceStats.Add((int)dice.type);
+        }
 
-        UIManager.S.ShowCombatUI(type, charaIDs, charaDice, enemyDice, charaScores, enemyScores, charaScore, enemyScore, result, visibility);
+        //UIManager.S.ShowCombatUI(type, charaIDs, charaDice, enemyDice, charaScores, enemyScores, charaScore, enemyScore, result, visibility);
         return result;
     }
 

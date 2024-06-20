@@ -28,6 +28,7 @@ public class IntegratedGameManager : MonoBehaviour
     public int currentLevel = 1;
     public bool isNetworkGame;
     public int readyForPlayerTurnCount = 0;
+    public int CombatResultSyncedCount = 0;
 
     private float lastTurnTimerReset = 0;
 
@@ -563,15 +564,46 @@ public class IntegratedGameManager : MonoBehaviour
             switch (t.tileType) {
                 case Tile.ObstacleType.None:
                     challengeType = Combat.FightType.Monster;
-                    win = Combat.ExecuteCombat(Combat.FightType.Monster, t, visibility);
+                    //win = Combat.S.ExecuteCombat(Combat.FightType.Monster, t, visibility);
+                    NetworkMiddleware.S.SyncExecuteCombat(Combat.FightType.Monster, t, visibility);
+                    while(CombatResultSyncedCount < 3)
+                    {
+                        //Debug.Log("Combat Result ready Count: " + CombatResultSyncedCount);
+                        yield return null;
+                    }
+                    CombatResultSyncedCount = 0;
+                    win = Combat.S.result;
+                    UIManager.S.ShowCombatUI(Combat.FightType.Monster, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores,
+                        Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
                     break;
                 case Tile.ObstacleType.Trap:
                     challengeType = Combat.FightType.Trap;
-                    win = Combat.ExecuteCombat(Combat.FightType.Trap, t, visibility);
+                    //win = Combat.S.ExecuteCombat(Combat.FightType.Trap, t, visibility);
+
+                    NetworkMiddleware.S.SyncExecuteCombat(Combat.FightType.Trap, t, visibility);
+                    while (CombatResultSyncedCount < 3)
+                    {
+                        //Debug.Log("Combat Result ready Count: " + CombatResultSyncedCount);
+                        yield return null;
+                    }
+                    CombatResultSyncedCount = 0;
+                    win = Combat.S.result;
+                    UIManager.S.ShowCombatUI(Combat.FightType.Trap, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores, 
+                        Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
                     break;
                 case Tile.ObstacleType.Rock:
                     challengeType = Combat.FightType.Rock;
-                    win = Combat.ExecuteCombat(Combat.FightType.Rock, t, visibility);
+                    //win = Combat.S.ExecuteCombat(Combat.FightType.Rock, t, visibility);
+                    NetworkMiddleware.S.SyncExecuteCombat(Combat.FightType.Rock, t, visibility);
+                    while (CombatResultSyncedCount < 3)
+                    {
+                        Debug.Log("Combat Result ready Count: " + CombatResultSyncedCount);
+                        yield return null;
+                    }
+                    CombatResultSyncedCount = 0;
+                    win = Combat.S.result;
+                    UIManager.S.ShowCombatUI(Combat.FightType.Rock, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores,
+                        Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
                     break;
                 default:
                     Debug.LogWarning("Unknown Combat Type Encountered");
@@ -589,7 +621,7 @@ public class IntegratedGameManager : MonoBehaviour
             }
 
             //wait for animation to play
-            yield return new WaitForSeconds(UIManager.S.animationDuration * 4);
+            yield return new WaitForSeconds(UIManager.S.animationDuration * 4.1f);
 
             if (win) {
                 // if the character(s) won the battle, destory the enemies
