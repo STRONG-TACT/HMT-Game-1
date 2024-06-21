@@ -230,7 +230,7 @@ MonoBehaviour:
   localChar: {fileID: 0}
   gameStatus: 0
   goalCount: 0
-  currentLevel: 2
+  currentLevel: 1
   isNetworkGame: 0
   readyForPlayerTurnCount: 0
   CombatResultSyncedCount: 0
