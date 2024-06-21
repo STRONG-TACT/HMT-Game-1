@@ -23,7 +23,7 @@ public class IntegratedGameManager : MonoBehaviour
     public GameStatus gameStatus = GameStatus.GetReady;
     public int CurrentRound { get; protected set; } = 0;
     public int goalCount = 0;
-    private Queue<Tile> eventQueue = new Queue<Tile>();
+    private List<Tile> eventQueue = new List<Tile>();
     protected Coroutine currentCoroutine = null;
     public int currentLevel = 1;
     public bool isNetworkGame;
@@ -271,7 +271,7 @@ public class IntegratedGameManager : MonoBehaviour
         UIManager.S.HideCharacterPlanUI();
         UIManager.S.HideCharacterPinUI();
         //moveFinishedCount = 0;       
-        eventQueue = new Queue<Tile>();
+        eventQueue = new List<Tile>();
 
         CompetitionMiddleware.Instance.LogStartPhase("Player_Movement");
 
@@ -552,10 +552,11 @@ public class IntegratedGameManager : MonoBehaviour
     // Combat.ExecuteCombat() is the actual combat function
     protected virtual IEnumerator ExecuteCombatOneByOne() {
         Debug.LogFormat("Exectuing {0} events in queue.", eventQueue.Count);
-
+        eventQueue.Sort();
         while (eventQueue.Count != 0) {
             bool win = false;
-            Tile t = eventQueue.Dequeue();
+            Tile t = eventQueue[0];
+            eventQueue.RemoveAt(0);
             Debug.LogFormat("Processing Event at {0}, {1}", t.row, t.col);            
             
             bool visibility = t.fogOfWarDictionary[localChar.CharacterId] == Tile.FogOfWarState.Visible;
@@ -597,7 +598,7 @@ public class IntegratedGameManager : MonoBehaviour
                     NetworkMiddleware.S.SyncExecuteCombat(Combat.FightType.Rock, t, visibility);
                     while (CombatResultSyncedCount < 3)
                     {
-                        Debug.Log("Combat Result ready Count: " + CombatResultSyncedCount);
+                        //Debug.Log("Combat Result ready Count: " + CombatResultSyncedCount);
                         yield return null;
                     }
                     CombatResultSyncedCount = 0;
@@ -790,7 +791,7 @@ public class IntegratedGameManager : MonoBehaviour
         Debug.LogFormat("Event generated at {0}, {1}, of type {2}", tile.row, tile.col, tile.tileType);
         if (!eventQueue.Contains(tile))
         {
-            eventQueue.Enqueue(tile);
+            eventQueue.Add(tile);
         }
     }
 

@@ -1,10 +1,29 @@
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Tile : MonoBehaviour
+public class Tile : MonoBehaviour, IComparable<Tile>
 {
+
+    public int CompareTo(Tile other)
+    {
+        if (other == null) return 1;
+
+        // First compare by row
+        int rowComparison = row.CompareTo(other.row);
+        if (rowComparison != 0)
+        {
+            return rowComparison;
+        }
+
+        // If rows are the same, compare by col
+        return col.CompareTo(other.col);
+    }
+
+
+
     private static Dictionary<string, int> TILE_IDS_BY_OBJ_KEY = new Dictionary<string, int>();
     private static string GetObjID(string objKey) {
         if (!TILE_IDS_BY_OBJ_KEY.ContainsKey(objKey)) {
@@ -173,6 +192,7 @@ public class Tile : MonoBehaviour
             fogOfWarDictionary[mask_character.CharacterId] = FogOfWarState.Visible;
         }
         
+        /*
         else if(col.gameObject.tag == "Character")
         {
             Character character = col.gameObject.GetComponent<Character>();
@@ -195,6 +215,7 @@ public class Tile : MonoBehaviour
                 enemyList.Add(monster);
             }
         }
+        */
 
         
     }
