@@ -443,6 +443,8 @@ public class IntegratedGameManager : MonoBehaviour
                 break;
             }
             Random.InitState(NetworkMiddleware.S.randomSeed);
+            //wait 0.5 seconds for collision to register properly
+            yield return new WaitForSeconds(0.5f);
             yield return StartCoroutine(SeparateDuplicateMonster());
             
 
@@ -455,6 +457,8 @@ public class IntegratedGameManager : MonoBehaviour
         }
         Random.InitState(NetworkMiddleware.S.randomSeed);
         //This function call here is necessary, otherwise monster won't separate if combat happens
+        //wait 0.5 seconds for collision to register properly
+        yield return new WaitForSeconds(0.5f);
         yield return StartCoroutine(SeparateDuplicateMonster());
         Debug.Log("Monster moving currPhase ended.");
         //StartPlayerTurn();

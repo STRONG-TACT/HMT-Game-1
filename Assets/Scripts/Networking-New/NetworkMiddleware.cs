@@ -310,6 +310,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         {
 
             Combat.S.ExecuteCombat(type, tile, visibility);
+            randomSeed = Random.Range(0, 10000);
             IntegratedGameManager.S.CombatResultSyncedCount = 3;
         }
     }
