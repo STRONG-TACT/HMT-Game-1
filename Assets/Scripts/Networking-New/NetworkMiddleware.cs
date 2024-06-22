@@ -60,7 +60,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     /// <param name="charID"></param>
     /// <param name="ready"></param>
     public void CallReadyForNextPhaseAuto(int charID, bool ready) {
-        if (IntegratedGameManager.S.isNetworkGame && PhotonNetwork.IsMasterClient) {
+        if (IntegratedGameManager.S.isNetworkGame) {
             photonView.RPC("ReadyForNextPhaseLocal", RpcTarget.All, charID, ready);
         }
         else {
@@ -119,14 +119,31 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         if (ready) {
             if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning) {
                 UIManager.S.UpdateCharacterPinUI();
-                IntegratedGameManager.S.CheckPingPhaseEnd();
+                if(PhotonNetwork.IsMasterClient)
+                    IntegratedGameManager.S.CheckPingPhaseEnd();
+                //IntegratedGameManager.S.CheckPingPhaseEnd();
             }
 
             if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
                 UIManager.S.UpdateCharacterPlanUI();
-                IntegratedGameManager.S.CheckPlanPhaseEnd();
+                if(PhotonNetwork.IsMasterClient)
+                    IntegratedGameManager.S.CheckPlanPhaseEnd();
             }
         }
+    }
+
+    public void CallGotoNextPhase() {
+        if (IntegratedGameManager.S.isNetworkGame) {
+            photonView.RPC("GotoNextPhaseLocal", RpcTarget.All);
+        }
+        else {
+            GotoNextPhaseLocal();
+        }
+    }
+
+    [PunRPC]
+    public void  GotoNextPhaseLocal() {
+        IntegratedGameManager.S.GotoNextPhase();
     }
 
 /*    public void CallSpawnCharacter(int charId, int row, int col) {
@@ -302,8 +319,11 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         {
             if (PhotonNetwork.IsMasterClient)
             {
+                
                 Combat.S.ExecuteCombat(type, tile, visibility);
-                photonView.RPC("SyncCombatResult", RpcTarget.All, Combat.S.result, Combat.S.charaIDs.ToArray(), Combat.S.charaDiceStats.ToArray(),
+                //Reinitialize seed and send it to all clients to make sure that subsequent monster action is consistent
+                randomSeed = Random.Range(0, 10000);
+                photonView.RPC("SyncCombatResult", RpcTarget.All, randomSeed, Combat.S.result, Combat.S.charaIDs.ToArray(), Combat.S.charaDiceStats.ToArray(),
                     Combat.S.enemyScores.ToArray(), Combat.S.enemyDiceStats.ToArray(), Combat.S.charaScores.ToArray(), Combat.S.challenges.ToArray(), Combat.S.enemyScore, Combat.S.charaScore, visibility);
             }
             if (CompetitionMiddleware.Instance.IsAI)
@@ -316,11 +336,13 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
             Combat.S.ExecuteCombat(type, tile, visibility);
             CombatResultReadyLocal(3);
+            randomSeed = Random.Range(0, 10000);
         }
     }
 
     [PunRPC]
     private void SyncCombatResult(
+        int newSeed,
         bool result,
         int[] charaIDs,
         int[] charaDiceStats,
@@ -332,6 +354,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         int charaScore,
         bool visibility)
     {
+        randomSeed = newSeed;
         Combat.S.charaIDs = new List<int>(charaIDs);
         Combat.S.result = result;
         Combat.S.charaDiceStats = new List<int>(charaDiceStats);

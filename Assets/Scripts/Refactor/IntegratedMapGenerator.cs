@@ -11,6 +11,8 @@ public class IntegratedMapGenerator : MonoBehaviour
     public GameData gameData;
     public Transform tileParent;
     public Tile[,] Map;
+    public bool FOW_enabled = true;
+    public Dictionary<Tile, Dictionary<int, Tile.FogOfWarState>> FOW_States = new Dictionary<Tile, Dictionary<int, Tile.FogOfWarState>>();
     public string CurrentLevelName { get; private set; }
 
     public Dictionary<string, string> AlternateSchema = new Dictionary<string, string>()
@@ -55,6 +57,39 @@ public class IntegratedMapGenerator : MonoBehaviour
         foreach (Tile tile in Map)
         {
             tile.SetFOWVisualsToCharacter(IntegratedGameManager.S.localChar.CharacterId);
+        }
+    }
+
+    public void ToggleFOW_OnOff()
+    {
+        if (FOW_enabled)
+        {
+            FOW_States.Clear();
+            foreach (Tile tile in Map)
+            {
+                Dictionary<int, Tile.FogOfWarState> newDict = new Dictionary<int, Tile.FogOfWarState>();
+                foreach (KeyValuePair<int, Tile.FogOfWarState> kvp in tile.fogOfWarDictionary)
+                {
+                    newDict.Add(kvp.Key, kvp.Value);
+                }
+                FOW_States.Add(tile, newDict);
+                tile.fogOfWarDictionary = new Dictionary<int, Tile.FogOfWarState> {
+                    { 0, Tile.FogOfWarState.Visible },
+                    { 1, Tile.FogOfWarState.Visible },
+                    { 2, Tile.FogOfWarState.Visible }
+                };
+            }
+            UpdateFOWVisuals();
+            FOW_enabled = false;
+        }
+        else
+        {
+            foreach (Tile tile in Map)
+            {
+                tile.fogOfWarDictionary = FOW_States[tile];
+            }
+            UpdateFOWVisuals();
+            FOW_enabled = true ;
         }
     }
 

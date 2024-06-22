@@ -5,6 +5,7 @@ using UnityEngine;
 using GameConstant;
 using System.Linq;
 using Photon.Pun;
+using Random = UnityEngine.Random;
 
 public class IntegratedGameManager : MonoBehaviour
 {
@@ -104,6 +105,11 @@ public class IntegratedGameManager : MonoBehaviour
         if(TimeRemaining<= 0) {
             TimeoutSubmit();
         }
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            IntegratedMapGenerator.Instance.ToggleFOW_OnOff();
+        }
+
     }
 
     protected virtual void TimeoutSubmit() {  }
@@ -194,10 +200,31 @@ public class IntegratedGameManager : MonoBehaviour
         return phaseEnd;
     }
 
+    public virtual void GotoNextPhase() {
+        switch (gameStatus) {
+            //Note: the "EndXPhase" functions always call the StartX+1Phase function
+            case GameStatus.Player_Pinning:
+                EndPlayerPinningPhase();
+                break;
+            case GameStatus.Player_Planning:
+                EndPlayerPlanningPhase();
+                break;
+            case GameStatus.Player_Moving:
+            case GameStatus.Monster_Moving:
+                //These should be automatic?
+                break;
+            default:
+                Debug.LogFormat("Don't know what to do with gameStatus {0}", gameStatus);
+                break;
+        }
+    }
+
     // Update params, if all end their pinning, move to planning currPhase
     public virtual void CheckPingPhaseEnd() {
         if(CheckPhaseEnd()) {
-            EndPlayerPinningPhase();
+            NetworkMiddleware.S.CallGotoNextPhase();
+
+            //EndPlayerPinningPhase();
         }
     }
 
@@ -243,7 +270,8 @@ public class IntegratedGameManager : MonoBehaviour
     // Update params, if all submitted their plan, move to moving currPhase
     public virtual void CheckPlanPhaseEnd() {
         if (CheckPhaseEnd()) {
-            EndPlayerPlanningPhase();
+            NetworkMiddleware.S.CallGotoNextPhase();
+            //EndPlayerPlanningPhase();
         }
     }
 
@@ -400,6 +428,7 @@ public class IntegratedGameManager : MonoBehaviour
     // Monsters moving step by step
     // Same with chara move by step, when events happened, deal with them and come back
     protected virtual IEnumerator MonsterMoveByStep() {
+        Random.InitState(NetworkMiddleware.S.randomSeed);
         List<Monster> monstersMoving = new List<Monster>();
         foreach(Monster m in inSceneMonsters) {
             if(m.MovesLeftThisTurn > 0) {
@@ -435,7 +464,9 @@ public class IntegratedGameManager : MonoBehaviour
                 yield return ExecuteCombatOneByOne();
                 break;
             }
-
+            Random.InitState(NetworkMiddleware.S.randomSeed);
+            //wait 0.5 seconds for collision to register properly
+            yield return new WaitForSeconds(0.5f);
             yield return StartCoroutine(SeparateDuplicateMonster());
             
 
@@ -446,7 +477,10 @@ public class IntegratedGameManager : MonoBehaviour
                 }
             }
         }
+        Random.InitState(NetworkMiddleware.S.randomSeed);
         //This function call here is necessary, otherwise monster won't separate if combat happens
+        //wait 0.5 seconds for collision to register properly
+        yield return new WaitForSeconds(0.5f);
         yield return StartCoroutine(SeparateDuplicateMonster());
         Debug.Log("Monster moving currPhase ended.");
         //StartPlayerTurn();
@@ -573,6 +607,7 @@ public class IntegratedGameManager : MonoBehaviour
                         yield return null;
                     }
                     CombatResultSyncedCount = 0;
+                    Random.InitState(NetworkMiddleware.S.randomSeed);
                     win = Combat.S.result;
                     UIManager.S.ShowCombatUI(Combat.FightType.Monster, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores,
                         Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
@@ -588,6 +623,7 @@ public class IntegratedGameManager : MonoBehaviour
                         yield return null;
                     }
                     CombatResultSyncedCount = 0;
+                    Random.InitState(NetworkMiddleware.S.randomSeed);
                     win = Combat.S.result;
                     UIManager.S.ShowCombatUI(Combat.FightType.Trap, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores, 
                         Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
@@ -602,6 +638,7 @@ public class IntegratedGameManager : MonoBehaviour
                         yield return null;
                     }
                     CombatResultSyncedCount = 0;
+                    Random.InitState(NetworkMiddleware.S.randomSeed);
                     win = Combat.S.result;
                     UIManager.S.ShowCombatUI(Combat.FightType.Rock, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores,
                         Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
