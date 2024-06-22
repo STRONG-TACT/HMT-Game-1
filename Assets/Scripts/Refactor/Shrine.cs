@@ -30,7 +30,7 @@ public class Shrine : MonoBehaviour
     private string HMTObjID = null;
 
     public CharacterConfig.CharacterType CharacterType;
-    public bool Reached { get; private set; } = true;
+    public bool Reached { get; private set; } = false;
 
     public Tile tile;
     

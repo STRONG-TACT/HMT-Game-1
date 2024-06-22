@@ -255,6 +255,7 @@ namespace HMT {
         public void SendOKResponse(string message, string content = null) {
             string mess = string.Format("{{\"command\":\"{0}\", \"status\":\"OK\", \"message\":\"{1}\", \"content\":{2} }}", command, message, content);
             originService.Context.WebSocket.Send(mess);
+            Debug.Log($"OK response sent with message: {message}");
         }
 
         public void SendErrorResponse(string message, string content = null) {

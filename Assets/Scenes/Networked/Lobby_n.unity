@@ -700,7 +700,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1219399765}
   m_HandleRect: {fileID: 1219399764}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -7648,15 +7648,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4543776451520676383, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
       propertyPath: HttpSendLogs
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4543776451520676383, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
       propertyPath: enableLogging
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4543776451520676383, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
-      propertyPath: overrideAIMode
+      propertyPath: DebugTraceLogs
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4543776451520676383, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
+      propertyPath: overrideAIMode
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}

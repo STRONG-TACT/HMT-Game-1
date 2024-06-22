@@ -69,27 +69,32 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     }
 
 
-    public void SyncStartPlayerturn()
+    public void CallSyncStartPlayerturn()
     {
         if (IntegratedGameManager.S.isNetworkGame)
         {
-            photonView.RPC("SyncStartPlayerTurnLocal", RpcTarget.All);
+            if (CompetitionMiddleware.Instance.IsAI)
+                photonView.RPC("SyncStartPlayerTurnLocal", RpcTarget.All,
+                    CompetitionMiddleware.Instance.RegisteredAgents.Count);
+            else
+                photonView.RPC("SyncStartPlayerTurnLocal", RpcTarget.All, 1);
         }
         else
         {
-            IntegratedGameManager.S.readyForPlayerTurnCount = 3;
+            SyncStartPlayerTurnLocal(3);
         }
     }
 
     [PunRPC]
-    private void SyncStartPlayerTurnLocal()
+    private void SyncStartPlayerTurnLocal(int numPlayer)
     {
 
         foreach (Character chara in IntegratedGameManager.S.inSceneCharacters)
         {
             chara.ReadyForNextPhase = false;
         }
-        IntegratedGameManager.S.readyForPlayerTurnCount ++;
+
+        IntegratedGameManager.S.readyForPlayerTurnCount += numPlayer;
     }
 
     public void CallReadyForNextPhase(int charID, bool ready) {
@@ -289,7 +294,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     #region Combat RPC
 
-    public void SyncExecuteCombat(Combat.FightType type, Tile tile, bool visibility)
+    public void CallSyncExecuteCombat(Combat.FightType type, Tile tile, bool visibility)
     {
 
 
@@ -301,13 +306,16 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
                 photonView.RPC("SyncCombatResult", RpcTarget.All, Combat.S.result, Combat.S.charaIDs.ToArray(), Combat.S.charaDiceStats.ToArray(),
                     Combat.S.enemyScores.ToArray(), Combat.S.enemyDiceStats.ToArray(), Combat.S.charaScores.ToArray(), Combat.S.challenges.ToArray(), Combat.S.enemyScore, Combat.S.charaScore, visibility);
             }
-            photonView.RPC("CombatResultReadyRPC", RpcTarget.All);
+            if (CompetitionMiddleware.Instance.IsAI)
+                photonView.RPC("CombatResultReadyLocal", RpcTarget.All, CompetitionMiddleware.Instance.RegisteredAgents.Count);
+            else 
+                photonView.RPC("CombatResultReadyLocal", RpcTarget.All, 1);
         }
         else
         {
 
             Combat.S.ExecuteCombat(type, tile, visibility);
-            IntegratedGameManager.S.CombatResultSyncedCount = 3;
+            CombatResultReadyLocal(3);
         }
     }
 
@@ -336,9 +344,9 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    private void CombatResultReadyRPC()
+    private void CombatResultReadyLocal(int numPlayer)
     {
-        IntegratedGameManager.S.CombatResultSyncedCount++;
+        IntegratedGameManager.S.CombatResultSyncedCount += numPlayer;
     }
 
 

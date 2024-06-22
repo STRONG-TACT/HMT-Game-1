@@ -89,6 +89,7 @@ public class IntegratedGame1Interface : HMTInterface {
     }
 
     public override IEnumerator Register(Command command) {
+        Debug.Log($"Calling registered");
         string target = command.target;
         string agent_id = command.json["agent_id"].ToString();
         int character_id;
@@ -109,14 +110,17 @@ public class IntegratedGame1Interface : HMTInterface {
 
 
         CompetitionMiddleware.Instance.AddAIAgent(target, agent_id, character_id);
+        Debug.Log($"registered, agent added");
 
 
         while(!InGame) {
             yield return null;
         }
+        Debug.Log("waited on InGame");
         while(IntegratedGameManager.S.gameStatus == GameConstant.GameStatus.GetReady) {
             yield return null;
         }
+        Debug.Log("waited on GetReady");
 
         command.SendOKResponse("Ready for Actions");
         yield break;

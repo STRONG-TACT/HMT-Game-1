@@ -125,7 +125,7 @@ public class IntegratedGameManager : MonoBehaviour
 
         yield return new WaitForFixedUpdate();
 
-        NetworkMiddleware.S.SyncStartPlayerturn();
+        NetworkMiddleware.S.CallSyncStartPlayerturn();
         // Wait until all clients are ready
         while (readyForPlayerTurnCount < 3)
         {
@@ -450,7 +450,7 @@ public class IntegratedGameManager : MonoBehaviour
         yield return StartCoroutine(SeparateDuplicateMonster());
         Debug.Log("Monster moving currPhase ended.");
         //StartPlayerTurn();
-        NetworkMiddleware.S.SyncStartPlayerturn();
+        NetworkMiddleware.S.CallSyncStartPlayerturn();
         // Wait until all clients are ready
         while (readyForPlayerTurnCount < 3)
         {
@@ -566,7 +566,7 @@ public class IntegratedGameManager : MonoBehaviour
                 case Tile.ObstacleType.None:
                     challengeType = Combat.FightType.Monster;
                     //win = Combat.S.ExecuteCombat(Combat.FightType.Monster, t, visibility);
-                    NetworkMiddleware.S.SyncExecuteCombat(Combat.FightType.Monster, t, visibility);
+                    NetworkMiddleware.S.CallSyncExecuteCombat(Combat.FightType.Monster, t, visibility);
                     while(CombatResultSyncedCount < 3)
                     {
                         //Debug.Log("Combat Result ready Count: " + CombatResultSyncedCount);
@@ -581,7 +581,7 @@ public class IntegratedGameManager : MonoBehaviour
                     challengeType = Combat.FightType.Trap;
                     //win = Combat.S.ExecuteCombat(Combat.FightType.Trap, t, visibility);
 
-                    NetworkMiddleware.S.SyncExecuteCombat(Combat.FightType.Trap, t, visibility);
+                    NetworkMiddleware.S.CallSyncExecuteCombat(Combat.FightType.Trap, t, visibility);
                     while (CombatResultSyncedCount < 3)
                     {
                         //Debug.Log("Combat Result ready Count: " + CombatResultSyncedCount);
@@ -595,7 +595,7 @@ public class IntegratedGameManager : MonoBehaviour
                 case Tile.ObstacleType.Rock:
                     challengeType = Combat.FightType.Rock;
                     //win = Combat.S.ExecuteCombat(Combat.FightType.Rock, t, visibility);
-                    NetworkMiddleware.S.SyncExecuteCombat(Combat.FightType.Rock, t, visibility);
+                    NetworkMiddleware.S.CallSyncExecuteCombat(Combat.FightType.Rock, t, visibility);
                     while (CombatResultSyncedCount < 3)
                     {
                         //Debug.Log("Combat Result ready Count: " + CombatResultSyncedCount);

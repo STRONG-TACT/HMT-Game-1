@@ -115,7 +115,7 @@ public class Tile : MonoBehaviour, IComparable<Tile>
     /// </summary>
     public List<Monster> MonsterList {
         get {
-            return new List<Monster>(enemyList).OrderBy(m => m.ObjKey).ToList();
+            return new List<Monster>(enemyList).OrderBy(m => m.HMTObjID).ToList();
         }
     }
 

@@ -30,7 +30,7 @@ public class Monster : MonoBehaviour
     }
 
     private string _objKey = null;
-    private string HMTObjID = null;
+    public string HMTObjID { get; private set; } = null;
 
     public MonsterConfig config;
     public int monsterId;
