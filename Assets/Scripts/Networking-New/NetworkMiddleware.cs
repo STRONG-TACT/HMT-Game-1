@@ -129,7 +129,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     public void CallGotoNextPhase() {
         if (IntegratedGameManager.S.isNetworkGame) {
-            photonView.RPC("GotoNextPhase", RpcTarget.All);
+            photonView.RPC("GotoNextPhaseLocal", RpcTarget.All);
         }
         else {
             GotoNextPhaseLocal();

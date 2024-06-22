@@ -270,7 +270,8 @@ public class IntegratedGameManager : MonoBehaviour
     // Update params, if all submitted their plan, move to moving currPhase
     public virtual void CheckPlanPhaseEnd() {
         if (CheckPhaseEnd()) {
-            EndPlayerPlanningPhase();
+            NetworkMiddleware.S.CallGotoNextPhase();
+            //EndPlayerPlanningPhase();
         }
     }
 

@@ -84,6 +84,7 @@ MonoBehaviour:
   - SyncStartPlayerTurnLocal
   - SyncCombatResult
   - CombatResultReadyRPC
+  - GotoNextPhaseLocal
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
