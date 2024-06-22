@@ -60,7 +60,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     /// <param name="charID"></param>
     /// <param name="ready"></param>
     public void CallReadyForNextPhaseAuto(int charID, bool ready) {
-        if (IntegratedGameManager.S.isNetworkGame && PhotonNetwork.IsMasterClient) {
+        if (IntegratedGameManager.S.isNetworkGame) {
             photonView.RPC("ReadyForNextPhaseLocal", RpcTarget.All, charID, ready);
         }
         else {
@@ -114,14 +114,31 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         if (ready) {
             if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning) {
                 UIManager.S.UpdateCharacterPinUI();
-                IntegratedGameManager.S.CheckPingPhaseEnd();
+                if(PhotonNetwork.IsMasterClient)
+                    IntegratedGameManager.S.CheckPingPhaseEnd();
+                //IntegratedGameManager.S.CheckPingPhaseEnd();
             }
 
             if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
                 UIManager.S.UpdateCharacterPlanUI();
-                IntegratedGameManager.S.CheckPlanPhaseEnd();
+                if(PhotonNetwork.IsMasterClient)
+                    IntegratedGameManager.S.CheckPlanPhaseEnd();
             }
         }
+    }
+
+    public void CallGotoNextPhase() {
+        if (IntegratedGameManager.S.isNetworkGame) {
+            photonView.RPC("GotoNextPhase", RpcTarget.All);
+        }
+        else {
+            GotoNextPhaseLocal();
+        }
+    }
+
+    [PunRPC]
+    public void  GotoNextPhaseLocal() {
+        IntegratedGameManager.S.GotoNextPhase();
     }
 
 /*    public void CallSpawnCharacter(int charId, int row, int col) {

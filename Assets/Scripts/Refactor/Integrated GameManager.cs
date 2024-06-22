@@ -200,10 +200,31 @@ public class IntegratedGameManager : MonoBehaviour
         return phaseEnd;
     }
 
+    public virtual void GotoNextPhase() {
+        switch (gameStatus) {
+            //Note: the "EndXPhase" functions always call the StartX+1Phase function
+            case GameStatus.Player_Pinning:
+                EndPlayerPinningPhase();
+                break;
+            case GameStatus.Player_Planning:
+                EndPlayerPlanningPhase();
+                break;
+            case GameStatus.Player_Moving:
+            case GameStatus.Monster_Moving:
+                //These should be automatic?
+                break;
+            default:
+                Debug.LogFormat("Don't know what to do with gameStatus {0}", gameStatus);
+                break;
+        }
+    }
+
     // Update params, if all end their pinning, move to planning currPhase
     public virtual void CheckPingPhaseEnd() {
         if(CheckPhaseEnd()) {
-            EndPlayerPinningPhase();
+            NetworkMiddleware.S.CallGotoNextPhase();
+
+            //EndPlayerPinningPhase();
         }
     }
 
