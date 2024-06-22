@@ -5,9 +5,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewCharacterConfig", menuName = "Character/CharacterConfig")]
 public class CharacterConfig : ScriptableObject {
     public enum CharacterType {
-        Human,
-        Dwarf,
-        Giant
+        Dwarf = 0,
+        Giant = 1,
+        Human = 2
     }
 
     [Tooltip("Name for this character type. Usually just Dwarf, Giant, or Human. Will Show up in logs and state descriptions")]

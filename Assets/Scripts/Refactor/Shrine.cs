@@ -51,16 +51,27 @@ public class Shrine : MonoBehaviour
         shrineStone.gameObject.SetActive(true);
     }
 
-    public JObject HMTStateRep() {
-        return new JObject {
-            {"entityType", "Shrine" },
-            {"objKey",ObjKey },
-            {"id", HMTObjID },
-            { "character", CharacterType.ToString() },
-            { "reached", Reached },
-            {"x", tile.col },
-            {"y", tile.row }
-        };
-
+    public JObject HMTStateRep(bool fullState) {
+        if (fullState) {
+            return new JObject {
+                {"entityType", "Shrine" },
+                {"objKey",ObjKey },
+                {"id", HMTObjID },
+                //replace with character ID
+                {"character", "C"+ ((int)CharacterType+1) + "1" },
+                { "reached", Reached },
+                {"x", tile.col },
+                {"y", tile.row }
+            };
+        }
+        else {
+            return new JObject {
+                {"entityType", "Shrine" },
+                {"objKey",ObjKey },
+                {"id", HMTObjID },
+                {"character", "C"+ ((int)CharacterType+1) + "1" },
+                { "reached", Reached },
+            };
+        }
     }
 }

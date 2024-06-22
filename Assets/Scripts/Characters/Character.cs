@@ -720,17 +720,17 @@ public class Character : MonoBehaviour {
             {"objKey", "C"+(CharacterId+1) },
             {"id", "C"+(CharacterId+1)+"1" },
             {"sightRange", config.sightRange },
-            {"monsterDice", config.monsterDice.ToString()},
-            {"trapDice", config.trapDice.ToString() },
-            {"stoneDice", config.stoneDice.ToString() },
+            {"monsterDie", config.monsterDice.ToString()},
+            {"trapDie", config.trapDice.ToString() },
+            {"stoneDie", config.stoneDice.ToString() },
             {"ready", ReadyForNextPhase },      //This is visible in the TeamStatus UI so should always be here
             {"dead", dead},                     //This is visible in the TeamStatus UI so should always be here
+            {"lives", Lives },
         };
 
         switch (level) {
             case StateRepLevel.Full:
                 ret["health"] = Health;
-                ret["lives"] = Lives;
                 ret["respawnCounter"] = respawnCountdown;
                 ret["actionPoints"] = ActionPointsRemaining;
                 ret["actionPlan"] = new JArray(ActionPlan.Select(d => d.ToString()));

@@ -542,7 +542,7 @@ public class Tile : MonoBehaviour, IComparable<Tile>
         ret["x"] = col;
         ret["y"] = row;
         if (tileType == ObstacleType.Rock || tileType == ObstacleType.Trap) {
-            ret["challenge"] = dice.ToString();
+            ret["challengeDie"] = dice.ToString();
         }
 
         return ret;

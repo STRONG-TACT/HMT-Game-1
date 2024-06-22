@@ -391,8 +391,8 @@ public class Monster : MonoBehaviour
             {"objKey", ObjKey },
             {"id", HMTObjID },
             //{"type", config.configName },
-            {"actionPoints", config.movement },
-            {"combatDice", config.combatDice.ToString() },
+            //{"actionPoints", config.movement },
+            {"challengeDie", config.combatDice.ToString() },
             {"x", currentTile.col },
             {"y", currentTile.row }
         };
@@ -407,7 +407,7 @@ public class Monster : MonoBehaviour
             {"moveStyle", config.movementStyle.ToString() },
             {"currDirection", currentDirection.ToString() },
             {"actionPoints", MovesLeftThisTurn },
-            {"combatDice", config.combatDice.ToString() },
+            {"challengeDie", config.combatDice.ToString() },
             {"x", currentTile.col },
             {"y", currentTile.row }
         };
