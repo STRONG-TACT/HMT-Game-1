@@ -297,8 +297,11 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         {
             if (PhotonNetwork.IsMasterClient)
             {
+                
                 Combat.S.ExecuteCombat(type, tile, visibility);
-                photonView.RPC("SyncCombatResult", RpcTarget.All, Combat.S.result, Combat.S.charaIDs.ToArray(), Combat.S.charaDiceStats.ToArray(),
+                //Reinitialize seed and send it to all clients to make sure that subsequent monster action is consistent
+                randomSeed = Random.Range(0, 10000);
+                photonView.RPC("SyncCombatResult", RpcTarget.All, randomSeed, Combat.S.result, Combat.S.charaIDs.ToArray(), Combat.S.charaDiceStats.ToArray(),
                     Combat.S.enemyScores.ToArray(), Combat.S.enemyDiceStats.ToArray(), Combat.S.charaScores.ToArray(), Combat.S.challenges.ToArray(), Combat.S.enemyScore, Combat.S.charaScore, visibility);
             }
             photonView.RPC("CombatResultReadyRPC", RpcTarget.All);
@@ -313,6 +316,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     [PunRPC]
     private void SyncCombatResult(
+        int newSeed,
         bool result,
         int[] charaIDs,
         int[] charaDiceStats,
@@ -324,6 +328,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         int charaScore,
         bool visibility)
     {
+        randomSeed = newSeed;
         Combat.S.charaIDs = new List<int>(charaIDs);
         Combat.S.result = result;
         Combat.S.charaDiceStats = new List<int>(charaDiceStats);

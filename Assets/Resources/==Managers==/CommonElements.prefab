@@ -3543,6 +3543,8 @@ MonoBehaviour:
   charaDice: []
   enemyScores: 
   enemyDice: []
+  charaDiceStats: 
+  enemyDiceStats: 
   charaScores: 
   challenges: []
   enemyScore: 0
@@ -18523,6 +18525,7 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 639404744e3da4b3997394218ee948a6, type: 3}
   - {fileID: 4900000, guid: c9e7b73f32ecb6242a72e2395226fa1b, type: 3}
   - {fileID: 4900000, guid: b65f17e11a9aaad45bee7535046d8047, type: 3}
+  - {fileID: 4900000, guid: 848149bd69bead8469189d7677ce8107, type: 3}
   characterConfigs:
   - {fileID: 11400000, guid: c6b44fe2a04fe7b44872f86875a07caf, type: 2}
   - {fileID: 11400000, guid: c716ed11fa455404ab8b58937cdf7629, type: 2}
