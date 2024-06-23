@@ -51,7 +51,7 @@ public class Shrine : MonoBehaviour
         shrineStone.gameObject.SetActive(true);
     }
 
-    public JObject HMTStateRep(bool fullState) {
+    public JObject HMTStateRep(bool fullState = true) {
         if (fullState) {
             return new JObject {
                 {"entityType", "Shrine" },

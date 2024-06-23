@@ -177,13 +177,13 @@ public class IntegratedGame1Interface : HMTInterface {
                             scene.Add(monster.HMTStateRep());
                         }
                         if (tile.shrine != null) {
-                            scene.Add(tile.shrine.HMTStateRep());
+                            scene.Add(tile.shrine.HMTStateRep(false));
                         }
                         break;
                     case Tile.FogOfWarState.Seen:
                     case Tile.FogOfWarState.Unseen:
                         if (tile.shrine != null) {
-                            scene.Add(tile.shrine.HMTStateRep());
+                            scene.Add(tile.shrine.HMTStateRep(false));
                         }
                         foreach (Character character in tile.CharacterList) {
                             scene.Add(character.HMTStateRep(Character.StateRepLevel.TeamUnseen));
