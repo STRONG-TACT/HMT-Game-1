@@ -119,14 +119,22 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         if (ready) {
             if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning) {
                 UIManager.S.UpdateCharacterPinUI();
-                if(PhotonNetwork.IsMasterClient)
+                if (!IntegratedGameManager.S.isNetworkGame)
+                {
+                    IntegratedGameManager.S.CheckPingPhaseEnd();
+                }
+                else if(PhotonNetwork.IsMasterClient)
                     IntegratedGameManager.S.CheckPingPhaseEnd();
                 //IntegratedGameManager.S.CheckPingPhaseEnd();
             }
 
             if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
                 UIManager.S.UpdateCharacterPlanUI();
-                if(PhotonNetwork.IsMasterClient)
+                if (!IntegratedGameManager.S.isNetworkGame)
+                {
+                    IntegratedGameManager.S.CheckPlanPhaseEnd();
+                }
+                else if (PhotonNetwork.IsMasterClient)
                     IntegratedGameManager.S.CheckPlanPhaseEnd();
             }
         }
