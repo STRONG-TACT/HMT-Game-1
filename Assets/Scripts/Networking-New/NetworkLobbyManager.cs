@@ -21,7 +21,9 @@ public class NetworkLobbyManager : MonoBehaviour
     private bool _onePersonEnforced = false;
     public List<RoomInfo> ListOfRooms;
 
+    private float _oneHumanChance;
     private float _twoHumanChance;
+    private float _threeHumanChance;
     private float _timeoutLimit;
     private bool _matchmakingConfigSet;
     private float _timer;
@@ -35,7 +37,9 @@ public class NetworkLobbyManager : MonoBehaviour
         else S = this;
 
         _matchmakingConfigSet = false;
+        _oneHumanChance = MatchMakingParameter.ONE_PERSON_GAME_CHANCE;
         _twoHumanChance = MatchMakingParameter.TWO_PERSON_GAME_CHANCE;
+        _threeHumanChance = MatchMakingParameter.THREE_PERSON_GAME_CHANCE;
         _timeoutLimit = MatchMakingParameter.TIMEOUT_LIMIT;
     }
 
@@ -133,8 +137,11 @@ public class NetworkLobbyManager : MonoBehaviour
             {
                 yield return null;
             }
-        
-            _numPerson = (Random.Range(0.0f, 1.0f) < _twoHumanChance) ? 2 : 1;
+
+            float rand = Random.Range(0.0f, 1.0f);
+            if (rand < _oneHumanChance) _numPerson = 1;
+            else if (rand < _oneHumanChance + _twoHumanChance) _numPerson = 2;
+            else _numPerson = 3;
         }
         StartCoroutine(JointMatchmakingRoom());
     }
@@ -142,10 +149,14 @@ public class NetworkLobbyManager : MonoBehaviour
     private void OnMatchmakingConfigResponse(JObject response)
     {
         if (response != null 
+            && response.ContainsKey("one_human_prob") 
             && response.ContainsKey("two_human_prob") 
+            && response.ContainsKey("three_human_prob") 
             && response.ContainsKey("timeout_limit"))
         {
+            _oneHumanChance = response["one_human_prob"].ToObject<float>();
             _twoHumanChance = response["two_human_prob"].ToObject<float>();
+            _threeHumanChance = response["three_human_prob"].ToObject<float>();
             _timeoutLimit = response["timeout_limit"].ToObject<float>();
             Debug.Log($"Matchmaking parameter fetched from server with " +
                       $"two_human_prob: {_twoHumanChance} and timeout limit: {_timeoutLimit}");
@@ -187,15 +198,15 @@ public class NetworkLobbyManager : MonoBehaviour
             foreach (RoomInfo roomInfo in ListOfRooms)
             {
                 object numPlayerProp = roomInfo.CustomProperties[MatchMakingParameter.NUM_PERSON_KEY];
-                if (numPlayerProp is int prop && prop == _numPerson && roomInfo.PlayerCount == 1)
+                if (numPlayerProp is int prop && prop == _numPerson && roomInfo.PlayerCount < _numPerson)
                 {
-                    Debug.Log($"Two human room found with name {roomInfo.Name}, joining");
+                    Debug.Log($"{_numPerson} human room found with name {roomInfo.Name}, joining");
                     LobbyNetwork.S.TryJoinRoom(roomInfo.Name);
                     yield break;
                 }
             }
             // If two person room not present rn, create one and wait for someone to join
-            Debug.Log("Two human room not found in current room list, creating one");
+            Debug.Log($"{_numPerson} human room not found in current room list, creating one");
             LobbyNetwork.S.TryCreateRoom(
                 Random.Range(0, MatchMakingParameter.ROOM_NAME_RANGE).ToString(), 
                 roomOptions);
@@ -253,8 +264,8 @@ public class NetworkLobbyManager : MonoBehaviour
 
     public void OnRoomEntered()
     {
-        Debug.Log("Joined a room, initiating travel to room");
-        SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
+        Debug.Log($"Joined a room, waiting for total of {_numPerson} to join");
+        StartCoroutine(OnRoomCreated());
     }
 
     public IEnumerator OnRoomCreated()
@@ -269,7 +280,7 @@ public class NetworkLobbyManager : MonoBehaviour
             while (_timer > 0.0f)
             {
                 //TODO: should actually just use the OnPlayerEnteredRoom Callback
-                if (PhotonNetwork.CurrentRoom.PlayerCount < 2)
+                if (PhotonNetwork.CurrentRoom.PlayerCount < _numPerson)
                 {
                     _timer -= 0.05f;
                     yield return new WaitForSeconds(0.05f);
@@ -280,13 +291,18 @@ public class NetworkLobbyManager : MonoBehaviour
                     yield break;
                 }
             }
-            // fall back to one person game
-            _numPerson = 1;
+            // fall back to whatever is left in the room
             PhotonNetwork.CurrentRoom.IsOpen = false;
             PhotonNetwork.CurrentRoom.IsVisible = false;
+            _numPerson = 1;
             _onePersonEnforced = true;
             PhotonNetwork.LeaveRoom();
             LobbyNetwork.S.TryJoinLobby();
+            
+            // _numPerson = PhotonNetwork.CurrentRoom.PlayerCount;
+            // CompetitionMiddleware.Instance.numPlayer = _numPerson;
+            // // calling all clients in room to travel to room scene
+            // LobbyNetwork.S.AllClientTravelToRoom();
         }
     }
     
