@@ -231,6 +231,7 @@ public class LobbyUI : MonoBehaviour
             competitionIDUIText.text = "Competition ID: " + competitionIdText.text;
             CompetitionMiddleware.Instance.SetUserID(competitionIdText.text);
             competitionIDUI.SetActive(false);
+            CompetitionMiddleware.Instance.competitionID = competitionIdText.text;
             ShowStartSceneUI();
         }
         CheckCompetitionIDCoroutineRunning = false;
@@ -254,6 +255,7 @@ public class LobbyUI : MonoBehaviour
         PlayerPrefs.DeleteKey("competitionID");
         competitionIDUIText.text = "Competition ID: " + "Anonymous";
         CompetitionMiddleware.Instance.SetUserID( System.Guid.NewGuid().ToString());
+        CompetitionMiddleware.Instance.competitionID = "Anonymous";
 
         //for testing survey scene only
         //SceneManager.LoadScene(GlobalConstant.SURVEY_SCENE);
