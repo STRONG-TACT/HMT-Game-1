@@ -335,6 +335,7 @@ public class IntegratedMapGenerator : MonoBehaviour
                 tileObj.shrine = goal1.GetComponent<Shrine>();
                 tileObj.shrine.tile = tileObj;
                 tileObj.shrine.ObjKey = code;
+                IntegratedGameManager.S.InSceneShrines[0] = tileObj.shrine;
                 tileObj.tag = "Goal";
                 goal1.transform.parent = tileObj.transform;
                 break;
@@ -344,6 +345,7 @@ public class IntegratedMapGenerator : MonoBehaviour
                 tileObj.shrine = goal2.GetComponent<Shrine>();
                 tileObj.shrine.tile = tileObj;
                 tileObj.shrine.ObjKey = code;
+                IntegratedGameManager.S.InSceneShrines[1] = tileObj.shrine;
                 tileObj.tag = "Goal";
                 goal2.transform.parent = tileObj.transform;
                 break;
@@ -353,6 +355,7 @@ public class IntegratedMapGenerator : MonoBehaviour
                 tileObj.shrine = goal3.GetComponent<Shrine>();
                 tileObj.shrine.tile = tileObj;
                 tileObj.shrine.ObjKey = code;
+                IntegratedGameManager.S.InSceneShrines[2] = tileObj.shrine;
                 tileObj.tag = "Goal";
                 goal3.transform.parent = tileObj.transform;
                 break;

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: StandardHuman
   m_EditorClassIdentifier: 
   characterName: Human
-  type: 0
+  type: 2
   StartingActionPoints: 5
   StartingHealth: 3
   monsterDice:

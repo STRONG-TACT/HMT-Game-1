@@ -103,6 +103,10 @@ public class UIManager : MonoBehaviour
     public GameObject networkStatusHandle;
     public TMP_Text networkStatusMsg;
 
+    [Header("Forfeit button")]
+    public GameObject ForfeitConfirmationUI;
+
+
     public static UIManager S;
 
     private void Awake()
@@ -142,6 +146,7 @@ public class UIManager : MonoBehaviour
         networkStatusHandle.SetActive(false);
         VictoryScreen.SetActive(false);
         LossScreen.SetActive(false);
+        ForfeitConfirmationUI.SetActive(false);
     }
     
     public void DisplayVictoryScreen() {
@@ -678,7 +683,8 @@ public class UIManager : MonoBehaviour
         foreach (RawImage death_counter in death_counters){
             death_counter.enabled = false;
         }
-        for (int i = character.Deaths; i < character.config.StartingHealth; i++)
+        //For hackthon, hardcode max life to 3
+        for (int i = character.Deaths; i < 3; i++)
         {
             life_counters[i].enabled = true;
         }
@@ -989,6 +995,16 @@ public class UIManager : MonoBehaviour
             PhotonNetwork.Disconnect();
         }
         SceneManager.LoadScene(GlobalConstant.SURVEY_SCENE);
+    }
+
+    public void HideForfeitUI()
+    {
+        ForfeitConfirmationUI.SetActive(false);
+    }
+
+    public void ShowForfeitUI()
+    {
+        ForfeitConfirmationUI.SetActive(true);
     }
 
     #endregion

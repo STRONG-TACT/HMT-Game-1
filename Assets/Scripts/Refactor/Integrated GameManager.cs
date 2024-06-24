@@ -47,7 +47,7 @@ public class IntegratedGameManager : MonoBehaviour
         }
     }
 
-
+    public List<Shrine> InSceneShrines = new List<Shrine> { null, null, null };
     public List<Character> inSceneCharacters = new List<Character>();
     public List<Monster> inSceneMonsters = new List<Monster>();
 
@@ -122,7 +122,7 @@ public class IntegratedGameManager : MonoBehaviour
     }
 
     public virtual IEnumerator StartLevel() {
-
+        InSceneShrines = new List<Shrine> { null, null, null }; 
         IntegratedMapGenerator.Instance.LoadLevel(gameData.levelTextFiles[currentLevel - 1]);
 
         gameStatus = GameStatus.GetReady;
@@ -142,6 +142,7 @@ public class IntegratedGameManager : MonoBehaviour
             yield return null;
         }
         readyForPlayerTurnCount = 0;
+        CheckLoseCondition();
         StartPlayerTurn();
     }
 
@@ -899,13 +900,26 @@ public class IntegratedGameManager : MonoBehaviour
         int deadPlayerCount = 0;
         foreach (var character in inSceneCharacters)
         {
-            if (character.dead) deadPlayerCount++;
+            if (character.dead)
+            {
+                deadPlayerCount++;
+                //if any player exhausts all the lives and hasn't reach the shrine, the game loses
+                if(character.Lives <= 0)
+                {
+                    if (!InSceneShrines[character.CharacterId].Reached)
+                    {
+                        Lose();
+                    }
+                }
+            }
         }
 
+        //if all players are dead, game loses
         if (deadPlayerCount >= 3)
         {
             Lose();
         }
+
     }
     protected virtual void Lose()
     {
