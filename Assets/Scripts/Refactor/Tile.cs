@@ -133,7 +133,7 @@ public class Tile : MonoBehaviour, IComparable<Tile>
 
     public Dictionary<int, FogOfWarState> fogOfWarDictionary;
 
-    private Dictionary<Renderer, Material[]> originalMaterials = new Dictionary<Renderer, Material[]>();
+    public Dictionary<Renderer, Material[]> originalMaterials = new Dictionary<Renderer, Material[]>();
     public Material seen_material;
     public Material unseen_material;
 

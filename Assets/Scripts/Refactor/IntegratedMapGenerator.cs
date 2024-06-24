@@ -316,6 +316,7 @@ public class IntegratedMapGenerator : MonoBehaviour
 
     private void SpawnEntity(string tileName, float x, float z, Tile tileObj, string code)
     {
+        Renderer[] renderers = null;
         switch (tileName)
         {
             case "1Spawn":
@@ -338,6 +339,12 @@ public class IntegratedMapGenerator : MonoBehaviour
                 IntegratedGameManager.S.InSceneShrines[0] = tileObj.shrine;
                 tileObj.tag = "Goal";
                 goal1.transform.parent = tileObj.transform;
+                renderers = goal1.GetComponentsInChildren<Renderer>(true);
+                foreach (Renderer renderer in renderers)
+                {
+                    // Store the original materials
+                    tileObj.GetComponent<Tile>().originalMaterials[renderer] = renderer.materials;
+                }
                 break;
 
             case "2Goal":
@@ -348,6 +355,12 @@ public class IntegratedMapGenerator : MonoBehaviour
                 IntegratedGameManager.S.InSceneShrines[1] = tileObj.shrine;
                 tileObj.tag = "Goal";
                 goal2.transform.parent = tileObj.transform;
+                renderers = goal2.GetComponentsInChildren<Renderer>(true);
+                foreach (Renderer renderer in renderers)
+                {
+                    // Store the original materials
+                    tileObj.GetComponent<Tile>().originalMaterials[renderer] = renderer.materials;
+                }
                 break;
 
             case "3Goal":
@@ -358,6 +371,12 @@ public class IntegratedMapGenerator : MonoBehaviour
                 IntegratedGameManager.S.InSceneShrines[2] = tileObj.shrine;
                 tileObj.tag = "Goal";
                 goal3.transform.parent = tileObj.transform;
+                renderers = goal3.GetComponentsInChildren<Renderer>(true);
+                foreach (Renderer renderer in renderers)
+                {
+                    // Store the original materials
+                    tileObj.GetComponent<Tile>().originalMaterials[renderer] = renderer.materials;
+                }
                 break;
 
             case "Monster1":
