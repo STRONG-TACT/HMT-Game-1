@@ -18926,9 +18926,12 @@ MonoBehaviour:
   levelTextFiles:
   - {fileID: 4900000, guid: 4dd78d57817c6444eb09fe4c816f645e, type: 3}
   - {fileID: 4900000, guid: 639404744e3da4b3997394218ee948a6, type: 3}
+  - {fileID: 4900000, guid: c53013c2df5067a4fa2b265664670313, type: 3}
+  - {fileID: 4900000, guid: 6f489af45804b134f975cafdae2edf22, type: 3}
+  - {fileID: 4900000, guid: e8cf73315b76b1c4586a48d673ef3a61, type: 3}
   - {fileID: 4900000, guid: c9e7b73f32ecb6242a72e2395226fa1b, type: 3}
-  - {fileID: 4900000, guid: b65f17e11a9aaad45bee7535046d8047, type: 3}
-  - {fileID: 4900000, guid: 848149bd69bead8469189d7677ce8107, type: 3}
+  - {fileID: 4900000, guid: 46687e28c0733b04381250dfd1691a82, type: 3}
+  - {fileID: 4900000, guid: 34fefb30af7dcf84abe57edb017f7bd7, type: 3}
   characterConfigs:
   - {fileID: 11400000, guid: c6b44fe2a04fe7b44872f86875a07caf, type: 2}
   - {fileID: 11400000, guid: c716ed11fa455404ab8b58937cdf7629, type: 2}
