@@ -99,12 +99,15 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
 
     public override void OnCreatedRoom()
     {
-        // NetworkLobbyManager.S.OnRoomEntered();
+        StartCoroutine(NetworkLobbyManager.S.OnRoomCreated());
     }
 
     public override void OnJoinedRoom()
     {
-        NetworkLobbyManager.S.OnRoomEntered();
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            NetworkLobbyManager.S.OnRoomEntered();
+        }
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
