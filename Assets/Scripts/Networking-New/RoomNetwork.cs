@@ -164,8 +164,6 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
     private void BeginRunLocal(string runId, int seed, string dwarfPlayer, string giantPlayer, string humanPlayer) {
         Debug.LogFormat("BeginRunLocal runId:{0} seed:{1} dwarfPlayer:{2} giantPlayer:{3} humanPlayer:{4}, myUserID:{5}", runId, seed, dwarfPlayer, giantPlayer, humanPlayer, CompetitionMiddleware.Instance.UserID);
 
-
-
         if (PhotonNetwork.IsMasterClient) {
             CompetitionMiddleware.Instance.LogStartGameNetwork(runId,
                 dwarfPlayer, _playerEntries[dwarfPlayer].sessionId, _playerEntries[dwarfPlayer].isAI,
@@ -193,6 +191,9 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
             PhotonNetwork.LocalPlayer.NickName = "Human";
             NetworkMiddleware.S.SetupMiddleware(seed, 2);
         }
+        
+        // sending this so that master client can have a mapping between CharID and playerID in report_result
+        CompetitionMiddleware.Instance.RegisterCharID2PlayerID(dwarfPlayer, giantPlayer, humanPlayer);
 
         SceneManager.LoadScene(GameConstant.GlobalConstant.NETWORK_SCENE);
     }
@@ -249,7 +250,6 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
         while (characterMapping.Count < 3) {
             characterMapping.Add("uniform");
         }
-        characterMapping.OrderBy(_ => Random.value).ToList();
-        return characterMapping;
+        return characterMapping.OrderBy(_ => Random.value).ToList();
     }
 }

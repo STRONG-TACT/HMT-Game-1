@@ -25,6 +25,8 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     public string SessionID { get { return currSessionID; } }
 
+    public List<string> charID2PlayerID = new List<string>();
+
     public struct AgentRecord {
         public string agentID;
         public string sessionID;
@@ -49,6 +51,13 @@ public class CompetitionMiddleware : MonoBehaviour {
             return false;
 #endif
         }
+    }
+
+    public void RegisterCharID2PlayerID(string dwarfPlayer, string giantPlayer, string humanPlayer)
+    {
+        charID2PlayerID.Add(dwarfPlayer);
+        charID2PlayerID.Add(giantPlayer);
+        charID2PlayerID.Add(humanPlayer);
     }
 
     public bool LogSystemEvents {
@@ -179,7 +188,7 @@ public class CompetitionMiddleware : MonoBehaviour {
         };
         StartCoroutine(SendPostRequestWithCallback(flaskURL + "/verify_competition_id", JsonConvert.SerializeObject(job), callback));
     }
-
+    
     public void CallLaunchGame(string photonRoom, string dwarfPlayerId, string giantPlayerId, string humanPlayerId) {
         //this may benefit form being a coroutine as well
 

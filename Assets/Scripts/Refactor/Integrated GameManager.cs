@@ -33,6 +33,8 @@ public class IntegratedGameManager : MonoBehaviour
 
     private float lastTurnTimerReset = 0;
 
+    public bool[] characterDied;
+
     public float TimeRemaining {
         get {
             switch (gameStatus) {
@@ -78,6 +80,7 @@ public class IntegratedGameManager : MonoBehaviour
         gameData = GameData.S;
         pinningSystem = PinningSystem.S;
         goalCount = 0;
+        characterDied = new bool[3];
 
         Debug.LogFormat("NetworkMiddleware.S.myCharacterID = {0}", NetworkMiddleware.S.myCharacterID);
 
@@ -125,6 +128,7 @@ public class IntegratedGameManager : MonoBehaviour
         gameStatus = GameStatus.GetReady;
         CurrentRound = 0;
         goalCount = 0;
+        characterDied = new bool[3];
         UIManager.S.InitGameUI();
         UIManager.S.ResetTeamActionStatus();
         UIManager.S.ResetTeamGoalStatus();
@@ -491,6 +495,9 @@ public class IntegratedGameManager : MonoBehaviour
             yield return null;
         }
         readyForPlayerTurnCount = 0;
+        
+        if (isNetworkGame && PhotonNetwork.IsMasterClient) LogLevelResult();
+        
         StartPlayerTurn();
     }
 
@@ -918,16 +925,12 @@ public class IntegratedGameManager : MonoBehaviour
             playerInfo[inSceneCharacters[charID].config.characterName.ToLower()] = new Dictionary<string, string>
             {
                 { "player_type", CompetitionMiddleware.Instance.RegisteredAgents.ContainsKey(charID) ? "ai" : "human" },
-                //TODO: refer to Lobby UI CheckCompetitionIDCoroutine()
-                { "player_id", "test_player_id" },
+                { "player_id", CompetitionMiddleware.Instance.charID2PlayerID[charID] },
                 { "health", inSceneCharacters[charID].Health.ToString() },
-                //TODO: max_health field in character config
-                { "max_health", 3.ToString() },
+                { "max_health", inSceneCharacters[charID].config.StartingHealth.ToString() },
                 { "lives", inSceneCharacters[charID].Lives.ToString() },
-                //TODO: max_lives field in character config
                 { "max_lives", 3.ToString() },
-                //TODO: keep track of respawn
-                { "respawned", false.ToString() }
+                { "respawned", characterDied[charID].ToString() }
             };
         }
         

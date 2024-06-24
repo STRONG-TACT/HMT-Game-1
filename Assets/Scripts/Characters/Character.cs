@@ -629,8 +629,8 @@ public class Character : MonoBehaviour {
 
         //movePoint = startPos;
         //prevMovePointPos = movePoint;
-        
-        
+
+        IntegratedGameManager.S.characterDied[CharacterId] = true;
     }
     
     public void RespawnCheck() {
