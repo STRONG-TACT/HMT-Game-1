@@ -247,4 +247,11 @@ public class LobbyUI : MonoBehaviour
         //SceneManager.LoadScene(GlobalConstant.SURVEY_SCENE);
         ShowStartSceneUI();
     }
+
+    public void OpenHelpPageLink()
+    {
+        Application.OpenURL("https://strong-tact.github.io/game/");
+    }
+
+
 }
