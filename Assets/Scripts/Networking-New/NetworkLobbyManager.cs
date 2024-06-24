@@ -18,11 +18,13 @@ public class NetworkLobbyManager : MonoBehaviour
     public OnBoardingState playChoice = OnBoardingState.ChooseGameMode;
 
     private int _numPerson;
+    private bool _onePersonEnforced = false;
     public List<RoomInfo> ListOfRooms;
 
     private float _twoHumanChance;
     private float _timeoutLimit;
     private bool _matchmakingConfigSet;
+    private float _timer;
     
     // Singleton reference
     public static NetworkLobbyManager S;
@@ -121,22 +123,25 @@ public class NetworkLobbyManager : MonoBehaviour
 
     public IEnumerator OnJoinLobbySucceed()
     {
-        onBoardingState = OnBoardingState.CreateOrJoinRoom;
-        LobbyUI.S.ShowLoadingUI("Initializing Matchmaking System");
-        
-        CompetitionMiddleware.Instance.CallMatchmakingConfig(OnMatchmakingConfigResponse);
-        while (!_matchmakingConfigSet)
+        if (!_onePersonEnforced)
         {
-            yield break;
-        }
+            onBoardingState = OnBoardingState.CreateOrJoinRoom;
+            LobbyUI.S.ShowLoadingUI("Initializing Matchmaking System");
         
-        _numPerson = (Random.Range(0.0f, 1.0f) < _twoHumanChance) ? 2 : 1;
-        JointMatchmakingRoom();
+            CompetitionMiddleware.Instance.CallMatchmakingConfig(OnMatchmakingConfigResponse);
+            while (!_matchmakingConfigSet)
+            {
+                yield return null;
+            }
+        
+            _numPerson = (Random.Range(0.0f, 1.0f) < _twoHumanChance) ? 2 : 1;
+        }
+        StartCoroutine(JointMatchmakingRoom());
     }
     
     private void OnMatchmakingConfigResponse(JObject response)
     {
-        if (response != null 
+        if (false && response != null 
             && response.ContainsKey("two_human_prob") 
             && response.ContainsKey("timeout_limit"))
         {
@@ -147,7 +152,7 @@ public class NetworkLobbyManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("failed to retrieve matchmaking parameter from server, " +
+            Debug.LogWarning("failed to retrieve matchmaking parameter from server, " +
                            "reverting to built in default one");
         }
 
@@ -156,7 +161,10 @@ public class NetworkLobbyManager : MonoBehaviour
 
     private IEnumerator JointMatchmakingRoom()
     {
-        Debug.Log($"Creating a room with {_numPerson} human players");
+        Debug.Log($"Creating/Joining a room with {_numPerson} human players");
+        LobbyUI.S.ShowLoadingUI("Searching for a Room to Join...");
+        
+        _timer = _onePersonEnforced ? 0.0f : _timeoutLimit;
         Hashtable roomPropertyHashTable = new Hashtable { { MatchMakingParameter.NUM_PERSON_KEY, _numPerson } };
         RoomOptions roomOptions = new RoomOptions
         {
@@ -165,10 +173,9 @@ public class NetworkLobbyManager : MonoBehaviour
             CustomRoomProperties = roomPropertyHashTable
         };
 
-        LobbyUI.S.ShowLoadingUI("Searching for a Room to Join...");
         if (_numPerson == 1)
         {
-            yield return new WaitForSeconds(MatchMakingParameter.TIMEOUT_LIMIT);
+            yield return new WaitForSeconds(Random.Range(0.0f, Mathf.Max(0.0f, _timer)));
             LobbyNetwork.S.TryCreateRoom(
                 Random.Range(0, MatchMakingParameter.ROOM_NAME_RANGE).ToString(), 
                 roomOptions);
@@ -176,14 +183,22 @@ public class NetworkLobbyManager : MonoBehaviour
         else
         {
             // Note: not sure there's a more efficient way than this linear search
+            Debug.Log("Searching if a two human room is present");
             foreach (RoomInfo roomInfo in ListOfRooms)
             {
                 object numPlayerProp = roomInfo.CustomProperties[MatchMakingParameter.NUM_PERSON_KEY];
-                if (numPlayerProp is int && (int)numPlayerProp == _numPerson && roomInfo.PlayerCount == 1)
+                if (numPlayerProp is int prop && prop == _numPerson && roomInfo.PlayerCount == 1)
                 {
+                    Debug.Log($"Two human room found with name {roomInfo.Name}, joining");
                     LobbyNetwork.S.TryJoinRoom(roomInfo.Name);
+                    yield break;
                 }
             }
+            // If two person room not present rn, create one and wait for someone to join
+            Debug.Log("Two human room not found in current room list, creating one");
+            LobbyNetwork.S.TryCreateRoom(
+                Random.Range(0, MatchMakingParameter.ROOM_NAME_RANGE).ToString(), 
+                roomOptions);
         }
     }
 
@@ -240,6 +255,38 @@ public class NetworkLobbyManager : MonoBehaviour
     {
         Debug.Log("Joined a room, initiating travel to room");
         SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
+    }
+
+    public IEnumerator OnRoomCreated()
+    {
+        if (_numPerson == 1)
+        {
+            SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
+        }
+        else
+        {
+            while (_timer > 0.0f)
+            {
+                //TODO: should actually just use the OnPlayerEnteredRoom Callback
+                if (PhotonNetwork.CurrentRoom.PlayerCount < 2)
+                {
+                    _timer -= 0.05f;
+                    yield return new WaitForSeconds(0.05f);
+                }
+                else
+                {
+                    SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
+                    yield break;
+                }
+            }
+            // fall back to one person game
+            _numPerson = 1;
+            PhotonNetwork.CurrentRoom.IsOpen = false;
+            PhotonNetwork.CurrentRoom.IsVisible = false;
+            _onePersonEnforced = true;
+            PhotonNetwork.LeaveRoom();
+            LobbyNetwork.S.TryJoinLobby();
+        }
     }
     
 

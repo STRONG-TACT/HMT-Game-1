@@ -12,8 +12,8 @@
 /[Uu]serSettings/
 
 # NEVER check in our photon app id
-/Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset
-/Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset.meta
+Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset
+Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset.meta
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
@@ -64,5 +64,4 @@ sysinfo.txt
 crashlytics-build.properties
 
 /UserSettings/EditorUserSettings.asset
-Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset
 Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset
