@@ -259,6 +259,7 @@ public class NetworkLobbyManager : MonoBehaviour
 
     public IEnumerator OnRoomCreated()
     {
+        CompetitionMiddleware.Instance.numPlayer = _numPerson;
         if (_numPerson == 1)
         {
             SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
