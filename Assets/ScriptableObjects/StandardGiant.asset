@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: StandardGiant
   m_EditorClassIdentifier: 
   characterName: Giant
-  type: 2
+  type: 1
   StartingActionPoints: 4
   StartingHealth: 3
   monsterDice:

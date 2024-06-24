@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: StandardDwarf
   m_EditorClassIdentifier: 
   characterName: Dwarf
-  type: 1
+  type: 0
   StartingActionPoints: 6
   StartingHealth: 3
   monsterDice:
