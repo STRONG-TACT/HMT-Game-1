@@ -68,6 +68,7 @@ public class LobbyUI : MonoBehaviour
             CompetitionMiddleware.Instance.SetUserID(competitionID);
             ShowStartSceneUI();
         }
+        reset_id_UI.SetActive(true);
 
     }
 
