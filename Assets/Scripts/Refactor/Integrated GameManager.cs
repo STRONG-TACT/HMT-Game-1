@@ -950,4 +950,9 @@ public class IntegratedGameManager : MonoBehaviour
         
         NetworkMiddleware.S.CallLogLevelResult(playerInfo);
     }
+
+    private void OnDestroy()
+    {
+        Destroy(NetworkMiddleware.S.gameObject);
+    }
 }
