@@ -218,6 +218,13 @@ MonoBehaviour:
   goalCount: 0
   currentLevel: 1
   isNetworkGame: 0
+  readyForPlayerTurnCount: 0
+  CombatResultSyncedCount: 0
+  characterDied: 
+  InSceneShrines:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   inSceneCharacters:
   - {fileID: 913249313}
   - {fileID: 1136102503}

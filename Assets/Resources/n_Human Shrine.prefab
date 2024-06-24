@@ -449,6 +449,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 196cab1131fcb455089cf1d0b1367dd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CharacterType: 0
+  CharacterType: 2
   tile: {fileID: 0}
   shrineStone: {fileID: 838368203160557562}

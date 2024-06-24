@@ -376,7 +376,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 196cab1131fcb455089cf1d0b1367dd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CharacterType: 2
+  CharacterType: 1
   tile: {fileID: 0}
   shrineStone: {fileID: 4351001487545631762}
 --- !u!1001 &4769636838279319071
