@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using GameConstant;
+using UnityEngine.SceneManagement;
 
 public class LobbyNetwork : MonoBehaviourPunCallbacks
 {
@@ -115,5 +116,17 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
         NetworkLobbyManager.S.ListOfRooms = roomList;
+    }
+
+    public void AllClientTravelToRoom()
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+        photonView.RPC("AllClientTravelToRoomRPC", RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void AllClientTravelToRoomRPC()
+    {
+        SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
     }
 }

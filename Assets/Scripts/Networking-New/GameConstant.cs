@@ -17,7 +17,9 @@ namespace GameConstant
 
     public class MatchMakingParameter
     {
-        public const float TWO_PERSON_GAME_CHANCE = 1.0f;
+        public const float ONE_PERSON_GAME_CHANCE = 0.1f;
+        public const float TWO_PERSON_GAME_CHANCE = 0.25f;
+        public const float THREE_PERSON_GAME_CHANCE = 0.65f;
         public const string NUM_PERSON_KEY = "NPK";
         public const int ROOM_NAME_RANGE = 999999999;
         public const float TIMEOUT_LIMIT = 5.0f;

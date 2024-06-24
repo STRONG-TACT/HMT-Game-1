@@ -66,7 +66,10 @@ public class IntegratedGameManager : MonoBehaviour
     public float excecutionStepTime = 1;
 
     protected virtual void Awake() {
-        if (S) Destroy(this);
+        if (S)
+        {
+            Destroy(this);
+        }
         else S = this;
     }
 
