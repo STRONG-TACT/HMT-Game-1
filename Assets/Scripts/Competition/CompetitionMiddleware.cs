@@ -25,7 +25,9 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     public string SessionID { get { return currSessionID; } }
 
-    public List<string> charID2PlayerID = new List<string>();
+    [HideInInspector] public List<string> charID2PlayerID = new List<string>();
+
+    [HideInInspector] public int numPlayer;
 
     public struct AgentRecord {
         public string agentID;
@@ -94,7 +96,7 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-
+        
     }
 
     private void OnDestroy() {

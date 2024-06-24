@@ -18,6 +18,8 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
 
     private List<string> CharacterMapping = null;
 
+    private bool AILaunched = false;
+
     private class PlayerEntry {
         public string userId;
         public string sessionId;
@@ -103,7 +105,17 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
         yield break;
     }
 
-/*    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer) {
+    private void Update()
+    {
+        if (!PhotonNetwork.IsMasterClient || AILaunched) return;
+        if (ReadyCount() == CompetitionMiddleware.Instance.numPlayer)
+        {
+            LaunchGameWithAIsLocal();
+            AILaunched = true;
+        }
+    }
+
+    /*    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer) {
         if (PhotonNetwork.IsMasterClient) {
             // sync network data to all clients' network middleware
             photonView.RPC("SetupNetworkMiddleware",
@@ -205,7 +217,6 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
                 count++;
             }
         }
-        Debug.LogFormat("ReadyCount {0}", count);
         return count;
     }
 
