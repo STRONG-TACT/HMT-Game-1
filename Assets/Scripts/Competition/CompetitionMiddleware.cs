@@ -13,6 +13,7 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     public static CompetitionMiddleware Instance = null;
 
+    public string competitionID = null;
     public string flaskURL = "https://localhost";
     public string serverKey = "NOTSET";
     public bool overrideAIMode = true;

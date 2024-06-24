@@ -108,7 +108,7 @@ public class IntegratedGameManager : MonoBehaviour
         if(TimeRemaining<= 0) {
             TimeoutSubmit();
         }
-        if (Input.GetKeyDown(KeyCode.P))
+        if (CompetitionMiddleware.Instance.competitionID == "developer" && Input.GetKeyDown(KeyCode.P))
         {
             IntegratedMapGenerator.Instance.ToggleFOW_OnOff();
         }
