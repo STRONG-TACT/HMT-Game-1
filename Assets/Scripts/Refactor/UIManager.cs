@@ -103,6 +103,10 @@ public class UIManager : MonoBehaviour
     public GameObject networkStatusHandle;
     public TMP_Text networkStatusMsg;
 
+    [Header("Forfeit button")]
+    public GameObject ForfeitConfirmationUI;
+
+
     public static UIManager S;
 
     private void Awake()
@@ -142,6 +146,7 @@ public class UIManager : MonoBehaviour
         networkStatusHandle.SetActive(false);
         VictoryScreen.SetActive(false);
         LossScreen.SetActive(false);
+        ForfeitConfirmationUI.SetActive(false);
     }
     
     public void DisplayVictoryScreen() {
@@ -989,6 +994,16 @@ public class UIManager : MonoBehaviour
             PhotonNetwork.Disconnect();
         }
         SceneManager.LoadScene(GlobalConstant.SURVEY_SCENE);
+    }
+
+    public void HideForfeitUI()
+    {
+        ForfeitConfirmationUI.SetActive(false);
+    }
+
+    public void ShowForfeitUI()
+    {
+        ForfeitConfirmationUI.SetActive(true);
     }
 
     #endregion
