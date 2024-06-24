@@ -286,6 +286,11 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
                 return;
             }
         }
+        if (CompetitionMiddleware.Instance.IsAI)
+        {
+            Application.Quit();
+        }
+
 
         Debug.Log($"Player {player.NickName} has left the room");
         CompetitionMiddleware.Instance.LogDisconnect(player.NickName);
