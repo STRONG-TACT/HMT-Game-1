@@ -683,7 +683,8 @@ public class UIManager : MonoBehaviour
         foreach (RawImage death_counter in death_counters){
             death_counter.enabled = false;
         }
-        for (int i = character.Deaths; i < character.config.StartingHealth; i++)
+        //For hackthon, hardcode max life to 3
+        for (int i = character.Deaths; i < 3; i++)
         {
             life_counters[i].enabled = true;
         }
