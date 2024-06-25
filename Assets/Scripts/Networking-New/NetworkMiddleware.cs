@@ -5,6 +5,7 @@ using GameConstant;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class NetworkMiddleware : MonoBehaviourPunCallbacks
@@ -26,8 +27,10 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     public static NetworkMiddleware S;
 
     private void Awake() {
+        Debug.LogWarning("A middleware appeared");
         if (S) {
-            Destroy(this.gameObject);
+            Destroy(S.gameObject);
+            S = this;
         }
         else {
             S = this;
@@ -390,6 +393,8 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     #endregion
 
 
-
-
+    private void OnDestroy()
+    {
+        Debug.LogWarning("Network Middleware dies");
+    }
 }

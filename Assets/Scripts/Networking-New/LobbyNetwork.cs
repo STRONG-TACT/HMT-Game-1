@@ -97,7 +97,7 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
     {
         StartCoroutine(NetworkLobbyManager.S.OnRoomEntered());
     }
-
+    
     public void AllTravelToRoom()
     {
         photonView.RPC("AllTravelToRoomRPC", RpcTarget.All);
@@ -106,7 +106,8 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
     [PunRPC]
     public void AllTravelToRoomRPC()
     {
-        SceneManager.LoadScene(GameConstant.GlobalConstant.ROOM_SCENE);
+        Debug.LogWarning("traveling to room");
+        SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)

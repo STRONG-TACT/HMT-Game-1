@@ -138,69 +138,7 @@ public class NetworkLobbyManager : MonoBehaviour
         
         LobbyNetwork.S.TryCreateRoom(Random.Range(0, MatchMakingParameter.ROOM_NAME_RANGE).ToString());
     }
-    
-    private void OnMatchmakingConfigResponse(JObject response)
-    {
-        if (response != null 
-            && response.ContainsKey("two_human_prob") 
-            && response.ContainsKey("timeout_limit"))
-        {
-            _twoHumanChance = response["two_human_prob"].ToObject<float>();
-            _timeoutLimit = response["timeout_limit"].ToObject<float>();
-            Debug.Log($"Matchmaking parameter fetched from server with " +
-                      $"two_human_prob: {_twoHumanChance} and timeout limit: {_timeoutLimit}");
-        }
-        else
-        {
-            Debug.LogWarning("failed to retrieve matchmaking parameter from server, " +
-                           "reverting to built in default one");
-        }
 
-        _matchmakingConfigSet = true;
-    }
-
-    private IEnumerator JointMatchmakingRoom()
-    {
-        Debug.Log($"Creating/Joining a room with {_numPerson} human players");
-        LobbyUI.S.ShowLoadingUI("Searching for a Room to Join...");
-        
-        _timer = _onePersonEnforced ? 0.0f : _timeoutLimit;
-        Hashtable roomPropertyHashTable = new Hashtable { { MatchMakingParameter.NUM_PERSON_KEY, _numPerson } };
-        RoomOptions roomOptions = new RoomOptions
-        {
-            MaxPlayers = 3,
-            CustomRoomPropertiesForLobby = new string[]{MatchMakingParameter.NUM_PERSON_KEY},
-            CustomRoomProperties = roomPropertyHashTable
-        };
-
-        if (_numPerson == 1)
-        {
-            yield return new WaitForSeconds(Random.Range(0.0f, Mathf.Max(0.0f, _timer)));
-            LobbyNetwork.S.TryCreateRoom(
-                Random.Range(0, MatchMakingParameter.ROOM_NAME_RANGE).ToString(), 
-                roomOptions);
-        }
-        else
-        {
-            // Note: not sure there's a more efficient way than this linear search
-            Debug.Log("Searching if a two human room is present");
-            foreach (RoomInfo roomInfo in ListOfRooms)
-            {
-                object numPlayerProp = roomInfo.CustomProperties[MatchMakingParameter.NUM_PERSON_KEY];
-                if (numPlayerProp is int prop && prop == _numPerson && roomInfo.PlayerCount == 1)
-                {
-                    Debug.Log($"Two human room found with name {roomInfo.Name}, joining");
-                    LobbyNetwork.S.TryJoinRoom(roomInfo.Name);
-                    yield break;
-                }
-            }
-            // If two person room not present rn, create one and wait for someone to join
-            Debug.Log("Two human room not found in current room list, creating one");
-            LobbyNetwork.S.TryCreateRoom(
-                Random.Range(0, MatchMakingParameter.ROOM_NAME_RANGE).ToString(), 
-                roomOptions);
-        }
-    }
 
     /* TODO: !!!!!!!!!!!!!!!!
        Current hacky solution: join & create is the same button. Will try to join room with name
@@ -254,17 +192,15 @@ public class NetworkLobbyManager : MonoBehaviour
     public IEnumerator OnRoomEntered()
     {
         Debug.Log("Joined a room, waiting for players to travel to room");
+        if (!PhotonNetwork.IsMasterClient) yield break;
         while (PhotonNetwork.CurrentRoom.PlayerCount < 3)
         {
             yield return null;
         }
-
-        if (PhotonNetwork.IsMasterClient)
-        {
-            PhotonNetwork.CurrentRoom.IsOpen = false;
-            PhotonNetwork.CurrentRoom.IsVisible = false;
-            LobbyNetwork.S.AllTravelToRoom();
-        }
+        
+        PhotonNetwork.CurrentRoom.IsOpen = false;
+        PhotonNetwork.CurrentRoom.IsVisible = false;
+        LobbyNetwork.S.AllTravelToRoom();
     }
 
     // public IEnumerator OnRoomCreated()

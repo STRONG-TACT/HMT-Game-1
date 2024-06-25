@@ -39,6 +39,7 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
     private Dictionary<string, PlayerEntry> _playerEntries = new Dictionary<string, PlayerEntry>();
 
     private void Awake() {
+        Debug.Log("Entered Room");
         if (S) Destroy(this);
         else S = this;
     }
