@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using GameConstant;
+using UnityEngine.SceneManagement;
 
 public class LobbyNetwork : MonoBehaviourPunCallbacks
 {
@@ -86,28 +87,26 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
         PhotonNetwork.CreateRoom(roomName, roomOptions);
     }
 
-    public void TryJoinRoomWithProperty(Hashtable expectedProperties)
-    {
-        PhotonNetwork.JoinRandomRoom(expectedProperties, 3);
-    }
-
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
         Debug.Log("Failed to create a room");
         NetworkLobbyManager.S.OnCreateRoomFailed();
     }
 
-    public override void OnCreatedRoom()
-    {
-        StartCoroutine(NetworkLobbyManager.S.OnRoomCreated());
-    }
-
     public override void OnJoinedRoom()
     {
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            NetworkLobbyManager.S.OnRoomEntered();
-        }
+        StartCoroutine(NetworkLobbyManager.S.OnRoomEntered());
+    }
+
+    public void AllTravelToRoom()
+    {
+        photonView.RPC("AllTravelToRoomRPC", RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void AllTravelToRoomRPC()
+    {
+        SceneManager.LoadScene(GameConstant.GlobalConstant.ROOM_SCENE);
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)

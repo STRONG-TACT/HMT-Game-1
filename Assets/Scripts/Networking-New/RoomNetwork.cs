@@ -105,16 +105,6 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
         yield break;
     }
 
-    private void Update()
-    {
-        if (!PhotonNetwork.IsMasterClient || AILaunched) return;
-        if (ReadyCount() == CompetitionMiddleware.Instance.numPlayer)
-        {
-            LaunchGameWithAIsLocal();
-            AILaunched = true;
-        }
-    }
-
     /*    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer) {
         if (PhotonNetwork.IsMasterClient) {
             // sync network data to all clients' network middleware

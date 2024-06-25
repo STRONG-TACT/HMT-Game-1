@@ -123,20 +123,20 @@ public class NetworkLobbyManager : MonoBehaviour
 
     public IEnumerator OnJoinLobbySucceed()
     {
-        if (!_onePersonEnforced)
+        LobbyUI.S.ShowLoadingUI("Searching for a Room to Join...");
+        yield return new WaitForEndOfFrame();
+        
+        foreach (RoomInfo roomInfo in ListOfRooms)
         {
-            onBoardingState = OnBoardingState.CreateOrJoinRoom;
-            LobbyUI.S.ShowLoadingUI("Initializing Matchmaking System");
-        
-            CompetitionMiddleware.Instance.CallMatchmakingConfig(OnMatchmakingConfigResponse);
-            while (!_matchmakingConfigSet)
+            if (roomInfo.PlayerCount < 3)
             {
-                yield return null;
+                Debug.Log($"Three human room found with name {roomInfo.Name}, joining");
+                LobbyNetwork.S.TryJoinRoom(roomInfo.Name);
+                yield break;
             }
-        
-            _numPerson = (Random.Range(0.0f, 1.0f) < _twoHumanChance) ? 2 : 1;
         }
-        StartCoroutine(JointMatchmakingRoom());
+        
+        LobbyNetwork.S.TryCreateRoom(Random.Range(0, MatchMakingParameter.ROOM_NAME_RANGE).ToString());
     }
     
     private void OnMatchmakingConfigResponse(JObject response)
@@ -251,44 +251,54 @@ public class NetworkLobbyManager : MonoBehaviour
         LobbyUI.S.ShowCreateJoinRoomUI();
     }
 
-    public void OnRoomEntered()
+    public IEnumerator OnRoomEntered()
     {
-        Debug.Log("Joined a room, initiating travel to room");
-        SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
-    }
-
-    public IEnumerator OnRoomCreated()
-    {
-        CompetitionMiddleware.Instance.numPlayer = _numPerson;
-        if (_numPerson == 1)
+        Debug.Log("Joined a room, waiting for players to travel to room");
+        while (PhotonNetwork.CurrentRoom.PlayerCount < 3)
         {
-            SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
+            yield return null;
         }
-        else
+
+        if (PhotonNetwork.IsMasterClient)
         {
-            while (_timer > 0.0f)
-            {
-                //TODO: should actually just use the OnPlayerEnteredRoom Callback
-                if (PhotonNetwork.CurrentRoom.PlayerCount < 2)
-                {
-                    _timer -= 0.05f;
-                    yield return new WaitForSeconds(0.05f);
-                }
-                else
-                {
-                    SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
-                    yield break;
-                }
-            }
-            // fall back to one person game
-            _numPerson = 1;
             PhotonNetwork.CurrentRoom.IsOpen = false;
             PhotonNetwork.CurrentRoom.IsVisible = false;
-            _onePersonEnforced = true;
-            PhotonNetwork.LeaveRoom();
-            LobbyNetwork.S.TryJoinLobby();
+            LobbyNetwork.S.AllTravelToRoom();
         }
     }
+
+    // public IEnumerator OnRoomCreated()
+    // {
+    //     CompetitionMiddleware.Instance.numPlayer = _numPerson;
+    //     if (_numPerson == 1)
+    //     {
+    //         SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
+    //     }
+    //     else
+    //     {
+    //         while (_timer > 0.0f)
+    //         {
+    //             //TODO: should actually just use the OnPlayerEnteredRoom Callback
+    //             if (PhotonNetwork.CurrentRoom.PlayerCount < 2)
+    //             {
+    //                 _timer -= 0.05f;
+    //                 yield return new WaitForSeconds(0.05f);
+    //             }
+    //             else
+    //             {
+    //                 SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
+    //                 yield break;
+    //             }
+    //         }
+    //         // fall back to one person game
+    //         _numPerson = 1;
+    //         PhotonNetwork.CurrentRoom.IsOpen = false;
+    //         PhotonNetwork.CurrentRoom.IsVisible = false;
+    //         _onePersonEnforced = true;
+    //         PhotonNetwork.LeaveRoom();
+    //         LobbyNetwork.S.TryJoinLobby();
+    //     }
+    // }
     
 
     // ============ Back Button Logic ============
