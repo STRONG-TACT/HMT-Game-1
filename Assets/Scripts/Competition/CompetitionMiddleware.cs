@@ -306,12 +306,21 @@ public class CompetitionMiddleware : MonoBehaviour {
         if(IntegratedGameManager.S == null || IntegratedMapGenerator.Instance == null) {
             return null;
         }
+        int shrinesCount = 0;
+        foreach (bool shrineCollected in IntegratedGameManager.S.ShrineReached)
+        {
+            if (shrineCollected)
+            {
+                shrinesCount += 1;
+            }
+        }
         JObject ret = new JObject {
             {"level", currLevel },
             {"round", currRound },
             {"phase", currPhase },
             {"timer", IntegratedGameManager.S.TimeRemaining },
-            {"shrineCount", IntegratedGameManager.S.goalCount }
+            //{"shrineCount", IntegratedGameManager.S.goalCount }
+            {"shrineCount", shrinesCount}
         };
 
         string maplayout = "";
