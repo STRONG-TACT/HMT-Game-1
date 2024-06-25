@@ -24,7 +24,7 @@ public class IntegratedGameManager : MonoBehaviour
     public GameStatus gameStatus = GameStatus.GetReady;
     public int CurrentRound { get; protected set; } = 0;
     public int goalCount = 0;
-    List<bool> ShrineReached = new List<bool> { false, false, false };
+    public List<bool> ShrineReached = new List<bool> { false, false, false };
     private List<Tile> eventQueue = new List<Tile>();
     protected Coroutine currentCoroutine = null;
     public int currentLevel = 1;
