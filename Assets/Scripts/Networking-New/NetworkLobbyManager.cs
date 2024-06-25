@@ -128,7 +128,7 @@ public class NetworkLobbyManager : MonoBehaviour
         
         foreach (RoomInfo roomInfo in ListOfRooms)
         {
-            if (roomInfo.PlayerCount < 3)
+            if (roomInfo.PlayerCount < 3 && roomInfo.IsOpen)
             {
                 Debug.Log($"Three human room found with name {roomInfo.Name}, joining");
                 LobbyNetwork.S.TryJoinRoom(roomInfo.Name);
@@ -189,18 +189,14 @@ public class NetworkLobbyManager : MonoBehaviour
         LobbyUI.S.ShowCreateJoinRoomUI();
     }
 
-    public IEnumerator OnRoomEntered()
+    public void OnRoomEntered()
     {
-        Debug.Log("Joined a room, waiting for players to travel to room");
-        if (!PhotonNetwork.IsMasterClient) yield break;
-        while (PhotonNetwork.CurrentRoom.PlayerCount < 3)
+        SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
+        if (PhotonNetwork.CurrentRoom.PlayerCount == 3)
         {
-            yield return null;
+            PhotonNetwork.CurrentRoom.IsOpen = false;
+            PhotonNetwork.CurrentRoom.IsVisible = false;
         }
-        
-        PhotonNetwork.CurrentRoom.IsOpen = false;
-        PhotonNetwork.CurrentRoom.IsVisible = false;
-        LobbyNetwork.S.AllTravelToRoom();
     }
 
     // public IEnumerator OnRoomCreated()

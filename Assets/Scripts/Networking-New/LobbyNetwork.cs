@@ -95,7 +95,7 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        StartCoroutine(NetworkLobbyManager.S.OnRoomEntered());
+        NetworkLobbyManager.S.OnRoomEntered();
     }
     
     public void AllTravelToRoom()

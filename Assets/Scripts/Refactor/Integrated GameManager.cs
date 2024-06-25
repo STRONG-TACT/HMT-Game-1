@@ -139,6 +139,7 @@ public class IntegratedGameManager : MonoBehaviour
         // Wait until all clients are ready
         while (readyForPlayerTurnCount < 3)
         {
+            Debug.Log(readyForPlayerTurnCount);
             yield return null;
         }
         readyForPlayerTurnCount = 0;

@@ -29,8 +29,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     private void Awake() {
         Debug.LogWarning("A middleware appeared");
         if (S) {
-            Destroy(S.gameObject);
-            S = this;
+            Destroy(this);
         }
         else {
             S = this;
