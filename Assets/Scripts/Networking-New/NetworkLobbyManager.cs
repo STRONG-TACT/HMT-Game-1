@@ -177,7 +177,7 @@ public class NetworkLobbyManager : MonoBehaviour
         {
             yield return new WaitForSeconds(Random.Range(0.0f, Mathf.Max(0.0f, _timer)));
             LobbyNetwork.S.TryCreateRoom(
-                Random.Range(0, MatchMakingParameter.ROOM_NAME_RANGE).ToString(), 
+                Guid.NewGuid().ToString(), 
                 roomOptions);
         }
         else
@@ -197,7 +197,7 @@ public class NetworkLobbyManager : MonoBehaviour
             // If two person room not present rn, create one and wait for someone to join
             Debug.Log("Two human room not found in current room list, creating one");
             LobbyNetwork.S.TryCreateRoom(
-                Random.Range(0, MatchMakingParameter.ROOM_NAME_RANGE).ToString(), 
+                Guid.NewGuid().ToString(), 
                 roomOptions);
         }
     }
