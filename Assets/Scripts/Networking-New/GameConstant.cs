@@ -20,7 +20,7 @@ namespace GameConstant
         public const float TWO_PERSON_GAME_CHANCE = 1.0f;
         public const string NUM_PERSON_KEY = "NPK";
         public const int ROOM_NAME_RANGE = 999999999;
-        public const float TIMEOUT_LIMIT = 15.0f;
+        public const float TIMEOUT_LIMIT = 3.0f;
     }
     
     public enum OnBoardingState

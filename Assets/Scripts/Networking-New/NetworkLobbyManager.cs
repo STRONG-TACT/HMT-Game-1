@@ -141,7 +141,7 @@ public class NetworkLobbyManager : MonoBehaviour
     
     private void OnMatchmakingConfigResponse(JObject response)
     {
-        if (response != null 
+        if (false && response != null 
             && response.ContainsKey("two_human_prob") 
             && response.ContainsKey("timeout_limit"))
         {
@@ -187,7 +187,7 @@ public class NetworkLobbyManager : MonoBehaviour
             foreach (RoomInfo roomInfo in ListOfRooms)
             {
                 object numPlayerProp = roomInfo.CustomProperties[MatchMakingParameter.NUM_PERSON_KEY];
-                if (numPlayerProp is int prop && prop == _numPerson && roomInfo.PlayerCount == 1)
+                if (numPlayerProp is int prop && prop == _numPerson && roomInfo.PlayerCount == 1 && roomInfo.IsVisible)
                 {
                     Debug.Log($"Two human room found with name {roomInfo.Name}, joining");
                     LobbyNetwork.S.TryJoinRoom(roomInfo.Name);
@@ -282,11 +282,10 @@ public class NetworkLobbyManager : MonoBehaviour
             }
             // fall back to one person game
             _numPerson = 1;
-            PhotonNetwork.CurrentRoom.IsOpen = false;
+            CompetitionMiddleware.Instance.numPlayer = _numPerson;
+            PhotonNetwork.CurrentRoom.IsOpen = true;
             PhotonNetwork.CurrentRoom.IsVisible = false;
-            _onePersonEnforced = true;
-            PhotonNetwork.LeaveRoom();
-            LobbyNetwork.S.TryJoinLobby();
+            SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
         }
     }
     
