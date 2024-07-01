@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Photon.Pun;
 using System.Linq;
+using OGD;
 
 public class CompetitionMiddleware : MonoBehaviour {
 
@@ -14,12 +15,22 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     public string competitionID = null;
     public string flaskURL = "https://localhost";
-    public string serverKey = "NOTSET";
+    public string flaskServerKey = "NOTSET";
     public bool overrideAIMode = true;
-    [Tooltip("Whether logs should be send to the server.")]
-    public bool HttpSendLogs = true;
+    [Tooltip("Whether logs should be sent to the flask server.")]
+    public bool FlaskSendLogs = true;
     [Tooltip("Wheter logs should be printed to the console window and, in compiled builds, to the player log file.")]
     public bool DebugTraceLogs = true;
+
+    [Header("Open Game Data Settings")]
+    [Tooltip("Whether logs should be sent to the Open Game Data Infrastructure")]
+    public bool OGDSendLogs = false;
+
+    public string OGDAppID;
+
+    [Header("Local File Logging Settings")]
+    [Tooltip("Whether logs should be written to a local file.")]
+    public bool LogToFile = false;
 
     public string UserID { get { return currUserID; } }
 
@@ -78,6 +89,8 @@ public class CompetitionMiddleware : MonoBehaviour {
     private string currPhase = null;
 
     private List<string> Conditions = new List<string>();
+
+    OGDLog ogdLogger;
 
     // Start is called before the first frame update
     void Awake() {
@@ -139,7 +152,7 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
     private IEnumerator SendPostRequestWithCallback(string url, System.Action<JObject> callback, bool supressDebug = false) {
-        return SendPostRequestWithCallback(url, JsonConvert.SerializeObject(new JObject { { "api_key", serverKey } }), callback, supressDebug);
+        return SendPostRequestWithCallback(url, JsonConvert.SerializeObject(new JObject { { "api_key", flaskServerKey } }), callback, supressDebug);
     }
 
     private IEnumerator SendPostRequestWithCallback(string url, string json, System.Action<JObject> callback, bool supressDebug=false) {
@@ -163,6 +176,12 @@ public class CompetitionMiddleware : MonoBehaviour {
             Debug.LogWarning("Setting currUserID when already set.");
         }
         this.currUserID = userID;
+
+        if(OGDSendLogs) {
+            ogdLogger = new OGDLog(OGDAppID, Application.version);
+            ogdLogger.SetUserId(userID);
+        }
+
         LogStartSession();
     }
 
@@ -187,7 +206,7 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     public void CallVerifyCompetitionId(string compId, System.Action<JObject> callback) {
         JObject job = new JObject {
-            {"api_key", serverKey },
+            {"api_key", flaskServerKey },
             { "competition_id", compId }
         };
         StartCoroutine(SendPostRequestWithCallback(flaskURL + "/verify_competition_id", JsonConvert.SerializeObject(job), callback));
@@ -201,7 +220,7 @@ public class CompetitionMiddleware : MonoBehaviour {
         //this may benefit form being a coroutine as well
 
         JObject obj = new JObject {
-            { "api_key", serverKey },
+            { "api_key", flaskServerKey },
             { "photon_room", photonRoom },
         };
         obj["characters"] = new JObject {
@@ -217,7 +236,7 @@ public class CompetitionMiddleware : MonoBehaviour {
     public void CallReportResult(Dictionary<string, Dictionary<string, string>> playerInfo)
     {
         JObject retObj = new JObject {
-            { "api_key", serverKey },
+            { "api_key", flaskServerKey },
             {"game_version", Application.version },
             {"time", System.DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.ffff")},
             {"game_id", currGameId},
@@ -284,9 +303,8 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
     private void CallLogEvent(string userID, string sessionID, int eventID, string actor, string verb, JObject obj, bool includeContext = false, bool immediate = false) {
-        if (!HttpSendLogs && !DebugTraceLogs) { return; }
+        if (!FlaskSendLogs && !DebugTraceLogs) { return; }
         JObject job = new JObject {
-           {"api_key", serverKey},
            {"event_id", eventID},
            {"time", System.DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.ffff")},
            {"user_id", userID},
@@ -304,13 +322,17 @@ public class CompetitionMiddleware : MonoBehaviour {
         if (DebugTraceLogs) { 
             Debug.LogFormat("Log <color=cyan>{0}</color> <color=yellow>{1}</color> Full JSON: {2}", eventID, verb, job.ToString(Formatting.None));
         }
-        if (HttpSendLogs) {
+        if (FlaskSendLogs) {
+            job["api_key"] = flaskServerKey;
             if (immediate) {
                 SendPostRequestImmediate(flaskURL + "/log_event", JsonConvert.SerializeObject(job), true);
             }
             else {
                 StartCoroutine(SendPostRequestFireAndForget(flaskURL + "/log_event", JsonConvert.SerializeObject(job), true));
             }
+        }
+        if (OGDSendLogs) {
+            ogdLogger.Log(verb, JsonConvert.SerializeObject(job));
         }
     }
 
