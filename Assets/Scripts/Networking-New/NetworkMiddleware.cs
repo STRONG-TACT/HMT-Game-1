@@ -35,17 +35,27 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
             Debug.LogWarning($"networkmiddleware spawned in {SceneManager.GetActiveScene().name}");
             S = this;
             DontDestroyOnLoad(this.gameObject);
-            SceneManager.activeSceneChanged += (_, loadedScene) => {
-                if (loadedScene.name == GlobalConstant.LOBBY_SCENE)
-                {
-                    S = null;
-                    Debug.Log("NetworkMiddleware destroyed");
-                    Destroy(this.gameObject);
-                } 
-            };
+            //SceneManager.activeSceneChanged += OnSceneChanged;
         }
     }
-    
+
+    /*
+    void OnSceneChanged(Scene current, Scene next)
+    {
+        if (next.name == GlobalConstant.LOBBY_SCENE)
+        {
+            S = null;
+            Debug.Log("NetworkMiddleware destroyed");
+            Destroy(this.gameObject);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.activeSceneChanged -= OnSceneChanged;
+    }
+    */
+
 
     public void SetupMiddleware(int randomSeed_, int characterID_) {
         randomSeed = randomSeed_;

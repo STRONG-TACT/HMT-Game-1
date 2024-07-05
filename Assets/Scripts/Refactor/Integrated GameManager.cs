@@ -964,6 +964,10 @@ public class IntegratedGameManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Destroy(NetworkMiddleware.S.gameObject);
+        if(gameStatus != GameStatus.GetReady)
+        {
+            Debug.Log("Game manager OnDestory getting called, destroying NetworkMiddleware, current gamestatus: " + gameStatus);
+            Destroy(NetworkMiddleware.S.gameObject);
+        }
     }
 }

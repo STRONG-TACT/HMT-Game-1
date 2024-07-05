@@ -80,10 +80,12 @@ public class NetworkLobbyManager : MonoBehaviour
 
     private void Start()
     {
+        /*
         if (NetworkMiddleware.S != null)
         {
             Destroy(NetworkMiddleware.S.gameObject);
         }
+        */
     }
 #endif
 
