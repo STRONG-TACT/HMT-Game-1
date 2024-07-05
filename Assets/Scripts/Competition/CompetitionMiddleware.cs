@@ -290,6 +290,7 @@ public class CompetitionMiddleware : MonoBehaviour {
            {"time", System.DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.ffff")},
            {"user_id", userID},
            {"session_id", sessionID},
+           {"game_id", currGameId },
            {"transaction_id", System.Guid.NewGuid().ToString()},
            {"actor", actor},
            {"verb", verb},
