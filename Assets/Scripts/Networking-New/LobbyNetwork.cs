@@ -104,6 +104,8 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
+        CompetitionMiddleware.Instance.LogJoinRoom(PhotonNetwork.CurrentRoom.Name);
+
         if (!PhotonNetwork.IsMasterClient)
         {
             NetworkLobbyManager.S.OnRoomEntered();

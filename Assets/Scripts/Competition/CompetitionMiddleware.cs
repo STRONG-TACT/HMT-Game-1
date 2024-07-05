@@ -29,6 +29,8 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     [HideInInspector] public int numPlayer;
 
+    private JObject matchGameData = null;
+
     public struct AgentRecord {
         public string agentID;
         public string sessionID;
@@ -223,10 +225,8 @@ public class CompetitionMiddleware : MonoBehaviour {
         };
 
         try {
-            foreach (string character in new string[] { "dwarf", "giant", "human" })
-            {
-                retObj[character] = new JObject
-                {
+            foreach (string character in new string[] { "dwarf", "giant", "human" }) {
+                retObj[character] = new JObject {
                     { "player_type", playerInfo[character]["player_type"] },
                     { "player_id", playerInfo[character]["player_id"] },
                     { "health", int.Parse(playerInfo[character]["health"]) },
@@ -235,6 +235,14 @@ public class CompetitionMiddleware : MonoBehaviour {
                     { "max_lives", int.Parse(playerInfo[character]["max_lives"]) },
                     { "respawned", bool.Parse(playerInfo[character]["respawned"]) },
                 };
+
+                /// If we have the matchgame data we should augment the report with the session and user ids
+                /// TODO - this will only work if we're reporting match info from the MasterClient, other clients don't have this information.
+                if (matchGameData != null) {
+                    retObj[character]["player_type"] = matchGameData[character]["ai"];
+                    retObj[character]["player_id"] = matchGameData[character]["user_id"];
+                    retObj[character]["session_id"] = matchGameData[character]["session_id"];
+                }
             }
         }
         catch (KeyNotFoundException e) {
@@ -248,6 +256,10 @@ public class CompetitionMiddleware : MonoBehaviour {
         }
         
         StartCoroutine(SendPostRequestFireAndForget(flaskURL + "/report_result", JsonConvert.SerializeObject(retObj)));
+    }
+
+    private void CallLogEvent(string userID, string sessionID, int eventId, string actor, string verb, string label, float value, bool immediate = false) {
+        CallLogEvent(userID, sessionID, eventId, actor, verb, new JObject { { label, value } }, false, immediate);
     }
 
     private void CallLogEvent(string userID, string sessionID, int eventId, string actor, string verb, string label, int value, bool immediate = false) {
@@ -384,7 +396,7 @@ public class CompetitionMiddleware : MonoBehaviour {
         CallLogEvent(1000, "system", "start_session",
             new JObject {
                 {"session_id", currSessionID },
-                {"version", GlobalConstant.GAME_VERSION},
+                {"version", Application.version},
                 {"platform", Application.platform.ToString()},
 #if HMT_BUILD
                 {"HMT_BUILD",true },
@@ -420,14 +432,16 @@ public class CompetitionMiddleware : MonoBehaviour {
             LogEndGame();
         }
         currGameId = gameID;
-        CallLogEvent(1010, "system", "start_game",
-            new JObject {
+        matchGameData = new JObject {
                 {"game_id", gameID },
                 {"mode", "network"},
                 {"dwarf", new JObject { { "user_id", dwarfUserID}, { "session_id", dwarfSessionID}, {"ai", dwarfIsAI } } },
                 {"giant", new JObject { { "user_id", giantUserID}, { "session_id", giantSessionID}, {"ai", giantIsAI } } },
                 {"human", new JObject { { "user_id", humanUserID}, { "session_id", humanSessionID}, {"ai", humanIsAI} } }
-            });
+            };
+
+
+        CallLogEvent(1010, "system", "start_game", matchGameData);
     }
 
     public void LogEndGame() {
@@ -491,8 +505,11 @@ public class CompetitionMiddleware : MonoBehaviour {
         CallLogEvent(2001, "player", "leave_queue", null);
     }
 
-    public void LogQueueTimeout(string newCondition) { 
-        CallLogEvent(2002, "player", "queue_timeout", "new_condition", newCondition);
+    public void LogQueueTimeout(float duration) {
+        CallLogEvent(2002, "player", "queue_timeout", 
+            new JObject {
+                {"waitTime", duration }
+            });
     }
 
     public void LogJoinRoom(string roomName) {
@@ -642,6 +659,21 @@ public class CompetitionMiddleware : MonoBehaviour {
                 { "challenge_die", challenge.ToString() },
             },
             true);
+    }
+
+    public void LogChangeCharacter(int newCharacterId) {
+        CallLogEvent(3103, IntegratedGameManager.S.inSceneCharacters[newCharacterId].config.characterName, "change_character", null, true);
+    }
+
+    public void LogForfeit(int characterId) {
+        ///Leaving this suggested code here just in case but AIs can't initiate a forfeit so it shouldnt be necessary.
+        //if (RegisteredAgents.ContainsKey(characterId)) {
+        //    CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
+        //                       3104, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "forfeit", null, true);
+        //}
+        //else {
+            CallLogEvent(3099, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "forfeit", null, true);
+        //}
     }
 
     #endregion

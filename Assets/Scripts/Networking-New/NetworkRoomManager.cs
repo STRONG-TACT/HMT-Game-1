@@ -20,6 +20,7 @@ public class NetworkRoomManager : MonoBehaviour
     {
         RoomNetwork.S.RegisterPlayerReadyLocal();
         _readyButton.interactable = false;
+        CompetitionMiddleware.Instance.LogReadyUp();
     }
 
     public void LaunchGameWithAIs() {

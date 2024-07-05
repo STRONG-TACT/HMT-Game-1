@@ -989,6 +989,9 @@ public class UIManager : MonoBehaviour
 
     public void ReturnToLobby()
     {
+        if (forfeiting) {
+            CompetitionMiddleware.Instance.LogForfeit(IntegratedGameManager.S.localChar.CharacterId);
+        }
         if (PhotonNetwork.IsConnected)
         {
             Debug.Log("Photon is connected. Disconnecting...");
@@ -999,11 +1002,15 @@ public class UIManager : MonoBehaviour
 
     public void HideForfeitUI()
     {
+        forfeiting = false;
         ForfeitConfirmationUI.SetActive(false);
     }
 
+    bool forfeiting = false;
+
     public void ShowForfeitUI()
     {
+        forfeiting = true;
         ForfeitConfirmationUI.SetActive(true);
     }
 

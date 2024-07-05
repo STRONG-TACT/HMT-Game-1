@@ -81,7 +81,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
             UIManager.S.HideCharacterPinUI();
             UIManager.S.HideCharacterPlanUI();
         }
-       
+        CompetitionMiddleware.Instance.LogChangeCharacter(index);
        CameraManager.S.ChangeTargetCharacter(index);
        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
     }

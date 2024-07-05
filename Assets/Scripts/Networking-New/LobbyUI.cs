@@ -251,6 +251,7 @@ public class LobbyUI : MonoBehaviour
 
     public void OpenHelpPageLink()
     {
+        CompetitionMiddleware.Instance.LogOpenHelp();
         Application.OpenURL("https://strong-tact.github.io/game/");
     }
 

@@ -18,7 +18,6 @@ public class NetworkLobbyManager : MonoBehaviour
     public OnBoardingState playChoice = OnBoardingState.ChooseGameMode;
 
     private int _numPerson;
-    private bool _onePersonEnforced = false;
     public List<RoomInfo> ListOfRooms;
 
     private float _twoHumanChance;
@@ -146,7 +145,7 @@ public class NetworkLobbyManager : MonoBehaviour
         }
         
         _numPerson = (Random.Range(0.0f, 1.0f) < _twoHumanChance) ? 2 : 1;
-        
+        CompetitionMiddleware.Instance.LogAssignCondition(_numPerson+"-human");
         StartCoroutine(JointMatchmakingRoom());
 #endif
     }
@@ -174,9 +173,10 @@ public class NetworkLobbyManager : MonoBehaviour
     private IEnumerator JointMatchmakingRoom()
     {
         Debug.Log($"Creating/Joining a room with {_numPerson} human players");
+        CompetitionMiddleware.Instance.LogJoinQueue();
         LobbyUI.S.ShowLoadingUI("Searching for a Room to Join...");
         
-        _timer = _onePersonEnforced ? 0.0f : _timeoutLimit;
+        _timer = _timeoutLimit;
         Hashtable roomPropertyHashTable = new Hashtable { { MatchMakingParameter.NUM_PERSON_KEY, _numPerson } };
         RoomOptions roomOptions = new RoomOptions
         {
@@ -278,29 +278,29 @@ public class NetworkLobbyManager : MonoBehaviour
         }
         else
         {
-            while (_timer > 0.0f)
-            {
+            float startTime = Time.time;
+
+            while (Time.time - startTime < _timer) {
                 //TODO: should actually just use the OnPlayerEnteredRoom Callback
-                if (PhotonNetwork.CurrentRoom.PlayerCount < 2)
-                {
-                    _timer -= 0.05f;
-                    yield return new WaitForSeconds(0.05f);
+                if (PhotonNetwork.CurrentRoom.PlayerCount < 2) {
+                    yield return null;
                 }
-                else
-                {
+                else {
                     SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
                     yield break;
                 }
             }
+            CompetitionMiddleware.Instance.LogQueueTimeout(_timer);
             // fall back to one person game
+            CompetitionMiddleware.Instance.LogRemoveCondition("2-human");
             _numPerson = 1;
+            CompetitionMiddleware.Instance.LogAssignCondition("1-human-fallback");
             CompetitionMiddleware.Instance.numPlayer = _numPerson;
             PhotonNetwork.CurrentRoom.IsOpen = true;
             PhotonNetwork.CurrentRoom.IsVisible = false;
             SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
         }
     }
-    
 
     // ============ Back Button Logic ============
 
