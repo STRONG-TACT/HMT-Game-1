@@ -76,6 +76,15 @@ public class NetworkLobbyManager : MonoBehaviour
             //if the connection failes then just bail, AI's don't create rooms
         }
     }
+#else
+
+    private void Start()
+    {
+        if (NetworkMiddleware.S != null)
+        {
+            Destroy(NetworkMiddleware.S.gameObject);
+        }
+    }
 #endif
 
 
@@ -123,20 +132,23 @@ public class NetworkLobbyManager : MonoBehaviour
 
     public IEnumerator OnJoinLobbySucceed()
     {
-        if (!_onePersonEnforced)
+        onBoardingState = OnBoardingState.CreateOrJoinRoom;
+#if HMT_BUILD
+        yield break;
+#else
+
+        LobbyUI.S.ShowLoadingUI("Initializing Matchmaking System");
+        
+        CompetitionMiddleware.Instance.CallMatchmakingConfig(OnMatchmakingConfigResponse);
+        while (!_matchmakingConfigSet)
         {
-            onBoardingState = OnBoardingState.CreateOrJoinRoom;
-            LobbyUI.S.ShowLoadingUI("Initializing Matchmaking System");
-        
-            CompetitionMiddleware.Instance.CallMatchmakingConfig(OnMatchmakingConfigResponse);
-            while (!_matchmakingConfigSet)
-            {
-                yield return null;
-            }
-        
-            _numPerson = (Random.Range(0.0f, 1.0f) < _twoHumanChance) ? 2 : 1;
+            yield return null;
         }
+        
+        _numPerson = (Random.Range(0.0f, 1.0f) < _twoHumanChance) ? 2 : 1;
+        
         StartCoroutine(JointMatchmakingRoom());
+#endif
     }
     
     private void OnMatchmakingConfigResponse(JObject response)

@@ -964,6 +964,6 @@ public class IntegratedGameManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        Destroy(NetworkMiddleware.S.gameObject);
+        // Destroy(NetworkMiddleware.S.gameObject);
     }
 }

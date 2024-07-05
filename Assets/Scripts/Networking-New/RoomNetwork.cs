@@ -107,8 +107,7 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
 
     private void Update()
     {
-        if (!PhotonNetwork.IsMasterClient || AILaunched) return;
-        if (ReadyCount() == CompetitionMiddleware.Instance.numPlayer)
+        if (PhotonNetwork.IsMasterClient && !AILaunched &&ReadyCount() == CompetitionMiddleware.Instance.numPlayer)
         {
             LaunchGameWithAIsLocal();
             AILaunched = true;

@@ -5,6 +5,7 @@ using GameConstant;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class NetworkMiddleware : MonoBehaviourPunCallbacks
@@ -27,13 +28,24 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     private void Awake() {
         if (S) {
+            Debug.LogWarning($"Duplicate of networkmiddleware find in {SceneManager.GetActiveScene().name}");
             Destroy(this.gameObject);
         }
         else {
+            Debug.LogWarning($"networkmiddleware spawned in {SceneManager.GetActiveScene().name}");
             S = this;
             DontDestroyOnLoad(this.gameObject);
+            SceneManager.activeSceneChanged += (_, loadedScene) => {
+                if (loadedScene.name == GlobalConstant.LOBBY_SCENE)
+                {
+                    S = null;
+                    Debug.Log("NetworkMiddleware destroyed");
+                    Destroy(this.gameObject);
+                } 
+            };
         }
     }
+    
 
     public void SetupMiddleware(int randomSeed_, int characterID_) {
         randomSeed = randomSeed_;
