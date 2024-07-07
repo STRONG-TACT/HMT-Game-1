@@ -11,6 +11,7 @@ public class SuveryHandler : MonoBehaviour
     [SerializeField] private GameObject DialogBox;
     [SerializeField] private GameObject SurveyUI;
     [SerializeField] private ToggleGroup[] questions;
+    [SerializeField] private Button submitBtn;
     private List<string> questionTexts;
     private List<string> responses;
 
@@ -23,10 +24,24 @@ public class SuveryHandler : MonoBehaviour
         else S = this;
     }
 
+    private void Update()
+    {
+    }
+
 
     // Start is called before the first frame update
     void Start()
     {
+        foreach (ToggleGroup question in questions)
+        {
+            Toggle[] toggles = question.GetComponentsInChildren<Toggle>();
+            foreach (Toggle toggle in toggles)
+            {
+                toggle.onValueChanged.AddListener(delegate { CheckIfAllQuestionAnswered(); });
+            }
+        }
+        submitBtn.interactable = false;
+
         questionTexts = new List<string>();
         responses = new List<string>();
         questionTexts.Add("I would play with this team again.");
@@ -54,6 +69,32 @@ public class SuveryHandler : MonoBehaviour
         DisableAllUI();
         SurveyUI.SetActive(true);
     }
+
+
+    private void CheckIfAllQuestionAnswered()
+    {
+        int questionAnsweredCount = 0;
+        foreach (ToggleGroup question in questions)
+        {
+            Toggle[] toggles = question.GetComponentsInChildren<Toggle>();
+            foreach (Toggle toggle in toggles)
+            {
+                if (toggle.isOn)
+                {
+                    questionAnsweredCount++;
+                }
+            }
+        }
+        if(questionAnsweredCount >= 5)
+        {
+            submitBtn.interactable = true;
+        }
+        else
+        {
+            submitBtn.interactable = false;
+        }
+    }
+
 
     public void Submit()
     {
