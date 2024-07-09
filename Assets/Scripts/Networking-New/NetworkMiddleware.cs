@@ -328,6 +328,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         // If we're at the end of a game we might want to stay alive for a bit so the AI can know the game is over
 
         if (!CompetitionMiddleware.Instance.overrideAIMode) {
+            CompetitionMiddleware.Instance.LogEndGame("OtherPlayerDisconnected");
             Application.Quit();
         }
 #endif

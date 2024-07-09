@@ -902,6 +902,7 @@ public class IntegratedGameManager : MonoBehaviour
         }
         else {
             Debug.Log("Game ends.");
+            CompetitionMiddleware.Instance.LogEndGame("Win");
             UIManager.S.DisplayVictoryScreen();
             gameStatus = GameStatus.GameEnd;
         }
@@ -935,6 +936,7 @@ public class IntegratedGameManager : MonoBehaviour
     }
     protected virtual void Lose()
     {
+        CompetitionMiddleware.Instance.LogEndGame("Loss");
         UIManager.S.DisplayLossScreen();
     }
 

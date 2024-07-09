@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using GameConstant;
 using Photon.Pun;
 using System.Linq;
 
@@ -177,7 +176,7 @@ public class CompetitionMiddleware : MonoBehaviour {
         RegisteredAgents[characterID] = record;
 
         LogHMTConnect(characterID);
-        CallLogEvent(agentID, record.sessionID, 1000, "system", "start_session", "session_id", currSessionID);
+        CallLogEvent(agentID, record.sessionID, 1000, "system", "start_session", "session_id", record.sessionID);
     }
 
     public void CallListAgents(System.Action<JObject> callback) {
@@ -218,6 +217,7 @@ public class CompetitionMiddleware : MonoBehaviour {
     {
         JObject retObj = new JObject {
             { "api_key", serverKey },
+            {"game_version", Application.version },
             {"time", System.DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.ffff")},
             {"game_id", currGameId},
             {"level_name", currLevel},
@@ -408,14 +408,21 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
     private void LogEndSession() {
-        CallLogEvent(1001, "system", "end_session", "session_id", currSessionID, true);
-        currSessionID = null;
+        if (RegisteredAgents.Count > 0) {
+            foreach(AgentRecord record in RegisteredAgents.Values) {
+                CallLogEvent(record.agentID, record.sessionID, 1001, "system", "end_session", "session_id", record.sessionID, true);
+            }
+        }
+        else {
+            CallLogEvent(1001, "system", "end_session", "session_id", currSessionID, true);
+            currSessionID = null;
+        }     
     }
 
 
     public void LogStartGameLocal(string gameID) {
         if (currGameId != null) {
-            LogEndGame();
+            LogEndGame("Unknown");
         }
         currGameId = gameID;
         CallLogEvent(1010, "system", "start_game",
@@ -430,7 +437,7 @@ public class CompetitionMiddleware : MonoBehaviour {
                             string giantUserID, string giantSessionID, bool giantIsAI,
                             string humanUserID, string humanSessionID, bool humanIsAI) {
         if (currGameId != null) {
-            LogEndGame();
+            LogEndGame("Unknown");
         }
         currGameId = gameID;
         matchGameData = new JObject {
@@ -439,14 +446,25 @@ public class CompetitionMiddleware : MonoBehaviour {
                 {"dwarf", new JObject { { "user_id", dwarfUserID}, { "session_id", dwarfSessionID}, {"ai", dwarfIsAI } } },
                 {"giant", new JObject { { "user_id", giantUserID}, { "session_id", giantSessionID}, {"ai", giantIsAI } } },
                 {"human", new JObject { { "user_id", humanUserID}, { "session_id", humanSessionID}, {"ai", humanIsAI} } }
-            };
+         };
 
 
         CallLogEvent(1010, "system", "start_game", matchGameData);
     }
 
-    public void LogEndGame() {
-        CallLogEvent(1011, "system", "end_game", "game_id", currGameId);
+    public void LogEndGame(string outcome) {
+        if(currGameId == null) {
+            return;
+        }
+
+        if(RegisteredAgents.Count > 0) {
+            foreach(AgentRecord record in RegisteredAgents.Values) {
+                CallLogEvent(record.agentID, record.sessionID, 1011, "system", "end_game", "outcome", outcome);
+            }            
+        }
+        else {
+            CallLogEvent(1011, "system", "end_game", "outcome", outcome);
+        }
         currGameId = null;
     }
 

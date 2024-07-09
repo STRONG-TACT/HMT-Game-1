@@ -980,18 +980,36 @@ public class UIManager : MonoBehaviour
 
     #region Network StatusnUI
 
+    private enum DisconnectReason {
+        OtherPlayerDisconnected,
+        Forfeiting,
+        Unknown
+    }
+
+    private DisconnectReason disconnectReason = DisconnectReason.Unknown;
+
     public void ShowOtherPlayerDisconnectUI(string playerName)
     {
-        networkStatusMsg.text = $"Unfortunately, player {playerName} was disconnected from the game!" +
-                                $"\nThis game will not be recorded.";
+        networkStatusMsg.text = $"Unfortunately, player {playerName} was disconnected from the game!";
+        disconnectReason = DisconnectReason.OtherPlayerDisconnected;
         networkStatusHandle.SetActive(true);
     }
 
     public void ReturnToLobby()
     {
-        if (forfeiting) {
-            CompetitionMiddleware.Instance.LogForfeit(IntegratedGameManager.S.localChar.CharacterId);
+        switch (disconnectReason) {
+            case DisconnectReason.OtherPlayerDisconnected:
+               CompetitionMiddleware.Instance.LogEndGame("OtherPlayerDisconnected");
+                break;
+            case DisconnectReason.Forfeiting:
+                CompetitionMiddleware.Instance.LogForfeit(IntegratedGameManager.S.localChar.CharacterId);
+                CompetitionMiddleware.Instance.LogEndGame("Forfeit");
+                break;
+            case DisconnectReason.Unknown:
+                CompetitionMiddleware.Instance.LogEndGame("Unknown");
+                break;
         }
+
         if (PhotonNetwork.IsConnected)
         {
             Debug.Log("Photon is connected. Disconnecting...");
@@ -1002,15 +1020,13 @@ public class UIManager : MonoBehaviour
 
     public void HideForfeitUI()
     {
-        forfeiting = false;
+        disconnectReason = DisconnectReason.Unknown;
         ForfeitConfirmationUI.SetActive(false);
     }
 
-    bool forfeiting = false;
-
     public void ShowForfeitUI()
     {
-        forfeiting = true;
+        disconnectReason = DisconnectReason.Forfeiting;
         ForfeitConfirmationUI.SetActive(true);
     }
 
