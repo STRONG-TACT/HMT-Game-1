@@ -500,7 +500,7 @@ public class IntegratedGameManager : MonoBehaviour
         }
         readyForPlayerTurnCount = 0;
         
-        if (isNetworkGame && PhotonNetwork.IsMasterClient) LogLevelResult();
+        //if (isNetworkGame && PhotonNetwork.IsMasterClient) LogLevelResult();
         
         StartPlayerTurn();
     }
@@ -858,6 +858,7 @@ public class IntegratedGameManager : MonoBehaviour
         if (level_finished) {
             Tile tile = inSceneCharacters[charaID].currentTile;
             CompetitionMiddleware.Instance.LogClearGoal(charaID, tile.col, tile.row);
+            if (isNetworkGame && PhotonNetwork.IsMasterClient) LogLevelResult();
             StartCoroutine(PrepareForNextLevel());
         }
     }
