@@ -490,7 +490,9 @@ public class Tile : MonoBehaviour, IComparable<Tile>
         }
     }
 
-
+    public void SetFOWVisualsToVisible() {
+        setRenderer(FogOfWarState.Visible);
+    }
 
     public void SetFOWVisualsToCharacter(int characterID) {
         switch (fogOfWarDictionary[characterID]) {

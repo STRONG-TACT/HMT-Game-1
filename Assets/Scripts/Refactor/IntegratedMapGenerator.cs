@@ -12,8 +12,9 @@ public class IntegratedMapGenerator : MonoBehaviour
     public Transform tileParent;
     public Tile[,] Map;
     public bool FOW_enabled = true;
-    public Dictionary<Tile, Dictionary<int, Tile.FogOfWarState>> FOW_States = new Dictionary<Tile, Dictionary<int, Tile.FogOfWarState>>();
     public string CurrentLevelName { get; private set; }
+
+    public List<KeyCode> SecretFOWToggleCode = new List<KeyCode> { KeyCode.F, KeyCode.O, KeyCode.W };
 
     public Dictionary<string, string> AlternateSchema = new Dictionary<string, string>()
     {
@@ -52,45 +53,41 @@ public class IntegratedMapGenerator : MonoBehaviour
         Instance = this;
     }
 
+    void Update() {
+        for(int i = 0; i < SecretFOWToggleCode.Count; i++) {
+            if (Input.GetKeyDown(SecretFOWToggleCode[i])) {
+                bool toggle = true;
+                for(int j = 0; j < SecretFOWToggleCode.Count; j++) {
+                    if (j == i) continue;
+                    if (!Input.GetKey(SecretFOWToggleCode[j])) {
+                        toggle = false;
+                        break;
+                    }
+                }
+                if (toggle) {
+                    ToggleFOW_OnOff();
+                }
+            }
+        }
+    }
+
     public void UpdateFOWVisuals()
     {
         foreach (Tile tile in Map)
         {
-            tile.SetFOWVisualsToCharacter(IntegratedGameManager.S.localChar.CharacterId);
+            if (FOW_enabled) {
+                tile.SetFOWVisualsToCharacter(IntegratedGameManager.S.localChar.CharacterId);
+            }
+            else {
+                tile.SetFOWVisualsToVisible();
+            }
         }
     }
 
     public void ToggleFOW_OnOff()
     {
-        if (FOW_enabled)
-        {
-            FOW_States.Clear();
-            foreach (Tile tile in Map)
-            {
-                Dictionary<int, Tile.FogOfWarState> newDict = new Dictionary<int, Tile.FogOfWarState>();
-                foreach (KeyValuePair<int, Tile.FogOfWarState> kvp in tile.fogOfWarDictionary)
-                {
-                    newDict.Add(kvp.Key, kvp.Value);
-                }
-                FOW_States.Add(tile, newDict);
-                tile.fogOfWarDictionary = new Dictionary<int, Tile.FogOfWarState> {
-                    { 0, Tile.FogOfWarState.Visible },
-                    { 1, Tile.FogOfWarState.Visible },
-                    { 2, Tile.FogOfWarState.Visible }
-                };
-            }
-            UpdateFOWVisuals();
-            FOW_enabled = false;
-        }
-        else
-        {
-            foreach (Tile tile in Map)
-            {
-                tile.fogOfWarDictionary = FOW_States[tile];
-            }
-            UpdateFOWVisuals();
-            FOW_enabled = true ;
-        }
+        FOW_enabled = !FOW_enabled;
+        UpdateFOWVisuals();
     }
 
     private void Start()

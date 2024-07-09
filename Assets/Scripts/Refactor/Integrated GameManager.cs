@@ -110,11 +110,6 @@ public class IntegratedGameManager : MonoBehaviour
         if(TimeRemaining<= 0) {
             TimeoutSubmit();
         }
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            IntegratedMapGenerator.Instance.ToggleFOW_OnOff();
-        }
-
     }
 
     protected virtual void TimeoutSubmit() {  }
