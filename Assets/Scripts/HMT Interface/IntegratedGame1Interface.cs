@@ -43,9 +43,14 @@ public class IntegratedGame1Interface : HMTInterface {
             CompetitionMiddleware.Instance.LogHMTInterfaceCall(GetTargetCharacterID(command.target), command);
         }
         if (InGame) {
+            /// The GetReady state is used both for first time intialization but also tranditions between levels.
+            /// Rather than telling the agent to try agian later, we can just wait for things to be ready.
+            while (IntegratedGameManager.S.gameStatus == GameConstant.GameStatus.GetReady) {
+                yield return null;
+            }
             switch (IntegratedGameManager.S.gameStatus) {
                 case GameConstant.GameStatus.GetReady:
-                    command.SendErrorResponse("Game is not started yet.", 1002);
+                    command.SendErrorResponse("Game or level is intializing, try again later.", 1002);
                     break;
                 case GameConstant.GameStatus.GameEnd:
                     command.SendGameOverResponse("Game Over"); // may want to send more interesting information than this
@@ -116,11 +121,11 @@ public class IntegratedGame1Interface : HMTInterface {
         while(!InGame) {
             yield return null;
         }
-        Debug.Log("waited on InGame");
+        Debug.Log("Waited to be InGame");
         while(IntegratedGameManager.S.gameStatus == GameConstant.GameStatus.GetReady) {
             yield return null;
         }
-        Debug.Log("waited on GetReady");
+        Debug.Log("Waited to be Ready");
 
         command.SendOKResponse("Ready for Actions");
         yield break;
