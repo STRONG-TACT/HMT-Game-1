@@ -854,12 +854,14 @@ public class IntegratedGameManager : MonoBehaviour
             Tile tile = inSceneCharacters[charaID].currentTile;
             CompetitionMiddleware.Instance.LogClearGoal(charaID, tile.col, tile.row);
             if (isNetworkGame && PhotonNetwork.IsMasterClient) LogLevelResult();
+            StopAllCoroutines();
             StartCoroutine(PrepareForNextLevel());
         }
     }
 
     protected virtual IEnumerator PrepareForNextLevel() {
-
+        //temporarily disable all physical interactions
+        Physics.autoSimulation = false;
         while (inSceneMonsters.Count != 0) {
             Monster m = inSceneMonsters[0];
             inSceneMonsters.Remove(m);
@@ -873,10 +875,12 @@ public class IntegratedGameManager : MonoBehaviour
 
         eventQueue.Clear();
         UIManager.S.HideCharacterPinUI();
-        yield return new WaitForSeconds(5f);
+        //yield return new WaitForSeconds(5f);
+        /*
         foreach (Character c in inSceneCharacters) {
             c.State = Character.CharacterState.Idle;
         }
+        */
 
 
         Debug.Log("Moving to next currLevel.");
@@ -885,18 +889,25 @@ public class IntegratedGameManager : MonoBehaviour
         if (currentLevel <= gameData.levelTextFiles.Length) {
 
             eventQueue.Clear();
-            StopAllCoroutines();
+            //StopAllCoroutines();
 
+            yield return new WaitForSeconds(5f);
+            foreach (Character c in inSceneCharacters)
+            {
+                c.State = Character.CharacterState.Idle;
+            }
             foreach (Character c in inSceneCharacters) {
                 c.StopAllCoroutines();
                 c.QuickRespawn();
                 UIManager.S.UpdateCharacterLifeStatus(c.CharacterId, true);
             }
-
+            Physics.autoSimulation = true;
             StartCoroutine(StartLevel());
         }
         else {
+            Physics.autoSimulation = true;
             Debug.Log("Game ends.");
+            yield return new WaitForSeconds(5f);
             CompetitionMiddleware.Instance.LogEndGame("Win");
             UIManager.S.DisplayVictoryScreen();
             gameStatus = GameStatus.GameEnd;

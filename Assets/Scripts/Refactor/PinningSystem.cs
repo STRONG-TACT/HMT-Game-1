@@ -87,7 +87,7 @@ public class PinningSystem : MonoBehaviour
 
             if (!PinUIUp) {
                 // if raycast on ground
-                if (Physics.Raycast(ray, out hit, 1000f, LayerMask.GetMask("Ground"))) { 
+                if (Physics.Raycast(ray, out hit, 1000f, LayerMask.GetMask("Ground") | LayerMask.GetMask("Impassible"))) { 
                     focusedTile = hit.transform.gameObject.GetComponent<Tile>();
                     //Debug.LogFormat("tile location: {0}, {1}", focusedTile.row, focusedTile.col);
                     Debug.Log(focusedTile.row);
