@@ -317,7 +317,7 @@ public class Character : MonoBehaviour {
             _ => Vector3.forward
         };
         RaycastHit hit;
-        if (Physics.Raycast(indicator.transform.position, moveVec, out hit, stepLength, LayerMask.GetMask("Impassible")))
+        if (Physics.Raycast(indicator.transform.position, moveVec, out hit, stepLength, LayerMask.GetMask("Impassible") | LayerMask.GetMask("Boundary")))
         {
             Tile getTile = hit.collider.gameObject.GetComponent<Tile>();
             if (getTile != null && getTile.fogOfWarDictionary[CharacterId] == Tile.FogOfWarState.Unseen)
