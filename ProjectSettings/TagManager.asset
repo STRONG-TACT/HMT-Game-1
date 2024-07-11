@@ -15,6 +15,11 @@ TagManager:
   - GiantDiceSide
   - Walls
   - Door
+  - Corner
+  - Character
+  - VisibleMask
+  - TileGround
+  - Ping
   layers:
   - Default
   - TransparentFX
@@ -23,9 +28,9 @@ TagManager:
   - Water
   - UI
   - Ground
-  - 
-  - 
-  - 
+  - Dice
+  - Impassible
+  - NoCollision
   - 
   - 
   - 

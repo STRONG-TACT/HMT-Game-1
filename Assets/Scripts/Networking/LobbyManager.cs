@@ -103,7 +103,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 tutorialPagesUI.transform.GetChild(currentPageNum).gameObject.SetActive(false);
                 tutorialPagesUI.transform.GetChild(0).gameObject.SetActive(true);
             }
-            else  // bcak to lobby
+            else  // back to lobby
             {
                 lobbyUI.SetActive(true);
                 tutorialUI.SetActive(false);

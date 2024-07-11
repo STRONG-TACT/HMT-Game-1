@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8586804875866554802
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8586804875866554796}
+  - component: {fileID: 8586804875866554797}
+  m_Layer: 0
+  m_Name: GameAssets
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8586804875866554796
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8586804875866554802}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 562.796, y: 136.5347, z: 0.0009918213}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8586804875866554797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8586804875866554802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 532dddaaad537dc4d93d88129dbadec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trapCombatUI: {fileID: 21300000, guid: 803dfac12502e014297457aaf35dc800, type: 3}
+  rockCombatUI: {fileID: 21300000, guid: 2933c5eb108bf694e9063476aa318b79, type: 3}
+  monsterCombatUI: {fileID: 21300000, guid: 1d813286f9c44914cb3172b9c89e0e10, type: 3}
+  diceImg:
+  - {fileID: 21300000, guid: 7606ee24a194fdf46969336f9191f0d5, type: 3}
+  - {fileID: 21300000, guid: 7606ee24a194fdf46969336f9191f0d5, type: 3}
+  - {fileID: 21300000, guid: 7606ee24a194fdf46969336f9191f0d5, type: 3}
+  - {fileID: 21300000, guid: 7606ee24a194fdf46969336f9191f0d5, type: 3}
+  - {fileID: 21300000, guid: 7606ee24a194fdf46969336f9191f0d5, type: 3}
+  - {fileID: 21300000, guid: 7606ee24a194fdf46969336f9191f0d5, type: 3}
+  dwarfIcon: {fileID: 21300000, guid: d0d76f0bcf97e5645bb0a8ae52e5192d, type: 3}
+  giantIcon: {fileID: 21300000, guid: ef146bac666375346acc6ebaf3d7ea20, type: 3}
+  humanIcon: {fileID: 21300000, guid: 84bedc0588834bb4595092c86e34fbbe, type: 3}
+  youAreDwarf: {fileID: 0}
+  youAreGiant: {fileID: 0}
+  youAreHuman: {fileID: 0}
+  OpenTile: {fileID: 820993973835651314, guid: dc9bfa23167af4069aafeba8ba5b7fb4, type: 3}
+  DoorTile: {fileID: 5421383699883065198, guid: 2156a555e7f4c4b41bcd9dbf07356e3f, type: 3}
+  WallTiles:
+  - {fileID: 5461037204865345503, guid: 6077b557c406243dca71e4e0d47f5dcc, type: 3}
+  - {fileID: 4676536006019389302, guid: efb8beacbeead4575bb50147c2436388, type: 3}
+  - {fileID: 665779002927803539, guid: b5e02e4f14105497da7e517b0bfa5736, type: 3}
+  - {fileID: 438455888594864229, guid: 9971c73df0df1419697bbffade6f76ec, type: 3}
+  - {fileID: 5959802271096397102, guid: ad1c09a307c4e40eeaf984caea821595, type: 3}
+  - {fileID: 1984093338750683295, guid: 68ffa9b1f00564fb7aae450381df8f19, type: 3}
+  - {fileID: 9153439007067548606, guid: b22349b874fd0424fa8ad053e7390403, type: 3}
+  - {fileID: 4348979063034727788, guid: a4a541ba43bbc4024bf7d236a5586f67, type: 3}
+  - {fileID: 5489681040685038276, guid: 3a20117565be841f1a0d73c6d56146fd, type: 3}
+  - {fileID: 458854253063774723, guid: 6e836351b528e4efaaa47eb0da2281ee, type: 3}
+  - {fileID: 4284385660779267023, guid: 644c1c4ac61164b389ee97d007e58883, type: 3}
+  - {fileID: 7850342880735688130, guid: 5bc145bfb2462416fbe2b7d0a63d9afe, type: 3}
+  - {fileID: 4049360142575092999, guid: 09a9adafbd5f8479e867817aa1a32543, type: 3}
+  - {fileID: 4775453016064692093, guid: 89d453257fe314ff0be98eebf368db17, type: 3}
+  - {fileID: 2195637893526711754, guid: 25752f57696ad4373abd70da3080cfaf, type: 3}
+  TrapTiles:
+  - {fileID: 7221710844014363561, guid: 6aa9873090c0241d28b5c6faa1b52e53, type: 3}
+  - {fileID: 5914118010568122004, guid: 520945744428d49caad12b15a5bb9110, type: 3}
+  RockTiles:
+  - {fileID: 8650430472697255982, guid: aee4999fb5988426faee69d40a989673, type: 3}
+  - {fileID: 6257837338122040717, guid: 3718fa21ad3df41d79ef52a528f0d922, type: 3}
+  - {fileID: 4459639482418607303, guid: 7fa0943a883cd4b16acd004ef9247690, type: 3}
+  - {fileID: 1294591075230484441, guid: 8b2d3d25875e445fc94cdbca93dbb4f6, type: 3}
+  MapBoundary: {fileID: 733805391813641436, guid: c6d2da011e7ba4f9692401c53021b507, type: 3}
+  Characters:
+  - {fileID: 2284675785199134838, guid: 0029e325ca3214438a0e4cb70cd4d0bc, type: 3}
+  - {fileID: 2958692308354745720, guid: 2daec67310b2a4e6487d722fb37b1851, type: 3}
+  - {fileID: 814971363674059150, guid: 786c6b4cdb24c479d914df36d458cf89, type: 3}
+  Monsters:
+  - {fileID: 6420842695932332083, guid: 93410dc0679a87140ae1427232e7754b, type: 3}
+  - {fileID: 6422928321250116657, guid: 3c93fad8f5f7da0438bfea971e483f12, type: 3}
+  - {fileID: 7741471954033257679, guid: 57439934da097324185497b2335ca96e, type: 3}
+  Goals:
+  - {fileID: 8362223678440659000, guid: 977b3e1ccab1d41c3bf33f30e78164d3, type: 3}
+  - {fileID: 7350101868502248773, guid: 915585588ce0b4eaea95a87e0d83c750, type: 3}
+  - {fileID: 5065180891822975960, guid: ed3ae3283b9394fa7b4ae297e86cb384, type: 3}

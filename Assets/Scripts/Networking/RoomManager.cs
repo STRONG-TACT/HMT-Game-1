@@ -18,7 +18,7 @@ public class RoomManager : MonoBehaviour
     private void Update()
     {
         playerLeft = 3 - PhotonNetwork.CurrentRoom.Players.Count;
-        waitingTxt.text = "Wait for " + playerLeft.ToString() + " players to start the game";
+        waitingTxt.text = "Wait for " + playerLeft.ToString() + " characters to start the game";
 /*        if (PhotonNetwork.IsMasterClient && !startGame)
         {
             PhotonNetwork.LoadLevel("Game");
@@ -26,7 +26,8 @@ public class RoomManager : MonoBehaviour
         }*/
         if (PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.Players.Count == 3 && !startGame)
         {
-            PhotonNetwork.LoadLevel("Game");
+            //PhotonNetwork.LoadLevel("Level_1");
+            PhotonNetwork.LoadLevel("Level_1");
             startGame = true;
         }
     }

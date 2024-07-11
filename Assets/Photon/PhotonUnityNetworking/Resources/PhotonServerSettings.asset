@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: PhotonServerSettings
   m_EditorClassIdentifier: 
   AppSettings:
-    AppIdRealtime: 69df1c67-1b02-4863-adc5-4c3baee56ac9
+    AppIdRealtime: 4f9e5970-9898-48ef-8966-6765f8365fae
     AppIdFusion: 
     AppIdChat: 
     AppIdVoice: 
     AppVersion: 
     UseNameServer: 1
-    FixedRegion: 
+    FixedRegion: us
     Server: 
     Port: 0
     ProxyServer: 
@@ -50,6 +50,42 @@ MonoBehaviour:
   - PingUISetUp
   - AddPlayerID
   - EndGame
+  - LoadNextLevel
+  - StartGame
+  - EndTutorial
+  - UpdateActionPoints
+  - CallAddPlayerID
+  - CallAssignCharacter
+  - NextTurn
+  - AssignCharacter
+  - DoMove
+  - MoveCharacter
+  - GoalReached
+  - StartFight
+  - RollDie
+  - DisplayCombatResult
+  - DamageCharacter
+  - SetupNetworkMiddleware
+  - RegisterPlayerReady
+  - TravelToGameLevel
+  - AddPin
+  - ReadyForNextPhaseRPC
+  - AddMoveToCharacterRPC
+  - UndoPlanStepRpc
+  - MovePingCursorOnCharacterRPC
+  - DropPinAtRpc
+  - HandshakeSessionIds
+  - AddMoveToCharacterLocal
+  - DropPinAtLocal
+  - MovePingCursorOnCharacterLocal
+  - ReadyForNextPhaseLocal
+  - UndoPlanStepLocal
+  - BeginRunLocal
+  - SyncStartPlayerTurnLocal
+  - SyncCombatResult
+  - CombatResultReadyRPC
+  - CombatResultReadyLocal
+  - GotoNextPhaseLocal
   DisableAutoOpenWizard: 1
-  ShowSettings: 0
+  ShowSettings: 1
   DevRegionSetOnce: 1

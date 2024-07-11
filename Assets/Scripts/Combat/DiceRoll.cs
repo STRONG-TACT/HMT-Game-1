@@ -2,81 +2,105 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DiceRoll : MonoBehaviour
-{
-    private bool diceRolled;
-    private bool diceSpinning;
-    private bool endGame;
+public class DiceRoll : MonoBehaviour {
+    public enum DieState {
+        Idle,
+        Spinning,
+        Rolling,
+        Stopped
+    }
+
     private Vector3 orignialPosition;
-    
-    void Start()
-    {
-        endGame = false;
-        diceRolled = false;
+    new private Rigidbody rigidbody;
+    public bool acceptInput = false;
+
+    public Material[] faceMaterials;
+
+    public DieState dieState;
+    public float spinTime = 1.5f;
+
+    private Transform[] faces;
+    private int[] faceValues;
+
+    void Awake() {
+        rigidbody = GetComponent<Rigidbody>();
+        rigidbody.useGravity = false;
+        faces = new Transform[6];
+        foreach (Transform child in transform) {
+            if (child.name.StartsWith("Face")) {
+                faces[int.Parse(child.name[4] + "")-1] = child;
+            }
+        }
+        dieState = DieState.Idle;
+        ConfigureDie(new int[] { 1, 2, 3, 4, 5, 6 });
     }
-    void OnEnable()
-    {
-        orignialPosition = this.transform.position;
-        GetComponent<Rigidbody>().useGravity = false;
+
+    public void ConfigureDie(int[] faceValues) {
+        for (int i = 0; i < faceValues.Length; i++) {
+            faces[i].GetComponent<MeshRenderer>().material = faceMaterials[faceValues[i] - 1];
+        }
+        this.faceValues = faceValues;
     }
-    void OnDisable()
-    {
-        resetPostion();
-        diceRolled = false;
-        diceSpinning = false;
-        endGame = false;
+
+    void OnEnable() {
+        orignialPosition = this.transform.localPosition;
+        rigidbody.useGravity = false;
+        dieState = DieState.Idle;
+    }
+    void OnDisable() {
+        ResetDie();
+        dieState = DieState.Idle;
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && !diceRolled && !endGame)
-        {
-            diceRolled = true;
-        }
-
-        if (diceRolled)
-        {
-            if (!diceSpinning)
-            {
-                diceSpinning = true;
-                this.transform.Rotate(Random.Range(0, 360), Random.Range(0, 360), Random.Range(0, 360));
-                StartCoroutine("stopSpinDice");
-            }
-            spinDice();
+    void Update() {
+        if (acceptInput && Input.GetKeyDown(KeyCode.Space) && dieState == DieState.Idle) {
+            StartCoroutine(RollCoroutine());
         }
     }
 
-    private void spinDice()
-    {
-        this.transform.Rotate(300f * Time.deltaTime, 300f * Time.deltaTime, 300f * Time.deltaTime, Space.Self);
+    IEnumerator RollCoroutine() {
+        float startTime = Time.time;
+        this.transform.Rotate(Random.Range(0, 360), Random.Range(0, 360), Random.Range(0, 360));
+        dieState = DieState.Spinning;
+        while (Time.time - startTime <= spinTime) {
+            this.transform.Rotate(300f * Time.deltaTime, 300f * Time.deltaTime, 300f * Time.deltaTime, Space.Self);
+            yield return new WaitForEndOfFrame();
+        }
+        dieState = DieState.Rolling;
+        rigidbody.useGravity = true;
+        while (!rigidbody.IsSleeping()) {
+            yield return new WaitForEndOfFrame();
+        }
+        dieState = DieState.Stopped;
+        yield break;
     }
 
-    private IEnumerator stopSpinDice()
-    {
-        yield return new WaitForSeconds(1.5f);
-        GetComponent<Rigidbody>().useGravity = true;
-        yield return new WaitForSeconds(.5f);
-        diceRolled = false;
-        endGame = true;
-        /*        yield return new WaitForSeconds(2f);
-                resetPostion();
-                this.gameObject.SetActive(false);*/
-    }
-
-    private void resetPostion()
-    {
-        this.transform.position = orignialPosition;
+    public void ResetDie() {
+        this.transform.localPosition = orignialPosition;
         this.transform.rotation = Quaternion.Euler(0, 0, 0);
-        GetComponent<Rigidbody>().useGravity = false;
+        rigidbody.useGravity = false;
+        dieState = DieState.Idle;
     }
 
-    public void ReRoll()
-    {
-        resetPostion();
-        diceRolled = false;
-        diceSpinning = false;
-        endGame = false;
-        GetComponent<Rigidbody>().useGravity = false;
+    public void Roll() {
+        StartCoroutine(RollCoroutine());
     }
+
+    public void CallReroll() {
+        ResetDie();
+        Roll();
+    }
+
+    //since the individual faces are their own subobjects the one with the greatest y value is on top
+    public int GetFaceValue() {
+        int maxDex = 0;
+        for(int i = 1; i < faces.Length; i++) {
+            if (faces[i].position.y > faces[maxDex].position.y) {
+                maxDex = i;
+            }
+        }
+        return faceValues[maxDex];
+    }
+
 }

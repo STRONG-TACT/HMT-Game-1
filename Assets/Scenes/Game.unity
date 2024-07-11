@@ -1801,6 +1801,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 191270735}
+  - component: {fileID: 191270737}
   - component: {fileID: 191270734}
   - component: {fileID: 191270736}
   m_Layer: 0
@@ -1866,6 +1867,24 @@ MonoBehaviour:
   sceneViewId: 4
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &191270737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191270733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8b8421b714639e4cbac959afb696977, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dwarfMovecount: 6
+  giantMovecount: 4
+  humanMovecount: 4
+  MaskOn: 1
+  tileSize: 3
+  tileGapLength: 0.2
 --- !u!1 &234164954
 GameObject:
   m_ObjectHideFlags: 0
@@ -5766,8 +5785,7 @@ MonoBehaviour:
   GiantPlayer: {fileID: 1582840647592877992, guid: 7247fcd4f4dfbfa428db438e2b8f06c7, type: 3}
   HumanPlayer: {fileID: 5365208050811761953, guid: 678e8a201d80eb944a4ecd939c8c79ab, type: 3}
   newPlayer: {fileID: 0}
-  minX: -1
-  maxX: 1
+  gameData: {fileID: 0}
 --- !u!4 &677070293
 Transform:
   m_ObjectHideFlags: 0

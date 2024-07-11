@@ -159,7 +159,7 @@ namespace Photon.Pun.UtilityScripts
 
                 if (player.IsLocal)
                 {
-					Debug.Log ("PhotonNetwork.CurrentRoom.PlayerCount = " + PhotonNetwork.CurrentRoom.PlayerCount);
+					//Debug.Log ("PhotonNetwork.CurrentRoom.PlayerCount = " + PhotonNetwork.CurrentRoom.PlayerCount);
 
                     // select a number
                     for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount; i++)
@@ -259,7 +259,7 @@ namespace Photon.Pun.UtilityScripts
             int current = player.GetPlayerNumber();
             if (current != playerNumber)
             {
-				Debug.Log("PlayerNumbering: Set number "+playerNumber);
+				//Debug.Log("PlayerNumbering: Set number "+playerNumber);
                 player.SetCustomProperties(new Hashtable() { { PlayerNumbering.RoomPlayerIndexedProp, (byte)playerNumber } });
             }
         }
