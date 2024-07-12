@@ -32,6 +32,7 @@ public class LobbyUI : MonoBehaviour
     [SerializeField]
     private Text competitionIdText;
     [SerializeField] private TextMeshProUGUI competitionIDUIText;
+    [SerializeField] private InputField inputFieldText;
 
     public bool RememberMe;
     private bool CheckCompetitionIDCoroutineRunning;
@@ -163,6 +164,16 @@ public class LobbyUI : MonoBehaviour
         DisableAllUI();
         ShowConsentFormUI();
     }
+
+
+    public void PasteCompetitionID()
+    {
+        string clipboardText = GUIUtility.systemCopyBuffer;
+        Debug.Log("Clipboard text: " + clipboardText);
+        inputFieldText.text = clipboardText;
+        Debug.Log(competitionIdText.text);
+    }
+
 
     public void SetCompetitionID() {
         if (!CheckCompetitionIDCoroutineRunning)
