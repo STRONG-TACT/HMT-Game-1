@@ -371,7 +371,7 @@ public class Monster : MonoBehaviour
             {
                 passible = false;
             }
-            else if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Impassible"))
+            else if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Impassible") || hit.collider.gameObject.layer == LayerMask.NameToLayer("Boundary"))
             {
                 passible = false;
             }
