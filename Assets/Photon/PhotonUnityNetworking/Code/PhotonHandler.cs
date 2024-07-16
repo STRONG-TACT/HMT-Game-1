@@ -235,7 +235,7 @@ namespace Photon.Pun
 
             if (ex != null)
             {
-                throw new AggregateException("Caught " + exceptionCount + ex.GetType() + " exception(s) in methods called by DispatchIncomingCommands(). Rethrowing first only (see above).", ex);
+                throw new AggregateException("Caught " + exceptionCount + ex.GetType() + " " + ex.InnerException + " exception(s) in methods called by DispatchIncomingCommands(). Rethrowing first only (see above).", ex);
             }
         }
 
