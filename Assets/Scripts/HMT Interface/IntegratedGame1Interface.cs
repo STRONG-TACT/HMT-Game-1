@@ -477,6 +477,7 @@ public class IntegratedGame1Interface : HMTInterface {
                 }
                 else {
                     NetworkMiddleware.S.CallDropPinAt(target.CharacterId, pinType, pos.x, pos.y);
+                    command.SendOKResponse("Pin Placed");
                 }
                 break;
 
