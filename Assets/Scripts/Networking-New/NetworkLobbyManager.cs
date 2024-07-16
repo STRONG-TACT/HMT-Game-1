@@ -154,7 +154,7 @@ public class NetworkLobbyManager : MonoBehaviour
     
     private void OnMatchmakingConfigResponse(JObject response)
     {
-        if (false && response != null 
+        if (response != null 
             && response.ContainsKey("two_human_prob") 
             && response.ContainsKey("timeout_limit"))
         {

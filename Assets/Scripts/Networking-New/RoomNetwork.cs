@@ -43,7 +43,8 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
         else S = this;
     }
 
-    private IEnumerator Start() {
+    private IEnumerator Start()
+    {
         Debug.Log("My UserId: " + PhotonNetwork.LocalPlayer.UserId);
         Debug.Log("Am I the master: " + PhotonNetwork.IsMasterClient);
 

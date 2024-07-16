@@ -1,3 +1,4 @@
+using System;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,6 +16,11 @@ public class NetworkRoomManager : MonoBehaviour
     [SerializeField]
     private Text _launchAIText;
 
+
+    private void Start()
+    {
+        
+    }
 
     public void PlayerReady()
     {
