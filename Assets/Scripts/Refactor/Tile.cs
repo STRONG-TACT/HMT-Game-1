@@ -70,7 +70,7 @@ public class Tile : MonoBehaviour, IComparable<Tile>
 
     public Vector2Int GridPosition {
         get {
-            return new Vector2Int(row, col);
+            return new Vector2Int(col, row);
         }
     }
 
