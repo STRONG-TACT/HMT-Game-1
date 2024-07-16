@@ -395,6 +395,36 @@ public class IntegratedGame1Interface : HMTInterface {
         }
     }
 
+    public static Vector2Int Vector2FromDirection(Character.Direction direction) {
+        switch (direction) {
+            case Character.Direction.Up:
+                return Vector2Int.up;
+            case Character.Direction.Down:
+                return Vector2Int.down;
+            case Character.Direction.Left:
+                return Vector2Int.left;
+            case Character.Direction.Right:
+                return Vector2Int.right;
+            default:
+                return Vector2Int.zero;
+        }
+    }
+
+    public static Vector2Int Vector2FromString(string direction) {
+        switch (direction.ToLower()) {
+            case "up":
+                return Vector2Int.up;
+            case "down":
+                return Vector2Int.down;
+            case "left":
+                return Vector2Int.left;
+            case "right":
+                return Vector2Int.right;
+            default:
+                return Vector2Int.zero;
+        }
+    }
+
     private IEnumerator ExecuteActionInPinning(Command command) {
         string action = command.json["action"].ToString();
         Character target = GetTargetCharacter(command.target);
@@ -466,8 +496,14 @@ public class IntegratedGame1Interface : HMTInterface {
                     command.SendIllegalActionResponse("Out of Action Points, cannot move pin cursor", 2002);
                 }
                 else {
-                    NetworkMiddleware.S.CallMovePingCursorOnCharacter(target.CharacterId, DirectionFromString(action));
-                    command.SendOKResponse("Ping Cursor Moved");
+                    Vector2Int move = Vector2FromString(action);
+                    if (IntegratedMapGenerator.Instance.InMap(target.currentTile.GridPosition + target.pingCursor + move)) {
+                        NetworkMiddleware.S.CallMovePingCursorOnCharacter(target.CharacterId, DirectionFromString(action));
+                        command.SendOKResponse("Ping Cursor Moved");
+                    }
+                    else {
+                        command.SendIllegalActionResponse("Attempt to move pin cursor out of map", 2001);
+                    }
                 }
                 yield break;
             case "undo":

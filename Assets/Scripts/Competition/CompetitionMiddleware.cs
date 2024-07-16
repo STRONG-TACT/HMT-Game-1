@@ -819,10 +819,11 @@ public class CompetitionMiddleware : MonoBehaviour {
     #region 5000s Logging Messages, AI Agent Events
 
     public void LogHMTConnect(int characterId) {
-        if (!RegisteredAgents.ContainsKey(characterId)) {
-            Debug.LogErrorFormat("Could not find agent record for characterId {0}", characterId);
-            return;
-        }
+        // This is literally called immediated after registration so it should be impossible for the record to not exist.
+        //if (!RegisteredAgents.ContainsKey(characterId)) {
+        //    Debug.LogErrorFormat("Logger could not find agent record for characterId {0}, are you calling Register?", characterId);
+        //    return;
+        //}
         AgentRecord record = RegisteredAgents[characterId];
         CallLogEvent(record.agentID, record.sessionID, 5000, record.agentID, "hmt_connect",
             new JObject { { "service_target", record.target } },
@@ -830,10 +831,9 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
 
-    //TODO need to figure out what to do with this for the Register Command, which predates the characterId system
     public void LogHMTInterfaceCall(int characterId, HMT.Command command) {
         if (!RegisteredAgents.ContainsKey(characterId)) {
-            Debug.LogErrorFormat("Could not find agent record for service target {0}", characterId);
+            Debug.LogErrorFormat("Logger could not find agent record for service target {0}, are you calling Register?", characterId);
             return;
         }
         AgentRecord record = RegisteredAgents[characterId];

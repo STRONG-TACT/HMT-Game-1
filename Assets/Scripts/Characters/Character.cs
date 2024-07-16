@@ -251,36 +251,22 @@ public class Character : MonoBehaviour {
         ReadyForNextPhase = false;
     }
 
-    public bool MovePingCursor(Character.Direction direction) {
+    public void MovePingCursor(Character.Direction direction) {
         if (ActionPointsRemaining <= 0) {
-            return false;
+            return;
         }
         else {
-            switch (direction) {
-                case Character.Direction.Up:
-                    if (pingCursor.y < IntegratedMapGenerator.Instance.Map.GetLength(1)) {
-                        pingCursor += Vector2Int.up;
-                    }
-                    break;
-                case Character.Direction.Down:
-                    if (pingCursor.y > 0) {
-                        pingCursor += Vector2Int.down;
-                    }
-                    break;
-                case Character.Direction.Left:
-                    if (pingCursor.x > 0) {
-                        pingCursor += Vector2Int.left;
-                    }
-                    break;
-                case Character.Direction.Right:
-                    if (pingCursor.x < IntegratedMapGenerator.Instance.Map.GetLength(0)) {
-                        pingCursor += Vector2Int.right;
-                    }
-                    break;
-                case Character.Direction.Wait:
-                    return false;
+            Vector2Int movement = direction switch {
+                Character.Direction.Up => Vector2Int.up,
+                Character.Direction.Down => Vector2Int.down,
+                Character.Direction.Left => Vector2Int.left,
+                Character.Direction.Right => Vector2Int.right,
+                _ => Vector2Int.zero
+            };
+
+            if (IntegratedMapGenerator.Instance.InMap(currentTile.GridPosition + pingCursor + movement)) {
+                pingCursor += movement;
             }
-            return true;
         }
     }
 
