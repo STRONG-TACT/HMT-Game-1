@@ -97,7 +97,7 @@ public class Pin : MonoBehaviour
             {"entityType", "Pin" },
             {"objKey", ObjKey },
             {"id", HMTObjID },
-            {"placedBy", placingCharacter.CharacterId },
+            {"placedBy", placingCharacter.HMTStateID },
             {"x", locationTile.col },
             {"y", locationTile.row }
         };

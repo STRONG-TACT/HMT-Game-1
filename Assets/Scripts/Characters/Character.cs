@@ -32,6 +32,8 @@ public class Character : MonoBehaviour {
 
     public CharacterConfig config;
     public int CharacterId { get; private set; }
+    public string HMTStateID { get { return "C" + (CharacterId + 1) + "1"; } }
+
     public Tile currentTile;
 
     private Vector3 indicator_offset;
