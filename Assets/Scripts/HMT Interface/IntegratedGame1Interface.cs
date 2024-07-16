@@ -476,7 +476,7 @@ public class IntegratedGame1Interface : HMTInterface {
                     command.SendIllegalActionResponse("Out of Action Points, cannot place pin", 2002);
                 }
                 else {
-                    NetworkMiddleware.S.CallDropPinAt(target.CharacterId, pinType, pos.x, pos.y);
+                    NetworkMiddleware.S.CallDropPinAt(target.CharacterId, pinType, pos.y, pos.x);
                     command.SendOKResponse("Pin Placed");
                 }
                 break;
