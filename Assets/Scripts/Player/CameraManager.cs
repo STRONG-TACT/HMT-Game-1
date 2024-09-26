@@ -96,7 +96,7 @@ public class CameraManager : MonoBehaviour
     {
         Vector3 target = targetCharacter.transform.position;// + cameraOffset;
         float startTime = Time.time;
-        while (Time.time - startTime < lerpDuration)
+        while (Time.time - startTime < IntegratedGameManager.S.excecutionStepTime)
         {
             cameraPivot.transform.position = Vector3.Lerp(cameraPivot.transform.position, target, (Time.time - startTime) / lerpDuration);
             yield return new WaitForEndOfFrame();

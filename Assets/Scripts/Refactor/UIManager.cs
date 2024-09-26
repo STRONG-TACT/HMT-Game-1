@@ -69,7 +69,7 @@ public class UIManager : MonoBehaviour
     public Button HumanBtn;
 
     [Header("Combat UI")]
-    public float animationDuration = 1.5f;
+    //public float animationDuration = 1.5f;
     public float spinSpeed = 360.0f;
     public GameObject CombatUI;
     public GameObject[] PlayerCombatSlots = new GameObject[3];
@@ -431,15 +431,15 @@ public class UIManager : MonoBehaviour
 
     #region Combat UI
 
-    public void ShowCombatUI(Combat.FightType type, List<int> charaIDs, List<int> charaDice, List<int> enemyDice, List<int> charaScores, List<int> enemyScores,
-                         int playerFinalScore, int enemyFinalScore, bool win, bool visible = true)
-    {
-        StartCoroutine(CombatUICoroutine(type, charaIDs, charaDice, enemyDice, charaScores, enemyScores, playerFinalScore, enemyFinalScore, win, visible));
-    }
+    //public void ShowCombatUI(Combat.FightType type, List<int> charaIDs, List<int> charaDice, List<int> enemyDice, List<int> charaScores, List<int> enemyScores,
+    //                     int playerFinalScore, int enemyFinalScore, bool win, bool visible = true)
+    //{
+    //    StartCoroutine(CombatUICoroutine(type, charaIDs, charaDice, enemyDice, charaScores, enemyScores, playerFinalScore, enemyFinalScore, win, visible));
+    //}
 
-    public IEnumerator CombatUICoroutine(Combat.FightType type, List<int> charaIDs, List<int> charaDice, List<int> enemyDice, List<int> charaScores, List<int> enemyScores,
-                             int playerFinalScore, int enemyFinalScore, bool win, bool visible=true)
-    {
+    //public IEnumerator CombatUICoroutine(Combat.FightType type, List<int> charaIDs, List<int> charaDice, List<int> enemyDice, List<int> charaScores, List<int> enemyScores,
+    //                         int playerFinalScore, int enemyFinalScore, bool win, bool visible=true)
+        public IEnumerator CombatUICoroutine(Combat.FightType type, Combat combatInstance, bool visible = true) {
         GameObject scoreBoard = CombatUI.transform.Find("Scoreboard").gameObject;
         GameObject vsText = CombatUI.transform.Find("VSText").gameObject;
         GameObject inProgressText = CombatUI.transform.Find("InProgressText").gameObject;
@@ -469,20 +469,20 @@ public class UIManager : MonoBehaviour
             inProgressText.SetActive(true);
             UnknownOpponentSlot.SetActive(true);
         }
-        for (int i = 0; i < charaIDs.Count; i++)
+        for (int i = 0; i < combatInstance.charaIDs.Count; i++)
         {
             GameObject dice_ui = PlayerCombatSlots[i].transform.GetChild(0).gameObject;
             if (visible == true)
             {
                 dice_ui.SetActive(true);
-                StartCoroutine(DiceAnimation(dice_ui, PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>(), charaScores[i], charaDice[i]));
+                StartCoroutine(DiceAnimation(dice_ui, PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>(), combatInstance.charaScores[i], combatInstance.charaDiceStats[i]));
             }
             else
             {
                 dice_ui.SetActive(false);
                 PlayerCombatSlots[i].GetComponentInChildren<TMP_Text>().text = "";
             }
-            switch (charaIDs[i])
+            switch (combatInstance.charaIDs[i])
             {
                 case 0:
                     PlayerCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.dwarfIcon;
@@ -507,10 +507,10 @@ public class UIManager : MonoBehaviour
         else if (type == Combat.FightType.Monster)
         {
             // TODO: differenciate monster types
-            for (int i = 0; i < enemyScores.Count; i++)
+            for (int i = 0; i < combatInstance.enemyScores.Count; i++)
             {
                 GameObject dice_ui = EnemyCombatSlots[i].transform.GetChild(0).gameObject;
-                StartCoroutine(DiceAnimation(dice_ui, EnemyCombatSlots[i].GetComponentInChildren<TMP_Text>(), enemyScores[i], enemyDice[i]));
+                StartCoroutine(DiceAnimation(dice_ui, EnemyCombatSlots[i].GetComponentInChildren<TMP_Text>(), combatInstance.enemyScores[i], combatInstance.enemyDiceStats[i]));
                 EnemyCombatSlots[i].GetComponentInChildren<Image>().sprite = gameAssets.monsterIcon;
                 EnemyCombatSlots[i].SetActive(true);
             }
@@ -518,26 +518,26 @@ public class UIManager : MonoBehaviour
         else if (type == Combat.FightType.Trap)
         {
             GameObject dice_ui = EnemyCombatSlots[0].transform.GetChild(0).gameObject;
-            StartCoroutine(DiceAnimation(dice_ui, EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>(), enemyScores[0], enemyDice[0]));
+            StartCoroutine(DiceAnimation(dice_ui, EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>(), combatInstance.enemyScores[0], combatInstance.enemyDiceStats[0]));
             EnemyCombatSlots[0].GetComponentInChildren<Image>().sprite = gameAssets.trapIcon;
             EnemyCombatSlots[0].SetActive(true);
         }
         else if (type == Combat.FightType.Rock)
         {
             GameObject dice_ui = EnemyCombatSlots[0].transform.GetChild(0).gameObject;
-            StartCoroutine(DiceAnimation(dice_ui, EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>(), enemyScores[0], enemyDice[0]));
+            StartCoroutine(DiceAnimation(dice_ui, EnemyCombatSlots[0].GetComponentInChildren<TMP_Text>(), combatInstance.enemyScores[0], combatInstance.enemyDiceStats[0]));
             EnemyCombatSlots[0].GetComponentInChildren<Image>().sprite = gameAssets.rockIcon;
             EnemyCombatSlots[0].SetActive(true);
         }
 
-        yield return new WaitForSeconds(animationDuration*2);
+        yield return IntegratedGameManager.S.WaitForExecutionSteps(3);
 
         //Debug.Log("player score: " + playerFinalScore.ToString());
         //Debug.Log("enemy score: " + enemyFinalScore.ToString());
         if (visible == true) 
         {
-            PlayerFinalScore.text = playerFinalScore.ToString();
-            EnemyFinalScore.text = enemyFinalScore.ToString();
+            PlayerFinalScore.text = combatInstance.charaScore.ToString();
+            EnemyFinalScore.text = combatInstance.enemyScore.ToString();
         }
         else
         {
@@ -546,24 +546,25 @@ public class UIManager : MonoBehaviour
         }
 
         //expand and shrink the score text 
-        float shrink_rate = 0.02f;
-        for(int i=0; i<animationDuration*50; i++)
-        {
-            PlayerFinalScore.gameObject.transform.localScale += new Vector3(shrink_rate, shrink_rate, shrink_rate);
-            EnemyFinalScore.gameObject.transform.localScale += new Vector3(shrink_rate, shrink_rate, shrink_rate);
-            yield return new WaitForSeconds(0.01f);
+        float startTime = Time.time;
+        Vector3 playerScoreScale = PlayerFinalScore.gameObject.transform.localScale;
+        Vector3 enemyScoreScale = EnemyFinalScore.gameObject.transform.localScale;
+
+        while(Time.time - startTime < IntegratedGameManager.S.excecutionStepTime *.75f) {
+            PlayerFinalScore.gameObject.transform.localScale = Vector3.Lerp(playerScoreScale, playerScoreScale * 1.5f, (Time.time - startTime) / (IntegratedGameManager.S.excecutionStepTime * .75f));
+            EnemyFinalScore.gameObject.transform.localScale = Vector3.Lerp(enemyScoreScale, enemyScoreScale * 1.5f, (Time.time - startTime) / (IntegratedGameManager.S.excecutionStepTime * .75f));
+            yield return null;
         }
-        for (int i = 0; i < animationDuration*50; i++)
-        {
-            PlayerFinalScore.gameObject.transform.localScale -= new Vector3(shrink_rate, shrink_rate, shrink_rate);
-            EnemyFinalScore.gameObject.transform.localScale -= new Vector3(shrink_rate, shrink_rate, shrink_rate);
-            yield return new WaitForSeconds(0.01f);
+        PlayerFinalScore.gameObject.transform.localScale = playerScoreScale * 1.5f;
+        EnemyFinalScore.gameObject.transform.localScale = enemyScoreScale * 1.5f;
+        startTime = Time.time;
+        while(Time.time - startTime < IntegratedGameManager.S.excecutionStepTime * .75f) {
+            PlayerFinalScore.gameObject.transform.localScale = Vector3.Lerp(playerScoreScale * 1.5f, playerScoreScale, (Time.time - startTime) / (IntegratedGameManager.S.excecutionStepTime * .75f));
+            EnemyFinalScore.gameObject.transform.localScale = Vector3.Lerp(enemyScoreScale * 1.5f, enemyScoreScale, (Time.time - startTime) / (IntegratedGameManager.S.excecutionStepTime * .75f));
+            yield return null;
         }
 
-
-        
-
-        if (win)
+        if (combatInstance.result)
         {
             WinBG.SetActive(true);
             LoseBG.SetActive(false);
@@ -575,9 +576,7 @@ public class UIManager : MonoBehaviour
             LoseBG.SetActive(true);
             ResultMessage.text = "Failed to defeat the opponent!";
         }
-        yield return new WaitForSeconds(animationDuration);
-
-        yield return null;
+        yield return IntegratedGameManager.S.WaitForExecutionSteps(1.5f);
     }
     
     public void HideCombatUI()
@@ -597,28 +596,23 @@ public class UIManager : MonoBehaviour
     private IEnumerator DiceAnimation(GameObject diceUI, TMP_Text scoreDisplay, int score, int diceStat) 
     {
         diceUI.SetActive(true);
-        float elapsedTime = 0.0f;
-        float scoreUpdateTime = 0.0f;
-        while (elapsedTime < animationDuration)
-        {
+        float startTime = Time.time;
+        float lastChange = Time.time;
+        float changeDelay = IntegratedGameManager.S.excecutionStepTime * 1.5f / 20;
+        while (Time.time - startTime < IntegratedGameManager.S.excecutionStepTime * 1.5) {
             float deltaRotation = spinSpeed * Time.deltaTime;
             //diceUI.transform.Rotate(Vector3.up, deltaRotation); 
             //diceUI.transform.Rotate(Vector3.right, deltaRotation); 
             diceUI.transform.Rotate(Vector3.forward, deltaRotation);
-
-            //update random score every 0.2 seconds
-            if(elapsedTime - scoreUpdateTime >= 0.2f)
-            {
+            if (Time.time - lastChange >= changeDelay) {
                 scoreDisplay.text = UnityEngine.Random.Range(1, diceStat + 1).ToString();
-                scoreUpdateTime = elapsedTime;
+                lastChange = Time.time;
             }
-
-            elapsedTime += Time.deltaTime;
             yield return null;
         }
         scoreDisplay.text = score.ToString();
         //diceUI.SetActive(false);
-        yield return new WaitForSeconds(animationDuration);
+        yield return IntegratedGameManager.S.WaitForExecutionSteps(1.5f);
     }
 
 
@@ -753,12 +747,15 @@ public class UIManager : MonoBehaviour
     }
 
     public IEnumerator DotsAnimation(TextMeshProUGUI dotsText) {
+        if (IntegratedGameManager.S.InstantMode) {
+            yield break;
+        }
         string[] dotsStates = new string[] { ".", "..", "..." };
         int currentState = 0;
         while (true) {
             dotsText.text = dotsStates[currentState]; // Update the CurrentPhaseLabel to the current state
             currentState = (currentState + 1) % dotsStates.Length;
-            yield return new WaitForSeconds(0.5f);
+            yield return IntegratedGameManager.S.WaitForExecutionSteps(.5f);
         }
     }
 

@@ -19,6 +19,16 @@ public class IntegratedLocalGameManager : IntegratedGameManager
     protected override void Start() {
         base.Start();
         UIManager.S.ShowCharacterSwitcher();
+        HMT.ArgParser argParser = new HMT.ArgParser();
+
+        argParser.AddArg("stepTime", HMT.ArgParser.ArgType.One);
+        argParser.AddArg("instanceMode", HMT.ArgParser.ArgType.Flag);
+        argParser.ParseArgs();
+
+        excecutionStepTime = argParser.GetArgValue("stepTime", excecutionStepTime);
+        if (argParser.CheckFlag("instantMode")) {
+            excecutionStepTime = 0;
+        }
     }
 
     protected override void TimeoutSubmit() {

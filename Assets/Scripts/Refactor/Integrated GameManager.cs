@@ -469,7 +469,8 @@ public class IntegratedGameManager : MonoBehaviour
             }
             Random.InitState(NetworkMiddleware.S.randomSeed);
             //wait 0.5 seconds for collision to register properly
-            yield return new WaitForSeconds(0.5f);
+            //yield return new WaitForSeconds(0.5f);
+            yield return new WaitForFixedUpdate();
             yield return StartCoroutine(SeparateDuplicateMonster());
             
 
@@ -483,7 +484,8 @@ public class IntegratedGameManager : MonoBehaviour
         Random.InitState(NetworkMiddleware.S.randomSeed);
         //This function call here is necessary, otherwise monster won't separate if combat happens
         //wait 0.5 seconds for collision to register properly
-        yield return new WaitForSeconds(0.5f);
+        //yield return new WaitForSeconds(0.5f);
+        yield return new WaitForFixedUpdate();
         yield return StartCoroutine(SeparateDuplicateMonster());
         Debug.Log("Monster moving currPhase ended.");
         //StartPlayerTurn();
@@ -615,8 +617,8 @@ public class IntegratedGameManager : MonoBehaviour
                     CombatResultSyncedCount = 0;
                     Random.InitState(NetworkMiddleware.S.randomSeed);
                     win = Combat.S.result;
-                    UIManager.S.ShowCombatUI(Combat.FightType.Monster, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores,
-                        Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
+                    //UIManager.S.ShowCombatUI(Combat.FightType.Monster, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores,
+                    //    Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
                     break;
                 case Tile.ObstacleType.Trap:
                     challengeType = Combat.FightType.Trap;
@@ -631,8 +633,8 @@ public class IntegratedGameManager : MonoBehaviour
                     CombatResultSyncedCount = 0;
                     Random.InitState(NetworkMiddleware.S.randomSeed);
                     win = Combat.S.result;
-                    UIManager.S.ShowCombatUI(Combat.FightType.Trap, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores, 
-                        Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
+                    //UIManager.S.ShowCombatUI(Combat.FightType.Trap, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores, 
+                    //    Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
                     break;
                 case Tile.ObstacleType.Rock:
                     challengeType = Combat.FightType.Rock;
@@ -646,8 +648,8 @@ public class IntegratedGameManager : MonoBehaviour
                     CombatResultSyncedCount = 0;
                     Random.InitState(NetworkMiddleware.S.randomSeed);
                     win = Combat.S.result;
-                    UIManager.S.ShowCombatUI(Combat.FightType.Rock, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores,
-                        Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
+                    //UIManager.S.ShowCombatUI(Combat.FightType.Rock, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores,
+                    //    Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
                     break;
                 default:
                     Debug.LogWarning("Unknown Combat Type Encountered");
@@ -665,7 +667,7 @@ public class IntegratedGameManager : MonoBehaviour
             }
 
             //wait for animation to play
-            yield return new WaitForSeconds(UIManager.S.animationDuration * 4.1f);
+            yield return UIManager.S.CombatUICoroutine(challengeType, Combat.S, visibility);
 
             if (win) {
                 // if the character(s) won the battle, destory the enemies
@@ -736,7 +738,7 @@ public class IntegratedGameManager : MonoBehaviour
             }
 
             //TODO this should probably be waiting for a button click in the future.
-            yield return new WaitForSeconds(2 * excecutionStepTime);
+            yield return WaitForExecutionSteps(2);
             foreach (Character c in copiedCharacters)
             {
                 if (c != null && !c.dead)
@@ -891,7 +893,7 @@ public class IntegratedGameManager : MonoBehaviour
             eventQueue.Clear();
             //StopAllCoroutines();
 
-            yield return new WaitForSeconds(5f);
+            yield return WaitForExecutionSteps(5);
             foreach (Character c in inSceneCharacters)
             {
                 c.State = Character.CharacterState.Idle;
@@ -907,7 +909,7 @@ public class IntegratedGameManager : MonoBehaviour
         else {
             Physics.autoSimulation = true;
             Debug.Log("Game ends.");
-            yield return new WaitForSeconds(5f);
+            yield return WaitForExecutionSteps(5);
             CompetitionMiddleware.Instance.LogEndGame("Win");
             UIManager.S.DisplayVictoryScreen();
             gameStatus = GameStatus.GameEnd;
@@ -977,6 +979,28 @@ public class IntegratedGameManager : MonoBehaviour
         {
             Debug.Log("Game manager OnDestory getting called, destroying NetworkMiddleware, current gamestatus: " + gameStatus);
             Destroy(NetworkMiddleware.S.gameObject);
+        }
+    }
+
+    /// <summary>
+    /// Waits for a number of execution steps to pass before continuing.
+    /// 
+    /// This assumes the executionStepTime is usually 1, but in instant mode it is 0.
+    /// </summary>
+    /// <param name="time"></param>
+    /// <returns></returns>
+    public IEnumerator WaitForExecutionSteps(float time) {
+        if (excecutionStepTime <= 0) {
+            yield break;
+        }
+        else {
+            yield return new WaitForSeconds(time * excecutionStepTime);
+        }
+    }
+
+    public bool InstantMode {
+        get {
+            return excecutionStepTime <= 0;
         }
     }
 }

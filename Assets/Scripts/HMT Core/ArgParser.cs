@@ -65,7 +65,20 @@ namespace HMT {
             args.Add(key, new Arg(key, type, 1));
         }
 
-        public string GetArgValue(string key, string defaultValue = "") {
+        public bool CheckFlag(string key) {
+            return args.ContainsKey(key) && args[key].IsSet;
+        }
+
+        public string GetArgValue(string key) {
+            if (args.ContainsKey(key) && args[key].IsSet) {
+                return args[key].value;
+            }
+            else {
+                return string.Empty;
+            }
+        }
+
+        public string GetArgValue(string key, string defaultValue) {
             if (args.ContainsKey(key) && args[key].IsSet) {
                 return args[key].value;
             }
@@ -74,7 +87,7 @@ namespace HMT {
             }
         }
 
-        public bool GetArgValue(string key, bool defaultValue = false) {
+        public bool GetArgValue(string key, bool defaultValue) {
             if (args.ContainsKey(key) && args[key].IsSet && bool.TryParse(args[key].value, out bool ret)) {
                 return ret;
             }
@@ -83,8 +96,17 @@ namespace HMT {
             }
         }
 
-        public int GetArgValue(string key, int defaultValue = 0) {
+        public int GetArgValue(string key, int defaultValue) {
             if (args.ContainsKey(key) && args[key].IsSet && int.TryParse(args[key].value, out int ret)) {
+                return ret;
+            }
+            else {
+                return defaultValue;
+            }
+        }
+
+        public float GetArgValue(string key, float defaultValue) {
+            if (args.ContainsKey(key) && args[key].IsSet && float.TryParse(args[key].value, out float ret)) {
                 return ret;
             }
             else {
