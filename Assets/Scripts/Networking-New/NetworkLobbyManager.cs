@@ -112,7 +112,7 @@ public class NetworkLobbyManager : MonoBehaviour
     public void OnDisconnectSucceed()
     {
         onBoardingState = OnBoardingState.ChooseGameMode;
-        LobbyUI.S.ShowGameModeUI();
+        LobbyUI.S.ConnectToServer();
     }
 
     public void OnUnexpectedDisconnect()
@@ -215,15 +215,9 @@ public class NetworkLobbyManager : MonoBehaviour
                 roomOptions);
         }
     }
-
-    /* TODO: !!!!!!!!!!!!!!!!
-       Current hacky solution: join & create is the same button. Will try to join room with name
-       first. If failed a room will be created with the same name. This is obviously NOT SAFE
-       but it works for testing purposes*/
+    
     public void JoinRoomAttempt(string roomName = "")
     {
-        Debug.LogFormat("Joining room with name: {0}", roomName);
-
         if (roomName == "") {
             roomName = LobbyUI.S.GetRoomNameEntered();
         }
@@ -231,6 +225,7 @@ public class NetworkLobbyManager : MonoBehaviour
         if (roomName != "")
         {
             onBoardingState = OnBoardingState.Loading;
+            
             LobbyNetwork.S.TryJoinRoom(roomName);
             LobbyUI.S.ShowLoadingUI();
         }
@@ -271,37 +266,9 @@ public class NetworkLobbyManager : MonoBehaviour
         SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
     }
 
-    public IEnumerator OnRoomCreated()
+    public void OnRoomCreated()
     {
-        CompetitionMiddleware.Instance.numPlayer = _numPerson;
-        if (_numPerson == 1)
-        {
-            SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
-        }
-        else
-        {
-            float startTime = Time.time;
-
-            while (Time.time - startTime < _timer) {
-                //TODO: should actually just use the OnPlayerEnteredRoom Callback
-                if (PhotonNetwork.CurrentRoom.PlayerCount < 2) {
-                    yield return null;
-                }
-                else {
-                    SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
-                    yield break;
-                }
-            }
-            CompetitionMiddleware.Instance.LogQueueTimeout(_timer);
-            // fall back to one person game
-            CompetitionMiddleware.Instance.LogRemoveCondition("2-human");
-            _numPerson = 1;
-            CompetitionMiddleware.Instance.LogAssignCondition("1-human-fallback");
-            CompetitionMiddleware.Instance.numPlayer = _numPerson;
-            PhotonNetwork.CurrentRoom.IsOpen = true;
-            PhotonNetwork.CurrentRoom.IsVisible = false;
-            SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
-        }
+        SceneManager.LoadScene(GlobalConstant.ROOM_SCENE);
     }
 
     // ============ Back Button Logic ============

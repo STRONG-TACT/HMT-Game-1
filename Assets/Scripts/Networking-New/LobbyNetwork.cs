@@ -31,7 +31,7 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         Debug.Log("Successfully connected to server.");
-        NetworkLobbyManager.S.OnConnectToServer();
+        LobbyUI.S.ConnectToLobby();
     }
 
     // TODO: might be worth to handle connection error, casing on cause
@@ -64,7 +64,8 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()
     {
         Debug.Log("Joined Lobby");
-        StartCoroutine(NetworkLobbyManager.S.OnJoinLobbySucceed());
+        // StartCoroutine(NetworkLobbyManager.S.OnJoinLobbySucceed());
+        LobbyUI.S.ShowCreateJoinUI();
     }
 
     public void TryJoinRoom(string roomName)
@@ -99,7 +100,7 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
 
     public override void OnCreatedRoom()
     {
-        StartCoroutine(NetworkLobbyManager.S.OnRoomCreated());
+        NetworkLobbyManager.S.OnRoomCreated();
     }
 
     public override void OnJoinedRoom()

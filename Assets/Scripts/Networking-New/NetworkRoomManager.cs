@@ -16,12 +16,6 @@ public class NetworkRoomManager : MonoBehaviour
     [SerializeField]
     private Text _launchAIText;
 
-
-    private void Start()
-    {
-        
-    }
-
     public void PlayerReady()
     {
         RoomNetwork.S.RegisterPlayerReadyLocal();

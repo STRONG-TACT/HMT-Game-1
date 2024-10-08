@@ -24,6 +24,7 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private GameObject ConsentFormUI;
     [SerializeField] private GameObject reset_id_UI;
     [SerializeField] private GameObject prompt;
+    [SerializeField] private GameObject createJoinRoomUI;
 
     [Header("Text Input Fields")] 
     [SerializeField]
@@ -70,15 +71,26 @@ public class LobbyUI : MonoBehaviour
             ShowStartSceneUI();
         }
         reset_id_UI.SetActive(true);
-
     }
 
 
-    public void ShowGameModeUI()
+    public void ConnectToServer()
+    {
+        LobbyNetwork.S.TryConnectToServer();
+        ShowLoadingUI("Connecting to Server");
+    }
+
+    public void ConnectToLobby()
+    {
+        ShowLoadingUI("Joining Matchmaking Lobby");
+        LobbyNetwork.S.TryJoinLobby();
+        CompetitionMiddleware.Instance.numPlayer = 3;
+    }
+
+    public void ShowCreateJoinUI()
     {
         DisableAllUI();
-        reset_id_UI.SetActive(false);
-        gameModeUI.SetActive(true);
+        createJoinUI.SetActive(true);
     }
 
     public void ShowStartSceneUI()
@@ -144,6 +156,7 @@ public class LobbyUI : MonoBehaviour
         ConsentFormUI.SetActive(false);
         competitionIDUI.SetActive(false);
         prompt.SetActive(false);
+        createJoinUI.SetActive(false);
     }
 
     public string GetRoomNameEntered()
