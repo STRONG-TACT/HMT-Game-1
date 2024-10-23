@@ -538,7 +538,7 @@ public class Tile : MonoBehaviour, IComparable<Tile>
         ret["objKey"] = _objKey;
         if(_objKey == "**") {
             ret["entityType"] = "Goal";
-            ret["subGoalCount"] = IntegratedGameManager.S.goalCount;
+            ret["subGoalCount"] = IntegratedGameManager.S.GoalCount;
         }
         ret["id"] = HMTObjID;
         ret["x"] = col;

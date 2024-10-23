@@ -45,6 +45,11 @@ public class Shrine : MonoBehaviour
         }
         return false;
     }
+
+    public void SetReached(bool state) {
+        Reached = state;
+        shrineStone.gameObject.SetActive(!state);
+    }
     
     public void ReturnOrb()
     {

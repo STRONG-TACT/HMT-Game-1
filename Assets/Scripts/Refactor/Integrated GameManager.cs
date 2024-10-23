@@ -23,8 +23,6 @@ public class IntegratedGameManager : MonoBehaviour
     public Character localChar;
     public GameStatus gameStatus = GameStatus.GetReady;
     public int CurrentRound { get; protected set; } = 0;
-    public int goalCount = 0;
-    public List<bool> ShrineReached = new List<bool> { false, false, false };
     private List<Tile> eventQueue = new List<Tile>();
     protected Coroutine currentCoroutine = null;
     public int currentLevel = 1;
@@ -45,6 +43,18 @@ public class IntegratedGameManager : MonoBehaviour
                 default:
                     return float.PositiveInfinity;
             }
+        }
+    }
+
+    public int GoalCount {
+        get {
+            var ret = 0;
+            foreach (var shrine in InSceneShrines) {
+                if (shrine.Reached) {
+                    ret++;
+                }
+            }
+            return ret;
         }
     }
 
@@ -80,8 +90,6 @@ public class IntegratedGameManager : MonoBehaviour
     protected virtual void Start() {        
         gameData = GameData.S;
         pinningSystem = PinningSystem.S;
-        goalCount = 0;
-        ShrineReached = new List<bool> { false, false, false };
         characterDied = new bool[3];
 
         Debug.LogFormat("NetworkMiddleware.S.myCharacterID = {0}", NetworkMiddleware.S.myCharacterID);
@@ -124,8 +132,6 @@ public class IntegratedGameManager : MonoBehaviour
 
         gameStatus = GameStatus.GetReady;
         CurrentRound = 0;
-        goalCount = 0;
-        ShrineReached = new List<bool>{ false, false, false };
         characterDied = new bool[3];
         UIManager.S.InitGameUI();
         UIManager.S.ResetTeamActionStatus();
@@ -804,8 +810,7 @@ public class IntegratedGameManager : MonoBehaviour
         Tile tile = inSceneCharacters[charaID].currentTile;
         CompetitionMiddleware.Instance.LogClearShrine(charaID, tile.col, tile.row);
         UIManager.S.UpdateCharacterGoalStatus(charaID);
-        goalCount += 1;
-        ShrineReached[charaID] = true;
+        InSceneShrines[charaID].SetReached(true);
     }
 
     public virtual void GoalUnReached(int charaID)
@@ -813,8 +818,7 @@ public class IntegratedGameManager : MonoBehaviour
         Tile tile = inSceneCharacters[charaID].currentTile;
         CompetitionMiddleware.Instance.LogRevokeShrine(charaID, tile.col, tile.row);
         UIManager.S.UpdateCharacterGoalStatus(charaID, false);
-        goalCount -= 1;
-        ShrineReached[charaID] = false;
+        InSceneShrines[charaID].SetReached(false);
         Debug.Log("refunded");
     }
 
@@ -846,12 +850,13 @@ public class IntegratedGameManager : MonoBehaviour
     // "Move" to next currLevel by reset all relevant constants, delete monsters and tiles (tiles done by map generator) this currLevel, and reset chara status
     public virtual void CheckGoalReached(int charaID)
     {
-        bool level_finished = false;
-        if (!ShrineReached.Contains(false))
-        {
-            level_finished = true;
+        bool level_finished = true;
+        foreach(Shrine shrine in InSceneShrines) {
+            if (!shrine.Reached) {
+                level_finished = false;
+                break;
+            }
         }
-        //if (goalCount >= 3) { //TODO: take th conditional logic out of the character and move it to the Manager
         if (level_finished) {
             Tile tile = inSceneCharacters[charaID].currentTile;
             CompetitionMiddleware.Instance.LogClearGoal(charaID, tile.col, tile.row);

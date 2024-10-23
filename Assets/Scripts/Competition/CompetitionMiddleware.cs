@@ -320,9 +320,9 @@ public class CompetitionMiddleware : MonoBehaviour {
             return null;
         }
         int shrinesCount = 0;
-        foreach (bool shrineCollected in IntegratedGameManager.S.ShrineReached)
+        foreach( Shrine shrine in IntegratedGameManager.S.InSceneShrines)
         {
-            if (shrineCollected)
+            if(shrine.Reached)
             {
                 shrinesCount += 1;
             }
