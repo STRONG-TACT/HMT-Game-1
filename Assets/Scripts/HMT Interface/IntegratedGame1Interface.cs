@@ -182,10 +182,17 @@ public class IntegratedGame1Interface : HMTInterface {
                             scene.Add(monster.HMTStateRep());
                         }
                         if (tile.shrine != null) {
-                            scene.Add(tile.shrine.HMTStateRep(false));
+                            scene.Add(tile.shrine.HMTStateRep(true));
                         }
                         break;
                     case Tile.FogOfWarState.Seen:
+                        if (tile.shrine != null) {
+                            scene.Add(tile.shrine.HMTStateRep(true));
+                        }
+                        foreach (Character character in tile.CharacterList) {
+                            scene.Add(character.HMTStateRep(Character.StateRepLevel.TeamUnseen));
+                        }
+                        break;
                     case Tile.FogOfWarState.Unseen:
                         if (tile.shrine != null) {
                             scene.Add(tile.shrine.HMTStateRep(false));
@@ -246,7 +253,7 @@ public class IntegratedGame1Interface : HMTInterface {
                     scene.Add(pin.HMTStateRep());
                 }
                 if (tile.shrine != null) {
-                    scene.Add(tile.shrine.HMTStateRep());
+                    scene.Add(tile.shrine.HMTStateRep(true));
                 }
             }
         }
@@ -306,7 +313,7 @@ public class IntegratedGame1Interface : HMTInterface {
                             scene.Add(monster.HMTStateRep());
                         }
                         if (tile.shrine != null) {
-                            scene.Add(tile.shrine.HMTStateRep());
+                            scene.Add(tile.shrine.HMTStateRep(true));
                         }
                         break;
                     case Tile.FogOfWarState.Seen:
@@ -319,10 +326,16 @@ public class IntegratedGame1Interface : HMTInterface {
                                 scene.Add(tile.HMTStateRep());
                                 break;
                         }
-                        goto case Tile.FogOfWarState.Unseen;
+                        if (tile.shrine != null) {
+                            scene.Add(tile.shrine.HMTStateRep(true));
+                        }
+                        foreach (Character character in tile.CharacterList) {
+                            scene.Add(character.HMTStateRep(Character.StateRepLevel.TeamUnseen));
+                        }
+                        break;
                     case Tile.FogOfWarState.Unseen:
                         if (tile.shrine != null) {
-                            scene.Add(tile.shrine.HMTStateRep());
+                            scene.Add(tile.shrine.HMTStateRep(false));
                         }
                         foreach (Character character in tile.CharacterList) {
                             scene.Add(character.HMTStateRep(Character.StateRepLevel.TeamUnseen));

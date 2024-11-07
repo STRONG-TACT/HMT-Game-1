@@ -364,7 +364,7 @@ public class CompetitionMiddleware : MonoBehaviour {
                     challenges.Add(tile.HMTStateRep());
                 }
                 if(tile.shrine != null) {
-                    shrines.Add(tile.shrine.HMTStateRep());
+                    shrines.Add(tile.shrine.HMTStateRep(true));
                 }
                 foreach(Monster monster in tile.MonsterList) {
                     challenges.Add(monster.LogStateRep());
