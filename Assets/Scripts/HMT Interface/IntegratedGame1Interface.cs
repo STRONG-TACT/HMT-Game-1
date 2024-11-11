@@ -221,6 +221,7 @@ public class IntegratedGame1Interface : HMTInterface {
             {"boardWidth", map.Map.GetLength(0)},
             {"boardHeight", map.Map.GetLength(1)},
             {"currLevel", gameManager.currentLevel },
+            {"currRound", gameManager.CurrentRound },
             {"currentPhase", gameManager.gameStatus.ToString() },
             {"timer", IntegratedGameManager.S.TimeRemaining.ToString() }
         };
