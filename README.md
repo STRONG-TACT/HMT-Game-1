@@ -45,6 +45,19 @@ The valid scene order is:
 1. Player experience survey
 
 
+# Launch Parameters
+-`batchmode`: 
+Launches the game in headless mode to save on rendering resources, this is a built in Unity param.\
+-`hmtsocketurl` <ip address/url>: 
+The url you should use to serve the HMT Interface socket. Default is ws://localhost.\
+-`hmtsocketport` <port number for the HMT API to open on>:
+The port you should use for the HMTInterface connection. This needs to be unique for each instance of the game running on the server and will be managed by the flask environment.\
+-`photonroom` <the name of the photon room provided by the flask call>: 
+The name of the photon room to join. This will be provided to the flask server by the call to launch_game.\
+-`localmode`: 
+A flag that can be provided to launch the game into local multiplayer mode. This would prevent the game from connecting to remote human clients and should only be used for an all agent game.\
+
+
 
 # -------------------------------------------------------
 The game currently requires that three separate client instances connect to each other in order to play the game.
