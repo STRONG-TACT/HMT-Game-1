@@ -58,12 +58,3 @@ The name of the photon room to join. This will be provided to the flask server b
 A flag that can be provided to launch the game into local multiplayer mode. This would prevent the game from connecting to remote human clients and should only be used for an all agent game.\
 
 
-
-# -------------------------------------------------------
-The game currently requires that three separate client instances connect to each other in order to play the game.
-
-The easiest way to run the game locally is to:
-1. Open the project in the Unity Editor
-2. Compile the game to your local platform (or use the WebGL build target) See [Unity's Documentation](https://docs.unity3d.com/Manual/PublishingBuilds.html) for how to build a project.
-3. Run the compiled build twice, and run a third instance from within the Unity Editor.
-4. Use one instance to create a room and the other two to connect.
