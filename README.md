@@ -13,8 +13,7 @@ The game has 2 modes:
 3. [Open this repo](https://docs.unity3d.com/2019.1/Documentation/Manual/GettingStartedOpeningProjects.html) in the Unity Editor.
 
 
-# Project Details
-## Scenes
+# Scenes
 The valid scene order is:
 1. /Assets/Scenes/Networked/Lobby_n
 2. /Assets/Scenes/Networked/Room_n
@@ -56,5 +55,8 @@ The port you should use for the HMTInterface connection. This needs to be unique
 The name of the photon room to join. This will be provided to the flask server by the call to launch_game.\
 -`localmode`: 
 A flag that can be provided to launch the game into local multiplayer mode. This would prevent the game from connecting to remote human clients and should only be used for an all agent game.\
+
+# Levels
+Levels in the game are based on schema descriptions and you could design your own levels too. Refer the [schema design document](https://docs.google.com/document/d/1OhPlfYfoKjUuYjsSkr330V0Sl4VWTWIvQXsPBW-5Gx4/edit?tab=t.0) to get started.
 
 
