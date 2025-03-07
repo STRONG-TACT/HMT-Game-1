@@ -26,7 +26,8 @@ public class NetworkLobbyManager : MonoBehaviour
     private float _timeoutLimit;
     private bool _matchmakingConfigSet;
     private float _timer;
-    
+    private bool _onePersonEnforced;
+
     // Singleton reference
     public static NetworkLobbyManager S;
 

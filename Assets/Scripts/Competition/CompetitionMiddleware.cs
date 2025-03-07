@@ -95,7 +95,7 @@ public class CompetitionMiddleware : MonoBehaviour {
     // Start is called before the first frame update
     void Awake() {
         Debug.Log($"CompetitionMiddleware Sanity Check: \n" +
-                  $"flaskURL: {flaskURL}, overrideAIMode: {overrideAIMode}, HttpSendLogs: {HttpSendLogs}" +
+                  $"flaskURL: {flaskURL}, overrideAIMode: {overrideAIMode}, HttpSendLogs: {FlaskSendLogs}" +
                   $"DebugTraceLogs: {DebugTraceLogs}");
         
         if (Instance == null) {
