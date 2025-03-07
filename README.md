@@ -51,8 +51,7 @@ Launches the game in headless mode to save on rendering resources, this is a bui
 The port you should use for the HMTInterface connection. This needs to be unique for each instance of the game running on the server and will be managed by the flask environment.\
 -`photonroom` <the name of the photon room provided by the flask call>: 
 The name of the photon room to join. This will be provided to the flask server by the call to launch_game.\
--`localmode`: 
-A flag that can be provided to launch the game into local multiplayer mode. This would prevent the game from connecting to remote human clients and should only be used for an all agent game.\
+-`localmode`: A flag that can be provided to launch the game into local multiplayer mode. This would prevent the game from connecting to remote human clients and should only be used for an all agent game.\
 - `tracelogs`: Activate logging to standard debug console.\
 - -`batchmode` and -`nographics`: [Desktop Headless Mode](https://docs.unity3d.com/Manual/desktop-headless-mode.html)
 
