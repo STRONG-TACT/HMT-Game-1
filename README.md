@@ -47,14 +47,14 @@ The valid scene order is:
 # Launch Parameters
 -`batchmode`: 
 Launches the game in headless mode to save on rendering resources, this is a built in Unity param.\
--`hmtsocketurl` <ip address/url>: 
-The url you should use to serve the HMT Interface socket. Default is ws://localhost.\
 -`hmtsocketport` <port number for the HMT API to open on>:
 The port you should use for the HMTInterface connection. This needs to be unique for each instance of the game running on the server and will be managed by the flask environment.\
 -`photonroom` <the name of the photon room provided by the flask call>: 
 The name of the photon room to join. This will be provided to the flask server by the call to launch_game.\
 -`localmode`: 
 A flag that can be provided to launch the game into local multiplayer mode. This would prevent the game from connecting to remote human clients and should only be used for an all agent game.\
+- `tracelogs`: Activate logging to standard debug console.\
+- -`batchmode` and -`nographics`: [Desktop Headless Mode](https://docs.unity3d.com/Manual/desktop-headless-mode.html)
 
 # Levels
 Levels in the game are based on schema descriptions and you could design your own levels too. Refer the [schema design document](https://docs.google.com/document/d/1OhPlfYfoKjUuYjsSkr330V0Sl4VWTWIvQXsPBW-5Gx4/edit?tab=t.0) to get started.
