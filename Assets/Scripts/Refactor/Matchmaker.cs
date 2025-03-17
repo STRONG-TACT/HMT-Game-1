@@ -6,9 +6,9 @@ using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using GameConstant;
 
-public class LobbyNetwork : MonoBehaviourPunCallbacks
+public class Matchmaker : MonoBehaviourPunCallbacks
 {
-    public static LobbyNetwork S;
+    public static Matchmaker S;
 
     public bool playerQuitConnection = false;
 
@@ -31,7 +31,7 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         Debug.Log("Successfully connected to server.");
-        NetworkLobbyManager.S.OnConnectToServer();
+        LobbyManager.S.OnConnectToServer();
     }
 
     // TODO: might be worth to handle connection error, casing on cause
@@ -41,10 +41,10 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
         if (playerQuitConnection)
         {
             Debug.Log("Successfully disconnected.");
-            NetworkLobbyManager.S.OnDisconnectSucceed();
+            LobbyManager.S.OnDisconnectSucceed();
             playerQuitConnection = false;
         }
-        else NetworkLobbyManager.S.OnUnexpectedDisconnect();
+        else LobbyManager.S.OnUnexpectedDisconnect();
     }
 
     public void TryDisconnectFromServer()
@@ -64,7 +64,7 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()
     {
         Debug.Log("Joined Lobby");
-        StartCoroutine(NetworkLobbyManager.S.OnJoinLobbySucceed());
+        StartCoroutine(LobbyManager.S.OnJoinLobbySucceed());
     }
 
     public void TryJoinRoom(string roomName)
@@ -76,7 +76,7 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
         Debug.Log("Join room failed, attempt to create one");
-        NetworkLobbyManager.S.OnJoinRoomAttemptFailed();
+        LobbyManager.S.OnJoinRoomAttemptFailed();
     }
 
     public void TryCreateRoom(string roomName, RoomOptions roomOptions = null)
@@ -94,12 +94,12 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
         Debug.Log("Failed to create a room");
-        NetworkLobbyManager.S.OnCreateRoomFailed();
+        LobbyManager.S.OnCreateRoomFailed();
     }
 
     public override void OnCreatedRoom()
     {
-        StartCoroutine(NetworkLobbyManager.S.OnRoomCreated());
+        StartCoroutine(LobbyManager.S.OnRoomCreated());
     }
 
     public override void OnJoinedRoom()
@@ -108,12 +108,12 @@ public class LobbyNetwork : MonoBehaviourPunCallbacks
 
         if (!PhotonNetwork.IsMasterClient)
         {
-            NetworkLobbyManager.S.OnRoomEntered();
+            LobbyManager.S.OnRoomEntered();
         }
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        NetworkLobbyManager.S.ListOfRooms = roomList;
+        LobbyManager.S.ListOfRooms = roomList;
     }
 }

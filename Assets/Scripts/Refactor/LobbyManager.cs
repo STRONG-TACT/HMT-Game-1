@@ -12,7 +12,7 @@ using Photon.Realtime;
 using Random = UnityEngine.Random;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class NetworkLobbyManager : MonoBehaviour
+public class LobbyManager : MonoBehaviour
 {
     public OnBoardingState onBoardingState = OnBoardingState.ChooseGameMode;
     public OnBoardingState playChoice = OnBoardingState.ChooseGameMode;
@@ -26,7 +26,7 @@ public class NetworkLobbyManager : MonoBehaviour
     private float _timer;
     
     // Singleton reference
-    public static NetworkLobbyManager S;
+    public static LobbyManager S;
 
     private void Awake()
     {
@@ -99,7 +99,7 @@ public class NetworkLobbyManager : MonoBehaviour
 
     public void OnlinePlaySelected() {
         onBoardingState = OnBoardingState.Loading;
-        LobbyNetwork.S.TryConnectToServer();
+        Matchmaker.S.TryConnectToServer();
         LobbyUI.S.ShowLoadingUI("Connecting to Server...");
     }
 
@@ -127,7 +127,7 @@ public class NetworkLobbyManager : MonoBehaviour
     public void CreateOrJoinRoomSelected()
     {
         onBoardingState = OnBoardingState.Loading;
-        LobbyNetwork.S.TryJoinLobby();
+        Matchmaker.S.TryJoinLobby();
         LobbyUI.S.ShowLoadingUI();
     }
 
@@ -190,7 +190,7 @@ public class NetworkLobbyManager : MonoBehaviour
         if (_numPerson == 1)
         {
             yield return new WaitForSeconds(Random.Range(0.0f, Mathf.Max(0.0f, _timer)));
-            LobbyNetwork.S.TryCreateRoom(
+            Matchmaker.S.TryCreateRoom(
                 Guid.NewGuid().ToString(), 
                 roomOptions);
         }
@@ -204,13 +204,13 @@ public class NetworkLobbyManager : MonoBehaviour
                 if (numPlayerProp is int prop && prop == _numPerson && roomInfo.PlayerCount == 1 && roomInfo.IsVisible)
                 {
                     Debug.Log($"Two human room found with name {roomInfo.Name}, joining");
-                    LobbyNetwork.S.TryJoinRoom(roomInfo.Name);
+                    Matchmaker.S.TryJoinRoom(roomInfo.Name);
                     yield break;
                 }
             }
             // If two person room not present rn, create one and wait for someone to join
             Debug.Log("Two human room not found in current room list, creating one");
-            LobbyNetwork.S.TryCreateRoom(
+            Matchmaker.S.TryCreateRoom(
                 Guid.NewGuid().ToString(), 
                 roomOptions);
         }
@@ -231,7 +231,7 @@ public class NetworkLobbyManager : MonoBehaviour
         if (roomName != "")
         {
             onBoardingState = OnBoardingState.Loading;
-            LobbyNetwork.S.TryJoinRoom(roomName);
+            Matchmaker.S.TryJoinRoom(roomName);
             LobbyUI.S.ShowLoadingUI();
         }
     }
@@ -248,7 +248,7 @@ public class NetworkLobbyManager : MonoBehaviour
         }
         else {
             LobbyUI.S.ShowLoadingUI("Room Does Not Exist, Creating One...");
-            LobbyNetwork.S.TryCreateRoom(LobbyUI.S.GetRoomNameEntered());
+            Matchmaker.S.TryCreateRoom(LobbyUI.S.GetRoomNameEntered());
         }
     }
 
