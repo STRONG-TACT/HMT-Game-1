@@ -215,7 +215,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localChar: {fileID: 0}
   gameStatus: 0
-  goalCount: 0
   currentLevel: 1
   isNetworkGame: 0
   readyForPlayerTurnCount: 0
@@ -1461,15 +1460,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6070971950121737187, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: m_BackGroundColor.b
-      value: 0.6415094
+      value: 0.78431374
       objectReference: {fileID: 0}
     - target: {fileID: 6070971950121737187, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: m_BackGroundColor.g
-      value: 0.6415094
+      value: 0.6627451
       objectReference: {fileID: 0}
     - target: {fileID: 6070971950121737187, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: m_BackGroundColor.r
-      value: 0.6415094
+      value: 0.41960785
       objectReference: {fileID: 0}
     - target: {fileID: 6070971950221804341, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: m_Color.b
