@@ -37,12 +37,13 @@ namespace GameConstant
 
     public enum GameStatus
     {
-        GetReady, 
+        LevelStart, 
         Player_Pinning, 
         Player_Planning, 
         Player_Moving, 
         Monster_Moving, 
         Animation_Pause, 
+        LevelEnd,
         GameEnd
     }
 }

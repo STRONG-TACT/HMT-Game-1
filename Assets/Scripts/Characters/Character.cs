@@ -553,20 +553,20 @@ public class Character : MonoBehaviour {
     #region Shrine and Goal Checks
 
     private void OnTriggerEnter(Collider col) {
-        if (col.gameObject.tag == "Goal") {
-            Shrine shrine = col.gameObject.GetComponent<Shrine>();
-            if (shrine != null && shrine.CheckShrineType(this)) {
-                IntegratedGameManager.S.GoalReached(CharacterId);
-            }
+        switch(col.tag) {
+            case "Goal":
+                Shrine shrine = col.gameObject.GetComponent<Shrine>();
+                if (shrine != null && shrine.CheckShrineType(this)) {
+                    IntegratedGameManager.S.ShrineReached(CharacterId);
+                }
+                break;
+
+            case "Door":
+                IntegratedGameManager.S.CheckGoalReached(CharacterId);
+                break;
         }
     }
     
-    private void OnTriggerStay(Collider col) {
-        if (col.gameObject.tag == "Door") {
-            IntegratedGameManager.S.CheckGoalReached(CharacterId);
-        }
-    }
-
     #endregion
 
     #region Death and Respawn

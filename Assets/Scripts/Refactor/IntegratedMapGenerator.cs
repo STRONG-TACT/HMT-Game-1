@@ -142,6 +142,8 @@ public class IntegratedMapGenerator : MonoBehaviour
         return InMap(pos.x, pos.y);
     }
 
+    public Tile DoorTile { get; private set; }
+
 
     public void LoadLevel(TextAsset levelTextFile)
     {
@@ -245,6 +247,7 @@ public class IntegratedMapGenerator : MonoBehaviour
 
             case "Door":
                 tileObj = Instantiate(gameAssets.DoorTile, new Vector3(x, 0, z), Quaternion.identity, tileParent);
+                DoorTile = tileObj.GetComponent<Tile>();
                 break;
 
             case "Trap1":

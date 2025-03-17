@@ -1630,6 +1630,10 @@ PrefabInstance:
       propertyPath: TurntimeLimit
       value: 120
       objectReference: {fileID: 0}
+    - target: {fileID: 6070971951046079248, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
+      propertyPath: levelTextFiles.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6246426816346295481, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0

@@ -21,7 +21,7 @@ public class IntegratedGameManager : MonoBehaviour
     // ======== Game States ======== 
     [Header("Game States")]
     public Character localChar;
-    public GameStatus gameStatus = GameStatus.GetReady;
+    public GameStatus gameStatus = GameStatus.LevelStart;
     public int CurrentRound { get; protected set; } = 0;
     private List<Tile> eventQueue = new List<Tile>();
     protected Coroutine currentCoroutine = null;
@@ -130,7 +130,7 @@ public class IntegratedGameManager : MonoBehaviour
         InSceneShrines = new List<Shrine> { null, null, null }; 
         IntegratedMapGenerator.Instance.LoadLevel(gameData.levelTextFiles[currentLevel - 1]);
 
-        gameStatus = GameStatus.GetReady;
+        gameStatus = GameStatus.LevelStart;
         CurrentRound = 0;
         characterDied = new bool[3];
         UIManager.S.InitGameUI();
@@ -363,6 +363,8 @@ public class IntegratedGameManager : MonoBehaviour
             Debug.Log("Moving currPhase ended.");
             pinningSystem.ClearCurrentTurnPins();
         }
+
+        CheckWinCondition();
         StartMonsterTurn();
     }
 
@@ -709,7 +711,7 @@ public class IntegratedGameManager : MonoBehaviour
                             Shrine shrine = t.gameObject.GetComponentInChildren<Shrine>();
                             foreach (var character in t.CharacterList) {
                                 if (shrine.CheckShrineType(character)) {
-                                    GoalUnReached(character.CharacterId);
+                                    ShrineUnReached(character.CharacterId);
                                     shrine.ReturnOrb();
                                 }
                             }
@@ -805,7 +807,7 @@ public class IntegratedGameManager : MonoBehaviour
     }
 
     // Called by Character.OnTriggerEnter(), when a character collide with its goal
-    public virtual void GoalReached(int charaID)
+    public virtual void ShrineReached(int charaID)
     {
         Tile tile = inSceneCharacters[charaID].currentTile;
         CompetitionMiddleware.Instance.LogClearShrine(charaID, tile.col, tile.row);
@@ -813,7 +815,7 @@ public class IntegratedGameManager : MonoBehaviour
         InSceneShrines[charaID].SetReached(true);
     }
 
-    public virtual void GoalUnReached(int charaID)
+    public virtual void ShrineUnReached(int charaID)
     {
         Tile tile = inSceneCharacters[charaID].currentTile;
         CompetitionMiddleware.Instance.LogRevokeShrine(charaID, tile.col, tile.row);
@@ -846,12 +848,42 @@ public class IntegratedGameManager : MonoBehaviour
         }
     }
 
+    protected virtual void CheckWinCondition() {
+        if(gameStatus== GameStatus.LevelEnd || gameStatus == GameStatus.GameEnd) {
+            return;
+        }
+        bool shrinesReached = true;
+        foreach (Shrine shrine in InSceneShrines) {
+            if (!shrine.Reached) {
+                shrinesReached = false;
+                break;
+            }
+        }
+
+        bool onDoor = false;
+        Character doorCharacter = null;
+        foreach (Character character in inSceneCharacters) {
+            if(character.currentTile == IntegratedMapGenerator.Instance.DoorTile) {
+                onDoor = true;
+                doorCharacter = character;
+                break;
+            }
+        }
+
+        if (shrinesReached && onDoor) {
+            CompetitionMiddleware.Instance.LogClearGoal(doorCharacter.CharacterId, IntegratedMapGenerator.Instance.DoorTile.col, IntegratedMapGenerator.Instance.DoorTile.row);
+            if (isNetworkGame && PhotonNetwork.IsMasterClient) LogLevelResult();
+            StopAllCoroutines();
+            StartCoroutine(PrepareForNextLevel());
+        }
+    }
+
+
     // Called by Character.OnTriggerEnter(), when all three goals fetched and one character collide with the door after that
     // "Move" to next currLevel by reset all relevant constants, delete monsters and tiles (tiles done by map generator) this currLevel, and reset chara status
-    public virtual void CheckGoalReached(int charaID)
-    {
-        bool level_finished = true;
-        foreach(Shrine shrine in InSceneShrines) {
+    public virtual void CheckGoalReached(int charaID) {
+        /*bool level_finished = true;
+        foreach (Shrine shrine in InSceneShrines) {
             if (!shrine.Reached) {
                 level_finished = false;
                 break;
@@ -863,12 +895,14 @@ public class IntegratedGameManager : MonoBehaviour
             if (isNetworkGame && PhotonNetwork.IsMasterClient) LogLevelResult();
             StopAllCoroutines();
             StartCoroutine(PrepareForNextLevel());
-        }
+        }*/
+        CheckWinCondition();
     }
 
     protected virtual IEnumerator PrepareForNextLevel() {
         //temporarily disable all physical interactions
         Physics.autoSimulation = false;
+        gameStatus = GameStatus.LevelEnd;
         while (inSceneMonsters.Count != 0) {
             Monster m = inSceneMonsters[0];
             inSceneMonsters.Remove(m);
@@ -980,7 +1014,7 @@ public class IntegratedGameManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if(gameStatus != GameStatus.GetReady)
+        if(gameStatus != GameStatus.LevelStart)
         {
             Debug.Log("Game manager OnDestory getting called, destroying NetworkMiddleware, current gamestatus: " + gameStatus);
             Destroy(NetworkMiddleware.S.gameObject);

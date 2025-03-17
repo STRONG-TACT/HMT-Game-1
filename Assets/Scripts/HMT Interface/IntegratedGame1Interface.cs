@@ -45,11 +45,11 @@ public class IntegratedGame1Interface : HMTInterface {
         if (InGame) {
             /// The GetReady state is used both for first time intialization but also tranditions between levels.
             /// Rather than telling the agent to try agian later, we can just wait for things to be ready.
-            while (IntegratedGameManager.S.gameStatus == GameConstant.GameStatus.GetReady) {
+            while (IntegratedGameManager.S.gameStatus == GameConstant.GameStatus.LevelStart || IntegratedGameManager.S.gameStatus == GameConstant.GameStatus.LevelEnd) {
                 yield return null;
             }
             switch (IntegratedGameManager.S.gameStatus) {
-                case GameConstant.GameStatus.GetReady:
+                case GameConstant.GameStatus.LevelStart:
                     command.SendErrorResponse("Game or level is intializing, try again later.", 1002);
                     break;
                 case GameConstant.GameStatus.GameEnd:
@@ -122,7 +122,7 @@ public class IntegratedGame1Interface : HMTInterface {
             yield return null;
         }
         Debug.Log("Waited to be InGame");
-        while(IntegratedGameManager.S.gameStatus == GameConstant.GameStatus.GetReady) {
+        while(IntegratedGameManager.S.gameStatus == GameConstant.GameStatus.LevelStart) {
             yield return null;
         }
         Debug.Log("Waited to be Ready");
