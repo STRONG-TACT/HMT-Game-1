@@ -7,10 +7,10 @@ namespace GameConstant
 {
     public class GlobalConstant
     {
-        public const string LOBBY_SCENE = "Lobby_n";
-        public const string ROOM_SCENE = "Room_n";
-        public const string LOCAL_SCENE = "Local_Animated";
-        public const string SURVEY_SCENE = "Survey_scene";
+        public const string LOBBY_SCENE = "Lobby";
+        public const string ROOM_SCENE = "NetworkWaitingRoom";
+        public const string LOCAL_SCENE = "LocalGamePlay";
+        public const string SURVEY_SCENE = "EndGameSurvey";
         public const string NETWORK_SCENE = "NetworkGamePlay";
         public const string GAME_VERSION = "1.0.0";
     }
