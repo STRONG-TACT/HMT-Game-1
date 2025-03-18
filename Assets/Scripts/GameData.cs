@@ -34,11 +34,11 @@ public class GameData : MonoBehaviour
     [Min(1)]
     public int RespawnDelay = 2;
 
-    public static GameData S;
+    public static GameData Instance { get; private set; } = null;
 
     private void Awake()
     {
-        S = this;
+        Instance = this;
     }
 
     void Start()

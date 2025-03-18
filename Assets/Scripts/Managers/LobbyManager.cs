@@ -24,14 +24,14 @@ public class LobbyManager : MonoBehaviour
     private float _timeoutLimit;
     private bool _matchmakingConfigSet;
     private float _timer;
-    
+
     // Singleton reference
-    public static LobbyManager S;
+    public static LobbyManager Instance { get; private set; } = null;
 
     private void Awake()
     {
-        if (S) Destroy(this);
-        else S = this;
+        if (Instance) Destroy(this);
+        else Instance = this;
 
         _matchmakingConfigSet = false;
         _twoHumanChance = MatchMakingParameter.TWO_PERSON_GAME_CHANCE;
@@ -99,8 +99,8 @@ public class LobbyManager : MonoBehaviour
 
     public void OnlinePlaySelected() {
         onBoardingState = OnBoardingState.Loading;
-        Matchmaker.S.TryConnectToServer();
-        LobbyUI.S.ShowLoadingUI("Connecting to Server...");
+        Matchmaker.Instance.TryConnectToServer();
+        LobbyUI.Instance.ShowLoadingUI("Connecting to Server...");
     }
 
     public void OnConnectToServer() {
@@ -112,14 +112,14 @@ public class LobbyManager : MonoBehaviour
     public void OnDisconnectSucceed()
     {
         onBoardingState = OnBoardingState.ChooseGameMode;
-        LobbyUI.S.ShowGameModeUI();
+        LobbyUI.Instance.ShowGameModeUI();
     }
 
     public void OnUnexpectedDisconnect()
     {
         onBoardingState = OnBoardingState.Disconnected;
         Debug.LogWarning("Disconnected Unexpectedly");
-        LobbyUI.S.ShowDisconnectedUI();
+        LobbyUI.Instance.ShowDisconnectedUI();
     }
     
     // ============ Join/Create Room Handle ============
@@ -127,8 +127,8 @@ public class LobbyManager : MonoBehaviour
     public void CreateOrJoinRoomSelected()
     {
         onBoardingState = OnBoardingState.Loading;
-        Matchmaker.S.TryJoinLobby();
-        LobbyUI.S.ShowLoadingUI();
+        Matchmaker.Instance.TryJoinLobby();
+        LobbyUI.Instance.ShowLoadingUI();
     }
 
     public IEnumerator OnJoinLobbySucceed()
@@ -138,7 +138,7 @@ public class LobbyManager : MonoBehaviour
         yield break;
 #else
 
-        LobbyUI.S.ShowLoadingUI("Initializing Matchmaking System");
+        LobbyUI.Instance.ShowLoadingUI("Initializing Matchmaking System");
         
         CompetitionMiddleware.Instance.CallMatchmakingConfig(OnMatchmakingConfigResponse);
         while (!_matchmakingConfigSet)
@@ -176,7 +176,7 @@ public class LobbyManager : MonoBehaviour
     {
         Debug.Log($"Creating/Joining a room with {_numPerson} human players");
         CompetitionMiddleware.Instance.LogJoinQueue();
-        LobbyUI.S.ShowLoadingUI("Searching for a Room to Join...");
+        LobbyUI.Instance.ShowLoadingUI("Searching for a Room to Join...");
         
         _timer = _timeoutLimit;
         Hashtable roomPropertyHashTable = new Hashtable { { MatchMakingParameter.NUM_PERSON_KEY, _numPerson } };
@@ -190,7 +190,7 @@ public class LobbyManager : MonoBehaviour
         if (_numPerson == 1)
         {
             yield return new WaitForSeconds(Random.Range(0.0f, Mathf.Max(0.0f, _timer)));
-            Matchmaker.S.TryCreateRoom(
+            Matchmaker.Instance.TryCreateRoom(
                 Guid.NewGuid().ToString(), 
                 roomOptions);
         }
@@ -204,13 +204,13 @@ public class LobbyManager : MonoBehaviour
                 if (numPlayerProp is int prop && prop == _numPerson && roomInfo.PlayerCount == 1 && roomInfo.IsVisible)
                 {
                     Debug.Log($"Two human room found with name {roomInfo.Name}, joining");
-                    Matchmaker.S.TryJoinRoom(roomInfo.Name);
+                    Matchmaker.Instance.TryJoinRoom(roomInfo.Name);
                     yield break;
                 }
             }
             // If two person room not present rn, create one and wait for someone to join
             Debug.Log("Two human room not found in current room list, creating one");
-            Matchmaker.S.TryCreateRoom(
+            Matchmaker.Instance.TryCreateRoom(
                 Guid.NewGuid().ToString(), 
                 roomOptions);
         }
@@ -225,14 +225,14 @@ public class LobbyManager : MonoBehaviour
         Debug.LogFormat("Joining room with name: {0}", roomName);
 
         if (roomName == "") {
-            roomName = LobbyUI.S.GetRoomNameEntered();
+            roomName = LobbyUI.Instance.GetRoomNameEntered();
         }
         // TODO: Handle for names that are too long
         if (roomName != "")
         {
             onBoardingState = OnBoardingState.Loading;
-            Matchmaker.S.TryJoinRoom(roomName);
-            LobbyUI.S.ShowLoadingUI();
+            Matchmaker.Instance.TryJoinRoom(roomName);
+            LobbyUI.Instance.ShowLoadingUI();
         }
     }
 
@@ -247,8 +247,8 @@ public class LobbyManager : MonoBehaviour
             Application.Quit();
         }
         else {
-            LobbyUI.S.ShowLoadingUI("Room Does Not Exist, Creating One...");
-            Matchmaker.S.TryCreateRoom(LobbyUI.S.GetRoomNameEntered());
+            LobbyUI.Instance.ShowLoadingUI("Room Does Not Exist, Creating One...");
+            Matchmaker.Instance.TryCreateRoom(LobbyUI.Instance.GetRoomNameEntered());
         }
     }
 
@@ -259,10 +259,10 @@ public class LobbyManager : MonoBehaviour
 
     IEnumerator CreateRoomFailed()
     {
-        LobbyUI.S.ShowLoadingUI("Create/Join Room Failed, this is most likely the room name already exist and is closed.");
+        LobbyUI.Instance.ShowLoadingUI("Create/Join Room Failed, this is most likely the room name already exist and is closed.");
         yield return new WaitForSeconds(3.0f);
         onBoardingState = OnBoardingState.CreateOrJoinRoom;
-        LobbyUI.S.ShowCreateJoinRoomUI();
+        LobbyUI.Instance.ShowCreateJoinRoomUI();
     }
 
     public void OnRoomEntered()

@@ -10,7 +10,7 @@ using System.Linq;
 
 public class CompetitionMiddleware : MonoBehaviour {
 
-    public static CompetitionMiddleware Instance = null;
+    public static CompetitionMiddleware Instance { get; private set; } = null;
 
     public string flaskURL = "https://localhost";
     public string serverKey = "NOTSET";

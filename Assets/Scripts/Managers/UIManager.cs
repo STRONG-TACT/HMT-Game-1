@@ -107,12 +107,12 @@ public class UIManager : MonoBehaviour
     public GameObject ForfeitConfirmationUI;
 
 
-    public static UIManager S;
+    public static UIManager Instance { get; private set; } = null;
 
     private void Awake()
     {
-        if (S) Destroy(this);
-        else S = this;
+        if (Instance) Destroy(this);
+        else Instance = this;
     }
 
     private void Start() {
@@ -345,8 +345,8 @@ public class UIManager : MonoBehaviour
 
     private void SubmitPins() {
         //TODO we may want to send different names for these log functions
-        PinningSystem.S.ClosePinWheel();
-        NetworkMiddleware.S.CallReadyForNextPhase(GameManager.Instance.localChar.CharacterId, true);
+        PinningSystem.Instance.ClosePinWheel();
+        NetworkMiddleware.Instance.CallReadyForNextPhase(GameManager.Instance.localChar.CharacterId, true);
         
         UpdateCharacterPinUI();
     }
@@ -413,18 +413,18 @@ public class UIManager : MonoBehaviour
     }
     public void AddMoveToCharacter(Character.Direction direction) {
         if (GameManager.Instance.localChar.ActionPointsRemaining > 0 && GameManager.Instance.localChar.CheckMove(direction)) {
-            NetworkMiddleware.S.CallAddMoveToCharacter(GameManager.Instance.localChar.CharacterId, direction);
+            NetworkMiddleware.Instance.CallAddMoveToCharacter(GameManager.Instance.localChar.CharacterId, direction);
         }
     }
 
     public void UndoPlanStep() {
         if (GameManager.Instance.localChar.ActionPlan.Count > 0) {
-            NetworkMiddleware.S.CallUndoPlanStep(GameManager.Instance.localChar.CharacterId);
+            NetworkMiddleware.Instance.CallUndoPlanStep(GameManager.Instance.localChar.CharacterId);
         }
     }
 
     public void SubmitPlan() {
-        NetworkMiddleware.S.CallReadyForNextPhase(GameManager.Instance.localChar.CharacterId, true);
+        NetworkMiddleware.Instance.CallReadyForNextPhase(GameManager.Instance.localChar.CharacterId, true);
     }
 
     #endregion
@@ -825,7 +825,7 @@ public class UIManager : MonoBehaviour
 
     private void TooltipHoverUpdate() {
         //display combat skills when mouse hover on objects
-        if (PinningSystem.S.PinUIUp) {
+        if (PinningSystem.Instance.PinUIUp) {
             tooltipTarget = null;
             combatSkillDisplayActive = false;
             CombatSkillTooltip.SetActive(false);

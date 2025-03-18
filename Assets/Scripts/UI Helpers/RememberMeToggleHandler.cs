@@ -11,21 +11,21 @@ public class RememberMeToggleHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        RememberMe = LobbyUI.S.RememberMe;
+        RememberMe = LobbyUI.Instance.RememberMe;
         rememberMeToggle.isOn = RememberMe;
         rememberMeToggle.onValueChanged.AddListener(OnToggleChanged);
 
     }
     void OnEnable()
     {
-        if (LobbyUI.S != null) RememberMe = LobbyUI.S.RememberMe;
+        if (LobbyUI.Instance != null) RememberMe = LobbyUI.Instance.RememberMe;
         rememberMeToggle.isOn = RememberMe;
     }
 
     void OnToggleChanged(bool isOn)
     {
         RememberMe = isOn;
-        LobbyUI.S.RememberMe = isOn;
+        LobbyUI.Instance.RememberMe = isOn;
         Debug.Log("Remember Me status: " + RememberMe);
     }
 

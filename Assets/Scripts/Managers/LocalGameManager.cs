@@ -18,7 +18,7 @@ public class LocalGameManager : GameManager
 
     protected override void Start() {
         base.Start();
-        UIManager.S.ShowCharacterSwitcher();
+        UIManager.Instance.ShowCharacterSwitcher();
         HMT.ArgParser argParser = new HMT.ArgParser();
 
         argParser.AddArg("stepTime", HMT.ArgParser.ArgType.One);
@@ -36,7 +36,7 @@ public class LocalGameManager : GameManager
         foreach(Character character in inSceneCharacters) {
             if (!character.ReadyForNextPhase) {
                 CompetitionMiddleware.Instance.LogTimeOut(character.CharacterId);
-                NetworkMiddleware.S.CallReadyForNextPhaseAuto(character.CharacterId, true);
+                NetworkMiddleware.Instance.CallReadyForNextPhaseAuto(character.CharacterId, true);
             }
         }
     }
@@ -68,8 +68,8 @@ public class LocalGameManager : GameManager
             localChar.UnFocusCharacter();
             localChar = inSceneCharacters[index];
             localChar.FocusCharacter();
-            UIManager.S.UpdateCommonHUD();
-            UIManager.S.UpdateCharacterPinUI();
+            UIManager.Instance.UpdateCommonHUD();
+            UIManager.Instance.UpdateCharacterPinUI();
             //uiManager.ShowCharacterPinUI();
             //player.UpdateCharacterUI();
         }
@@ -78,21 +78,21 @@ public class LocalGameManager : GameManager
             localChar.UnFocusCharacter();
             localChar = inSceneCharacters[index];
             localChar.FocusCharacter();
-            UIManager.S.ShowCharacterPlanUI();
-            UIManager.S.UpdateCommonHUD();
-            UIManager.S.UpdateCharacterPlanUI();
+            UIManager.Instance.ShowCharacterPlanUI();
+            UIManager.Instance.UpdateCommonHUD();
+            UIManager.Instance.UpdateCharacterPlanUI();
             //player.UpdateCharacterUI();
         }
         else {
             localChar.UnFocusCharacter();
             localChar = inSceneCharacters[index];
             localChar.FocusCharacter();
-            UIManager.S.UpdateCommonHUD();
-            UIManager.S.HideCharacterPinUI();
-            UIManager.S.HideCharacterPlanUI();
+            UIManager.Instance.UpdateCommonHUD();
+            UIManager.Instance.HideCharacterPinUI();
+            UIManager.Instance.HideCharacterPlanUI();
         }
         CompetitionMiddleware.Instance.LogChangeCharacter(index);
-       CameraManager.S.ChangeTargetCharacter(index);
+       CameraManager.Instance.ChangeTargetCharacter(index);
        MapGenerator.Instance.UpdateFOWVisuals();
     }
 

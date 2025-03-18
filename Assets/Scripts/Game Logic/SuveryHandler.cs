@@ -16,12 +16,12 @@ public class SuveryHandler : MonoBehaviour
     private List<string> responses;
 
 
-    public static SuveryHandler S;
+    public static SuveryHandler Instance { get; private set; } = null;
 
     private void Awake()
     {
-        if (S) Destroy(this);
-        else S = this;
+        if (Instance) Destroy(this);
+        else Instance = this;
     }
 
     private void Update()

@@ -24,16 +24,16 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     // ======== Used During Gameplay ========
 
-    public static NetworkMiddleware S;
+    public static NetworkMiddleware Instance { get; private set; } = null;
 
     private void Awake() {
-        if (S) {
+        if (Instance) {
             Debug.LogWarning($"Duplicate of networkmiddleware find in {SceneManager.GetActiveScene().name}");
             Destroy(this.gameObject);
         }
         else {
             Debug.LogWarning($"networkmiddleware spawned in {SceneManager.GetActiveScene().name}");
-            S = this;
+            Instance = this;
             DontDestroyOnLoad(this.gameObject);
             //SceneManager.activeSceneChanged += OnSceneChanged;
         }
@@ -135,12 +135,12 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     private void ReadyForNextPhaseLocal(int charID, bool ready) {
         
         GameManager.Instance.inSceneCharacters[charID].ReadyForNextPhase = ready;
-        UIManager.S.UpdateCommonHUD();
-        UIManager.S.UpdateCharacterActionStatus(charID, ready);
+        UIManager.Instance.UpdateCommonHUD();
+        UIManager.Instance.UpdateCharacterActionStatus(charID, ready);
         
         if (ready) {
             if (GameManager.Instance.gameStatus == GameStatus.Player_Pinning) {
-                UIManager.S.UpdateCharacterPinUI();
+                UIManager.Instance.UpdateCharacterPinUI();
                 if (!GameManager.Instance.isNetworkGame)
                 {
                     GameManager.Instance.CheckPingPhaseEnd();
@@ -151,7 +151,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
             }
 
             if (GameManager.Instance.gameStatus == GameStatus.Player_Planning) {
-                UIManager.S.UpdateCharacterPlanUI();
+                UIManager.Instance.UpdateCharacterPlanUI();
                 if (!GameManager.Instance.isNetworkGame)
                 {
                     GameManager.Instance.CheckPlanPhaseEnd();
@@ -244,10 +244,10 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     [PunRPC]
     private void DropPinAtLocal(int charId, int pinTypeIdx, int row, int col) {
-        PinningSystem.S.InstantiatePin(charId, pinTypeIdx, row, col);
+        PinningSystem.Instance.InstantiatePin(charId, pinTypeIdx, row, col);
         GameManager.Instance.inSceneCharacters[charId].PinPlaced();
-        UIManager.S.UpdateCommonHUD();
-        UIManager.S.UpdateCharacterPinUI();
+        UIManager.Instance.UpdateCommonHUD();
+        UIManager.Instance.UpdateCharacterPinUI();
     }
 
     #endregion
@@ -268,8 +268,8 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     [PunRPC]
     private void AddMoveToCharacterLocal(int charID, Character.Direction direction) {
         GameManager.Instance.inSceneCharacters[charID].AddActionToPlan(direction);
-        UIManager.S.UpdateCommonHUD();
-        UIManager.S.UpdateCharacterPlanUI();
+        UIManager.Instance.UpdateCommonHUD();
+        UIManager.Instance.UpdateCharacterPlanUI();
     }
 
     public void CallUndoPlanStep(int charID) {
@@ -285,8 +285,8 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     [PunRPC]
     private void UndoPlanStepLocal(int charID) {
         GameManager.Instance.inSceneCharacters[charID].UndoPlanStep();
-        UIManager.S.UpdateCommonHUD();
-        UIManager.S.UpdateCharacterPlanUI();
+        UIManager.Instance.UpdateCommonHUD();
+        UIManager.Instance.UpdateCharacterPlanUI();
     }
 
     #endregion
@@ -296,7 +296,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     {
         // If we're in the survey scene, ignore this whole callback
         // Maybe even if the game is in an endstate
-        if(SuveryHandler.S != null)
+        if(SuveryHandler.Instance != null)
         {
             Debug.Log("In survey scene, ignore player disconnect");
             return;
@@ -317,8 +317,8 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         Debug.Log($"Player {player.NickName} has left the room");
         CompetitionMiddleware.Instance.LogDisconnect(player.NickName);
 
-        if (UIManager.S) { 
-            UIManager.S.ShowOtherPlayerDisconnectUI(player.NickName);
+        if (UIManager.Instance) { 
+            UIManager.Instance.ShowOtherPlayerDisconnectUI(player.NickName);
 
             // The ShowOtherPlayerDisonnectedUI should have a button that takes you to the survey scene
             
@@ -356,11 +356,11 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
             if (PhotonNetwork.IsMasterClient)
             {
                 
-                Combat.S.ExecuteCombat(type, tile, visibility);
+                Combat.Instance.ExecuteCombat(type, tile, visibility);
                 //Reinitialize seed and send it to all clients to make sure that subsequent monster action is consistent
                 randomSeed = Random.Range(0, 10000);
-                photonView.RPC("SyncCombatResult", RpcTarget.All, randomSeed, Combat.S.result, Combat.S.charaIDs.ToArray(), Combat.S.charaDiceStats.ToArray(),
-                    Combat.S.enemyScores.ToArray(), Combat.S.enemyDiceStats.ToArray(), Combat.S.charaScores.ToArray(), Combat.S.challenges.ToArray(), Combat.S.enemyScore, Combat.S.charaScore, visibility);
+                photonView.RPC("SyncCombatResult", RpcTarget.All, randomSeed, Combat.Instance.result, Combat.Instance.charaIDs.ToArray(), Combat.Instance.charaDiceStats.ToArray(),
+                    Combat.Instance.enemyScores.ToArray(), Combat.Instance.enemyDiceStats.ToArray(), Combat.Instance.charaScores.ToArray(), Combat.Instance.challenges.ToArray(), Combat.Instance.enemyScore, Combat.Instance.charaScore, visibility);
             }
             if (CompetitionMiddleware.Instance.IsAI)
                 photonView.RPC("CombatResultReadyLocal", RpcTarget.All, CompetitionMiddleware.Instance.RegisteredAgents.Count);
@@ -370,7 +370,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         else
         {
 
-            Combat.S.ExecuteCombat(type, tile, visibility);
+            Combat.Instance.ExecuteCombat(type, tile, visibility);
             CombatResultReadyLocal(3);
             randomSeed = Random.Range(0, 10000);
         }
@@ -391,15 +391,15 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
         bool visibility)
     {
         randomSeed = newSeed;
-        Combat.S.charaIDs = new List<int>(charaIDs);
-        Combat.S.result = result;
-        Combat.S.charaDiceStats = new List<int>(charaDiceStats);
-        Combat.S.enemyScores = new List<int>(enemyScores);
-        Combat.S.enemyDiceStats = new List<int>(enemyDiceStats);
-        Combat.S.charaScores = new List<int>(charaScores);
-        Combat.S.challenges = new List<string>(challenges);
-        Combat.S.enemyScore = enemyScore;
-        Combat.S.charaScore = charaScore;
+        Combat.Instance.charaIDs = new List<int>(charaIDs);
+        Combat.Instance.result = result;
+        Combat.Instance.charaDiceStats = new List<int>(charaDiceStats);
+        Combat.Instance.enemyScores = new List<int>(enemyScores);
+        Combat.Instance.enemyDiceStats = new List<int>(enemyDiceStats);
+        Combat.Instance.charaScores = new List<int>(charaScores);
+        Combat.Instance.challenges = new List<string>(challenges);
+        Combat.Instance.enemyScore = enemyScore;
+        Combat.Instance.charaScore = charaScore;
     }
 
     [PunRPC]

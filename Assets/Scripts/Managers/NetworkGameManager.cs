@@ -16,14 +16,14 @@ public class NetworkGameManager : GameManager {
     {
         base.Start();
         localChar.FocusCharacter();
-        UIManager.S.HideCharacterSwitcher();
+        UIManager.Instance.HideCharacterSwitcher();
     }
     
     public override IEnumerator StartLevel()
     {
         // center camera to player
-        CameraManager.S.ChangeTargetCharacter(localChar.CharacterId);
-        CameraManager.S.RecenterCamera();
+        CameraManager.Instance.ChangeTargetCharacter(localChar.CharacterId);
+        CameraManager.Instance.RecenterCamera();
         
         yield return base.StartLevel();
         // this call will mark every tile as unseen
@@ -42,13 +42,13 @@ public class NetworkGameManager : GameManager {
             foreach(CompetitionMiddleware.AgentRecord agent in CompetitionMiddleware.Instance.RegisteredAgents.Values) {
                 if (!inSceneCharacters[agent.characterID].ReadyForNextPhase) {
                     CompetitionMiddleware.Instance.LogTimeOut(agent.characterID);
-                    NetworkMiddleware.S.CallReadyForNextPhase(agent.characterID, true);
+                    NetworkMiddleware.Instance.CallReadyForNextPhase(agent.characterID, true);
                 }
             }
         }
         else {
             CompetitionMiddleware.Instance.LogTimeOut(localChar.CharacterId);
-            NetworkMiddleware.S.CallReadyForNextPhase(localChar.CharacterId,true);
+            NetworkMiddleware.Instance.CallReadyForNextPhase(localChar.CharacterId,true);
         }
     }
 }

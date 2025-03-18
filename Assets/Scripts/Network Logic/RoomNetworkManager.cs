@@ -14,7 +14,7 @@ public class RoomNetworkManager : MonoBehaviourPunCallbacks {
     // random seed
     private int _randomSeed = -1;
 
-    public static RoomNetworkManager Instance;
+    public static RoomNetworkManager Instance { get; private set; } = null;
 
     private List<string> CharacterMapping = null;
 
@@ -188,20 +188,20 @@ public class RoomNetworkManager : MonoBehaviourPunCallbacks {
 
         if (CompetitionMiddleware.Instance.IsAI) {
             PhotonNetwork.LocalPlayer.NickName = "AI AGENT";
-            NetworkMiddleware.S.SetupMiddleware(seed, 0);
+            NetworkMiddleware.Instance.SetupMiddleware(seed, 0);
         }
         else if(CompetitionMiddleware.Instance.UserID == dwarfPlayer)
         {
             PhotonNetwork.LocalPlayer.NickName = "Dwarf";
-            NetworkMiddleware.S.SetupMiddleware(seed, 0);
+            NetworkMiddleware.Instance.SetupMiddleware(seed, 0);
         }
         else if (CompetitionMiddleware.Instance.UserID == giantPlayer) {
             PhotonNetwork.LocalPlayer.NickName = "Giant";
-            NetworkMiddleware.S.SetupMiddleware(seed, 1);
+            NetworkMiddleware.Instance.SetupMiddleware(seed, 1);
         }
         else if (CompetitionMiddleware.Instance.UserID == humanPlayer) {
             PhotonNetwork.LocalPlayer.NickName = "Human";
-            NetworkMiddleware.S.SetupMiddleware(seed, 2);
+            NetworkMiddleware.Instance.SetupMiddleware(seed, 2);
         }
         
         // sending this so that master client can have a mapping between CharID and playerID in report_result

@@ -123,7 +123,7 @@ public class Monster : MonoBehaviour
         ObjKey = code;
 
         if (config.RandomizeInitialDirection) {
-            currentDirection = NetworkMiddleware.S.NextRandom() > 0.5f;
+            currentDirection = NetworkMiddleware.Instance.NextRandom() > 0.5f;
         }
         else {
             currentDirection = true;
@@ -195,7 +195,7 @@ public class Monster : MonoBehaviour
                         Character.Direction.Down,
                         Character.Direction.Left,
                         Character.Direction.Right };
-                    movementPlan = movementPlan.Where(x => CheckMove(x)).OrderBy(x => NetworkMiddleware.S.NextRandom()).ToList();
+                    movementPlan = movementPlan.Where(x => CheckMove(x)).OrderBy(x => NetworkMiddleware.Instance.NextRandom()).ToList();
                     movementPlan.Add(Character.Direction.Wait);
                     break;
             }

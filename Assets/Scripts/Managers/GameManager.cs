@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour
             switch (gameStatus) {
                 case GameStatus.Player_Pinning:
                 case GameStatus.Player_Planning:
-                    return GameData.S.TurntimeLimit - (Time.time - lastTurnTimerReset);
+                    return GameData.Instance.TurntimeLimit - (Time.time - lastTurnTimerReset);
                 default:
                     return float.PositiveInfinity;
             }
@@ -62,7 +62,7 @@ public class GameManager : MonoBehaviour
     public List<Character> inSceneCharacters = new List<Character>();
     public List<Monster> inSceneMonsters = new List<Monster>();
 
-    public static GameManager Instance;
+    public static GameManager Instance { get; protected set; } = null;
     public float excecutionStepTime = 1;
 
     protected virtual void Awake() {
@@ -79,7 +79,7 @@ public class GameManager : MonoBehaviour
             targetChara.SetUpConfig(config, ID, lives);
         }
         else {
-            targetChara.SetUpConfig(GameData.S.characterConfigs[ID], ID, lives);
+            targetChara.SetUpConfig(GameData.Instance.characterConfigs[ID], ID, lives);
         }
         Vector3 newPosition = new Vector3(x, targetChara.transform.position.y, z);
         targetChara.SetStartPosition(newPosition);
@@ -88,11 +88,11 @@ public class GameManager : MonoBehaviour
 
 
     protected virtual void Start() {        
-        gameData = GameData.S;
-        pinningSystem = PinningSystem.S;
+        gameData = GameData.Instance;
+        pinningSystem = PinningSystem.Instance;
         characterDied = new bool[3];
 
-        Debug.LogFormat("NetworkMiddleware.S.myCharacterID = {0}", NetworkMiddleware.S.myCharacterID);
+        Debug.LogFormat("NetworkMiddleware.S.myCharacterID = {0}", NetworkMiddleware.Instance.myCharacterID);
 
 #if HMT_BUILD
         if (isNetworkGame) {
@@ -107,14 +107,14 @@ public class GameManager : MonoBehaviour
             localChar = inSceneCharacters[0];
         }
 #else
-        localChar = inSceneCharacters[(isNetworkGame) ? NetworkMiddleware.S.myCharacterID : 0];
+        localChar = inSceneCharacters[(isNetworkGame) ? NetworkMiddleware.Instance.myCharacterID : 0];
 #endif
         //currentLevel = 1;
         StartCoroutine(StartLevel());
     }
 
     protected virtual void Update() {
-        UIManager.S.UpdateTurnTimer();
+        UIManager.Instance.UpdateTurnTimer();
         if(TimeRemaining<= 0) {
             TimeoutSubmit();
         }
@@ -133,13 +133,13 @@ public class GameManager : MonoBehaviour
         gameStatus = GameStatus.LevelStart;
         CurrentRound = 0;
         characterDied = new bool[3];
-        UIManager.S.InitGameUI();
-        UIManager.S.ResetTeamActionStatus();
-        UIManager.S.ResetTeamGoalStatus();
+        UIManager.Instance.InitGameUI();
+        UIManager.Instance.ResetTeamActionStatus();
+        UIManager.Instance.ResetTeamGoalStatus();
 
         yield return new WaitForFixedUpdate();
 
-        NetworkMiddleware.S.CallSyncStartPlayerturn();
+        NetworkMiddleware.Instance.CallSyncStartPlayerturn();
         // Wait until all clients are ready
         while (readyForPlayerTurnCount < 3)
         {
@@ -174,7 +174,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Start Pinning Phase.");
         gameStatus = GameStatus.Player_Pinning;
-        UIManager.S.UpdateGamePhaseInfo();
+        UIManager.Instance.UpdateGamePhaseInfo();
         ResetTurnTimer();
 
 
@@ -193,9 +193,9 @@ public class GameManager : MonoBehaviour
         }
         else {
             localChar.FocusCharacter();
-            UIManager.S.ShowCharacterPinUI();
-            UIManager.S.ShowCommonHUD();
-            UIManager.S.ResetTeamActionStatus();
+            UIManager.Instance.ShowCharacterPinUI();
+            UIManager.Instance.ShowCommonHUD();
+            UIManager.Instance.ResetTeamActionStatus();
         }
     }
 
@@ -231,7 +231,7 @@ public class GameManager : MonoBehaviour
     // Update params, if all end their pinning, move to planning currPhase
     public virtual void CheckPingPhaseEnd() {
         if(CheckPhaseEnd()) {
-            NetworkMiddleware.S.CallGotoNextPhase();
+            NetworkMiddleware.Instance.CallGotoNextPhase();
 
             //EndPlayerPinningPhase();
         }
@@ -244,8 +244,8 @@ public class GameManager : MonoBehaviour
         foreach (Character chara in inSceneCharacters) {
             chara.EndPingPhase();
         }
-        PinningSystem.S.ClosePinWheel();
-        UIManager.S.HideCharacterPinUI();
+        PinningSystem.Instance.ClosePinWheel();
+        UIManager.Instance.HideCharacterPinUI();
         //Debug.Log("Should start planning currPhase here.");
         StartPlayerPlanningPhase();
     }
@@ -255,7 +255,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Start Planning Phase.");
         //common operations only, derived classes extend this
         gameStatus = GameStatus.Player_Planning;
-        UIManager.S.UpdateGamePhaseInfo();
+        UIManager.Instance.UpdateGamePhaseInfo();
         ResetTurnTimer();
 
         foreach (Character chara in inSceneCharacters) {
@@ -268,9 +268,9 @@ public class GameManager : MonoBehaviour
             EndPlayerPlanningPhase();
         }
         else {
-            UIManager.S.UpdateCommonHUD();
-            UIManager.S.ResetTeamActionStatus();
-            UIManager.S.ShowCharacterPlanUI();
+            UIManager.Instance.UpdateCommonHUD();
+            UIManager.Instance.ResetTeamActionStatus();
+            UIManager.Instance.ShowCharacterPlanUI();
             localChar.FocusCharacter();
         }
     }
@@ -279,7 +279,7 @@ public class GameManager : MonoBehaviour
     // Update params, if all submitted their plan, move to moving currPhase
     public virtual void CheckPlanPhaseEnd() {
         if (CheckPhaseEnd()) {
-            NetworkMiddleware.S.CallGotoNextPhase();
+            NetworkMiddleware.Instance.CallGotoNextPhase();
             //EndPlayerPlanningPhase();
         }
     }
@@ -287,7 +287,7 @@ public class GameManager : MonoBehaviour
     protected virtual void EndPlayerPlanningPhase()
     {
         Debug.Log("End Planning Phase");
-        UIManager.S.HideCharacterPlanUI();
+        UIManager.Instance.HideCharacterPlanUI();
 
         foreach (Character chara in inSceneCharacters)
         {
@@ -303,10 +303,10 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Start Moving Phase.");
         gameStatus = GameStatus.Player_Moving;
-        UIManager.S.UpdateGamePhaseInfo();
-        UIManager.S.HideCommonHUD();
-        UIManager.S.HideCharacterPlanUI();
-        UIManager.S.HideCharacterPinUI();
+        UIManager.Instance.UpdateGamePhaseInfo();
+        UIManager.Instance.HideCommonHUD();
+        UIManager.Instance.HideCharacterPlanUI();
+        UIManager.Instance.HideCharacterPinUI();
         //moveFinishedCount = 0;       
         eventQueue = new List<Tile>();
 
@@ -373,7 +373,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Start Monster Turn.");
         gameStatus = GameStatus.Monster_Moving;
-        UIManager.S.UpdateGamePhaseInfo();
+        UIManager.Instance.UpdateGamePhaseInfo();
         //moveFinishedCount = 0;
 
         foreach (Monster m in inSceneMonsters)
@@ -439,7 +439,7 @@ public class GameManager : MonoBehaviour
     // Monsters moving step by step
     // Same with chara move by step, when events happened, deal with them and come back
     protected virtual IEnumerator MonsterMoveByStep() {
-        Random.InitState(NetworkMiddleware.S.randomSeed);
+        Random.InitState(NetworkMiddleware.Instance.randomSeed);
         List<Monster> monstersMoving = new List<Monster>();
         foreach(Monster m in inSceneMonsters) {
             if(m.MovesLeftThisTurn > 0) {
@@ -475,7 +475,7 @@ public class GameManager : MonoBehaviour
                 yield return ExecuteCombatOneByOne();
                 break;
             }
-            Random.InitState(NetworkMiddleware.S.randomSeed);
+            Random.InitState(NetworkMiddleware.Instance.randomSeed);
             //wait 0.5 seconds for collision to register properly
             //yield return new WaitForSeconds(0.5f);
             yield return new WaitForFixedUpdate();
@@ -489,7 +489,7 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
-        Random.InitState(NetworkMiddleware.S.randomSeed);
+        Random.InitState(NetworkMiddleware.Instance.randomSeed);
         //This function call here is necessary, otherwise monster won't separate if combat happens
         //wait 0.5 seconds for collision to register properly
         //yield return new WaitForSeconds(0.5f);
@@ -497,7 +497,7 @@ public class GameManager : MonoBehaviour
         yield return StartCoroutine(SeparateDuplicateMonster());
         Debug.Log("Monster moving currPhase ended.");
         //StartPlayerTurn();
-        NetworkMiddleware.S.CallSyncStartPlayerturn();
+        NetworkMiddleware.Instance.CallSyncStartPlayerturn();
         // Wait until all clients are ready
         while (readyForPlayerTurnCount < 3)
         {
@@ -586,7 +586,7 @@ public class GameManager : MonoBehaviour
                         {
                             foundSpot = true;
                             //select a random tile in the avaiable positions to move
-                            int randomIndex = NetworkMiddleware.S.NextRandomInt(0, availablePos.Count);
+                            int randomIndex = NetworkMiddleware.Instance.NextRandomInt(0, availablePos.Count);
                             Tile selectedTile = availablePos[randomIndex];
                             yield return StartCoroutine(mon.moveToTargetLocation(selectedTile.transform.position, excecutionStepTime));
                         }
@@ -616,15 +616,15 @@ public class GameManager : MonoBehaviour
                 case Tile.ObstacleType.None:
                     challengeType = Combat.FightType.Monster;
                     //win = Combat.S.ExecuteCombat(Combat.FightType.Monster, t, visibility);
-                    NetworkMiddleware.S.CallSyncExecuteCombat(Combat.FightType.Monster, t, visibility);
+                    NetworkMiddleware.Instance.CallSyncExecuteCombat(Combat.FightType.Monster, t, visibility);
                     while(CombatResultSyncedCount < 3)
                     {
                         //Debug.Log("Combat Result ready Count: " + CombatResultSyncedCount);
                         yield return null;
                     }
                     CombatResultSyncedCount = 0;
-                    Random.InitState(NetworkMiddleware.S.randomSeed);
-                    win = Combat.S.result;
+                    Random.InitState(NetworkMiddleware.Instance.randomSeed);
+                    win = Combat.Instance.result;
                     //UIManager.S.ShowCombatUI(Combat.FightType.Monster, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores,
                     //    Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
                     break;
@@ -632,30 +632,30 @@ public class GameManager : MonoBehaviour
                     challengeType = Combat.FightType.Trap;
                     //win = Combat.S.ExecuteCombat(Combat.FightType.Trap, t, visibility);
 
-                    NetworkMiddleware.S.CallSyncExecuteCombat(Combat.FightType.Trap, t, visibility);
+                    NetworkMiddleware.Instance.CallSyncExecuteCombat(Combat.FightType.Trap, t, visibility);
                     while (CombatResultSyncedCount < 3)
                     {
                         //Debug.Log("Combat Result ready Count: " + CombatResultSyncedCount);
                         yield return null;
                     }
                     CombatResultSyncedCount = 0;
-                    Random.InitState(NetworkMiddleware.S.randomSeed);
-                    win = Combat.S.result;
+                    Random.InitState(NetworkMiddleware.Instance.randomSeed);
+                    win = Combat.Instance.result;
                     //UIManager.S.ShowCombatUI(Combat.FightType.Trap, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores, 
                     //    Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
                     break;
                 case Tile.ObstacleType.Rock:
                     challengeType = Combat.FightType.Rock;
                     //win = Combat.S.ExecuteCombat(Combat.FightType.Rock, t, visibility);
-                    NetworkMiddleware.S.CallSyncExecuteCombat(Combat.FightType.Rock, t, visibility);
+                    NetworkMiddleware.Instance.CallSyncExecuteCombat(Combat.FightType.Rock, t, visibility);
                     while (CombatResultSyncedCount < 3)
                     {
                         //Debug.Log("Combat Result ready Count: " + CombatResultSyncedCount);
                         yield return null;
                     }
                     CombatResultSyncedCount = 0;
-                    Random.InitState(NetworkMiddleware.S.randomSeed);
-                    win = Combat.S.result;
+                    Random.InitState(NetworkMiddleware.Instance.randomSeed);
+                    win = Combat.Instance.result;
                     //UIManager.S.ShowCombatUI(Combat.FightType.Rock, Combat.S.charaIDs, Combat.S.charaDiceStats, Combat.S.enemyDiceStats, Combat.S.charaScores, Combat.S.enemyScores,
                     //    Combat.S.charaScore, Combat.S.enemyScore, Combat.S.result, visibility);
                     break;
@@ -675,7 +675,7 @@ public class GameManager : MonoBehaviour
             }
 
             //wait for animation to play
-            yield return UIManager.S.CombatUICoroutine(challengeType, Combat.S, visibility);
+            yield return UIManager.Instance.CombatUICoroutine(challengeType, Combat.Instance, visibility);
 
             if (win) {
                 // if the character(s) won the battle, destory the enemies
@@ -761,7 +761,7 @@ public class GameManager : MonoBehaviour
                     mo.State = Monster.CharacterState.Idle;
                 }
             }
-            UIManager.S.HideCombatUI();
+            UIManager.Instance.HideCombatUI();
         }
         yield break;
         // This should only be called as a sub-coroutine of the main moving one so it
@@ -784,8 +784,8 @@ public class GameManager : MonoBehaviour
 
             if (c.dead)
             {
-                UIManager.S.UpdateCharacterDeathCounter(c);
-                UIManager.S.UpdateCharacterLifeStatus(c.CharacterId, false);
+                UIManager.Instance.UpdateCharacterDeathCounter(c);
+                UIManager.Instance.UpdateCharacterLifeStatus(c.CharacterId, false);
                 deadChara.Add(c);
             }
             else
@@ -811,7 +811,7 @@ public class GameManager : MonoBehaviour
     {
         Tile tile = inSceneCharacters[charaID].currentTile;
         CompetitionMiddleware.Instance.LogClearShrine(charaID, tile.col, tile.row);
-        UIManager.S.UpdateCharacterGoalStatus(charaID);
+        UIManager.Instance.UpdateCharacterGoalStatus(charaID);
         InSceneShrines[charaID].SetReached(true);
     }
 
@@ -819,14 +819,14 @@ public class GameManager : MonoBehaviour
     {
         Tile tile = inSceneCharacters[charaID].currentTile;
         CompetitionMiddleware.Instance.LogRevokeShrine(charaID, tile.col, tile.row);
-        UIManager.S.UpdateCharacterGoalStatus(charaID, false);
+        UIManager.Instance.UpdateCharacterGoalStatus(charaID, false);
         InSceneShrines[charaID].SetReached(false);
         Debug.Log("refunded");
     }
 
     public virtual void CharacterDied(int charaID) {
-        UIManager.S.UpdateCharacterLifeStatus(charaID, false);
-        UIManager.S.UpdateCommonHUD();
+        UIManager.Instance.UpdateCharacterLifeStatus(charaID, false);
+        UIManager.Instance.UpdateCommonHUD();
         MapGenerator.Instance.UpdateFOWVisuals();
         CheckLoseCondition();
     }
@@ -909,13 +909,13 @@ public class GameManager : MonoBehaviour
             Destroy(m.gameObject);
         }
 
-        UIManager.S.LoadLevelEndUI();
+        UIManager.Instance.LoadLevelEndUI();
         foreach (Character c in inSceneCharacters) {
             c.State = Character.CharacterState.Cheering;
         }
 
         eventQueue.Clear();
-        UIManager.S.HideCharacterPinUI();
+        UIManager.Instance.HideCharacterPinUI();
         //yield return new WaitForSeconds(5f);
         /*
         foreach (Character c in inSceneCharacters) {
@@ -940,7 +940,7 @@ public class GameManager : MonoBehaviour
             foreach (Character c in inSceneCharacters) {
                 c.StopAllCoroutines();
                 c.QuickRespawn();
-                UIManager.S.UpdateCharacterLifeStatus(c.CharacterId, true);
+                UIManager.Instance.UpdateCharacterLifeStatus(c.CharacterId, true);
             }
             Physics.autoSimulation = true;
             StartCoroutine(StartLevel());
@@ -950,7 +950,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Game ends.");
             yield return WaitForExecutionSteps(5);
             CompetitionMiddleware.Instance.LogEndGame("Win");
-            UIManager.S.DisplayVictoryScreen();
+            UIManager.Instance.DisplayVictoryScreen();
             gameStatus = GameStatus.GameEnd;
         }
     }
@@ -984,7 +984,7 @@ public class GameManager : MonoBehaviour
     protected virtual void Lose()
     {
         CompetitionMiddleware.Instance.LogEndGame("Loss");
-        UIManager.S.DisplayLossScreen();
+        UIManager.Instance.DisplayLossScreen();
     }
 
     public virtual void SwitchCharacter(int index)
@@ -1009,7 +1009,7 @@ public class GameManager : MonoBehaviour
             };
         }
         
-        NetworkMiddleware.S.CallLogLevelResult(playerInfo);
+        NetworkMiddleware.Instance.CallLogLevelResult(playerInfo);
     }
 
     private void OnDestroy()
@@ -1017,7 +1017,7 @@ public class GameManager : MonoBehaviour
         if(gameStatus != GameStatus.LevelStart)
         {
             Debug.Log("Game manager OnDestory getting called, destroying NetworkMiddleware, current gamestatus: " + gameStatus);
-            Destroy(NetworkMiddleware.S.gameObject);
+            Destroy(NetworkMiddleware.Instance.gameObject);
         }
     }
 

@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 public class MapGenerator : MonoBehaviour
 {
-    public static MapGenerator Instance = null;
+    public static MapGenerator Instance { get; private set; } = null;
     public GameAssets gameAssets;
     public GameData gameData;
     public Transform tileParent;

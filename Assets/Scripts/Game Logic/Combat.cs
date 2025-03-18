@@ -18,12 +18,12 @@ public class Combat : MonoBehaviour {
     public int enemyScore = 0;
     public int charaScore = 0;
 
-    public static Combat S;
+    public static Combat Instance { get; private set; } = null;
 
     private void Awake()
     {
-        if (S) Destroy(this);
-        else S = this;
+        if (Instance) Destroy(this);
+        else Instance = this;
 
     }
 
@@ -76,7 +76,7 @@ public class Combat : MonoBehaviour {
                 return bonus;
             }
             else {
-                return NetworkMiddleware.S.NextRandomInt(1, (int)type + 1) + bonus;
+                return NetworkMiddleware.Instance.NextRandomInt(1, (int)type + 1) + bonus;
             }
         }
 

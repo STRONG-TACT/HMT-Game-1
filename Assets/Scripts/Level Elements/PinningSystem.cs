@@ -7,7 +7,7 @@ using GameConstant;
 
 public class PinningSystem : MonoBehaviour
 {
-    public static PinningSystem S { get; private set; }
+    public static PinningSystem Instance { get; private set; }
     private Camera mainCamera;
     private Ray ray;
     private RaycastHit hit;
@@ -52,8 +52,8 @@ public class PinningSystem : MonoBehaviour
             {omwPinPrefab, 3}
         };
         
-        if (S) Destroy(this);
-        else S = this;
+        if (Instance) Destroy(this);
+        else Instance = this;
     }
     
     private void Start()
@@ -124,7 +124,7 @@ public class PinningSystem : MonoBehaviour
     }
     
     public void DropPin(int pinTypeIdx) {
-        NetworkMiddleware.S.CallDropPinAt(GameManager.Instance.localChar.playerId, pinTypeIdx, focusedTile.row, focusedTile.col);
+        NetworkMiddleware.Instance.CallDropPinAt(GameManager.Instance.localChar.playerId, pinTypeIdx, focusedTile.row, focusedTile.col);
     }
 
     public void InstantiatePin(int charID, int pinIdx, int tileRow, int tileCol) {

@@ -170,7 +170,7 @@ public class Character : MonoBehaviour {
     public void SetUpConfig(CharacterConfig config, int characterId, int lives) {
         this.config = config;
         CharacterId = characterId;
-        GameData gameData = GameData.S;
+        GameData gameData = GameData.Instance;
         path_indicator_offset = gameData.tileSize * 0.15f;
         stepLength = gameData.tileSize + gameData.tileGapLength;
         Health = config.StartingHealth;
@@ -245,7 +245,7 @@ public class Character : MonoBehaviour {
         if (dead) {
             RespawnCheck();
         }
-        NetworkMiddleware.S.CallReadyForNextPhase(CharacterId, dead);
+        NetworkMiddleware.Instance.CallReadyForNextPhase(CharacterId, dead);
     }
     
     public void EndPingPhase() {
@@ -276,7 +276,7 @@ public class Character : MonoBehaviour {
         pinsPlaced += 1;
         pingCursor = Vector2Int.zero;
         if (ActionPointsRemaining == 0) {
-            NetworkMiddleware.S.CallReadyForNextPhase(CharacterId, true);
+            NetworkMiddleware.Instance.CallReadyForNextPhase(CharacterId, true);
         }
     }
 
@@ -291,7 +291,7 @@ public class Character : MonoBehaviour {
     public void StartPlanningPhase() {
         ResetPlan();
        
-        NetworkMiddleware.S.CallReadyForNextPhaseAuto(CharacterId, ActionPointsRemaining == 0 || dead);
+        NetworkMiddleware.Instance.CallReadyForNextPhaseAuto(CharacterId, ActionPointsRemaining == 0 || dead);
     }
     
     public bool CheckMove(Direction direction) {
@@ -599,10 +599,10 @@ public class Character : MonoBehaviour {
         Lives -= 1;
         Deaths += 1;
         dead = true;
-        respawnCountdown = GameData.S.RespawnDelay+1;
+        respawnCountdown = GameData.Instance.RespawnDelay+1;
         ResetPlan();
         GameManager.Instance.CharacterDied(CharacterId);
-        UIManager.S.UpdateDeathCounterPanel();
+        UIManager.Instance.UpdateDeathCounterPanel();
 
         CompetitionMiddleware.Instance.LogPlayerDeath(CharacterId, currentTile.col, currentTile.row);
 
@@ -627,7 +627,7 @@ public class Character : MonoBehaviour {
 
             if (respawnCountdown == 0) {
                 Debug.Log("Respawn in RespawnCheck");
-                UIManager.S.UpdateCharacterLifeStatus(CharacterId, true);
+                UIManager.Instance.UpdateCharacterLifeStatus(CharacterId, true);
                 ActionPlan.Clear();
                 dead = false;
                 Health = config.StartingHealth;

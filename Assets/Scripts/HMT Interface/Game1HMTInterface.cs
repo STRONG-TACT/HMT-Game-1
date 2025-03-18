@@ -1,14 +1,12 @@
-using ExitGames.Client.Photon.StructWrapping;
 using HMT;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class IntegratedGame1Interface : HMTInterface {
+public class Game1HMTInterface : HMTInterface {
     
     [Header("Game Specific Settings")]
     public string[] IgnoreScenes;
@@ -490,7 +488,7 @@ public class IntegratedGame1Interface : HMTInterface {
                     command.SendIllegalActionResponse("Out of Action Points, cannot place pin", 2002);
                 }
                 else {
-                    NetworkMiddleware.S.CallDropPinAt(target.CharacterId, pinType, pos.y, pos.x);
+                    NetworkMiddleware.Instance.CallDropPinAt(target.CharacterId, pinType, pos.y, pos.x);
                     command.SendOKResponse("Pin Placed");
                 }
                 break;
@@ -500,7 +498,7 @@ public class IntegratedGame1Interface : HMTInterface {
                     command.SendIllegalActionResponse("Cannot submit plan, already submitted", 2008);
                     yield break;
                 }
-                NetworkMiddleware.S.CallReadyForNextPhase(target.CharacterId, true);
+                NetworkMiddleware.Instance.CallReadyForNextPhase(target.CharacterId, true);
                 command.SendOKResponse("Pings Submited");
                 break;
             case "up":
@@ -513,7 +511,7 @@ public class IntegratedGame1Interface : HMTInterface {
                 else {
                     Vector2Int move = Vector2FromString(action);
                     if (MapGenerator.Instance.InMap(target.currentTile.GridPosition + target.pingCursor + move)) {
-                        NetworkMiddleware.S.CallMovePingCursorOnCharacter(target.CharacterId, DirectionFromString(action));
+                        NetworkMiddleware.Instance.CallMovePingCursorOnCharacter(target.CharacterId, DirectionFromString(action));
                         command.SendOKResponse("Ping Cursor Moved");
                     }
                     else {
@@ -559,7 +557,7 @@ public class IntegratedGame1Interface : HMTInterface {
                     command.SendIllegalActionResponse("Cannot submit plan, already submitted",2008);
                     yield break;
                 }
-                NetworkMiddleware.S.CallReadyForNextPhase(target.CharacterId, true);
+                NetworkMiddleware.Instance.CallReadyForNextPhase(target.CharacterId, true);
                 command.SendOKResponse("Plan Submited");
                 break;
             case "up":
@@ -583,7 +581,7 @@ public class IntegratedGame1Interface : HMTInterface {
                         command.SendIllegalActionResponse("Cannot undo action, no actions to undo",2005);
                     }
                     else {
-                        NetworkMiddleware.S.CallUndoPlanStep(target.CharacterId);
+                        NetworkMiddleware.Instance.CallUndoPlanStep(target.CharacterId);
                         command.SendOKResponse("Action Undone");
                     }
                     yield break;
@@ -602,7 +600,7 @@ public class IntegratedGame1Interface : HMTInterface {
     private void CheckAndAddMove(Character target, Character.Direction move, Command command) {
         if (target.ActionPointsRemaining > 0) {
             if (target.CheckMove(move)) {
-                NetworkMiddleware.S.CallAddMoveToCharacter(target.CharacterId, move);
+                NetworkMiddleware.Instance.CallAddMoveToCharacter(target.CharacterId, move);
                 command.SendOKResponse("Action Added");
             }
             else {

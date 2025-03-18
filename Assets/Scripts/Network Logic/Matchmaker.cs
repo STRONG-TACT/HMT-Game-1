@@ -8,7 +8,7 @@ using GameConstant;
 
 public class Matchmaker : MonoBehaviourPunCallbacks
 {
-    public static Matchmaker S;
+    public static Matchmaker Instance { get; private set; } = null;
 
     public bool playerQuitConnection = false;
 
@@ -16,8 +16,8 @@ public class Matchmaker : MonoBehaviourPunCallbacks
     
     private void Awake()
     {
-        if (S) Destroy(this);
-        else S = this;
+        if (Instance) Destroy(this);
+        else Instance = this;
     }
 
     public void TryConnectToServer()
@@ -31,7 +31,7 @@ public class Matchmaker : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         Debug.Log("Successfully connected to server.");
-        LobbyManager.S.OnConnectToServer();
+        LobbyManager.Instance.OnConnectToServer();
     }
 
     // TODO: might be worth to handle connection error, casing on cause
@@ -41,10 +41,10 @@ public class Matchmaker : MonoBehaviourPunCallbacks
         if (playerQuitConnection)
         {
             Debug.Log("Successfully disconnected.");
-            LobbyManager.S.OnDisconnectSucceed();
+            LobbyManager.Instance.OnDisconnectSucceed();
             playerQuitConnection = false;
         }
-        else LobbyManager.S.OnUnexpectedDisconnect();
+        else LobbyManager.Instance.OnUnexpectedDisconnect();
     }
 
     public void TryDisconnectFromServer()
@@ -64,7 +64,7 @@ public class Matchmaker : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()
     {
         Debug.Log("Joined Lobby");
-        StartCoroutine(LobbyManager.S.OnJoinLobbySucceed());
+        StartCoroutine(LobbyManager.Instance.OnJoinLobbySucceed());
     }
 
     public void TryJoinRoom(string roomName)
@@ -76,7 +76,7 @@ public class Matchmaker : MonoBehaviourPunCallbacks
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
         Debug.Log("Join room failed, attempt to create one");
-        LobbyManager.S.OnJoinRoomAttemptFailed();
+        LobbyManager.Instance.OnJoinRoomAttemptFailed();
     }
 
     public void TryCreateRoom(string roomName, RoomOptions roomOptions = null)
@@ -94,12 +94,12 @@ public class Matchmaker : MonoBehaviourPunCallbacks
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
         Debug.Log("Failed to create a room");
-        LobbyManager.S.OnCreateRoomFailed();
+        LobbyManager.Instance.OnCreateRoomFailed();
     }
 
     public override void OnCreatedRoom()
     {
-        StartCoroutine(LobbyManager.S.OnRoomCreated());
+        StartCoroutine(LobbyManager.Instance.OnRoomCreated());
     }
 
     public override void OnJoinedRoom()
@@ -108,12 +108,12 @@ public class Matchmaker : MonoBehaviourPunCallbacks
 
         if (!PhotonNetwork.IsMasterClient)
         {
-            LobbyManager.S.OnRoomEntered();
+            LobbyManager.Instance.OnRoomEntered();
         }
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        LobbyManager.S.ListOfRooms = roomList;
+        LobbyManager.Instance.ListOfRooms = roomList;
     }
 }

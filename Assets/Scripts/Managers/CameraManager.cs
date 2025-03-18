@@ -5,7 +5,7 @@ using Photon.Pun;
 
 public class CameraManager : MonoBehaviour
 {
-    public static CameraManager S { get; private set; }
+    public static CameraManager Instance { get; private set; } = null;
     public static Camera MainCamera;
     public GameObject cameraPivot;
     public GameData gameData;
@@ -25,7 +25,7 @@ public class CameraManager : MonoBehaviour
 
     private void Awake()
     {
-        S = this;
+        Instance = this;
     }
 
     IEnumerator Start()

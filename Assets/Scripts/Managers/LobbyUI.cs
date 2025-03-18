@@ -10,7 +10,7 @@ using GameConstant;
 
 public class LobbyUI : MonoBehaviour
 {
-    public static LobbyUI S;
+    public static LobbyUI Instance { get; private set; } = null;
 
     [Header("UI Block Parent")]
     [SerializeField] private GameObject startSceneUI;
@@ -41,8 +41,8 @@ public class LobbyUI : MonoBehaviour
 
     private void Awake()
     {
-        if (S) Destroy(this);
-        else S = this;
+        if (Instance) Destroy(this);
+        else Instance = this;
     }
 
     private void Start()
