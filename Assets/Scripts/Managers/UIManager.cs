@@ -160,8 +160,8 @@ public class UIManager : MonoBehaviour
 
     public void UpdateGamePhaseInfo()
     {
-        RoundCounter.text = "Round: " + IntegratedGameManager.S.CurrentRound;
-        if (IntegratedGameManager.S.localChar.dead)
+        RoundCounter.text = "Round: " + GameManager.Instance.CurrentRound;
+        if (GameManager.Instance.localChar.dead)
         {
             CurrentPhaseLabel.text = "Waiting Respawn";
             HideCharacterPlanUI();
@@ -169,7 +169,7 @@ public class UIManager : MonoBehaviour
             return;
         }
         
-        switch (IntegratedGameManager.S.gameStatus)
+        switch (GameManager.Instance.gameStatus)
         {
             case GameStatus.Player_Pinning:
                 CurrentPhaseLabel.text = "Player Pinning Phase";
@@ -311,7 +311,7 @@ public class UIManager : MonoBehaviour
     }
 
     public void UpdateCommonHUD() {
-        Character currentCharacter = IntegratedGameManager.S.localChar;
+        Character currentCharacter = GameManager.Instance.localChar;
         UpdateHealthPanel(currentCharacter);
         UpdateActionPanel(currentCharacter);
         UpdateYouAreInfo(currentCharacter);
@@ -335,7 +335,7 @@ public class UIManager : MonoBehaviour
     }
 
     public void UpdateCharacterPinUI() {
-        Character currentCharacter = IntegratedGameManager.S.localChar;
+        Character currentCharacter = GameManager.Instance.localChar;
         PinFinishBtn.interactable = !currentCharacter.ReadyForNextPhase;
     }
 
@@ -346,7 +346,7 @@ public class UIManager : MonoBehaviour
     private void SubmitPins() {
         //TODO we may want to send different names for these log functions
         PinningSystem.S.ClosePinWheel();
-        NetworkMiddleware.S.CallReadyForNextPhase(IntegratedGameManager.S.localChar.CharacterId, true);
+        NetworkMiddleware.S.CallReadyForNextPhase(GameManager.Instance.localChar.CharacterId, true);
         
         UpdateCharacterPinUI();
     }
@@ -364,7 +364,7 @@ public class UIManager : MonoBehaviour
     /// Updates accessiblity of the Plan UI buttons, always in reference to the current character.
     /// </summary>
     public void UpdateCharacterPlanUI() {
-        Character currentCharacter = IntegratedGameManager.S.localChar;
+        Character currentCharacter = GameManager.Instance.localChar;
 
         // we've submitted so lock everything
         if (currentCharacter.ReadyForNextPhase) {
@@ -412,19 +412,19 @@ public class UIManager : MonoBehaviour
         PlanUIPanel.SetActive(false);
     }
     public void AddMoveToCharacter(Character.Direction direction) {
-        if (IntegratedGameManager.S.localChar.ActionPointsRemaining > 0 && IntegratedGameManager.S.localChar.CheckMove(direction)) {
-            NetworkMiddleware.S.CallAddMoveToCharacter(IntegratedGameManager.S.localChar.CharacterId, direction);
+        if (GameManager.Instance.localChar.ActionPointsRemaining > 0 && GameManager.Instance.localChar.CheckMove(direction)) {
+            NetworkMiddleware.S.CallAddMoveToCharacter(GameManager.Instance.localChar.CharacterId, direction);
         }
     }
 
     public void UndoPlanStep() {
-        if (IntegratedGameManager.S.localChar.ActionPlan.Count > 0) {
-            NetworkMiddleware.S.CallUndoPlanStep(IntegratedGameManager.S.localChar.CharacterId);
+        if (GameManager.Instance.localChar.ActionPlan.Count > 0) {
+            NetworkMiddleware.S.CallUndoPlanStep(GameManager.Instance.localChar.CharacterId);
         }
     }
 
     public void SubmitPlan() {
-        NetworkMiddleware.S.CallReadyForNextPhase(IntegratedGameManager.S.localChar.CharacterId, true);
+        NetworkMiddleware.S.CallReadyForNextPhase(GameManager.Instance.localChar.CharacterId, true);
     }
 
     #endregion
@@ -530,7 +530,7 @@ public class UIManager : MonoBehaviour
             EnemyCombatSlots[0].SetActive(true);
         }
 
-        yield return IntegratedGameManager.S.WaitForExecutionSteps(3);
+        yield return GameManager.Instance.WaitForExecutionSteps(3);
 
         //Debug.Log("player score: " + playerFinalScore.ToString());
         //Debug.Log("enemy score: " + enemyFinalScore.ToString());
@@ -550,17 +550,17 @@ public class UIManager : MonoBehaviour
         Vector3 playerScoreScale = PlayerFinalScore.gameObject.transform.localScale;
         Vector3 enemyScoreScale = EnemyFinalScore.gameObject.transform.localScale;
 
-        while(Time.time - startTime < IntegratedGameManager.S.excecutionStepTime *.75f) {
-            PlayerFinalScore.gameObject.transform.localScale = Vector3.Lerp(playerScoreScale, playerScoreScale * 1.5f, (Time.time - startTime) / (IntegratedGameManager.S.excecutionStepTime * .75f));
-            EnemyFinalScore.gameObject.transform.localScale = Vector3.Lerp(enemyScoreScale, enemyScoreScale * 1.5f, (Time.time - startTime) / (IntegratedGameManager.S.excecutionStepTime * .75f));
+        while(Time.time - startTime < GameManager.Instance.excecutionStepTime *.75f) {
+            PlayerFinalScore.gameObject.transform.localScale = Vector3.Lerp(playerScoreScale, playerScoreScale * 1.5f, (Time.time - startTime) / (GameManager.Instance.excecutionStepTime * .75f));
+            EnemyFinalScore.gameObject.transform.localScale = Vector3.Lerp(enemyScoreScale, enemyScoreScale * 1.5f, (Time.time - startTime) / (GameManager.Instance.excecutionStepTime * .75f));
             yield return null;
         }
         PlayerFinalScore.gameObject.transform.localScale = playerScoreScale * 1.5f;
         EnemyFinalScore.gameObject.transform.localScale = enemyScoreScale * 1.5f;
         startTime = Time.time;
-        while(Time.time - startTime < IntegratedGameManager.S.excecutionStepTime * .75f) {
-            PlayerFinalScore.gameObject.transform.localScale = Vector3.Lerp(playerScoreScale * 1.5f, playerScoreScale, (Time.time - startTime) / (IntegratedGameManager.S.excecutionStepTime * .75f));
-            EnemyFinalScore.gameObject.transform.localScale = Vector3.Lerp(enemyScoreScale * 1.5f, enemyScoreScale, (Time.time - startTime) / (IntegratedGameManager.S.excecutionStepTime * .75f));
+        while(Time.time - startTime < GameManager.Instance.excecutionStepTime * .75f) {
+            PlayerFinalScore.gameObject.transform.localScale = Vector3.Lerp(playerScoreScale * 1.5f, playerScoreScale, (Time.time - startTime) / (GameManager.Instance.excecutionStepTime * .75f));
+            EnemyFinalScore.gameObject.transform.localScale = Vector3.Lerp(enemyScoreScale * 1.5f, enemyScoreScale, (Time.time - startTime) / (GameManager.Instance.excecutionStepTime * .75f));
             yield return null;
         }
 
@@ -576,7 +576,7 @@ public class UIManager : MonoBehaviour
             LoseBG.SetActive(true);
             ResultMessage.text = "Failed to defeat the opponent!";
         }
-        yield return IntegratedGameManager.S.WaitForExecutionSteps(1.5f);
+        yield return GameManager.Instance.WaitForExecutionSteps(1.5f);
     }
     
     public void HideCombatUI()
@@ -598,8 +598,8 @@ public class UIManager : MonoBehaviour
         diceUI.SetActive(true);
         float startTime = Time.time;
         float lastChange = Time.time;
-        float changeDelay = IntegratedGameManager.S.excecutionStepTime * 1.5f / 20;
-        while (Time.time - startTime < IntegratedGameManager.S.excecutionStepTime * 1.5) {
+        float changeDelay = GameManager.Instance.excecutionStepTime * 1.5f / 20;
+        while (Time.time - startTime < GameManager.Instance.excecutionStepTime * 1.5) {
             float deltaRotation = spinSpeed * Time.deltaTime;
             //diceUI.transform.Rotate(Vector3.up, deltaRotation); 
             //diceUI.transform.Rotate(Vector3.right, deltaRotation); 
@@ -612,7 +612,7 @@ public class UIManager : MonoBehaviour
         }
         scoreDisplay.text = score.ToString();
         //diceUI.SetActive(false);
-        yield return IntegratedGameManager.S.WaitForExecutionSteps(1.5f);
+        yield return GameManager.Instance.WaitForExecutionSteps(1.5f);
     }
 
 
@@ -747,7 +747,7 @@ public class UIManager : MonoBehaviour
     }
 
     public IEnumerator DotsAnimation(TextMeshProUGUI dotsText) {
-        if (IntegratedGameManager.S.InstantMode) {
+        if (GameManager.Instance.InstantMode) {
             yield break;
         }
         string[] dotsStates = new string[] { ".", "..", "..." };
@@ -755,7 +755,7 @@ public class UIManager : MonoBehaviour
         while (true) {
             dotsText.text = dotsStates[currentState]; // Update the CurrentPhaseLabel to the current state
             currentState = (currentState + 1) % dotsStates.Length;
-            yield return IntegratedGameManager.S.WaitForExecutionSteps(.5f);
+            yield return GameManager.Instance.WaitForExecutionSteps(.5f);
         }
     }
 
@@ -764,13 +764,13 @@ public class UIManager : MonoBehaviour
     #region Timer
 
     public void UpdateTurnTimer() {
-        if (float.IsInfinity(IntegratedGameManager.S.TimeRemaining)) {
+        if (float.IsInfinity(GameManager.Instance.TimeRemaining)) {
             TimerText.text = "\u221E";
         }
         else {
-            TimeSpan timeSpan = TimeSpan.FromSeconds(Mathf.Max(Mathf.RoundToInt(IntegratedGameManager.S.TimeRemaining), 0));
+            TimeSpan timeSpan = TimeSpan.FromSeconds(Mathf.Max(Mathf.RoundToInt(GameManager.Instance.TimeRemaining), 0));
             TimerText.text = string.Format("{0}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
-            if (IntegratedGameManager.S.TimeRemaining < warningTime && Mathf.RoundToInt(Mathf.Abs(IntegratedGameManager.S.TimeRemaining) * 5) % 2 == 0) {
+            if (GameManager.Instance.TimeRemaining < warningTime && Mathf.RoundToInt(Mathf.Abs(GameManager.Instance.TimeRemaining) * 5) % 2 == 0) {
                 TimerText.color = Color.red;
             }
             else {
@@ -792,7 +792,7 @@ public class UIManager : MonoBehaviour
     }
 
     private void SwitchCharacter(int charID) {
-        IntegratedGameManager.S.SwitchCharacter(charID);
+        GameManager.Instance.SwitchCharacter(charID);
 
         switch (charID) {
             case 0:
@@ -861,7 +861,7 @@ public class UIManager : MonoBehaviour
                 default:
                     continue;
             }
-            if (!combatSkillDisplayActive && tile != null && tile.fogOfWarDictionary[IntegratedGameManager.S.localChar.CharacterId] == Tile.FogOfWarState.Visible) {
+            if (!combatSkillDisplayActive && tile != null && tile.fogOfWarDictionary[GameManager.Instance.localChar.CharacterId] == Tile.FogOfWarState.Visible) {
                 if (hitObject != tooltipTarget) {
                     tooltipTarget = hitObject;
                     /*
@@ -884,7 +884,7 @@ public class UIManager : MonoBehaviour
 
 
     public void UpdateChallengeTooltipIcons(GameObject opponent, Combat.FightType challengeType, Tile tile) {
-        Character currentCharacter = IntegratedGameManager.S.localChar;
+        Character currentCharacter = GameManager.Instance.localChar;
         Character partner1 = null;
         Character partner2 = null;
 
@@ -895,16 +895,16 @@ public class UIManager : MonoBehaviour
         
         switch (currentCharacter.config.type){
             case CharacterConfig.CharacterType.Dwarf:
-                partner1 = IntegratedGameManager.S.inSceneCharacters[1];    // Giant
-                partner2 = IntegratedGameManager.S.inSceneCharacters[2];    // Human
+                partner1 = GameManager.Instance.inSceneCharacters[1];    // Giant
+                partner2 = GameManager.Instance.inSceneCharacters[2];    // Human
                 break;
             case CharacterConfig.CharacterType.Human:
-                partner1 = IntegratedGameManager.S.inSceneCharacters[0];    // Dwarf
-                partner2 = IntegratedGameManager.S.inSceneCharacters[1];    // Giant
+                partner1 = GameManager.Instance.inSceneCharacters[0];    // Dwarf
+                partner2 = GameManager.Instance.inSceneCharacters[1];    // Giant
                 break;
             case CharacterConfig.CharacterType.Giant:
-                partner1 = IntegratedGameManager.S.inSceneCharacters[0];    // Dwarf
-                partner2 = IntegratedGameManager.S.inSceneCharacters[2];    // human
+                partner1 = GameManager.Instance.inSceneCharacters[0];    // Dwarf
+                partner2 = GameManager.Instance.inSceneCharacters[2];    // human
                 break;
         }
 
@@ -999,7 +999,7 @@ public class UIManager : MonoBehaviour
                CompetitionMiddleware.Instance.LogEndGame("OtherPlayerDisconnected");
                 break;
             case DisconnectReason.Forfeiting:
-                CompetitionMiddleware.Instance.LogForfeit(IntegratedGameManager.S.localChar.CharacterId);
+                CompetitionMiddleware.Instance.LogForfeit(GameManager.Instance.localChar.CharacterId);
                 CompetitionMiddleware.Instance.LogEndGame("Forfeit");
                 break;
             case DisconnectReason.Unknown:

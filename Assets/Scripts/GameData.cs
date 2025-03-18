@@ -47,7 +47,7 @@ public class GameData : MonoBehaviour
         {
             Debug.LogError("GameData: characterConfigs must have exactly 3 elements.");
         }
-        if (IntegratedGameManager.S.inSceneCharacters.Count != 3)
+        if (GameManager.Instance.inSceneCharacters.Count != 3)
         {
             Debug.LogError("GameData: inSceneCharacters must have exactly 3 elements.");
         }

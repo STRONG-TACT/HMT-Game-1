@@ -34,7 +34,7 @@ public class CameraManager : MonoBehaviour
         cameraCentered = true;
 
         yield return new WaitForEndOfFrame();
-        targetCharacter = IntegratedGameManager.S.localChar.transform;
+        targetCharacter = GameManager.Instance.localChar.transform;
         cameraOffset = MainCamera.transform.position - targetCharacter.transform.position;
     }
 
@@ -96,7 +96,7 @@ public class CameraManager : MonoBehaviour
     {
         Vector3 target = targetCharacter.transform.position;// + cameraOffset;
         float startTime = Time.time;
-        while (Time.time - startTime < IntegratedGameManager.S.excecutionStepTime)
+        while (Time.time - startTime < GameManager.Instance.excecutionStepTime)
         {
             cameraPivot.transform.position = Vector3.Lerp(cameraPivot.transform.position, target, (Time.time - startTime) / lerpDuration);
             yield return new WaitForEndOfFrame();
@@ -108,7 +108,7 @@ public class CameraManager : MonoBehaviour
 
     public void ChangeTargetCharacter(int id)
     {
-        targetCharacter = IntegratedGameManager.S.inSceneCharacters[id].transform;
+        targetCharacter = GameManager.Instance.inSceneCharacters[id].transform;
         cameraCentered = false;
         RecenterCamera();
     }

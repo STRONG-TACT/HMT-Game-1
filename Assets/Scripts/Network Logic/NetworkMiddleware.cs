@@ -82,7 +82,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     /// <param name="charID"></param>
     /// <param name="ready"></param>
     public void CallReadyForNextPhaseAuto(int charID, bool ready) {
-        if (IntegratedGameManager.S.isNetworkGame) {
+        if (GameManager.Instance.isNetworkGame) {
             photonView.RPC("ReadyForNextPhaseLocal", RpcTarget.All, charID, ready);
         }
         else {
@@ -93,7 +93,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     public void CallSyncStartPlayerturn()
     {
-        if (IntegratedGameManager.S.isNetworkGame)
+        if (GameManager.Instance.isNetworkGame)
         {
             if (CompetitionMiddleware.Instance.IsAI)
                 photonView.RPC("SyncStartPlayerTurnLocal", RpcTarget.All,
@@ -111,19 +111,19 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     private void SyncStartPlayerTurnLocal(int numPlayer)
     {
 
-        foreach (Character chara in IntegratedGameManager.S.inSceneCharacters)
+        foreach (Character chara in GameManager.Instance.inSceneCharacters)
         {
             chara.ReadyForNextPhase = false;
         }
 
-        IntegratedGameManager.S.readyForPlayerTurnCount += numPlayer;
+        GameManager.Instance.readyForPlayerTurnCount += numPlayer;
     }
 
     public void CallReadyForNextPhase(int charID, bool ready) {
         if (ready) {
             CompetitionMiddleware.Instance.LogSubmit(charID);
         }
-        if (IntegratedGameManager.S.isNetworkGame) {
+        if (GameManager.Instance.isNetworkGame) {
             photonView.RPC("ReadyForNextPhaseLocal", RpcTarget.All, charID, ready);
         }
         else {
@@ -134,36 +134,36 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     [PunRPC]
     private void ReadyForNextPhaseLocal(int charID, bool ready) {
         
-        IntegratedGameManager.S.inSceneCharacters[charID].ReadyForNextPhase = ready;
+        GameManager.Instance.inSceneCharacters[charID].ReadyForNextPhase = ready;
         UIManager.S.UpdateCommonHUD();
         UIManager.S.UpdateCharacterActionStatus(charID, ready);
         
         if (ready) {
-            if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Pinning) {
+            if (GameManager.Instance.gameStatus == GameStatus.Player_Pinning) {
                 UIManager.S.UpdateCharacterPinUI();
-                if (!IntegratedGameManager.S.isNetworkGame)
+                if (!GameManager.Instance.isNetworkGame)
                 {
-                    IntegratedGameManager.S.CheckPingPhaseEnd();
+                    GameManager.Instance.CheckPingPhaseEnd();
                 }
                 else if(PhotonNetwork.IsMasterClient)
-                    IntegratedGameManager.S.CheckPingPhaseEnd();
+                    GameManager.Instance.CheckPingPhaseEnd();
                 //IntegratedGameManager.S.CheckPingPhaseEnd();
             }
 
-            if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
+            if (GameManager.Instance.gameStatus == GameStatus.Player_Planning) {
                 UIManager.S.UpdateCharacterPlanUI();
-                if (!IntegratedGameManager.S.isNetworkGame)
+                if (!GameManager.Instance.isNetworkGame)
                 {
-                    IntegratedGameManager.S.CheckPlanPhaseEnd();
+                    GameManager.Instance.CheckPlanPhaseEnd();
                 }
                 else if (PhotonNetwork.IsMasterClient)
-                    IntegratedGameManager.S.CheckPlanPhaseEnd();
+                    GameManager.Instance.CheckPlanPhaseEnd();
             }
         }
     }
 
     public void CallGotoNextPhase() {
-        if (IntegratedGameManager.S.isNetworkGame) {
+        if (GameManager.Instance.isNetworkGame) {
             photonView.RPC("GotoNextPhaseLocal", RpcTarget.All);
         }
         else {
@@ -173,7 +173,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     [PunRPC]
     public void  GotoNextPhaseLocal() {
-        IntegratedGameManager.S.GotoNextPhase();
+        GameManager.Instance.GotoNextPhase();
     }
 
 /*    public void CallSpawnCharacter(int charId, int row, int col) {
@@ -213,7 +213,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     #region Pinning Phase RPCs
 
     public void CallMovePingCursorOnCharacter(int charID, Character.Direction direction) {
-        if (IntegratedGameManager.S.isNetworkGame) {
+        if (GameManager.Instance.isNetworkGame) {
             photonView.RPC("MovePingCursorOnCharacterLocal", RpcTarget.All,charID, direction);
         }
         else {
@@ -223,12 +223,12 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     [PunRPC]
     private void MovePingCursorOnCharacterLocal(int charID, Character.Direction direction) {
-        IntegratedGameManager.S.inSceneCharacters[charID].MovePingCursor(direction);
+        GameManager.Instance.inSceneCharacters[charID].MovePingCursor(direction);
     }
 
     public void CallDropPinAt(int charId, int pinTypeIdx, int row, int col) {
         CompetitionMiddleware.Instance.LogPlacePin(charId, pinTypeIdx, row, col);
-        if (IntegratedGameManager.S.isNetworkGame) {
+        if (GameManager.Instance.isNetworkGame) {
             photonView.RPC(
                 "DropPinAtLocal",
                 RpcTarget.All,
@@ -245,7 +245,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     [PunRPC]
     private void DropPinAtLocal(int charId, int pinTypeIdx, int row, int col) {
         PinningSystem.S.InstantiatePin(charId, pinTypeIdx, row, col);
-        IntegratedGameManager.S.inSceneCharacters[charId].PinPlaced();
+        GameManager.Instance.inSceneCharacters[charId].PinPlaced();
         UIManager.S.UpdateCommonHUD();
         UIManager.S.UpdateCharacterPinUI();
     }
@@ -256,7 +256,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     public void CallAddMoveToCharacter(int charID, Character.Direction direction) {
         CompetitionMiddleware.Instance.LogAddPlan(charID, direction);
-        if (IntegratedGameManager.S.isNetworkGame) {
+        if (GameManager.Instance.isNetworkGame) {
             photonView.RPC("AddMoveToCharacterLocal", RpcTarget.All, charID, direction);
         }
         
@@ -267,14 +267,14 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     [PunRPC]
     private void AddMoveToCharacterLocal(int charID, Character.Direction direction) {
-        IntegratedGameManager.S.inSceneCharacters[charID].AddActionToPlan(direction);
+        GameManager.Instance.inSceneCharacters[charID].AddActionToPlan(direction);
         UIManager.S.UpdateCommonHUD();
         UIManager.S.UpdateCharacterPlanUI();
     }
 
     public void CallUndoPlanStep(int charID) {
         CompetitionMiddleware.Instance.LogUndoPlan(charID);
-        if (IntegratedGameManager.S.isNetworkGame) {
+        if (GameManager.Instance.isNetworkGame) {
             photonView.RPC("UndoPlanStepLocal", RpcTarget.All, charID);
         }
         else {
@@ -284,7 +284,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
 
     [PunRPC]
     private void UndoPlanStepLocal(int charID) {
-        IntegratedGameManager.S.inSceneCharacters[charID].UndoPlanStep();
+        GameManager.Instance.inSceneCharacters[charID].UndoPlanStep();
         UIManager.S.UpdateCommonHUD();
         UIManager.S.UpdateCharacterPlanUI();
     }
@@ -301,9 +301,9 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
             Debug.Log("In survey scene, ignore player disconnect");
             return;
         }
-        if(IntegratedGameManager.S != null)
+        if(GameManager.Instance != null)
         {
-            if(IntegratedGameManager.S.gameStatus == GameStatus.GameEnd)
+            if(GameManager.Instance.gameStatus == GameStatus.GameEnd)
             {
                 return;
             }
@@ -351,7 +351,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     {
 
 
-        if (IntegratedGameManager.S.isNetworkGame)
+        if (GameManager.Instance.isNetworkGame)
         {
             if (PhotonNetwork.IsMasterClient)
             {
@@ -405,7 +405,7 @@ public class NetworkMiddleware : MonoBehaviourPunCallbacks
     [PunRPC]
     private void CombatResultReadyLocal(int numPlayer)
     {
-        IntegratedGameManager.S.CombatResultSyncedCount += numPlayer;
+        GameManager.Instance.CombatResultSyncedCount += numPlayer;
     }
 
 

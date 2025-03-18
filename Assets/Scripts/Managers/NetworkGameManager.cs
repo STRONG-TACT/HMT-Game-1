@@ -5,7 +5,7 @@ using UnityEngine;
 using GameConstant;
 using Photon.Pun;
 
-public class IntegratedNetworkGameManager : IntegratedGameManager {
+public class NetworkGameManager : GameManager {
     
     protected override void Awake() {
         base.Awake();
@@ -31,7 +31,7 @@ public class IntegratedNetworkGameManager : IntegratedGameManager {
         // this call actually setup the correct FOW
         // the delay is needed because internal state of FOW needs physics trigger to work
         yield return new WaitForFixedUpdate();
-        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+        MapGenerator.Instance.UpdateFOWVisuals();
     }
 
     protected override void TimeoutSubmit() {

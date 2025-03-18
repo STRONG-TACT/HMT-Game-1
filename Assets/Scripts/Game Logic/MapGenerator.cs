@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class IntegratedMapGenerator : MonoBehaviour
+public class MapGenerator : MonoBehaviour
 {
-    public static IntegratedMapGenerator Instance = null;
+    public static MapGenerator Instance = null;
     public GameAssets gameAssets;
     public GameData gameData;
     public Transform tileParent;
@@ -76,7 +76,7 @@ public class IntegratedMapGenerator : MonoBehaviour
         foreach (Tile tile in Map)
         {
             if (FOW_enabled) {
-                tile.SetFOWVisualsToCharacter(IntegratedGameManager.S.localChar.CharacterId);
+                tile.SetFOWVisualsToCharacter(GameManager.Instance.localChar.CharacterId);
             }
             else {
                 tile.SetFOWVisualsToVisible();
@@ -219,8 +219,8 @@ public class IntegratedMapGenerator : MonoBehaviour
 
     IEnumerator LogCharacterSpawns() {
         yield return new WaitForFixedUpdate();
-        for (int i = 0; i < IntegratedGameManager.S.inSceneCharacters.Count; i++) {
-            Tile tile = IntegratedGameManager.S.inSceneCharacters[i].currentTile;
+        for (int i = 0; i < GameManager.Instance.inSceneCharacters.Count; i++) {
+            Tile tile = GameManager.Instance.inSceneCharacters[i].currentTile;
             CompetitionMiddleware.Instance.LogPlayerSpawn(i, tile.col, tile.row);
         }
     }
@@ -320,15 +320,15 @@ public class IntegratedMapGenerator : MonoBehaviour
         switch (tileName)
         {
             case "1Spawn":
-                IntegratedGameManager.S.SetupCharacter(0, x, z);
+                GameManager.Instance.SetupCharacter(0, x, z);
                 break;
 
             case "2Spawn":
-                IntegratedGameManager.S.SetupCharacter(1, x, z);
+                GameManager.Instance.SetupCharacter(1, x, z);
                 break;
 
             case "3Spawn":
-                IntegratedGameManager.S.SetupCharacter(2, x, z);
+                GameManager.Instance.SetupCharacter(2, x, z);
                 break;
 
             case "1Goal":
@@ -336,7 +336,7 @@ public class IntegratedMapGenerator : MonoBehaviour
                 tileObj.shrine = goal1.GetComponent<Shrine>();
                 tileObj.shrine.tile = tileObj;
                 tileObj.shrine.ObjKey = code;
-                IntegratedGameManager.S.InSceneShrines[0] = tileObj.shrine;
+                GameManager.Instance.InSceneShrines[0] = tileObj.shrine;
                 tileObj.tag = "Goal";
                 goal1.transform.parent = tileObj.transform;
                 renderers = goal1.GetComponentsInChildren<Renderer>(true);
@@ -352,7 +352,7 @@ public class IntegratedMapGenerator : MonoBehaviour
                 tileObj.shrine = goal2.GetComponent<Shrine>();
                 tileObj.shrine.tile = tileObj;
                 tileObj.shrine.ObjKey = code;
-                IntegratedGameManager.S.InSceneShrines[1] = tileObj.shrine;
+                GameManager.Instance.InSceneShrines[1] = tileObj.shrine;
                 tileObj.tag = "Goal";
                 goal2.transform.parent = tileObj.transform;
                 renderers = goal2.GetComponentsInChildren<Renderer>(true);
@@ -368,7 +368,7 @@ public class IntegratedMapGenerator : MonoBehaviour
                 tileObj.shrine = goal3.GetComponent<Shrine>();
                 tileObj.shrine.tile = tileObj;
                 tileObj.shrine.ObjKey = code;
-                IntegratedGameManager.S.InSceneShrines[2] = tileObj.shrine;
+                GameManager.Instance.InSceneShrines[2] = tileObj.shrine;
                 tileObj.tag = "Goal";
                 goal3.transform.parent = tileObj.transform;
                 renderers = goal3.GetComponentsInChildren<Renderer>(true);
@@ -381,20 +381,20 @@ public class IntegratedMapGenerator : MonoBehaviour
 
             case "Monster1":
                 GameObject monster1 = Instantiate(gameAssets.Monsters[0], new Vector3(x, 0f, z), Quaternion.identity);
-                IntegratedGameManager.S.inSceneMonsters.Add(monster1.GetComponent<Monster>());
-                monster1.GetComponent<Monster>().SetUpConfig(gameData.monsterConfigs[0], IntegratedGameManager.S.inSceneMonsters.Count - 1, gameData, code);
+                GameManager.Instance.inSceneMonsters.Add(monster1.GetComponent<Monster>());
+                monster1.GetComponent<Monster>().SetUpConfig(gameData.monsterConfigs[0], GameManager.Instance.inSceneMonsters.Count - 1, gameData, code);
                 break;
 
             case "Monster2":
                 GameObject monster2 = Instantiate(gameAssets.Monsters[1], new Vector3(x, 0f, z), Quaternion.identity);
-                IntegratedGameManager.S.inSceneMonsters.Add(monster2.GetComponent<Monster>());
-                monster2.GetComponent<Monster>().SetUpConfig(gameData.monsterConfigs[1], IntegratedGameManager.S.inSceneMonsters.Count - 1, gameData, code);
+                GameManager.Instance.inSceneMonsters.Add(monster2.GetComponent<Monster>());
+                monster2.GetComponent<Monster>().SetUpConfig(gameData.monsterConfigs[1], GameManager.Instance.inSceneMonsters.Count - 1, gameData, code);
                 break;
 
             case "Monster3":
                 GameObject monster3 = Instantiate(gameAssets.Monsters[2], new Vector3(x, 0f, z), Quaternion.identity);
-                IntegratedGameManager.S.inSceneMonsters.Add(monster3.GetComponent<Monster>());
-                monster3.GetComponent<Monster>().SetUpConfig(gameData.monsterConfigs[2], IntegratedGameManager.S.inSceneMonsters.Count - 1, gameData, code);
+                GameManager.Instance.inSceneMonsters.Add(monster3.GetComponent<Monster>());
+                monster3.GetComponent<Monster>().SetUpConfig(gameData.monsterConfigs[2], GameManager.Instance.inSceneMonsters.Count - 1, gameData, code);
                 break;
 
             default:

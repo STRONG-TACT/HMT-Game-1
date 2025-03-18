@@ -7,14 +7,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
-public class RoomNetwork : MonoBehaviourPunCallbacks {
+public class RoomNetworkManager : MonoBehaviourPunCallbacks {
     // Actor 2 character map
     // TODO: Implement a random shuffle
 
     // random seed
     private int _randomSeed = -1;
 
-    public static RoomNetwork S;
+    public static RoomNetworkManager Instance;
 
     private List<string> CharacterMapping = null;
 
@@ -39,8 +39,8 @@ public class RoomNetwork : MonoBehaviourPunCallbacks {
     private Dictionary<string, PlayerEntry> _playerEntries = new Dictionary<string, PlayerEntry>();
 
     private void Awake() {
-        if (S) Destroy(this);
-        else S = this;
+        if (Instance) Destroy(this);
+        else Instance = this;
     }
 
     private IEnumerator Start()

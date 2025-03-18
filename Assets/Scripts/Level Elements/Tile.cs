@@ -174,7 +174,7 @@ public class Tile : MonoBehaviour, IComparable<Tile>
     public void ClearMonsters() {
         foreach(Monster m in enemyList) {
             m.Kill();
-            IntegratedGameManager.S.inSceneMonsters.Remove(m);
+            GameManager.Instance.inSceneMonsters.Remove(m);
         }
         enemyList = new List<Monster>();
     }
@@ -263,16 +263,16 @@ public class Tile : MonoBehaviour, IComparable<Tile>
                 charaList.Remove(character);
             }
             if (charaList.Count != 0)
-                IntegratedGameManager.S.updateEventQueue(this);
+                GameManager.Instance.updateEventQueue(this);
         }
 
         if (tileType == ObstacleType.Trap && charaList.Count != 0)
         {
-            IntegratedGameManager.S.updateEventQueue(this);
+            GameManager.Instance.updateEventQueue(this);
         }
         else if (tileType == ObstacleType.Rock && charaList.Count != 0)
         {
-            IntegratedGameManager.S.updateEventQueue(this);
+            GameManager.Instance.updateEventQueue(this);
         }
         
     }
@@ -503,7 +503,7 @@ public class Tile : MonoBehaviour, IComparable<Tile>
                 setRenderer(FogOfWarState.Seen);
                 break;
             case FogOfWarState.Visible:
-                Character focusChar = IntegratedGameManager.S.inSceneCharacters[characterID];
+                Character focusChar = GameManager.Instance.inSceneCharacters[characterID];
                 if (focusChar.dead) {
                     if (this != focusChar.currentTile) {
                         setRenderer(FogOfWarState.Seen);
@@ -538,7 +538,7 @@ public class Tile : MonoBehaviour, IComparable<Tile>
         ret["objKey"] = _objKey;
         if(_objKey == "**") {
             ret["entityType"] = "Goal";
-            ret["subGoalCount"] = IntegratedGameManager.S.GoalCount;
+            ret["subGoalCount"] = GameManager.Instance.GoalCount;
         }
         ret["id"] = HMTObjID;
         ret["x"] = col;

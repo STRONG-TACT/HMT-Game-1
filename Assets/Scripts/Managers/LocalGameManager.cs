@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IntegratedLocalGameManager : IntegratedGameManager
+public class LocalGameManager : GameManager
 {
 
     // When awake, find all the managers and data.
@@ -93,7 +93,7 @@ public class IntegratedLocalGameManager : IntegratedGameManager
         }
         CompetitionMiddleware.Instance.LogChangeCharacter(index);
        CameraManager.S.ChangeTargetCharacter(index);
-       IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+       MapGenerator.Instance.UpdateFOWVisuals();
     }
 
 }

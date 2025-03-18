@@ -24,13 +24,13 @@ public class NetworkRoomManager : MonoBehaviour
 
     public void PlayerReady()
     {
-        RoomNetwork.S.RegisterPlayerReadyLocal();
+        RoomNetworkManager.Instance.RegisterPlayerReadyLocal();
         _readyButton.interactable = false;
         CompetitionMiddleware.Instance.LogReadyUp();
     }
 
     public void LaunchGameWithAIs() {
-        RoomNetwork.S.LaunchGameWithAIsLocal();
+        RoomNetworkManager.Instance.LaunchGameWithAIsLocal();
         _readyButton.interactable = false;
         _launchWithAIsButton.interactable = false;
     }

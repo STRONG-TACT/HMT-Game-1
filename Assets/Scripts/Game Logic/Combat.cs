@@ -183,7 +183,7 @@ public class Combat : MonoBehaviour {
         if (CompetitionMiddleware.Instance.LogSystemEvents) {
             CompetitionMiddleware.Instance.LogChallengeEncounter(
                 tile.col, tile.row,
-                charaIDs.Select(id => IntegratedGameManager.S.inSceneCharacters[id].config.characterName).ToList(),
+                charaIDs.Select(id => GameManager.Instance.inSceneCharacters[id].config.characterName).ToList(),
                 challenges,
                 charaScores, enemyScores,
                 CalculateOdds(charaDice, enemyDice), result);

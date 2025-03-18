@@ -66,7 +66,7 @@ public class PinningSystem : MonoBehaviour
     {
         //Debug.LogFormat("GameManager Is null? {0}", IntegratedGameManager.S == null);
         //Debug.LogFormat("localChar Is null? {0}", IntegratedGameManager.S.localChar == null);
-        if (IntegratedGameManager.S.localChar.ReadyForNextPhase || IntegratedGameManager.S.gameStatus != GameStatus.Player_Pinning) return;
+        if (GameManager.Instance.localChar.ReadyForNextPhase || GameManager.Instance.gameStatus != GameStatus.Player_Pinning) return;
         
 
         if (PinUIUp)
@@ -124,12 +124,12 @@ public class PinningSystem : MonoBehaviour
     }
     
     public void DropPin(int pinTypeIdx) {
-        NetworkMiddleware.S.CallDropPinAt(IntegratedGameManager.S.localChar.playerId, pinTypeIdx, focusedTile.row, focusedTile.col);
+        NetworkMiddleware.S.CallDropPinAt(GameManager.Instance.localChar.playerId, pinTypeIdx, focusedTile.row, focusedTile.col);
     }
 
     public void InstantiatePin(int charID, int pinIdx, int tileRow, int tileCol) {
         GameObject pinObj;
-        Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(tileCol, tileRow);
+        Tile targetTile = MapGenerator.Instance.GetTileAt(tileCol, tileRow);
 
         pinObj = Instantiate(idx2PinPrefab[pinIdx], targetTile.GetNextPingLocation() + pin_icon_offset, Quaternion.Euler(0, 180, 0));
         pinObj.transform.SetParent(targetTile.transform);
@@ -137,7 +137,7 @@ public class PinningSystem : MonoBehaviour
         pinList.Add(pin);
         targetTile.pinList.Add(pin);
         pin.locationTile = targetTile;
-        pin.SetPlacingCharacter(IntegratedGameManager.S.inSceneCharacters[charID]);
+        pin.SetPlacingCharacter(GameManager.Instance.inSceneCharacters[charID]);
         pinObj.transform.localScale = new Vector3(4f, 4f, 4f);
         
         ClosePinWheel();

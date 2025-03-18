@@ -22,7 +22,7 @@ public class IntegratedGame1Interface : HMTInterface {
 
     private bool InGame {
         get {
-            return IntegratedGameManager.S != null;
+            return GameManager.Instance != null;
         }
     }
 
@@ -45,10 +45,10 @@ public class IntegratedGame1Interface : HMTInterface {
         if (InGame) {
             /// The GetReady state is used both for first time intialization but also tranditions between levels.
             /// Rather than telling the agent to try agian later, we can just wait for things to be ready.
-            while (IntegratedGameManager.S.gameStatus == GameConstant.GameStatus.LevelStart || IntegratedGameManager.S.gameStatus == GameConstant.GameStatus.LevelEnd) {
+            while (GameManager.Instance.gameStatus == GameConstant.GameStatus.LevelStart || GameManager.Instance.gameStatus == GameConstant.GameStatus.LevelEnd) {
                 yield return null;
             }
-            switch (IntegratedGameManager.S.gameStatus) {
+            switch (GameManager.Instance.gameStatus) {
                 case GameConstant.GameStatus.LevelStart:
                     command.SendErrorResponse("Game or level is intializing, try again later.", 1002);
                     break;
@@ -71,8 +71,8 @@ public class IntegratedGame1Interface : HMTInterface {
                 case GameConstant.GameStatus.Player_Planning:
                     break;
                 default:
-                    Debug.LogWarningFormat("Execute Action called in Unknown Game State {0}", IntegratedGameManager.S.gameStatus);
-                    command.SendErrorResponse(string.Format("Game in Unknown Phase: {0}", IntegratedGameManager.S.gameStatus), 9000);
+                    Debug.LogWarningFormat("Execute Action called in Unknown Game State {0}", GameManager.Instance.gameStatus);
+                    command.SendErrorResponse(string.Format("Game in Unknown Phase: {0}", GameManager.Instance.gameStatus), 9000);
                     yield break;
             }
         }
@@ -122,7 +122,7 @@ public class IntegratedGame1Interface : HMTInterface {
             yield return null;
         }
         Debug.Log("Waited to be InGame");
-        while(IntegratedGameManager.S.gameStatus == GameConstant.GameStatus.LevelStart) {
+        while(GameManager.Instance.gameStatus == GameConstant.GameStatus.LevelStart) {
             yield return null;
         }
         Debug.Log("Waited to be Ready");
@@ -132,8 +132,8 @@ public class IntegratedGame1Interface : HMTInterface {
     }
 
     public override string GetState(Command command) {
-        IntegratedMapGenerator map = IntegratedMapGenerator.Instance;
-        IntegratedGameManager gameManager = IntegratedGameManager.S;
+        MapGenerator map = MapGenerator.Instance;
+        GameManager gameManager = GameManager.Instance;
 
         Character target = GetTargetCharacter(command.target);
         if (target == null) {
@@ -147,7 +147,7 @@ public class IntegratedGame1Interface : HMTInterface {
             {"boardHeight", map.Map.GetLength(1)},
             {"currLevel", gameManager.currentLevel },
             {"currentPhase", gameManager.gameStatus.ToString() },
-            {"timer", IntegratedGameManager.S.TimeRemaining.ToString() }
+            {"timer", GameManager.Instance.TimeRemaining.ToString() }
         };
 
         JArray scene = new JArray();
@@ -213,8 +213,8 @@ public class IntegratedGame1Interface : HMTInterface {
     }
 
     public string GetFullState(Command command) {
-        IntegratedMapGenerator map = IntegratedMapGenerator.Instance;
-        IntegratedGameManager gameManager = IntegratedGameManager.S;
+        MapGenerator map = MapGenerator.Instance;
+        GameManager gameManager = GameManager.Instance;
 
         JObject ret = new JObject();
         ret["gameData"] = new JObject {
@@ -223,7 +223,7 @@ public class IntegratedGame1Interface : HMTInterface {
             {"currLevel", gameManager.currentLevel },
             {"currRound", gameManager.CurrentRound },
             {"currentPhase", gameManager.gameStatus.ToString() },
-            {"timer", IntegratedGameManager.S.TimeRemaining.ToString() }
+            {"timer", GameManager.Instance.TimeRemaining.ToString() }
         };
 
         JArray scene = new JArray();
@@ -264,8 +264,8 @@ public class IntegratedGame1Interface : HMTInterface {
     }
 
     public string GetFOWState(Command command) {
-        IntegratedMapGenerator map = IntegratedMapGenerator.Instance;
-        IntegratedGameManager gameManager = IntegratedGameManager.S;
+        MapGenerator map = MapGenerator.Instance;
+        GameManager gameManager = GameManager.Instance;
 
         Character target = GetTargetCharacter(command.target);
         if (target == null) {
@@ -279,7 +279,7 @@ public class IntegratedGame1Interface : HMTInterface {
             {"boardHeight", map.Map.GetLength(1)},
             {"currLevel", gameManager.currentLevel },
             {"currentPhase", gameManager.gameStatus.ToString() },
-            {"timer", IntegratedGameManager.S.TimeRemaining.ToString() }
+            {"timer", GameManager.Instance.TimeRemaining.ToString() }
         };
 
         JArray scene = new JArray();
@@ -354,7 +354,7 @@ public class IntegratedGame1Interface : HMTInterface {
     }
 
     public override IEnumerator ExecuteAction(Command command) {
-        IntegratedGameManager manager = IntegratedGameManager.S;
+        GameManager manager = GameManager.Instance;
         switch (manager.gameStatus) {  
             case GameConstant.GameStatus.Player_Pinning:
                 yield return ExecuteActionInPinning(command);
@@ -381,11 +381,11 @@ public class IntegratedGame1Interface : HMTInterface {
     private Character GetTargetCharacter(string target) {
         switch (target.ToLower()) {
             case "giant":
-                return IntegratedGameManager.S.inSceneCharacters[giantID];
+                return GameManager.Instance.inSceneCharacters[giantID];
             case "human":
-                return IntegratedGameManager.S.inSceneCharacters[humanID];
+                return GameManager.Instance.inSceneCharacters[humanID];
             case "dwarf":
-                return IntegratedGameManager.S.inSceneCharacters[dwarfID];
+                return GameManager.Instance.inSceneCharacters[dwarfID];
             default:
                 return null;
         }
@@ -447,7 +447,7 @@ public class IntegratedGame1Interface : HMTInterface {
             yield break;
         }
 
-        IntegratedGameManager manager = IntegratedGameManager.S;
+        GameManager manager = GameManager.Instance;
         JObject inputs;
         switch (action.ToLower()){
             case "pinga":
@@ -482,7 +482,7 @@ public class IntegratedGame1Interface : HMTInterface {
                     pos.y = (int)inputs["y"];
                 }
 
-                if (!IntegratedMapGenerator.Instance.InMap(pos)) {
+                if (!MapGenerator.Instance.InMap(pos)) {
                     command.SendIllegalActionResponse(string.Format("Attempting to pin outside of map {0}, {1}", pos.x, pos.y),2001);
                     yield break;
                 }
@@ -512,7 +512,7 @@ public class IntegratedGame1Interface : HMTInterface {
                 }
                 else {
                     Vector2Int move = Vector2FromString(action);
-                    if (IntegratedMapGenerator.Instance.InMap(target.currentTile.GridPosition + target.pingCursor + move)) {
+                    if (MapGenerator.Instance.InMap(target.currentTile.GridPosition + target.pingCursor + move)) {
                         NetworkMiddleware.S.CallMovePingCursorOnCharacter(target.CharacterId, DirectionFromString(action));
                         command.SendOKResponse("Ping Cursor Moved");
                     }
@@ -540,7 +540,7 @@ public class IntegratedGame1Interface : HMTInterface {
 
     private IEnumerator ExecuteActionInPlanning(Command command) {
         string action = command.json["action"].ToString();
-        IntegratedGameManager manager = IntegratedGameManager.S;
+        GameManager manager = GameManager.Instance;
         Character target = GetTargetCharacter(command.target);
         if (target == null) {
             command.SendErrorResponse(string.Format("Unknown HMT Target {0}. Make sure the targets are configured correctly in the Inspector", command.target), 9002);

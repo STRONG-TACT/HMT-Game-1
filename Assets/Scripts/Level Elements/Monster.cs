@@ -318,7 +318,7 @@ public class Monster : MonoBehaviour
     }
 
     public void Kill() {
-        Kill(IntegratedGameManager.S.excecutionStepTime);
+        Kill(GameManager.Instance.excecutionStepTime);
     }
 
     public void Kill(float stepTime) {
@@ -347,7 +347,7 @@ public class Monster : MonoBehaviour
 
     public IEnumerator Retreat()
     {
-        yield return StartCoroutine(moveToTargetLocation(prevMovePointPos, IntegratedGameManager.S.excecutionStepTime));
+        yield return StartCoroutine(moveToTargetLocation(prevMovePointPos, GameManager.Instance.excecutionStepTime));
         movePoint = prevMovePointPos;
     }
 

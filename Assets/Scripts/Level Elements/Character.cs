@@ -212,8 +212,8 @@ public class Character : MonoBehaviour {
     public void FocusCharacter() {
         //MaskControl(true);
         Focused = true;
-        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
-        if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Planning) {
+        MapGenerator.Instance.UpdateFOWVisuals();
+        if (GameManager.Instance.gameStatus == GameStatus.Player_Planning) {
             indicator.SetActive(true);
             foreach (GameObject one_path_indicator in path_indicator_list) {
                 one_path_indicator.SetActive(true);
@@ -266,7 +266,7 @@ public class Character : MonoBehaviour {
                 _ => Vector2Int.zero
             };
 
-            if (IntegratedMapGenerator.Instance.InMap(currentTile.GridPosition + pingCursor + movement)) {
+            if (MapGenerator.Instance.InMap(currentTile.GridPosition + pingCursor + movement)) {
                 pingCursor += movement;
             }
         }
@@ -526,7 +526,7 @@ public class Character : MonoBehaviour {
             model.rotation = targetRotation;
         }
 
-        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+        MapGenerator.Instance.UpdateFOWVisuals();
 
         State = CharacterState.Idle;
         moving = false;
@@ -542,8 +542,8 @@ public class Character : MonoBehaviour {
 
     public IEnumerator Retreat()
     {
-        yield return StartCoroutine(moveToTargetLocation(prevMovePointPos, IntegratedGameManager.S.excecutionStepTime));
-        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+        yield return StartCoroutine(moveToTargetLocation(prevMovePointPos, GameManager.Instance.excecutionStepTime));
+        MapGenerator.Instance.UpdateFOWVisuals();
         movePoint = prevMovePointPos;
     }
 
@@ -557,12 +557,12 @@ public class Character : MonoBehaviour {
             case "Goal":
                 Shrine shrine = col.gameObject.GetComponent<Shrine>();
                 if (shrine != null && shrine.CheckShrineType(this)) {
-                    IntegratedGameManager.S.ShrineReached(CharacterId);
+                    GameManager.Instance.ShrineReached(CharacterId);
                 }
                 break;
 
             case "Door":
-                IntegratedGameManager.S.CheckGoalReached(CharacterId);
+                GameManager.Instance.CheckGoalReached(CharacterId);
                 break;
         }
     }
@@ -572,7 +572,7 @@ public class Character : MonoBehaviour {
     #region Death and Respawn
     public void TakeDamage(int damageAmount = 1) {
         Health -= damageAmount;
-        if(IntegratedGameManager.S.gameStatus == GameStatus.Player_Moving) {
+        if(GameManager.Instance.gameStatus == GameStatus.Player_Moving) {
             ResetPlan();
         }
         //Debug.Log(string.Format("Character {0} health: {1}", config.characterName, health));
@@ -592,7 +592,7 @@ public class Character : MonoBehaviour {
      */ 
     
     public void Die() {
-        if (IntegratedGameManager.S.gameStatus == GameStatus.Player_Moving) {
+        if (GameManager.Instance.gameStatus == GameStatus.Player_Moving) {
             transform.position = prevMovePointPos;
         }
         State = CharacterState.Die;
@@ -601,7 +601,7 @@ public class Character : MonoBehaviour {
         dead = true;
         respawnCountdown = GameData.S.RespawnDelay+1;
         ResetPlan();
-        IntegratedGameManager.S.CharacterDied(CharacterId);
+        GameManager.Instance.CharacterDied(CharacterId);
         UIManager.S.UpdateDeathCounterPanel();
 
         CompetitionMiddleware.Instance.LogPlayerDeath(CharacterId, currentTile.col, currentTile.row);
@@ -618,7 +618,7 @@ public class Character : MonoBehaviour {
         //movePoint = startPos;
         //prevMovePointPos = movePoint;
 
-        IntegratedGameManager.S.characterDied[CharacterId] = true;
+        GameManager.Instance.characterDied[CharacterId] = true;
     }
     
     public void RespawnCheck() {
@@ -634,7 +634,7 @@ public class Character : MonoBehaviour {
                // transform.position = startPos;
                // transform.rotation = Quaternion.identity;
                 //TODO this might need to wait a beat for collision checks
-                IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+                MapGenerator.Instance.UpdateFOWVisuals();
 
                 //Manually turn on the animator and renderer of the character
                 Animator[] char_animators = this.GetComponentsInChildren<Animator>(true);

@@ -65,7 +65,7 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     public bool LogSystemEvents {
         get {
-            return PhotonNetwork.IsMasterClient || (IntegratedGameManager.S != null && !IntegratedGameManager.S.isNetworkGame);
+            return PhotonNetwork.IsMasterClient || (GameManager.Instance != null && !GameManager.Instance.isNetworkGame);
         }
     }
 
@@ -316,11 +316,11 @@ public class CompetitionMiddleware : MonoBehaviour {
     private JObject GenerateContext() {
         //this is a placeholder for now
         //include the run_id in here eventually
-        if(IntegratedGameManager.S == null || IntegratedMapGenerator.Instance == null) {
+        if(GameManager.Instance == null || MapGenerator.Instance == null) {
             return null;
         }
         int shrinesCount = 0;
-        foreach( Shrine shrine in IntegratedGameManager.S.InSceneShrines)
+        foreach( Shrine shrine in GameManager.Instance.InSceneShrines)
         {
             if(shrine.Reached)
             {
@@ -331,7 +331,7 @@ public class CompetitionMiddleware : MonoBehaviour {
             {"level", currLevel },
             {"round", currRound },
             {"phase", currPhase },
-            {"timer", IntegratedGameManager.S.TimeRemaining },
+            {"timer", GameManager.Instance.TimeRemaining },
             //{"shrineCount", IntegratedGameManager.S.goalCount }
             {"shrineCount", shrinesCount}
         };
@@ -343,18 +343,18 @@ public class CompetitionMiddleware : MonoBehaviour {
 
         JArray challenges = new JArray();
         JArray shrines = new JArray();
-        JArray characters = new JArray ( IntegratedGameManager.S.inSceneCharacters.Select(c => c.HMTStateRep(Character.StateRepLevel.Full)).ToArray() );
+        JArray characters = new JArray ( GameManager.Instance.inSceneCharacters.Select(c => c.HMTStateRep(Character.StateRepLevel.Full)).ToArray() );
 
-        for (int y = IntegratedMapGenerator.Instance.Map.GetLength(1) - 1; y >= 0; y--) {
-            if(y < IntegratedMapGenerator.Instance.Map.GetLength(1) - 1) {
+        for (int y = MapGenerator.Instance.Map.GetLength(1) - 1; y >= 0; y--) {
+            if(y < MapGenerator.Instance.Map.GetLength(1) - 1) {
                 maplayout += "\n";
                 dwarf_map += "\n";
                 giant_map += "\n";
                 human_map += "\n";
             }
-            for (int x = 0; x < IntegratedMapGenerator.Instance.Map.GetLength(0); x++) {
+            for (int x = 0; x < MapGenerator.Instance.Map.GetLength(0); x++) {
             
-                Tile tile = IntegratedMapGenerator.Instance.GetTileAt(x, y);
+                Tile tile = MapGenerator.Instance.GetTileAt(x, y);
                 maplayout += tile.ObjKey;
                 dwarf_map += tile.fogOfWarDictionary[0].ToString()[0];
                 giant_map += tile.fogOfWarDictionary[1].ToString()[0];
@@ -597,20 +597,20 @@ public class CompetitionMiddleware : MonoBehaviour {
         // make a system to convert from characterId to character name based on IntegratedGameManager
         if (RegisteredAgents.ContainsKey(characterId)) {
             CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
-                3000, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "submit", null, true);
+                3000, GameManager.Instance.inSceneCharacters[characterId].config.characterName, "submit", null, true);
         }
         else {
-            CallLogEvent(3000, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "submit", null, true);
+            CallLogEvent(3000, GameManager.Instance.inSceneCharacters[characterId].config.characterName, "submit", null, true);
         }
     }
 
     public void LogTimeOut(int characterId) {
         if (RegisteredAgents.ContainsKey(characterId)) {
             CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
-                3001, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "action_timeout", null, true);
+                3001, GameManager.Instance.inSceneCharacters[characterId].config.characterName, "action_timeout", null, true);
         }
         else {
-            CallLogEvent(3001, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "action_timeout", null, true);
+            CallLogEvent(3001, GameManager.Instance.inSceneCharacters[characterId].config.characterName, "action_timeout", null, true);
         }
     }
 
@@ -618,13 +618,13 @@ public class CompetitionMiddleware : MonoBehaviour {
     public void LogPlacePin(int characterId, int pinTypeIdx, int x, int y) {
         if (RegisteredAgents.ContainsKey(characterId)) {
             CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
-                3100, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "place_pin",
+                3100, GameManager.Instance.inSceneCharacters[characterId].config.characterName, "place_pin",
                 new JObject { { "x", x }, { "y", y }, { "type", PinningSystem.PinIndxToPinType(pinTypeIdx) } },
                 true);
         }
         else {
             CallLogEvent(3100,
-                IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName,
+                GameManager.Instance.inSceneCharacters[characterId].config.characterName,
                 "place_pin",
                 new JObject { { "x", x }, { "y", y }, { "type", PinningSystem.PinIndxToPinType(pinTypeIdx) } },
                 true);
@@ -632,28 +632,28 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
     public void LogAddPlan(int characterId, Character.Direction direct) {
-        IList<Character.Direction> resultPlan = IntegratedGameManager.S.inSceneCharacters[characterId].ActionPlan;
+        IList<Character.Direction> resultPlan = GameManager.Instance.inSceneCharacters[characterId].ActionPlan;
         if (RegisteredAgents.ContainsKey(characterId)) {
             CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
-                3101, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "edit_plan",
+                3101, GameManager.Instance.inSceneCharacters[characterId].config.characterName, "edit_plan",
                 new JObject { { "edit", direct.ToString()}, { "result_plan", new JArray(resultPlan) } }, true);
         }
         else {
-            CallLogEvent(3101, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "edit_plan",
+            CallLogEvent(3101, GameManager.Instance.inSceneCharacters[characterId].config.characterName, "edit_plan",
                 new JObject { { "edit", direct.ToString() },{ "result_plan", new JArray(resultPlan) } },
                 true);
         }
     }
 
     public void LogUndoPlan(int characterId) {
-        IList<Character.Direction> resultPlan = IntegratedGameManager.S.inSceneCharacters[characterId].ActionPlan;
+        IList<Character.Direction> resultPlan = GameManager.Instance.inSceneCharacters[characterId].ActionPlan;
         if (RegisteredAgents.ContainsKey(characterId)) {
             CallLogEvent(RegisteredAgents[characterId].agentID, RegisteredAgents[characterId].sessionID,
-                3101, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "edit_plan",
+                3101, GameManager.Instance.inSceneCharacters[characterId].config.characterName, "edit_plan",
                 new JObject { { "edit", "undo" }, { "result_plan", new JArray(resultPlan) } }, true);
         }
         else {
-            CallLogEvent(3101, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "edit_plan",
+            CallLogEvent(3101, GameManager.Instance.inSceneCharacters[characterId].config.characterName, "edit_plan",
                 new JObject { { "edit", "undo" }, { "result_plan", new JArray(resultPlan) } }, true);
         }
     }
@@ -668,7 +668,7 @@ public class CompetitionMiddleware : MonoBehaviour {
                                     Combat.Dice selfDie, Combat.Dice partner1, Combat.Dice partner2, Combat.Dice challenge) {
 
 
-        CallLogEvent(3102, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "inspect_challenge",
+        CallLogEvent(3102, GameManager.Instance.inSceneCharacters[characterId].config.characterName, "inspect_challenge",
             new JObject {
                 { "x", x }, { "y", y },
                 { "challenge_type", challengeType },
@@ -681,7 +681,7 @@ public class CompetitionMiddleware : MonoBehaviour {
     }
 
     public void LogChangeCharacter(int newCharacterId) {
-        CallLogEvent(3103, IntegratedGameManager.S.inSceneCharacters[newCharacterId].config.characterName, "change_character", null, true);
+        CallLogEvent(3103, GameManager.Instance.inSceneCharacters[newCharacterId].config.characterName, "change_character", null, true);
     }
 
     public void LogForfeit(int characterId) {
@@ -691,7 +691,7 @@ public class CompetitionMiddleware : MonoBehaviour {
         //                       3104, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "forfeit", null, true);
         //}
         //else {
-            CallLogEvent(3099, IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName, "forfeit", null, true);
+            CallLogEvent(3099, GameManager.Instance.inSceneCharacters[characterId].config.characterName, "forfeit", null, true);
         //}
     }
 
@@ -701,7 +701,7 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     public void LogPlayerSpawn(int characterId, int x, int y) {
         if (!LogSystemEvents) return;
-        string character = IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName;
+        string character = GameManager.Instance.inSceneCharacters[characterId].config.characterName;
         CallLogEvent(4001, character, "player_spawn",
             new JObject { { "x", x }, { "y", y } },
             true);
@@ -709,7 +709,7 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     public void LogPlayerDeath(int characterId, int x, int y) {
         if (!LogSystemEvents) return;
-        string character = IntegratedGameManager.S.inSceneCharacters[characterId].config.characterName;
+        string character = GameManager.Instance.inSceneCharacters[characterId].config.characterName;
         CallLogEvent(4002, character, "player_death",
             new JObject { { "x", x }, { "y", y } },
             true);
@@ -742,20 +742,20 @@ public class CompetitionMiddleware : MonoBehaviour {
             new JObject {
                 {"dwarf", 
                     new JObject {
-                        { "done", IntegratedGameManager.S.inSceneCharacters[0].ActionPlan.Count == 0 },
-                        { "move", IntegratedGameManager.S.inSceneCharacters[0].ActionPlan.Count > 0 ? IntegratedGameManager.S.inSceneCharacters[0].ActionPlan[0].ToString() : "none" },
+                        { "done", GameManager.Instance.inSceneCharacters[0].ActionPlan.Count == 0 },
+                        { "move", GameManager.Instance.inSceneCharacters[0].ActionPlan.Count > 0 ? GameManager.Instance.inSceneCharacters[0].ActionPlan[0].ToString() : "none" },
                     }
                 },
                 {"giant", 
                     new JObject {
-                        { "done", IntegratedGameManager.S.inSceneCharacters[1].ActionPlan.Count == 0 },
-                        { "move", IntegratedGameManager.S.inSceneCharacters[1].ActionPlan.Count > 0 ? IntegratedGameManager.S.inSceneCharacters[1].ActionPlan[0].ToString() : "none" },
+                        { "done", GameManager.Instance.inSceneCharacters[1].ActionPlan.Count == 0 },
+                        { "move", GameManager.Instance.inSceneCharacters[1].ActionPlan.Count > 0 ? GameManager.Instance.inSceneCharacters[1].ActionPlan[0].ToString() : "none" },
                     }
                 },
                 {"human", 
                     new JObject {
-                        { "done", IntegratedGameManager.S.inSceneCharacters[2].ActionPlan.Count == 0 },
-                        { "move", IntegratedGameManager.S.inSceneCharacters[2].ActionPlan.Count > 0 ? IntegratedGameManager.S.inSceneCharacters[2].ActionPlan[0].ToString() : "none" },
+                        { "done", GameManager.Instance.inSceneCharacters[2].ActionPlan.Count == 0 },
+                        { "move", GameManager.Instance.inSceneCharacters[2].ActionPlan.Count > 0 ? GameManager.Instance.inSceneCharacters[2].ActionPlan[0].ToString() : "none" },
                     }
                 }
             }, true);
@@ -764,7 +764,7 @@ public class CompetitionMiddleware : MonoBehaviour {
     public void LogMonsterMoveStep(IList<Monster> monsters) {
         if (!LogSystemEvents) return;
         JObject job = new JObject();
-        foreach(Monster monster in IntegratedGameManager.S.inSceneMonsters) {
+        foreach(Monster monster in GameManager.Instance.inSceneMonsters) {
             job[monster.ObjKey] = new JObject {
                             { "done", monster.MovesLeftThisTurn == 0 },
                             { "move", monster.NextMove().ToString() }
@@ -795,21 +795,21 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     public void LogClearShrine(int characterID, int x, int y) {
         if (!LogSystemEvents) return;
-        CallLogEvent(4102, IntegratedGameManager.S.inSceneCharacters[characterID].config.characterName, "clear_shrine",
+        CallLogEvent(4102, GameManager.Instance.inSceneCharacters[characterID].config.characterName, "clear_shrine",
             new JObject { { "x", x }, { "y", y } },
             true);
     }
 
     public void LogRevokeShrine(int characterID, int x, int y) {
         if (!LogSystemEvents) return;
-        CallLogEvent(4103, IntegratedGameManager.S.inSceneCharacters[characterID].config.characterName, "revoke_shrine",
+        CallLogEvent(4103, GameManager.Instance.inSceneCharacters[characterID].config.characterName, "revoke_shrine",
             new JObject { { "x", x }, { "y", y } },
             true);
     }
 
     public void LogClearGoal(int characterID, int x, int y) {
         if (!LogSystemEvents) return;
-        CallLogEvent(4104, IntegratedGameManager.S.inSceneCharacters[characterID].config.characterName, "clear_goal",
+        CallLogEvent(4104, GameManager.Instance.inSceneCharacters[characterID].config.characterName, "clear_goal",
             new JObject { { "x", x }, { "y", y } },
             true);
     }

@@ -7,7 +7,7 @@ using System.Linq;
 using Photon.Pun;
 using Random = UnityEngine.Random;
 
-public class IntegratedGameManager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     //public enum GameStatus { GetReady, Player_Pinning, Player_Planning, Player_Moving, Monster_Moving, GameEnd }
 
@@ -62,12 +62,12 @@ public class IntegratedGameManager : MonoBehaviour
     public List<Character> inSceneCharacters = new List<Character>();
     public List<Monster> inSceneMonsters = new List<Monster>();
 
-    public static IntegratedGameManager S;
+    public static GameManager Instance;
     public float excecutionStepTime = 1;
 
     protected virtual void Awake() {
-        if (S) Destroy(this);
-        else S = this;
+        if (Instance) Destroy(this);
+        else Instance = this;
     }
 
     // Called by map generator to update characters' position at the beginning of the currLevel.
@@ -128,7 +128,7 @@ public class IntegratedGameManager : MonoBehaviour
 
     public virtual IEnumerator StartLevel() {
         InSceneShrines = new List<Shrine> { null, null, null }; 
-        IntegratedMapGenerator.Instance.LoadLevel(gameData.levelTextFiles[currentLevel - 1]);
+        MapGenerator.Instance.LoadLevel(gameData.levelTextFiles[currentLevel - 1]);
 
         gameStatus = GameStatus.LevelStart;
         CurrentRound = 0;
@@ -154,7 +154,7 @@ public class IntegratedGameManager : MonoBehaviour
     public virtual void StartPlayerTurn()
     {
         //Debug.Log("Goal Count at start of level: " + goalCount.ToString());
-        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+        MapGenerator.Instance.UpdateFOWVisuals();
         CurrentRound += 1;
 
         foreach (Character chara in inSceneCharacters)
@@ -420,7 +420,7 @@ public class IntegratedGameManager : MonoBehaviour
 
             foreach (Vector2Int loc in conflicts.Keys) {
                 if (conflicts[loc].Count > 1 ) {
-                    Tile t = IntegratedMapGenerator.Instance.GetTileAt(loc);
+                    Tile t = MapGenerator.Instance.GetTileAt(loc);
                     if (t != null && t.IsOccupiedByPlayer) {
                         continue;
                     }
@@ -522,7 +522,7 @@ public class IntegratedGameManager : MonoBehaviour
                 int startCol = currentTile.col;
                 bool foundSpot = false;
                 //move monster to nearest avaiable tile where there is no character and no other monster on it
-                for (int distance = 1; distance < Math.Max(IntegratedMapGenerator.Instance.Map.GetLength(0), IntegratedMapGenerator.Instance.Map.GetLength(1)); distance++)
+                for (int distance = 1; distance < Math.Max(MapGenerator.Instance.Map.GetLength(0), MapGenerator.Instance.Map.GetLength(1)); distance++)
                 {
                     if (!foundSpot)
                     {
@@ -534,9 +534,9 @@ public class IntegratedGameManager : MonoBehaviour
                                 {
                                     int targetRow = startRow;
                                     int targetCol = startCol + colOffset;
-                                    if (IntegratedMapGenerator.Instance.InMap(targetRow, targetCol))
+                                    if (MapGenerator.Instance.InMap(targetRow, targetCol))
                                     {
-                                        Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(targetRow, targetCol);
+                                        Tile targetTile = MapGenerator.Instance.GetTileAt(targetRow, targetCol);
                                         if (targetTile.tileType == Tile.ObstacleType.None && !targetTile.IsOccupied)
                                         {
                                             availablePos.Add(targetTile);
@@ -549,9 +549,9 @@ public class IntegratedGameManager : MonoBehaviour
                                 {
                                     int targetRow = startRow + rowOffset;
                                     int targetCol = startCol;
-                                    if (IntegratedMapGenerator.Instance.InMap(targetRow, targetCol))
+                                    if (MapGenerator.Instance.InMap(targetRow, targetCol))
                                     {
-                                        Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(targetRow, targetCol);
+                                        Tile targetTile = MapGenerator.Instance.GetTileAt(targetRow, targetCol);
                                         if (targetTile.tileType == Tile.ObstacleType.None && !targetTile.IsOccupied)
                                         {
                                             availablePos.Add(targetTile);
@@ -566,9 +566,9 @@ public class IntegratedGameManager : MonoBehaviour
                                     {
                                         int targetRow = startRow + rowOffset;
                                         int targetCol = startCol + colOffset;
-                                        if (IntegratedMapGenerator.Instance.InMap(targetRow, targetCol))
+                                        if (MapGenerator.Instance.InMap(targetRow, targetCol))
                                         {
-                                            Tile targetTile = IntegratedMapGenerator.Instance.GetTileAt(targetRow, targetCol);
+                                            Tile targetTile = MapGenerator.Instance.GetTileAt(targetRow, targetCol);
                                             if (targetTile.tileType == Tile.ObstacleType.None && !targetTile.IsOccupied)
                                             {
                                                 availablePos.Add(targetTile);
@@ -686,12 +686,12 @@ public class IntegratedGameManager : MonoBehaviour
                         break;
                     case Combat.FightType.Trap:
                     case Combat.FightType.Rock:
-                        IntegratedMapGenerator.Instance.ClearTile(t.col, t.row);
+                        MapGenerator.Instance.ClearTile(t.col, t.row);
                         break;
                 }
 
                 //problem -> need to fix
-                IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+                MapGenerator.Instance.UpdateFOWVisuals();
             }
             else {
                 // If not, reduce health except rock
@@ -721,7 +721,7 @@ public class IntegratedGameManager : MonoBehaviour
                         foreach(Character chara in t.CharacterList) {
                             chara.TakeDamage();
                         }
-                        IntegratedMapGenerator.Instance.ClearTile(t.col, t.row);
+                        MapGenerator.Instance.ClearTile(t.col, t.row);
                         break;
                     case Tile.ObstacleType.Rock:
                         foreach (Character c in t.CharacterList) {
@@ -742,7 +742,7 @@ public class IntegratedGameManager : MonoBehaviour
                         }
                         break;
                 }
-                IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+                MapGenerator.Instance.UpdateFOWVisuals();
             }
 
             //TODO this should probably be waiting for a button click in the future.
@@ -827,7 +827,7 @@ public class IntegratedGameManager : MonoBehaviour
     public virtual void CharacterDied(int charaID) {
         UIManager.S.UpdateCharacterLifeStatus(charaID, false);
         UIManager.S.UpdateCommonHUD();
-        IntegratedMapGenerator.Instance.UpdateFOWVisuals();
+        MapGenerator.Instance.UpdateFOWVisuals();
         CheckLoseCondition();
     }
 
@@ -863,7 +863,7 @@ public class IntegratedGameManager : MonoBehaviour
         bool onDoor = false;
         Character doorCharacter = null;
         foreach (Character character in inSceneCharacters) {
-            if(character.currentTile == IntegratedMapGenerator.Instance.DoorTile) {
+            if(character.currentTile == MapGenerator.Instance.DoorTile) {
                 onDoor = true;
                 doorCharacter = character;
                 break;
@@ -871,7 +871,7 @@ public class IntegratedGameManager : MonoBehaviour
         }
 
         if (shrinesReached && onDoor) {
-            CompetitionMiddleware.Instance.LogClearGoal(doorCharacter.CharacterId, IntegratedMapGenerator.Instance.DoorTile.col, IntegratedMapGenerator.Instance.DoorTile.row);
+            CompetitionMiddleware.Instance.LogClearGoal(doorCharacter.CharacterId, MapGenerator.Instance.DoorTile.col, MapGenerator.Instance.DoorTile.row);
             if (isNetworkGame && PhotonNetwork.IsMasterClient) LogLevelResult();
             StopAllCoroutines();
             StartCoroutine(PrepareForNextLevel());
