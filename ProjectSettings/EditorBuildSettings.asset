@@ -5,55 +5,19 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: Assets/Scenes/Tutorial.unity
-    guid: fbbbb674333a8c5489eb926cecf9ad61
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: Assets/Scenes/Game.unity
-    guid: f1327528c32d423448726f8f1abf3088
-  - enabled: 0
-    path: Assets/Scenes/EndGame.unity
-    guid: ef4a9b25b8337904fab862bc8fe3682c
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
   - enabled: 1
-    path: Assets/Scenes/Networked/Lobby_n.unity
+    path: Assets/Scenes/Root Scenes/Lobby.unity
     guid: 04e438f7d0ca140828ed4c5568a36b9b
   - enabled: 1
-    path: Assets/Scenes/Networked/Room_n.unity
-    guid: ffb66163f056d49d9bcca1e1d4b84f38
-  - enabled: 1
-    path: Assets/Scenes/LocalGame/Local_Animated.unity
+    path: Assets/Scenes/LocalGame/LocalGamePlay.unity
     guid: 528f45a96ee793547b710d072bd61fb9
+  - enabled: 1
+    path: Assets/Scenes/Networked/NetworkWaitingRoom.unity
+    guid: ffb66163f056d49d9bcca1e1d4b84f38
   - enabled: 1
     path: Assets/Scenes/Networked/NetworkGamePlay.unity
     guid: c75ce17acfd8d4f71aa5d2848dafb58c
   - enabled: 1
-    path: Assets/Scenes/Networked/Survey_scene.unity
+    path: Assets/Scenes/Root Scenes/EndGameSurvey.unity
     guid: 4561c1b730e65ba42934479d97dc3938
   m_configObjects: {}
