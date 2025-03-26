@@ -236,8 +236,8 @@ namespace HMT {
         }
 
         protected override void OnClose(CloseEventArgs e) {
-            if (UIManager.S) { 
-                UIManager.S.ShowOtherPlayerDisconnectUI("AI");
+            if (UIManager.Instance) { 
+                UIManager.Instance.ShowOtherPlayerDisconnectUI("AI");
             }
             Debug.Log("[HMTInterface] Cliend Disconnected.");
         }
