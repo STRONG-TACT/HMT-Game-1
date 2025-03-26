@@ -97,7 +97,7 @@ public class GameManager : MonoBehaviour
 #if HMT_BUILD
         if (isNetworkGame) {
             if (CompetitionMiddleware.Instance.overrideAIMode) {
-                localChar = inSceneCharacters[NetworkMiddleware.S.myCharacterID];
+                localChar = inSceneCharacters[NetworkMiddleware.Instance.myCharacterID];
             }
             else {
                 localChar = inSceneCharacters[0]; // AI Agent's just assume the focus character is dwarf because they don't actually need it.
