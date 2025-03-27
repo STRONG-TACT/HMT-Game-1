@@ -14,7 +14,8 @@ jobs:
 
       - name: Activate Unity License (macOS)
         run: |
-          echo ${{ secrets.UNITY_SERIAL }} | sudo tee /Unity/license.ulf
+          mkdir -p "$HOME/Library/Unity/License"
+          echo ${{ secrets.UNITY_SERIAL }} | tee "$HOME/Library/Unity/License/Unity_v2020.x.ulf" > /dev/null
         env:
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
 
@@ -50,7 +51,8 @@ jobs:
 
       - name: Activate Unity License (Windows)
         run: |
-          echo ${{ secrets.UNITY_SERIAL }} | sudo tee /Unity/license.ulf
+          mkdir -p "$HOME/AppData/Local/Unity/Editor"
+          echo ${{ secrets.UNITY_SERIAL }} | tee "$HOME/AppData/Local/Unity/Editor/Unity_v2020.x.ulf" > /dev/null
         env:
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
 
@@ -86,7 +88,8 @@ jobs:
 
       - name: Activate Unity License (WebGL)
         run: |
-          echo ${{ secrets.UNITY_SERIAL }} | sudo tee /Unity/license.ulf
+          mkdir -p "$HOME/.local/share/unity3d/Unity/License"
+          echo ${{ secrets.UNITY_SERIAL }} | tee "$HOME/.local/share/unity3d/Unity/License/Unity_v2020.x.ulf" > /dev/null
         env:
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
 
