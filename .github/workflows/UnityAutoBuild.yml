@@ -12,19 +12,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check UNITY_LICENSE secret (Mac)
+        run: echo "UNITY_LICENSE secret is set"
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+
+      - name: Save Unity License File
+        run: echo "${{ secrets.UNITY_LICENSE }}" > $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
+        shell: bash
+
       - name: Cache Library Folder
         uses: actions/cache@v3
         with:
-          path: Library/
-          key: Library-macOS-${{ runner.os }}-${{ github.sha }}
+          path: Library
+          key: Library-macOS-${{ github.sha }}
           restore-keys: |
-            Library-macOS-${{ runner.os }}-
-
-      - name: Activate Unity Education License
-        run: |
-          # Ensure Unity license is activated
-          mkdir -p ~/.local/share/unity3d/Unity
-          echo "${{ secrets.UNITY_LICENSE }}" > ~/.local/share/unity3d/Unity/Unity_lic.ulf
+            Library-macOS-
 
       - name: Build macOS
         uses: game-ci/unity-builder@v4
@@ -38,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: MacBuild
-          path: build/StandaloneOSX/
+          path: build/StandaloneOSX
 
   build-windows:
     name: Build for Windows
@@ -48,19 +51,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check UNITY_LICENSE secret (Windows)
+        run: echo "UNITY_LICENSE secret is set"
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+
+      - name: Save Unity License File (Windows)
+        run: echo "${{ secrets.UNITY_LICENSE }}" > $env:APPDATA\Unity\Unity_lic.ulf
+        shell: powershell
+
       - name: Cache Library Folder
         uses: actions/cache@v3
         with:
-          path: Library/
-          key: Library-Windows-${{ runner.os }}-${{ github.sha }}
+          path: Library
+          key: Library-Windows-${{ github.sha }}
           restore-keys: |
-            Library-Windows-${{ runner.os }}-
-
-      - name: Activate Unity Education License
-        run: |
-          # Ensure Unity license is activated
-          mkdir -p $HOME/AppData/Roaming/Unity
-          echo "${{ secrets.UNITY_LICENSE }}" > $HOME/AppData/Roaming/Unity/Unity_lic.ulf
+            Library-Windows-
 
       - name: Build Windows
         uses: game-ci/unity-builder@v4
@@ -74,7 +80,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WindowsBuild
-          path: build/StandaloneWindows64/
+          path: build/StandaloneWindows64
 
   build-webgl:
     name: Build for WebGL
@@ -84,19 +90,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check UNITY_LICENSE secret (WebGL)
+        run: echo "UNITY_LICENSE secret is set"
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+
+      - name: Save Unity License File
+        run: echo "${{ secrets.UNITY_LICENSE }}" > $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
+        shell: bash
+
       - name: Cache Library Folder
         uses: actions/cache@v3
         with:
-          path: Library/
-          key: Library-WebGL-${{ runner.os }}-${{ github.sha }}
+          path: Library
+          key: Library-WebGL-${{ github.sha }}
           restore-keys: |
-            Library-WebGL-${{ runner.os }}-
-
-      - name: Activate Unity Education License
-        run: |
-          # Ensure Unity license is activated
-          mkdir -p ~/.local/share/unity3d/Unity
-          echo "${{ secrets.UNITY_LICENSE }}" > ~/.local/share/unity3d/Unity/Unity_lic.ulf
+            Library-WebGL-
 
       - name: Build WebGL
         uses: game-ci/unity-builder@v4
@@ -110,4 +119,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WebGLBuild
-          path: build/WebGL/
+          path: build/WebGL
