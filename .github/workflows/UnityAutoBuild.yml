@@ -12,13 +12,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Activate Unity License (Mac)
+      - name: Activate Unity License (macOS)
         run: |
-          echo "Activating Unity with Serial..."
-          mkdir -p $HOME/.local/share/unity3d/Unity
-          echo "Serial:${{ secrets.UNITY_SERIAL }}" > $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
-          cat $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
-        shell: bash
+          echo ${{ secrets.UNITY_SERIAL }} | sudo tee /Unity/license.ulf
+        env:
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
 
       - name: Cache Library Folder
         uses: actions/cache@v3
@@ -52,11 +50,9 @@ jobs:
 
       - name: Activate Unity License (Windows)
         run: |
-          echo "Activating Unity with Serial..."
-          mkdir -p $env:APPDATA\Unity
-          echo "Serial:${{ secrets.UNITY_SERIAL }}" > $env:APPDATA\Unity\Unity_lic.ulf
-          cat $env:APPDATA\Unity\Unity_lic.ulf
-        shell: powershell
+          echo ${{ secrets.UNITY_SERIAL }} | sudo tee /Unity/license.ulf
+        env:
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
 
       - name: Cache Library Folder
         uses: actions/cache@v3
@@ -90,11 +86,9 @@ jobs:
 
       - name: Activate Unity License (WebGL)
         run: |
-          echo "Activating Unity with Serial..."
-          mkdir -p $HOME/.local/share/unity3d/Unity
-          echo "Serial:${{ secrets.UNITY_SERIAL }}" > $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
-          cat $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
-        shell: bash
+          echo ${{ secrets.UNITY_SERIAL }} | sudo tee /Unity/license.ulf
+        env:
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
 
       - name: Cache Library Folder
         uses: actions/cache@v3
