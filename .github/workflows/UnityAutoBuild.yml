@@ -20,6 +20,12 @@ jobs:
           restore-keys: |
             Library-macOS-${{ runner.os }}-
 
+      - name: Activate Unity Education License
+        run: |
+          # Ensure Unity license is activated
+          mkdir -p ~/.local/share/unity3d/Unity
+          echo "${{ secrets.UNITY_LICENSE }}" > ~/.local/share/unity3d/Unity/Unity_lic.ulf
+
       - name: Build macOS
         uses: game-ci/unity-builder@v4
         with:
@@ -32,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: MacBuild
-          path: build/StandaloneOSX
+          path: build/StandaloneOSX/
 
   build-windows:
     name: Build for Windows
@@ -50,6 +56,12 @@ jobs:
           restore-keys: |
             Library-Windows-${{ runner.os }}-
 
+      - name: Activate Unity Education License
+        run: |
+          # Ensure Unity license is activated
+          mkdir -p $HOME/AppData/Roaming/Unity
+          echo "${{ secrets.UNITY_LICENSE }}" > $HOME/AppData/Roaming/Unity/Unity_lic.ulf
+
       - name: Build Windows
         uses: game-ci/unity-builder@v4
         with:
@@ -62,7 +74,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WindowsBuild
-          path: build/StandaloneWindows64
+          path: build/StandaloneWindows64/
 
   build-webgl:
     name: Build for WebGL
@@ -80,6 +92,12 @@ jobs:
           restore-keys: |
             Library-WebGL-${{ runner.os }}-
 
+      - name: Activate Unity Education License
+        run: |
+          # Ensure Unity license is activated
+          mkdir -p ~/.local/share/unity3d/Unity
+          echo "${{ secrets.UNITY_LICENSE }}" > ~/.local/share/unity3d/Unity/Unity_lic.ulf
+
       - name: Build WebGL
         uses: game-ci/unity-builder@v4
         with:
@@ -92,4 +110,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WebGLBuild
-          path: build/WebGL
+          path: build/WebGL/
