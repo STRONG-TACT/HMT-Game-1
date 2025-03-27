@@ -1,48 +1,98 @@
-name: Actions 😎
+name: Unity Multi-Platform Auto Build
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
 
 jobs:
-  build:
-    name: Build my project ✨
-    runs-on: ubuntu-latest
+  build-mac:
+    name: Build for macOS
+    runs-on: macos-latest
+    if: github.ref == 'refs/heads/AutoBuildTest'
+
     steps:
-      # Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          lfs: true
 
-      # Cache
-      - uses: actions/cache@v3
+      - name: Cache Library Folder
+        uses: actions/cache@v3
         with:
           path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          key: Library-macOS-${{ github.sha }}
           restore-keys: |
-            Library-
+            Library-macOS-
 
-      # Test
-      - name: Run tests
-        uses: game-ci/unity-test-runner@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-
-      # Build
-      - name: Build project
+      - name: Build macOS
         uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          targetPlatform: WebGL
+          unityVersion: 2020.3.32f1
+          targetPlatform: StandaloneOSX
+          buildName: MacBuild
+          buildMethod: AutoBuild.PerformMacBuild
 
-      # Output
-      - uses: actions/upload-artifact@v3
+      - name: Upload macOS Build
+        uses: actions/upload-artifact@v4
         with:
-          name: Build
-          path: build
+          name: MacBuild
+          path: build/StandaloneOSX
+
+  build-windows:
+    name: Build for Windows
+    runs-on: windows-latest
+    if: github.ref == 'refs/heads/AutoBuildTest'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache Library Folder
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-Windows-${{ github.sha }}
+          restore-keys: |
+            Library-Windows-
+
+      - name: Build Windows
+        uses: game-ci/unity-builder@v4
+        with:
+          unityVersion: 2020.3.32f1
+          targetPlatform: StandaloneWindows64
+          buildName: WindowsBuild
+          buildMethod: AutoBuild.PerformWindowsBuild
+
+      - name: Upload Windows Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: WindowsBuild
+          path: build/StandaloneWindows64
+
+  build-webgl:
+    name: Build for WebGL
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/AutoBuildTest'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache Library Folder
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-WebGL-${{ github.sha }}
+          restore-keys: |
+            Library-WebGL-
+
+      - name: Build WebGL
+        uses: game-ci/unity-builder@v4
+        with:
+          unityVersion: 2020.3.32f1
+          targetPlatform: WebGL
+          buildName: WebGLBuild
+          buildMethod: AutoBuild.PerformWebGLBuild
+
+      - name: Upload WebGL Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebGLBuild
+          path: build/WebGL
