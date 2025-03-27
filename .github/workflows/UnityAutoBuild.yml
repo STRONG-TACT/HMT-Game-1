@@ -15,10 +15,10 @@ jobs:
       - name: Cache Library Folder
         uses: actions/cache@v3
         with:
-          path: Library
-          key: Library-macOS-${{ github.sha }}
+          path: Library/
+          key: Library-macOS-${{ runner.os }}-${{ github.sha }}
           restore-keys: |
-            Library-macOS-
+            Library-macOS-${{ runner.os }}-
 
       - name: Build macOS
         uses: game-ci/unity-builder@v4
@@ -45,10 +45,10 @@ jobs:
       - name: Cache Library Folder
         uses: actions/cache@v3
         with:
-          path: Library
-          key: Library-Windows-${{ github.sha }}
+          path: Library/
+          key: Library-Windows-${{ runner.os }}-${{ github.sha }}
           restore-keys: |
-            Library-Windows-
+            Library-Windows-${{ runner.os }}-
 
       - name: Build Windows
         uses: game-ci/unity-builder@v4
@@ -75,10 +75,10 @@ jobs:
       - name: Cache Library Folder
         uses: actions/cache@v3
         with:
-          path: Library
-          key: Library-WebGL-${{ github.sha }}
+          path: Library/
+          key: Library-WebGL-${{ runner.os }}-${{ github.sha }}
           restore-keys: |
-            Library-WebGL-
+            Library-WebGL-${{ runner.os }}-
 
       - name: Build WebGL
         uses: game-ci/unity-builder@v4
