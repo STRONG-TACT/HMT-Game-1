@@ -1564,6 +1564,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2a744c435f888445bb2b78d6df45b63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  path: Screenshots/MultiplayerMode/L3/
+  superSizeScale: 2
+  screenshotKeys: 32010000300100006a000000
 --- !u!1 &524380270
 GameObject:
   m_ObjectHideFlags: 0
@@ -3312,7 +3315,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4acbc126b86cd4df09ac88311de847e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerQuitConnection: 0
 --- !u!4 &1002958558
 Transform:
   m_ObjectHideFlags: 0
@@ -8097,7 +8099,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4543776451520676383, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
       propertyPath: HttpSendLogs
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4543776451520676383, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
       propertyPath: enableLogging
@@ -8105,11 +8107,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4543776451520676383, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
       propertyPath: DebugTraceLogs
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4543776451520676383, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
       propertyPath: overrideAIMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}

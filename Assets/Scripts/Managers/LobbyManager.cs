@@ -44,6 +44,7 @@ public class LobbyManager : MonoBehaviour
     private ArgParser Args = new ArgParser();
     private IEnumerator Start() {
         Args.AddArg("photonroom", ArgParser.ArgType.One);
+        Args.AddArg("tracelogs", ArgParser.ArgType.Flag);
         Args.AddArg("localmode", ArgParser.ArgType.Flag);
         Args.ParseArgs();
 
@@ -55,7 +56,10 @@ public class LobbyManager : MonoBehaviour
         Debug.LogFormat("Starting Autonomous Launch Sequence");
         Debug.LogFormat("photonroom: {0}, localmode: {1}", Args.GetArgValue("photonroom", ""), Args.GetArgValue("localmode",false));
 
-        if(Args.GetArgValue("localmode", false)) {
+
+        CompetitionMiddleware.Instance.DebugTraceLogs = Args.GetArgValue("tracelogs", CompetitionMiddleware.Instance.DebugTraceLogs);
+
+        if(Args.GetArgValue("localmode", true)) {
             Debug.Log("Starting Local Mode");
             LocalTestSelected();
             yield break;
