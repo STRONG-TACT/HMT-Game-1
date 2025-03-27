@@ -12,13 +12,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Activate Unity License (Mac)
+      - name: Activate Unity License (macOS)
         run: |
-          echo "Activating Unity with Serial..."
-          mkdir -p $HOME/.local/share/unity3d/Unity
-          echo "Serial:${{ secrets.UNITY_SERIAL }}" > $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
-          cat $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
-        shell: bash
+          mkdir -p "$HOME/Library/Unity/License"
+          echo ${{ secrets.UNITY_SERIAL }} | tee "$HOME/Library/Unity/License/Unity_v2020.x.ulf" > /dev/null
+        env:
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
 
       - name: Cache Library Folder
         uses: actions/cache@v3
@@ -52,11 +51,10 @@ jobs:
 
       - name: Activate Unity License (Windows)
         run: |
-          echo "Activating Unity with Serial..."
-          mkdir -p $env:APPDATA\Unity
-          echo "Serial:${{ secrets.UNITY_SERIAL }}" > $env:APPDATA\Unity\Unity_lic.ulf
-          cat $env:APPDATA\Unity\Unity_lic.ulf
-        shell: powershell
+          mkdir -p "$HOME/AppData/Local/Unity/Editor"
+          echo ${{ secrets.UNITY_SERIAL }} | tee "$HOME/AppData/Local/Unity/Editor/Unity_v2020.x.ulf" > /dev/null
+        env:
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
 
       - name: Cache Library Folder
         uses: actions/cache@v3
@@ -90,11 +88,10 @@ jobs:
 
       - name: Activate Unity License (WebGL)
         run: |
-          echo "Activating Unity with Serial..."
-          mkdir -p $HOME/.local/share/unity3d/Unity
-          echo "Serial:${{ secrets.UNITY_SERIAL }}" > $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
-          cat $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
-        shell: bash
+          mkdir -p "$HOME/.local/share/unity3d/Unity/License"
+          echo ${{ secrets.UNITY_SERIAL }} | tee "$HOME/.local/share/unity3d/Unity/License/Unity_v2020.x.ulf" > /dev/null
+        env:
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
 
       - name: Cache Library Folder
         uses: actions/cache@v3
