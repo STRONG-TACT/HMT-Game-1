@@ -13,12 +13,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check UNITY_LICENSE secret (Mac)
-        run: echo "UNITY_LICENSE secret is set"
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-
-      - name: Save Unity License File
-        run: echo "${{ secrets.UNITY_LICENSE }}" > $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
+        run: |
+          echo "UNITY_LICENSE secret is set"
+          mkdir -p $HOME/.local/share/unity3d/Unity
+          echo "${{ secrets.UNITY_LICENSE }}" > $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
+          cat $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
         shell: bash
 
       - name: Cache Library Folder
@@ -52,12 +51,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check UNITY_LICENSE secret (Windows)
-        run: echo "UNITY_LICENSE secret is set"
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-
-      - name: Save Unity License File (Windows)
-        run: echo "${{ secrets.UNITY_LICENSE }}" > $env:APPDATA\Unity\Unity_lic.ulf
+        run: |
+          echo "UNITY_LICENSE secret is set"
+          mkdir -p $env:APPDATA\Unity
+          echo "${{ secrets.UNITY_LICENSE }}" > $env:APPDATA\Unity\Unity_lic.ulf
+          cat $env:APPDATA\Unity\Unity_lic.ulf
         shell: powershell
 
       - name: Cache Library Folder
@@ -91,12 +89,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check UNITY_LICENSE secret (WebGL)
-        run: echo "UNITY_LICENSE secret is set"
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-
-      - name: Save Unity License File
-        run: echo "${{ secrets.UNITY_LICENSE }}" > $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
+        run: |
+          echo "UNITY_LICENSE secret is set"
+          mkdir -p $HOME/.local/share/unity3d/Unity
+          echo "${{ secrets.UNITY_LICENSE }}" > $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
+          cat $HOME/.local/share/unity3d/Unity/Unity_lic.ulf
         shell: bash
 
       - name: Cache Library Folder
