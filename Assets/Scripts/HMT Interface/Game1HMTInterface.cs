@@ -27,6 +27,8 @@ public class Game1HMTInterface : HMTInterface {
     // Start is called before the first frame update
     protected override void Start() {
         base.Start();
+        Args.AddArg("reloadonend", ArgParser.ArgType.Flag);
+        Args.ParseArgs();
         SceneManager.activeSceneChanged += OnSceneChange;
     }
 
@@ -52,6 +54,9 @@ public class Game1HMTInterface : HMTInterface {
                     break;
                 case GameConstant.GameStatus.GameEnd:
                     command.SendGameOverResponse("Game Over"); // may want to send more interesting information than this
+                    if(!GameManager.Instance.isNetworkGame && Args.CheckFlag("reloadonend")) {
+                        SceneManager.LoadScene(GameConstant.GlobalConstant.LOBBY_SCENE);
+                    }
                     yield break;
                 case GameConstant.GameStatus.Animation_Pause:
                     command.SendErrorResponse("Game in Deprecated Phase. This shouldn't be possible please report it.", 9001);

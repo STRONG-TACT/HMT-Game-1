@@ -25,6 +25,8 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private GameObject reset_id_UI;
     [SerializeField] private GameObject prompt;
 
+    [SerializeField] private Button onlineModeButton;
+
     [Header("Text Input Fields")] 
     [SerializeField]
     // TODO: This is not TMP_Text, we want TMP_Text
@@ -79,6 +81,11 @@ public class LobbyUI : MonoBehaviour
         DisableAllUI();
         reset_id_UI.SetActive(false);
         gameModeUI.SetActive(true);
+#if !UNITY_WEBGL
+        onlineModeButton.interactable = false;
+#else 
+        onlineModeButton.interactable = true;
+#endif
     }
 
     public void ShowStartSceneUI()
@@ -119,8 +126,14 @@ public class LobbyUI : MonoBehaviour
     }
     public void DisagreeConsent()
     {
+#if UNITY_WEBGL
         DisableAllUI();
         prompt.SetActive(true);
+#else
+        CompetitionMiddleware.Instance.HttpSendLogs = false;
+        //DisableConsentFormUI();
+        ShowStartSceneUI();
+#endif
     }
 
     public void ShowConsentFormUI()

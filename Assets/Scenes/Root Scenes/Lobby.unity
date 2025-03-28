@@ -8037,6 +8037,7 @@ MonoBehaviour:
   ConsentFormUI: {fileID: 1550488656}
   reset_id_UI: {fileID: 1021033485}
   prompt: {fileID: 342523033}
+  onlineModeButton: {fileID: 2109101756}
   roomSelectText: {fileID: 963941247}
   competitionIdText: {fileID: 1689862464}
   competitionIDUIText: {fileID: 1857214400}
@@ -8111,7 +8112,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4543776451520676383, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
       propertyPath: overrideAIMode
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 63e49450c7bbcfe498b6e496b90f0c7f, type: 3}
