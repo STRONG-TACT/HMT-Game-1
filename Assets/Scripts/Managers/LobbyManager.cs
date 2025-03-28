@@ -45,7 +45,6 @@ public class LobbyManager : MonoBehaviour
     private IEnumerator Start() {
         Args.AddArg("photonroom", ArgParser.ArgType.One);
         Args.AddArg("tracelogs", ArgParser.ArgType.Flag);
-        Args.AddArg("localmode", ArgParser.ArgType.Flag);
         Args.AddArg("trainingmode", ArgParser.ArgType.Flag);
         Args.ParseArgs();
 
