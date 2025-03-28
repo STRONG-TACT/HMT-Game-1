@@ -101,6 +101,7 @@ jobs:
       - name: Activate Unity License (WebGL)
         run: |
           mkdir -p "$HOME/.local/share/unity3d/Unity/License"
+          mkdir -p "$HOME/.local/share/unity3d/builds/WebGL"
           echo ${{ secrets.UNITY_SERIAL }} | tee "$HOME/.local/share/unity3d/Unity/License/Unity_v2020.x.ulf" > /dev/null
         env:
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
@@ -131,4 +132,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WebGLBuild
-          path: build/WebGL
+          path: '/github/workspace/build/WebGL'
