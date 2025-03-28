@@ -24,12 +24,14 @@ namespace HMT {
         public string serviceName = "hmt";
         public string[] serviceTargets = new string[0];
 
+        public ArgParser Args = new ArgParser();
+
 #if HMT_BUILD
         internal WebSocketServer server = null;
 
         public ConcurrentQueue<Command> CommandQueue = new ConcurrentQueue<Command>();
 
-        public ArgParser Args = new ArgParser();
+        
 
         // Start is called before the first frame update
         virtual protected void Start() {
