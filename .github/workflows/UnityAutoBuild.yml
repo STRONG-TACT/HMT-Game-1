@@ -17,8 +17,7 @@ jobs:
           mkdir -p "$HOME/Library/Unity/License"
           echo ${{ secrets.UNITY_SERIAL }} | tee "$HOME/Library/Unity/License/Unity_v2020.x.ulf" > /dev/null
           brew install --cask unity-hub
-          /Applications/Unity\Hub.app/Contents/MacOS/Unity\Hub --version
-          /Applications/Unity\Hub.app/Contents/MacOS/Unity\Hub --headless install --version 2020.3.32f1 --module mac-il2cpp --architecture arm64
+          /Applications/Unity Hub.app/Contents/MacOS/Unity Hub --headless install --version 2020.3.32f1 --module mac-il2cpp --architecture arm64
         env:
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
