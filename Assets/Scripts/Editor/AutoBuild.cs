@@ -18,7 +18,7 @@ public static class AutoBuild
 
         public static void PerformWebGLBuild()
         {
-            string buildPath = "build//DiceAdventureWebGL";
+            string buildPath = "build/DiceAdventureWebGL";
             Directory.CreateDirectory(buildPath);
             BuildPipeline.BuildPlayer(EditorBuildSettings.scenes, buildPath, BuildTarget.WebGL, BuildOptions.None);
         }
