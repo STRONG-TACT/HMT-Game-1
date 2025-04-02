@@ -15,7 +15,7 @@ jobs:
       - name: Activate Unity License (macOS)
         run: |
           brew install --cask unity-hub
-          echo 
+          echo /Applications/Unity\ Hub.app/Contents/MacOS/Unity\ Hub -- --headless editors -r
           "/Applications/Unity Hub.app/Contents/MacOS/Unity Hub" --disable-gpu --headless install --version 2020.3.32f1 --changeset 12f8b0834f07 --module mac-il2cpp --architecture arm64
         env:
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
