@@ -38,7 +38,7 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          unityVersion: 2020.3.32f1
+          unityVersion: 2021.3.45f1
           targetPlatform: StandaloneOSX
           buildName: MacBuild
           buildMethod: AutoBuild.PerformMacBuild
