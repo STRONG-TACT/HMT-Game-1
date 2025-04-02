@@ -59,8 +59,7 @@ jobs:
 
       - name: Activate Unity License (Windows)
         run: |
-          mkdir -p "$HOME/AppData/Local/Unity/Editor"
-          echo ${{ secrets.UNITY_SERIAL }} | tee "$HOME/AppData/Local/Unity/Editor/Unity_v2020.x.ulf" > /dev/null
+          mkdir -p "$HOME/AppData/Local/Unity/Editor"          
         env:
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
