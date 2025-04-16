@@ -1534,7 +1534,7 @@ PrefabInstance:
     - target: {fileID: 6070971951046079248, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: levelTextFiles.Array.data[0]
       value: 
-      objectReference: {fileID: 4900000, guid: f6a2467338b934acbbcbbd0ebdd59b26, type: 3}
+      objectReference: {fileID: 4900000, guid: 4dd78d57817c6444eb09fe4c816f645e, type: 3}
     - target: {fileID: 6070971951103539348, guid: 7a56ab4814f3248008a3ec1f6d5a52d2, type: 3}
       propertyPath: m_IsActive
       value: 1
