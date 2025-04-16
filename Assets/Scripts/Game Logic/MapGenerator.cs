@@ -1,12 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class MapGenerator : MonoBehaviour
 {
     public static MapGenerator Instance { get; private set; } = null;
+
+    public List<LevelSpec> levelSpecs = null;
     public GameAssets gameAssets;
     public GameData gameData;
     public Transform tileParent;
@@ -21,12 +24,6 @@ public class MapGenerator : MonoBehaviour
         {"**", "Door" },
         {"##", "Wall" },
         {"..", "Open" },
-        {"1S", "1Spawn" },
-        {"2S", "2Spawn" },
-        {"3S", "3Spawn" },
-        {"1G", "1Goal" },
-        {"2G", "2Goal" },
-        {"3G", "3Goal" },
         {"C1", "1Spawn" },
         {"C2", "2Spawn" },
         {"C3", "3Spawn" },
@@ -42,11 +39,31 @@ public class MapGenerator : MonoBehaviour
         {"R2", "Rock2" },
         {"R3", "Rock3" },
         {"R4", "Rock4" },
-        {"S1", "Rock1" }, //The S in the schema can also stand for stone, though in hindsight R is better
+
+//Everything below here is around for backwards compatibility of old level specs
+        {"1S", "1Spawn" },
+        {"2S", "2Spawn" },
+        {"3S", "3Spawn" },
+        {"1G", "1Goal" },
+        {"2G", "2Goal" },
+        {"3G", "3Goal" },
+        {"S1", "Rock1" },
         {"S2", "Rock2" },
         {"S3", "Rock3" },
         {"S4", "Rock4" },
     };
+
+    /// <summary>
+    /// A simple structure just to hold the split up string of a Level.
+    /// 
+    /// The generator should take this new struct and use it as a means for actually generating the level.
+    /// </summary>
+    public struct LevelSpec {
+        public string name;
+        public string[,] grid;
+        public int width { get { return grid.GetLength(0); } }
+        public int height { get { return grid.GetLength(1); } }
+    }
 
     void Awake()
     {
@@ -144,9 +161,44 @@ public class MapGenerator : MonoBehaviour
 
     public Tile DoorTile { get; private set; }
 
+    public void ParseLevelSpec(TextAsset levelSpecAsset) {
+        ParseLevelSpec(levelSpecAsset.text);
+    }
 
-    public void LoadLevel(TextAsset levelTextFile)
+    public void ParseLevelSpec(IList<TextAsset> levelSpecAssets) {
+        ParseLevelSpec(string.Join("`", levelSpecAssets.Select(l => l.text)));
+    }
+
+    public void ParseLevelSpec(string levelSpecString) {
+        string[] levelBlocks = levelSpecString.Split('`');
+        levelSpecs = new List<LevelSpec>();
+        foreach(string levelBlock in levelBlocks) {
+            string[] lines = levelBlock.Trim().Split('\n');
+
+            LevelSpec spec = new LevelSpec();
+            spec.name = lines[0].Trim();
+            string[] dimensions = lines[1].Split('x');
+            int colCount = int.Parse(dimensions[0]);
+            int rowCount = int.Parse(dimensions[1]);
+
+            spec.grid = new string[colCount, rowCount];
+
+            for (int i = 2; i < lines.Length; i++) {
+                for (int j = 0; j < lines[i].Length; j += 2) {
+                    if (j + 1 < lines[i].Length) // make sure there is a pair of characters
+                    {
+                        spec.grid[j / 2, rowCount - i + 1] = lines[i][j].ToString() + lines[i][j + 1].ToString();
+                    }
+                }
+            }
+
+            levelSpecs.Add(spec);
+        }
+    }
+
+    public void LoadLevel(int indx)
     {
+        LevelSpec levelSpec = levelSpecs[indx];
         while (tileParent.transform.childCount != 0)
         {
             Transform child = tileParent.transform.GetChild(0);
@@ -155,40 +207,56 @@ public class MapGenerator : MonoBehaviour
         }
 
         // Split the file content into lines
-        string[] lines = levelTextFile.text.Split('\n');
+        //string[] lines = levelTextFile.text.Split('\n');
 
-        CurrentLevelName = lines[0].Trim();
+        //CurrentLevelName = lines[0].Trim();
+        CurrentLevelName = levelSpec.name;
 
         CompetitionMiddleware.Instance.LogStartLevel(CurrentLevelName);
-        string[] dimensions = lines[1].Split('x');
-        int colCount = int.Parse(dimensions[0]);
-        int rowCount = int.Parse(dimensions[1]);
+        //string[] dimensions = lines[1].Split('x');
+        //int colCount = int.Parse(dimensions[0]);
+        //int rowCount = int.Parse(dimensions[1]);
 
         //string[,] tileStrings = new string[colCount, rowCount];
 
-        Map = new Tile[colCount, rowCount];
+        Map = new Tile[levelSpec.width, levelSpec.height];
 
 
         // Loop through each line and extract tiles
-        for (int i = 2; i < lines.Length; i++) {
-            for (int j = 0; j < lines[i].Length; j += 2) {
-                if (j + 1 < lines[i].Length) // make sure there is a pair of characters
-                {
+        //for (int i = 2; i < lines.Length; i++) {
+        //    for (int j = 0; j < lines[i].Length; j += 2) {
+        //        if (j + 1 < lines[i].Length) // make sure there is a pair of characters
+        //        {
                     
-                    string tile = lines[i][j].ToString() + lines[i][j + 1].ToString();
-                    //Debug.LogFormat("Adding Tile {0} at {1}, {2}", tile , j / 2, rowCount - i + 1);
-                    Map[  j / 2, rowCount - i + 1] = SpawnTile(rowCount - i + 1, j / 2,  tile);
-                }
+        //            string tile = lines[i][j].ToString() + lines[i][j + 1].ToString();
+        //            //Debug.LogFormat("Adding Tile {0} at {1}, {2}", tile , j / 2, rowCount - i + 1);
+        //            Map[  j / 2, rowCount - i + 1] = SpawnTile(rowCount - i + 1, j / 2,  tile);
+        //        }
+        //    }
+        //}
+
+        for (int i = 0; i < levelSpec.width; i++) {
+            for (int j = 0; j < levelSpec.height; j++) {
+
+                Map[i, j] = SpawnTile(j, i, levelSpec.grid[i,j]);
+
+                //if (j + 1 < lines[i].Length) // make sure there is a pair of characters
+                //{
+
+                //    string tile = lines[i][j].ToString() + lines[i][j + 1].ToString();
+                //    //Debug.LogFormat("Adding Tile {0} at {1}, {2}", tile , j / 2, rowCount - i + 1);
+                //    Map[j / 2, rowCount - i + 1] = SpawnTile(rowCount - i + 1, j / 2, tile);
+                //}
             }
         }
-        
-     
+
+
         // Calculate map width and length
-        float mapWidth = colCount * (gameData.tileSize + gameData.tileGapLength) - gameData.tileGapLength;
-        float mapHeight = rowCount * (gameData.tileSize + gameData.tileGapLength) - gameData.tileGapLength;
+        float mapWidth = levelSpec.width * (gameData.tileSize + gameData.tileGapLength) - gameData.tileGapLength;
+        float mapHeight = levelSpec.height * (gameData.tileSize + gameData.tileGapLength) - gameData.tileGapLength;
         // Calculate the middle point of map width and length
-        float mapWidthMid = (colCount - 1) * (gameData.tileSize + gameData.tileGapLength) / 2;
-        float mapHeightMid = (rowCount - 1) * (gameData.tileSize + gameData.tileGapLength) / 2;
+        float mapWidthMid = (levelSpec.width - 1) * (gameData.tileSize + gameData.tileGapLength) / 2;
+        float mapHeightMid = (levelSpec.height - 1) * (gameData.tileSize + gameData.tileGapLength) / 2;
 
         /*        for (int i = 0; i < rowCount; i++)
                 {
