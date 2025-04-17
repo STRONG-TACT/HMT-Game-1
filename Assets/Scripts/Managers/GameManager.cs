@@ -950,7 +950,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Moving to next currLevel.");
         currentLevel += 1;
 
-        if (currentLevel <= gameData.levelTextFiles.Length) {
+        if (currentLevel <= MapGenerator.Instance.levelSpecs.Count) {
 
             eventQueue.Clear();
             //StopAllCoroutines();
