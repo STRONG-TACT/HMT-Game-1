@@ -51,6 +51,7 @@ The port you should use for the HMTInterface connection. This needs to be unique
 The name of the photon room to join. This will be provided to the flask server by the call to launch_game.\
 - `-trainingmode`: A flag that can be provided to launch the game directly into local multiplayer mode intended for batch training agents without human players. This disables logging and prevents the game from connecting to remote human clients and should only be used for an all agent game.\
 - `-relaodonend`: A flag that sets the game up to loop back to the lobby once the game has finished and sent a GameOver response to an agent call. Useful for continuously training a batch of agents in trainingmode.
+- `-levelSpec` <path to levelSpec file>: Allows for changing the in-built level specification using a single file of new levels.
 - `-tracelogs`: Activate logging to standard debug console.
 - `-batchmode` and `-nographics` are built Unity in flags for [Desktop Headless Mode](https://docs.unity3d.com/Manual/desktop-headless-mode.html) that may be useful to agent training runs
 
