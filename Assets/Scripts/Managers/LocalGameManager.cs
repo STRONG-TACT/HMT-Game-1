@@ -19,14 +19,13 @@ public class LocalGameManager : GameManager
     protected override void Start() {
         base.Start();
         UIManager.Instance.ShowCharacterSwitcher();
-        HMT.ArgParser argParser = new HMT.ArgParser();
 
-        argParser.AddArg("stepTime", HMT.ArgParser.ArgType.One);
-        argParser.AddArg("instanceMode", HMT.ArgParser.ArgType.Flag);
-        argParser.ParseArgs();
+        ArgParser.AddArg("stepTime", HMT.ArgParser.ArgType.One);
+        ArgParser.AddArg("instanceMode", HMT.ArgParser.ArgType.Flag);
+        ArgParser.ParseArgs();
 
-        excecutionStepTime = argParser.GetArgValue("stepTime", excecutionStepTime);
-        if (argParser.CheckFlag("instantMode")) {
+        excecutionStepTime = ArgParser.GetArgValue("stepTime", excecutionStepTime);
+        if (ArgParser.CheckFlag("instantMode")) {
             excecutionStepTime = 0;
         }
     }

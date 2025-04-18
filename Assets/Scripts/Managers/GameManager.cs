@@ -6,6 +6,7 @@ using GameConstant;
 using System.Linq;
 using Photon.Pun;
 using Random = UnityEngine.Random;
+using System.IO;
 
 public class GameManager : MonoBehaviour
 {
@@ -31,6 +32,8 @@ public class GameManager : MonoBehaviour
     public int CombatResultSyncedCount = 0;
 
     private float lastTurnTimerReset = 0;
+
+    protected HMT.ArgParser ArgParser = new HMT.ArgParser();
 
     public bool[] characterDied;
 
@@ -94,6 +97,26 @@ public class GameManager : MonoBehaviour
 
         Debug.LogFormat("NetworkMiddleware.S.myCharacterID = {0}", NetworkMiddleware.Instance.myCharacterID);
 
+        ArgParser.AddArg("levelSpec", HMT.ArgParser.ArgType.One);
+        ArgParser.ParseArgs();
+
+        if (ArgParser.CheckFlag("levelSpec")) {
+            try {
+                StreamReader sr = new StreamReader(ArgParser.GetArgValue("levelSpec"));
+                string levelSpec = sr.ReadToEnd();
+                sr.Close();
+                MapGenerator.Instance.ParseLevelSpec(levelSpec);
+            }
+            catch(Exception e) {
+                Debug.LogError("Problem parsing spec file " + e + " Reverting to in-build levels.");
+                MapGenerator.Instance.levelSpecs = null;
+            }
+        }
+
+        if(MapGenerator.Instance.levelSpecs == null) {
+            MapGenerator.Instance.ParseLevelSpec(gameData.levelTextFiles);
+        }
+
 #if HMT_BUILD
         if (isNetworkGame) {
             if (CompetitionMiddleware.Instance.overrideAIMode) {
@@ -128,7 +151,7 @@ public class GameManager : MonoBehaviour
 
     public virtual IEnumerator StartLevel() {
         InSceneShrines = new List<Shrine> { null, null, null }; 
-        MapGenerator.Instance.LoadLevel(gameData.levelTextFiles[currentLevel - 1]);
+        MapGenerator.Instance.LoadLevel(currentLevel - 1);
 
         gameStatus = GameStatus.LevelStart;
         CurrentRound = 0;
@@ -927,7 +950,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Moving to next currLevel.");
         currentLevel += 1;
 
-        if (currentLevel <= gameData.levelTextFiles.Length) {
+        if (currentLevel <= MapGenerator.Instance.levelSpecs.Count) {
 
             eventQueue.Clear();
             //StopAllCoroutines();
