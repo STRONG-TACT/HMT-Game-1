@@ -1,3 +1,4 @@
+using System;
 using GameConstant;
 using Newtonsoft.Json.Linq;
 using System.Collections;
@@ -73,7 +74,14 @@ public class Character : MonoBehaviour {
     private Transform model;
     private Animator animator;
     private CharacterState characterState;
-    
+
+    private Rigidbody _rb;
+
+    private void Awake()
+    {
+        _rb = GetComponent<Rigidbody>();
+    }
+
     public CharacterState State
     {
         get { return characterState; }
@@ -477,7 +485,8 @@ public class Character : MonoBehaviour {
                 transform.position = Vector3.Lerp(origin, target, t);
                 yield return null;
             }
-            transform.position = target;
+            yield return new WaitForFixedUpdate();
+            _rb.MovePosition(target);
             model.rotation = targetRotation;
         }
         State = CharacterState.Idle;
@@ -522,7 +531,9 @@ public class Character : MonoBehaviour {
                 model.rotation = Quaternion.Slerp(model.rotation, targetRotation, t);
                 yield return null;
             }
-            transform.position = target;
+            // transform.position = target;
+            yield return new WaitForFixedUpdate();
+            _rb.MovePosition(target);
             model.rotation = targetRotation;
         }
 

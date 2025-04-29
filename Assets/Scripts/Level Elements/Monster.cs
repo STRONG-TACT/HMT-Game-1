@@ -1,9 +1,11 @@
+using System;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using GameConstant;
 using System.Linq;
+using Random = UnityEngine.Random;
 
 public class Monster : MonoBehaviour
 {
@@ -53,6 +55,13 @@ public class Monster : MonoBehaviour
 
     private List<Character.Direction> movementPlan = new List<Character.Direction>();
     private bool currentDirection = false;
+
+    private Rigidbody _rb;
+
+    private void Awake()
+    {
+        _rb = GetComponent<Rigidbody>();
+    }
 
     public enum CharacterState
     {
@@ -271,7 +280,8 @@ public class Monster : MonoBehaviour
                 model.rotation = Quaternion.Slerp(model.rotation, targetRotation, t);
                 yield return null;
             }
-            transform.position = target;
+            yield return new WaitForFixedUpdate();
+            _rb.MovePosition(target);
             model.rotation = targetRotation;
             MovesLeftThisTurn -= 1;
             if (MovesLeftThisTurn <= 0) {
@@ -281,7 +291,6 @@ public class Monster : MonoBehaviour
         }
         State = CharacterState.Idle;
         moving = false;
-        yield break;
     }
     
     public IEnumerator moveToTargetLocation(Vector3 target, float stepTime)

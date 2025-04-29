@@ -191,33 +191,6 @@ public class Tile : MonoBehaviour, IComparable<Tile>
             //Debug.Log(mask_character.CharacterId);
             fogOfWarDictionary[mask_character.CharacterId] = FogOfWarState.Visible;
         }
-        
-        /*
-        else if(col.gameObject.tag == "Character")
-        {
-            Character character = col.gameObject.GetComponent<Character>();
-            if (!character.dead)
-            {
-                if (!charaList.Contains(character))
-                {
-                    character.currentTile = this;
-                    charaList.Add(character);
-                }
-            }
-        }
-        else if (col.gameObject.tag == "Monster")
-        {
-            Monster monster = col.gameObject.GetComponent<Monster>();
-            monster.currentTile = this;
-            if (!enemyList.Contains(monster))
-            {
-                monster.currentTile = this;
-                enemyList.Add(monster);
-            }
-        }
-        */
-
-        
     }
 
     private void OnTriggerEnter(Collider col) {
@@ -238,10 +211,10 @@ public class Tile : MonoBehaviour, IComparable<Tile>
                 enemyList.Add(monster);
                 break;
             case "Character":
-                //Debug.Log("A character enters.");
                 Character character = col.gameObject.GetComponent<Character>();
                 character.currentTile = this;
                 charaList.Add(character);
+                //Debug.Log($"Char {character.config.name} entered {gameObject.name}");
                 break;
             default:
                 Debug.LogFormat("Tile Hit Trigger: {0}", col.gameObject.tag);
