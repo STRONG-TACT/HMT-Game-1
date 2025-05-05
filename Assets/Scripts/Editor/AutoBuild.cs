@@ -22,5 +22,17 @@ public static class AutoBuild
             Directory.CreateDirectory(buildPath);
             BuildPipeline.BuildPlayer(EditorBuildSettings.scenes, buildPath, BuildTarget.WebGL, BuildOptions.None);
         }
-    
+
+        public static void PerformLinuxBuild()
+        {
+            string buildPath = "build/StandaloneLinux64/DiceAdventure";
+            Directory.CreateDirectory("build/StandaloneLinux64");
+            BuildPipeline.BuildPlayer(
+                EditorBuildSettings.scenes,
+                buildPath,
+                BuildTarget.StandaloneLinux64,
+                BuildOptions.None
+            );
+        }
+
 }
