@@ -46,10 +46,10 @@ The valid scene order is:
 
 # Launch Parameters
 - `-hmtsocketport` <port number for the HMT API to open on>:
-The port you should use for the HMTInterface connection. This needs to be unique for each instance of the game running on the server and will be managed by the flask environment.\
+The port you should use for the HMTInterface connection. This needs to be unique for each instance of the game running on the server and will be managed by the flask environment.
 - `-photonroom` <the name of the photon room provided by the flask call>: 
-The name of the photon room to join. This will be provided to the flask server by the call to launch_game.\
-- `-trainingmode`: A flag that can be provided to launch the game directly into local multiplayer mode intended for batch training agents without human players. This disables logging and prevents the game from connecting to remote human clients and should only be used for an all agent game.\
+The name of the photon room to join. This will be provided to the flask server by the call to launch_game.
+- `-trainingmode`: A flag that can be provided to launch the game directly into local multiplayer mode intended for batch training agents without human players. This disables logging and prevents the game from connecting to remote human clients and should only be used for an all agent game.
 - `-relaodonend`: A flag that sets the game up to loop back to the lobby once the game has finished and sent a GameOver response to an agent call. Useful for continuously training a batch of agents in trainingmode.
 - `-levelSpec` <path to levelSpec file>: Allows for changing the in-built level specification using a single file of new levels.
 - `-tracelogs`: Activate logging to standard debug console.
