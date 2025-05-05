@@ -102,6 +102,10 @@ jobs:
         run: |
           mkdir -p "$HOME/.local/share/unity3d/Unity/License"
           echo ${{ secrets.UNITY_SERIAL }} | tee "$HOME/.local/share/unity3d/Unity/License/Unity_v2020.x.ulf" > /dev/null
+        env:
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
 
       - name: Cache Library Folder
         uses: actions/cache@v3
@@ -113,6 +117,10 @@ jobs:
 
       - name: Build Linux
         uses: game-ci/unity-builder@v4
+        env:
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           unityVersion: 2020.3.32f1
           targetPlatform: StandaloneLinux64
