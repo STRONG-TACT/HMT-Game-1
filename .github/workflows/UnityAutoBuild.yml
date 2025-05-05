@@ -91,6 +91,40 @@ jobs:
           name: DiceAdventureWindowsBuild
           path: build/StandaloneWindows64
 
+  build-linux:
+    name: Build for Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Activate Unity License (Linux)
+        run: |
+          mkdir -p "$HOME/.local/share/unity3d/Unity/License"
+          echo ${{ secrets.UNITY_SERIAL }} | tee "$HOME/.local/share/unity3d/Unity/License/Unity_v2020.x.ulf" > /dev/null
+
+      - name: Cache Library Folder
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-Linux-${{ github.sha }}
+          restore-keys: |
+            Library-Linux-
+
+      - name: Build Linux
+        uses: game-ci/unity-builder@v4
+        with:
+          unityVersion: 2020.3.32f1
+          targetPlatform: StandaloneLinux64
+          buildName: DiceAdventureLinuxBuild
+          buildMethod: AutoBuild.PerformLinuxBuild
+
+      - name: Upload Linux Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: DiceAdventureLinuxBuild
+          path: build/StandaloneLinux64
+
   build-webgl:
     name: Build for WebGL
     runs-on: ubuntu-latest
