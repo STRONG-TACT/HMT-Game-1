@@ -46,8 +46,7 @@ jobs:
           targetPlatform: StandaloneOSX
           buildName: DiceAdventureMacBuild_${{ inputs.buildTag }}
           buildMethod: AutoBuild.PerformMacBuild
-          versioning: Tag
-
+      
       - name: Upload macOS Build
         uses: actions/upload-artifact@v4
         with:
@@ -89,7 +88,6 @@ jobs:
           targetPlatform: StandaloneWindows64
           buildName: DiceAdventureWindowsBuild_${{ inputs.buildTag }}
           buildMethod: AutoBuild.PerformWindowsBuild
-          versioning: Tag
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v4
@@ -132,7 +130,6 @@ jobs:
           targetPlatform: StandaloneLinux64
           buildName: DiceAdventureLinuxBuild_${{ inputs.buildTag }}
           buildMethod: AutoBuild.PerformLinuxBuild
-          versioning: Tag
 
       - name: Upload Linux Build
         uses: actions/upload-artifact@v4
@@ -177,7 +174,6 @@ jobs:
           targetPlatform: WebGL
           buildName: DiceAdventureWebGLBuild_${{ inputs.buildTag }}
           buildMethod: AutoBuild.PerformWebGLBuild
-          versioning: Tag
 
       - name: Upload WebGL Build
         uses: actions/upload-artifact@v4
