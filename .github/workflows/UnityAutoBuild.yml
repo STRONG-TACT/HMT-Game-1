@@ -2,6 +2,10 @@ name: Unity Multi-Platform Auto Build
 
 on:
   workflow_dispatch:
+    inputs:
+        buildTag:
+          description: 'Provide Build Version'
+          required: true
 
 jobs:
   build-mac:
@@ -40,14 +44,14 @@ jobs:
         with:
           unityVersion: 2021.3.45f1
           targetPlatform: StandaloneOSX
-          buildName: DiceAdventureMacBuild
+          buildName: DiceAdventureMacBuild_${{ inputs.buildTag }}
           buildMethod: AutoBuild.PerformMacBuild
           versioning: Tag
 
       - name: Upload macOS Build
         uses: actions/upload-artifact@v4
         with:
-          name: DiceAdventureMacBuild
+          name: DiceAdventureMacBuild_${{ inputs.buildTag }}
           path: build/StandaloneOSX
 
   build-windows:
@@ -83,14 +87,14 @@ jobs:
         with:
           unityVersion: 2020.3.32f1
           targetPlatform: StandaloneWindows64
-          buildName: DiceAdventureWindowsBuild
+          buildName: DiceAdventureWindowsBuild_${{ inputs.buildTag }}
           buildMethod: AutoBuild.PerformWindowsBuild
           versioning: Tag
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v4
         with:
-          name: DiceAdventureWindowsBuild
+          name: DiceAdventureWindowsBuild_${{ inputs.buildTag }}
           path: build/StandaloneWindows64
 
   build-linux:
@@ -126,14 +130,14 @@ jobs:
         with:
           unityVersion: 2020.3.32f1
           targetPlatform: StandaloneLinux64
-          buildName: DiceAdventureLinuxBuild
+          buildName: DiceAdventureLinuxBuild_${{ inputs.buildTag }}
           buildMethod: AutoBuild.PerformLinuxBuild
           versioning: Tag
 
       - name: Upload Linux Build
         uses: actions/upload-artifact@v4
         with:
-          name: DiceAdventureLinuxBuild
+          name: DiceAdventureLinuxBuild_${{ inputs.buildTag }}
           path: build/StandaloneLinux64
 
   build-webgl:
@@ -171,12 +175,12 @@ jobs:
         with:
           unityVersion: 2020.3.32f1
           targetPlatform: WebGL
-          buildName: DiceAdventureWebGLBuild
+          buildName: DiceAdventureWebGLBuild_${{ inputs.buildTag }}
           buildMethod: AutoBuild.PerformWebGLBuild
           versioning: Tag
 
       - name: Upload WebGL Build
         uses: actions/upload-artifact@v4
         with:
-          name: DiceAdventureWebGLBuild
+          name: DiceAdventureWebGLBuild_${{ inputs.buildTag }}
           path: build/DiceAdventureWebGL
