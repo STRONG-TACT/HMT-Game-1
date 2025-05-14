@@ -485,9 +485,10 @@ public class Character : MonoBehaviour {
                 transform.position = Vector3.Lerp(origin, target, t);
                 yield return null;
             }
-            yield return new WaitForFixedUpdate();
-            _rb.MovePosition(target);
+
+            _rb.position = target;
             model.rotation = targetRotation;
+            yield return new WaitForFixedUpdate();
         }
         State = CharacterState.Idle;
         moving = false;
@@ -532,9 +533,11 @@ public class Character : MonoBehaviour {
                 yield return null;
             }
             // transform.position = target;
-            yield return new WaitForFixedUpdate();
-            _rb.MovePosition(target);
+           
+            _rb.position = target;
             model.rotation = targetRotation;
+
+            yield return new WaitForFixedUpdate();
         }
 
         MapGenerator.Instance.UpdateFOWVisuals();
