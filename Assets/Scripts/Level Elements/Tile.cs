@@ -183,6 +183,14 @@ public class Tile : MonoBehaviour, IComparable<Tile>
         enemyList.Remove(monster);
     }
 
+    public void AddCharacters(List<Character> characters) {
+        foreach (Character character in characters) {
+            if (!charaList.Contains(character)) {
+                charaList.Add(character);
+            }
+        }
+    }
+
     private void OnTriggerStay(Collider col)
     {
         if (col.gameObject.tag == "VisibleMask")

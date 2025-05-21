@@ -832,14 +832,23 @@ public class CompetitionMiddleware : MonoBehaviour {
 
 
     public void LogHMTInterfaceCall(int characterId, HMT.Command command) {
-        if (!RegisteredAgents.ContainsKey(characterId)) {
+        if (RegisteredAgents.ContainsKey(characterId)) {
+            AgentRecord record = RegisteredAgents[characterId];
+            CallLogEvent(record.agentID, record.sessionID, 5001, record.agentID, "hmt_interface_call",
+                new JObject { { "service_target", record.target }, { "command_json", command.json } },
+                true);
+
+            
+        }
+        else {
             Debug.LogErrorFormat("Logger could not find agent record for service target {0}, are you calling Register?", characterId);
+            CallLogEvent("USER-UNKNOWN","SESSION-UNKNOWN",5001, "AGENT-UNKNOWN", "hmt_interface_call",
+                new JObject { { "service_target", characterId }, { "command_json", command.json } },
+                true);
             return;
         }
-        AgentRecord record = RegisteredAgents[characterId];
-        CallLogEvent(record.agentID, record.sessionID, 5001, record.agentID, "hmt_interface_call",
-            new JObject { { "service_target", record.target }, { "command_json", command.json } },
-            true);
+        
+        
     }
 
     #endregion

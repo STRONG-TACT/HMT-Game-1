@@ -147,6 +147,7 @@ public class MapGenerator : MonoBehaviour
         newTile.fogOfWarDictionary = target.fogOfWarDictionary;
         newTile.row = target.row;
         newTile.col = target.col;
+        newTile.AddCharacters(target.CharacterList);
         SetTileAt(x,y,newTile);
         Destroy(target.gameObject);
     }
