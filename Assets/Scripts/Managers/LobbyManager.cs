@@ -20,7 +20,9 @@ public class LobbyManager : MonoBehaviour
     private int _numPerson;
     public List<RoomInfo> ListOfRooms;
 
-    private float _twoHumanChance;
+    private float _chanceOneHuman;
+    private float _chanceTwoHuman;
+    private float _chanceThreeHuman;
     private float _timeoutLimit;
     private bool _matchmakingConfigSet;
     private float _timer;
@@ -34,7 +36,9 @@ public class LobbyManager : MonoBehaviour
         else Instance = this;
 
         _matchmakingConfigSet = false;
-        _twoHumanChance = MatchMakingParameter.TWO_PERSON_GAME_CHANCE;
+        _chanceTwoHuman = MatchMakingParameter.TWO_PERSON_GAME_CHANCE;
+        _chanceOneHuman = MatchMakingParameter.ONE_PERSON_GAME_CHANCE;
+        _chanceThreeHuman = MatchMakingParameter.THREE_PERSON_GAME_CHANCE;
         _timeoutLimit = MatchMakingParameter.TIMEOUT_LIMIT;
     }
 
@@ -150,8 +154,21 @@ public class LobbyManager : MonoBehaviour
         {
             yield return null;
         }
-        
-        _numPerson = (Random.Range(0.0f, 1.0f) < _twoHumanChance) ? 2 : 1;
+
+        float _chanceSum = _chanceOneHuman + _chanceTwoHuman + _chanceThreeHuman;
+        float rand = Random.Range(0.0f, _chanceSum);
+
+        if (rand < _chanceOneHuman) {
+            _numPerson = 1;
+        }
+        else if (rand < _chanceOneHuman + _chanceTwoHuman) {
+            _numPerson = 2;
+        }
+        else {
+            _numPerson = 3;
+        }
+
+        //_numPerson = (Random.Range(0.0f, 1.0f) < _chanceTwoHuman) ? 2 : 1;
         CompetitionMiddleware.Instance.LogAssignCondition(_numPerson+"-human");
         StartCoroutine(JointMatchmakingRoom());
 #endif
@@ -159,18 +176,21 @@ public class LobbyManager : MonoBehaviour
     
     private void OnMatchmakingConfigResponse(JObject response)
     {
-        if (response != null 
-            && response.ContainsKey("two_human_prob") 
-            && response.ContainsKey("timeout_limit"))
+        if (response != null)
         {
-            _twoHumanChance = response["two_human_prob"].ToObject<float>();
-            _timeoutLimit = response["timeout_limit"].ToObject<float>();
+            _chanceOneHuman = response.TryGetDefault("prob_one_human", MatchMakingParameter.ONE_PERSON_GAME_CHANCE);
+            _chanceTwoHuman = response.TryGetDefault("prob_two_human", MatchMakingParameter.TWO_PERSON_GAME_CHANCE);
+            _chanceThreeHuman = response.TryGetDefault("prob_three_human", MatchMakingParameter.THREE_PERSON_GAME_CHANCE);
+            _timeoutLimit = response.TryGetDefault("timeout_limit", MatchMakingParameter.TIMEOUT_LIMIT);
             Debug.Log($"Matchmaking parameter fetched from server with " +
-                      $"two_human_prob: {_twoHumanChance} and timeout limit: {_timeoutLimit}");
+                      $"one_human_prob: {_chanceOneHuman}, " +
+                      $"two_human_prob: {_chanceTwoHuman}, " +
+                      $"three_human_prob: {_chanceThreeHuman}, " +
+                      $"timeout limit: {_timeoutLimit}");
         }
         else
         {
-            Debug.LogWarning("failed to retrieve matchmaking parameter from server, " +
+            Debug.LogError("failed to retrieve matchmaking parameter from server, " +
                            "reverting to built in default one");
         }
 
