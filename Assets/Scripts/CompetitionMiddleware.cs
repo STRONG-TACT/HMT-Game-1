@@ -65,7 +65,8 @@ public class CompetitionMiddleware : MonoBehaviour {
 
     public bool LogSystemEvents {
         get {
-            return PhotonNetwork.IsMasterClient || (GameManager.Instance != null && !GameManager.Instance.isNetworkGame);
+            return true;
+            //return PhotonNetwork.IsMasterClient || (GameManager.Instance != null && !GameManager.Instance.isNetworkGame);
         }
     }
 
@@ -770,6 +771,7 @@ public class CompetitionMiddleware : MonoBehaviour {
                             { "move", monster.NextMove().ToString() }
                         };
         }
+        CallLogEvent(4100, "system", "move_step", job, true);
     }
 
 
