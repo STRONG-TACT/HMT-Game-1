@@ -309,7 +309,7 @@ public class LobbyManager : MonoBehaviour
 
             while (Time.time - startTime < _timer) {
                 //TODO: should actually just use the OnPlayerEnteredRoom Callback
-                if (PhotonNetwork.CurrentRoom.PlayerCount < 2) {
+                if (PhotonNetwork.CurrentRoom.PlayerCount < CompetitionMiddleware.Instance.numPlayer) {
                     yield return null;
                 }
                 else {
@@ -319,9 +319,9 @@ public class LobbyManager : MonoBehaviour
             }
             CompetitionMiddleware.Instance.LogQueueTimeout(_timer);
             // fall back to one person game
-            CompetitionMiddleware.Instance.LogRemoveCondition("2-human");
-            _numPerson = 1;
-            CompetitionMiddleware.Instance.LogAssignCondition("1-human-fallback");
+            //CompetitionMiddleware.Instance.LogRemoveCondition("2-human");
+            _numPerson = PhotonNetwork.CurrentRoom.PlayerCount;
+            CompetitionMiddleware.Instance.LogAssignCondition($"{_numPerson}-human-fallback");
             CompetitionMiddleware.Instance.numPlayer = _numPerson;
             PhotonNetwork.CurrentRoom.IsOpen = true;
             PhotonNetwork.CurrentRoom.IsVisible = false;
