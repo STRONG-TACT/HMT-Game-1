@@ -226,7 +226,7 @@ public class LobbyManager : MonoBehaviour
             foreach (RoomInfo roomInfo in ListOfRooms)
             {
                 object numPlayerProp = roomInfo.CustomProperties[MatchMakingParameter.NUM_PERSON_KEY];
-                if (numPlayerProp is int prop && prop == _numPerson && roomInfo.PlayerCount == 1 && roomInfo.IsVisible)
+                if (numPlayerProp is int prop && prop == _numPerson && roomInfo.PlayerCount == (_numPerson-1) && roomInfo.IsVisible)
                 {
                     Debug.Log($"Two human room found with name {roomInfo.Name}, joining");
                     Matchmaker.Instance.TryJoinRoom(roomInfo.Name);
