@@ -170,6 +170,7 @@ public class LobbyManager : MonoBehaviour
 
         //_numPerson = (Random.Range(0.0f, 1.0f) < _chanceTwoHuman) ? 2 : 1;
         CompetitionMiddleware.Instance.LogAssignCondition(_numPerson+"-human");
+        CompetitionMiddleware.Instance.numPlayer = _numPerson;
         StartCoroutine(JointMatchmakingRoom());
 #endif
     }
@@ -226,7 +227,8 @@ public class LobbyManager : MonoBehaviour
             foreach (RoomInfo roomInfo in ListOfRooms)
             {
                 object numPlayerProp = roomInfo.CustomProperties[MatchMakingParameter.NUM_PERSON_KEY];
-                if (numPlayerProp is int prop && prop == _numPerson && roomInfo.PlayerCount == (_numPerson-1) && roomInfo.IsVisible)
+                Debug.Log($"{roomInfo.PlayerCount}, {(int)numPlayerProp == _numPerson}, {(roomInfo.PlayerCount == _numPerson-2 || roomInfo.PlayerCount == _numPerson-1)}, {roomInfo.IsVisible}");
+                if (numPlayerProp is int prop && prop == _numPerson && (roomInfo.PlayerCount == _numPerson-2 || roomInfo.PlayerCount == _numPerson-1) && roomInfo.IsVisible)
                 {
                     Debug.Log($"Two human room found with name {roomInfo.Name}, joining");
                     Matchmaker.Instance.TryJoinRoom(roomInfo.Name);

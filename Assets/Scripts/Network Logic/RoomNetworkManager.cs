@@ -95,13 +95,33 @@ public class RoomNetworkManager : MonoBehaviourPunCallbacks {
                                 true);
             }
         }
-        else {
+        else
+        {
+            /*yield return new WaitForSeconds(0.5f);
             photonView.RPC("HandshakeSessionIds",
                 RpcTarget.MasterClient,
                 PhotonNetwork.LocalPlayer.ActorNumber,
                 CompetitionMiddleware.Instance.UserID,
                 CompetitionMiddleware.Instance.SessionID,
-                CompetitionMiddleware.Instance.IsAI);
+                CompetitionMiddleware.Instance.IsAI);*/
+
+            while (true)
+            {
+                if (PhotonNetwork.CurrentRoom.PlayerCount < CompetitionMiddleware.Instance.numPlayer)
+                    yield return null;
+                else
+                {
+                    Debug.Log($"sending out HandshakeSessionIds, {PhotonNetwork.CurrentRoom.PlayerCount}, {CompetitionMiddleware.Instance.numPlayer}");
+                    yield return new WaitForSeconds(0.5f);
+                    photonView.RPC("HandshakeSessionIds",
+                        RpcTarget.MasterClient,
+                        PhotonNetwork.LocalPlayer.ActorNumber,
+                        CompetitionMiddleware.Instance.UserID,
+                        CompetitionMiddleware.Instance.SessionID,
+                        CompetitionMiddleware.Instance.IsAI);
+                    yield break;
+                }
+            }
         }
         yield break;
     }
@@ -139,7 +159,7 @@ public class RoomNetworkManager : MonoBehaviourPunCallbacks {
     }*/
 
     [PunRPC]
-    private void HandshakeSessionIds(int actorNumber, string userId, string sessionId, bool isAI) {
+    public void HandshakeSessionIds(int actorNumber, string userId, string sessionId, bool isAI) {
         if (PhotonNetwork.IsMasterClient) {
             Debug.LogFormat("Recieved Session Id Handshake for actor:{0} userId:{1} sessionId:{2} isAI:{3}", actorNumber, userId, sessionId, isAI);
             if (isAI) {
